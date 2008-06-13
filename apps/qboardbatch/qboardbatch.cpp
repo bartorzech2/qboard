@@ -112,6 +112,10 @@ type, so using the default to-string conversion is not recommended.
 #define VERBOSE if( st.verbose ) std::cerr << "VERBOSE: "
 #endif
 
+#ifndef WARNING
+#define WARNING qDebug() << "WARNING: "
+#endif
+
 #ifndef QDEBUG
 #define QDEBUG qDebug() << QString(__FILE__) << ":" << __LINE__ << " : "
 #endif
@@ -276,8 +280,8 @@ namespace QBatch {
 	      var = QVariant( QVariant(vs).toULongLong() );
 	      break;
 	  default:
-	      QDEBUG << "WARNING: using default string-to-variant conversion for ["
-		   <<QString(key.c_str())<<"]=["<<vs<<"]";
+	      WARNING << "using default string-to-variant conversion for ["
+		   << QString(key.c_str())<<"]=["<<vs<<"]";
 	      var = QVariant(vs);
 	      break;
 	}
@@ -393,6 +397,7 @@ namespace QBatch {
 	{
 		VERBOSE << "Setting current item to [board].\n";
 		st.current = &st.gstate.board();
+		//CERR << "pos: L" << ps.pos().line() << " C"<<ps.pos().col() << '\n';
 	}
     };
 
@@ -703,6 +708,16 @@ void try_script( int argc, char ** argv )
 
 int main(int argc, char ** argv)
 {
+#if 0
+    std::string inp("012345\n012345\n\n");
+    Ps::parse_iterator it(inp);
+    for( ; !it.eof(); ++it )
+    {
+	COUT << "CHAR=["<<*it<<"] L"<<it.line()<<" C"<<it.col()<<"\n";
+    }
+    return 0;
+#endif
+
     s11nlite::serializer_class("parens");
     if( 1 == argc )
     {
