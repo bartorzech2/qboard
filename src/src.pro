@@ -7,6 +7,7 @@
 
 include(../config.qmake)
 TEMPLATE = lib
+TARGET = dummy
 VERSION = QBoardDummy
 
 QT += script svg
