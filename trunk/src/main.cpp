@@ -95,8 +95,22 @@ void try_s11n()
 
 #include <QDir>
 #include "utility.h"
+#include <QMessageBox>
+#include <sstream>
 int do_setup()
 {
+#if QT_VERSION < 0x040400
+    std::ostringstream os;
+    os << "Warning: your QBoard was built against Qt 4.3.x. While it will be basically functional, "
+       << "there are known weird behaviours under Qt 4.3 which don't show up in Qt 4.4. For example, "
+       << "most of the application icons simply don't appear under 4.3, and the game board stretches "
+       << "to fit the window, even though it should not.";
+    QMessageBox::warning( 0, "Qt 4.3.x warning", os.str().c_str(),
+			  QMessageBox::Ok, QMessageBox::Ok );
+			  
+#endif
+
+
 	QDir home(qboard::home());
 	QString dirname = home.absolutePath();
 #if 1
