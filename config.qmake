@@ -1,18 +1,42 @@
 ########################################################################
-# This is the main "dynanamic configuration" qmake code for the QBoard
-# project. It is in a separate file for several reasons:
-# 1) QDevelop has problems with all but the most basic qmake constructs.
-# 2) Eventually the tree will be refactored into more modular subdirs,
-#    and this will support that effort.
+# This is the main "dynamic configuration" qmake code for the QBoard
+# project.
 #
-# You must edit the TOP_SRCDIR variable to the top-most directory of
-# your QBoard source tree.
-TOP_SRCDIR=/home/stephan/Projects/QBoard
-!exists($$TOP_SRCDIR) {
-    error("to fix this, edit config.qmake and set the variable TOP_SRCDIR to the \
+# As a normal user, you "shouldn't" have to touch any variables in
+# this file.
+########################################################################
+# Maintainer's notes:
+#
+# This file is unfortunately not usable by .pro-file-based IDEs
+# (e.g. Edyuk and QDevelop) because it uses qmake constructs which (as
+# of this writing) those tools choke on.
+#
+# It is important that all QBoard qmake code not use ANY platform-specific
+# commands (e.g. $$system(date)). While the code is currently untested
+# on Windows, building it there is a priority and using platform-specific
+# constructs make that more difficult. The obligatory exception to this rule
+# is the use of platform scopes provided by qmake, e.g.:
+#
+#  unix { ... }
+#
+# But of course those sections should not contain any code which is
+# necessary for the build process on other platforms.
+#
+# QMake is nice in its own way, but it it very limited it what we can
+# do with it. We do not have the expressive power of Make on Unix
+# platforms. Try and keep that in mind when using/editing this code
+# (remembering it saves some degree of frustration).
+#
+########################################################################
+QBOARD_VERSION = 0 # we need a 0 here. The source will convert this to "SVN" (or similar)
+QBOARD_CONF = config.qmake # THIS file
+TOP_SRCDIR=$$PWD
+!exists($$TOP_SRCDIR/$$QBOARD_CONF) {
+    error("to fix this, edit $$QBOARD_CONF and set the variable TOP_SRCDIR to the \
 	absolute path of the top-most directory of this source tree (the dir \
-	containing .qmake.cache)")
+	containing $$QBOARD_CONF)")
 }
+
 ########################################################################
 # You should need to touch anything after that unless you're a QBoard
 # maintainer.
@@ -28,7 +52,6 @@ REL_SRCDIR=$$replace(REL_SRCDIR,[^/]+,..)
 # Qt -Includes and such don't get added.
 CONFIG += stl warn_on debug_and_release ordered 
 
-QBOARD_VERSION = $$system(date +%Y%m%d)
 # Reminder: i'd rather use %Y.%m.%d as QBOARD_VERSION, but apparently
 # it's impossible to properly escape that to a string from here. i had
 # it working once and qdevelop hosed the quoting when it re-saved
