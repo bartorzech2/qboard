@@ -191,13 +191,15 @@ namespace Ps {
     */
     class parse_iterator : public std::iterator<std::input_iterator_tag,const std::string::value_type>
     {
+    private:
+	static const int start_column = 1;
     public:
 	typedef std::string::const_iterator iterator;
 	/**
 	   Constructs an empty iterator, useful only as the target
 	   of an assignment.
 	*/
-	parse_iterator() : m_beg(), m_pos(), m_end(m_pos)
+	parse_iterator() : m_beg(), m_pos(), m_end(m_pos), m_line(1), m_col(start_column)
 	{}
 	/**
 	   Constructs an iterator for the range [it,end). The string
@@ -206,7 +208,7 @@ namespace Ps {
 	   undefined behaviour results.
 	*/
 	parse_iterator( iterator it, iterator end )
-	    : m_beg(it), m_pos(it), m_end(end)
+	    : m_beg(it), m_pos(it), m_end(end), m_line(1), m_col(start_column)
 	{}
 	/**
 	   Equivalent to the parse_iterator(in.begin(),in.end()).
@@ -217,7 +219,8 @@ namespace Ps {
 	   the string invalidates all iterators.
 	*/
 	explicit parse_iterator( std::string const & in )
-	    : m_beg(in.begin()),m_pos(m_beg), m_end(in.end())
+	    : m_beg(in.begin()),m_pos(m_beg), m_end(in.end()),
+	      m_line(1), m_col(start_column)
 	{}
 
 	/**
@@ -275,9 +278,24 @@ namespace Ps {
 	*/
  	parse_iterator & operator++()
  	{
-	    if( this->m_pos != this->m_end )
+	    if( m_pos != m_end )
 	    {
-		++this->m_pos;
+		if( ++m_pos != m_end )
+		{
+		    if('\n' == *m_pos)
+		    {
+			m_line += 1;
+			m_col = 0;
+		    }
+		    else
+		    {
+			++m_col;
+		    }
+		}
+ 		else
+ 		{
+ 		    ++m_col; // for symmetry with op--
+ 		}
 	    }
  	    return *this;
  	}
@@ -291,8 +309,8 @@ namespace Ps {
 	*/
  	parse_iterator operator++(int)
  	{
-	    return ( this->m_pos != this->m_end )
-		? parse_iterator(this->m_pos++, this->m_end)
+	    return (this->m_pos != this->m_end )
+		? (++(parse_iterator(*this)))
 		: *this;
  	}
 
@@ -305,7 +323,29 @@ namespace Ps {
  	{
 	    if( this->m_pos != this->m_beg )
 	    {
-		--this->m_pos;
+		if( m_beg != --m_pos )
+		{
+		    if('\n' == *m_pos)
+		    {
+			m_line -= 1;
+			m_col = 0;
+			iterator it = m_pos;
+			--it;
+			for( ; it != m_beg; --it )
+			{
+			    ++m_col;
+			    if( '\n' == *it ) break;
+			}
+		    }
+		    else
+		    {
+			--m_col;
+		    }
+		}
+		else
+		{
+		    m_col = 0;
+		}
 	    }
  	    return *this;
  	}
@@ -316,7 +356,7 @@ namespace Ps {
  	parse_iterator operator--(int)
  	{
 	    return ( this->m_pos != this->m_beg )
-		? parse_iterator(this->m_pos--, this->m_end)
+		? (--(parse_iterator(*this)))
 		: *this;
  	}
 
@@ -357,10 +397,29 @@ namespace Ps {
 	    return this->m_pos < rhs.m_pos;
 	}
 
+	/**
+	   Returns the 1-based line number of this iterator. Counting starts
+	   only at the begin iterator this object was initialized with, and is
+	   updated via the ++/-- operators. If an itertor is used on a partial
+	   range of input, the line/col numbers won't reflect those of the
+	   whole input.
+	*/
+	int line() const { return m_line; }
+	/**
+	   Returns the 1-base column number of the input. When (*this == '\n')
+	   then col() actually returns 0, as doing so simplifies the implementation
+	   a good deal and seems to coincide with text editors which use row 1/col 1
+	   as a starting point (as opposed to emacs, which uses row 1/col 0).
+	   See line() for important caveats.
+	*/
+	int col() const { return m_col; }
+
     private:
 	iterator m_beg;
 	iterator m_pos;
 	iterator m_end;
+	int m_line;
+	int m_col;
     };
 
     /***
@@ -599,8 +658,14 @@ namespace Ps {
     private:
 	void calcWhere()
 	{
+	    // these two options actually provide different column numbers:
+#if 0
 	    int line = 1, col = 0;
 	    calc_line_col( m_pos, line, col );
+#else
+	    int line = m_pos.line();
+	    int col = m_pos.col();
+#endif
 	    std::ostringstream os;
 	    os << "[line "<<line<<" col "<<col<<']';
 	    m_where = (os.str());
