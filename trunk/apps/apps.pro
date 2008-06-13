@@ -1,3 +1,3 @@
 TEMPLATE = subdirs
 CONFIG += ordered
-SUBDIRS = s11nobj QBoard qboardbatch
+SUBDIRS = QBoard qboardbatch
