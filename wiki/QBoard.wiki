@@ -19,6 +19,10 @@ as yet unimplemented, and some other things will change significantly.
 
 You can find screenshots over at: http://wanderinghorse.net/gaming/QBoard
 
+Here's one to get you started:
+
+http://wh/gaming/QBoard/thumbs/qboard-20080611-veg.jpg
+
 == Features ==
 
   * A simple interface for quickly setting up and playing a boardgame.
