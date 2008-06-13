@@ -6,8 +6,9 @@
 namespace Ps {
 
     /**
-       StringsForwarder is a Concept type which exists for demonstrating the interface
-       required by the strings<> class.
+       StringsForwarder is a Concept type which exists for
+       demonstrating the interface required by the strings<> class.
+       See StringsForwarderString for a sample implementation.
     */
     template <typename ClientState>
     struct StringsForwarder
@@ -15,7 +16,7 @@ namespace Ps {
 	/**
 	   Signals the start of a read-quoted-string operation.
 	   The client should normally empty any existing string buffer
-	   at this point.
+	   at this point, to prepare for more input.
 	*/
 	void start_string( ClientState & );
 	/**
@@ -41,7 +42,7 @@ namespace Ps {
 	   The client should normally empty any existing string buffer
 	   at this point.
 	*/
-	void start_string( std::string & st )
+	inline void start_string( std::string & st )
 	{
 	    st.clear();
 	}
@@ -49,7 +50,7 @@ namespace Ps {
 	   Signals the appending of one or more chars to a parsed string.
 	   The client should simply append m to his input buffer.
 	*/
-	void append( std::string &st, std::string const & m )
+	inline void append( std::string &st, std::string const & m )
 	{
 	    st += m;
 	}
@@ -58,16 +59,16 @@ namespace Ps {
 	   required to do anything here, but can use this to trigger
 	   actions which are waiting on the end of the string.
 	*/
-	void end_string( std::string & )
+	inline void end_string( std::string & )
 	{
 	}
     };
 
     /**
        Rules for parsing conventional quoted strings (single- or
-       double-quoted). TransFunc must conform to the StringsForwarder
-       interface. It supports common C-style escape sequences in its
-       input.
+       double-quoted). It supports common C-style escape sequences in
+       its input. TransFunc must conform to the StringsForwarder
+       interface.
     */
     template <typename TransFunc>
     struct strings {
@@ -192,19 +193,19 @@ namespace Ps {
        quoted string. It reads from src, which is expected to be
        string data (possibly escaped using C-style escaped) enclosed
        in either single or double quotes. If the parse is successful
+       true is returned. If it fails
+       to parse then false is returned.
+
        tgt is overwritten with the unescaped content of the string
-       (minus the enclosing quotes) and true is returned. If it fails
-       to parse then false is returned and tgt is not modified.
+       (minus the enclosing quotes). In the case of a parse failure,
+       the state of tgt is undefined - it will likely hold the chars
+       of the string up until the point where the parse failed, which
+       might be useful in debugging the problem.
     */
-    bool parse_quoted_string( std::string const & src,
-			      std::string & tgt )
+    inline bool parse_qstring(  std::string const & src, std::string & tgt )
     {
-	std::string ss;
-	typedef strings<StringsForwarderString>::start R;
-	return parse<R>( src, ss )
-	    ? (tgt = ss,true)
-	    : false;
-    };
+	return parse< strings<StringsForwarderString>::start >( src, tgt );
+    }
 
 } // namespaces
 #undef RL
