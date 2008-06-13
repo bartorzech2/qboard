@@ -5,7 +5,7 @@ AboutQBoardImpl::AboutQBoardImpl( QWidget * parent )
 {
 	this->setupUi(this);
 	this->textBrowser->setOpenExternalLinks(true);
-	QString msg = QString("About QBoard v. %1").arg(QBOARD_VERSION);
+	QString msg = QString("About QBoard v. %1").arg(qboard::versionString());
 	this->labelHeader->setText(msg);
 }
 
