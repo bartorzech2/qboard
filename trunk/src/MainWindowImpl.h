@@ -33,6 +33,8 @@ protected:
 	//bool eventFilter(QObject *obj, QEvent *ev);	
 private Q_SLOTS:
 	void chdir(const QDir & dir);
+    void clipboardUpdated();
+    void clearClipboard();
 private:
 	struct Impl;
 	Impl * impl;

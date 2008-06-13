@@ -213,6 +213,11 @@ void QBoardView::mousePressEvent ( QMouseEvent * event )
 	this->QGraphicsView::mousePressEvent(event);
 }
 
+QBoard & QBoardView::board()
+{
+    return m_b;
+}
+
 void QBoardView::dragMoveEvent( QDragMoveEvent * ev )
 {
     ev->ignore();
@@ -230,4 +235,24 @@ void QBoardView::selectAll()
 	sc->setSelectionArea( path, Qt::IntersectsItemShape );
     }
 
+}
+
+#include <QContextMenuEvent>
+#include "MenuHandlerBoard.h"
+void QBoardView::contextMenuEvent( QContextMenuEvent * event )
+{
+//     this->QGraphicsView::contextMenuEvent(event);
+//     return;
+    // i can't believe this is the only way to know if the menu event
+    // needs to be passed to an item!
+    QGraphicsItem * it = this->itemAt( event->pos() );
+    if( ! it )
+    {
+	MenuHandlerBoard mh;
+	mh.doMenu( this, event );
+    }
+    else
+    {
+	this->QGraphicsView::contextMenuEvent(event);
+    }
 }

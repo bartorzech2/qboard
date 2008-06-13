@@ -113,6 +113,7 @@ for(CPP, S11N_SOURCES){
 QBOARD_HEADERS_LIB = \
  $$SRC_DIR/GamePiece.h \
  $$SRC_DIR/GameState.h \
+ $$SRC_DIR/MenuHandlerBoard.h \
  $$SRC_DIR/MenuHandlerGeneric.h \
  $$SRC_DIR/MenuHandlerPiece.h \
  $$SRC_DIR/QBoard.h \
@@ -135,6 +136,7 @@ QBOARD_HEADERS_LIB = \
 QBOARD_SOURCES_LIB = \
  $$SRC_DIR/GamePiece.cpp \
  $$SRC_DIR/GameState.cpp \
+ $$SRC_DIR/MenuHandlerBoard.cpp \
  $$SRC_DIR/MenuHandlerGeneric.cpp \
  $$SRC_DIR/MenuHandlerPiece.cpp \
  $$SRC_DIR/QBoard.cpp \

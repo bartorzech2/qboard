@@ -8,6 +8,7 @@ class QWheelEvent;
 class QMouseEvent;
 class QPainter;
 class QDragMoveEvent;
+class QContextMenuEvent;
 #include "QBoard.h"
 
 class QBoardView : public QGraphicsView
@@ -19,6 +20,10 @@ public:
 	virtual void wheelEvent(QWheelEvent *event);
 	void persistentZoom( qreal );
 	virtual QSize sizeHint () const;
+    /**
+       This object's board. Ownership is not changed.
+    */
+    QBoard & board();
 public Q_SLOTS:
 	void updateBoardPixmap();
 	void zoomOut();
@@ -33,6 +38,8 @@ protected:
 	virtual void drawBackground( QPainter *, const QRectF & );
 	virtual void mousePressEvent ( QMouseEvent * event );
     virtual void dragMoveEvent( QDragMoveEvent * event );
+    virtual void contextMenuEvent( QContextMenuEvent * event );
+
 private:
 	QBoard & m_b;
 	qreal m_scale;

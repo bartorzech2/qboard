@@ -23,6 +23,7 @@
 #include "FileBrowser.h"
 #include "QGILine.h"
 #include "utility.h"
+#include "S11nClipboard.h"
 struct MainWindowImpl::Impl
 {
 	GameState gstate;
@@ -55,6 +56,10 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	connect( this->actionHelp, SIGNAL(triggered(bool)), this, SLOT(launchHelp()) );
 	connect( this->actionClearBoard, SIGNAL(triggered(bool)), this, SLOT(clearBoard()) );
 	connect( this->actionExperiment, SIGNAL(triggered(bool)), this, SLOT(doSomethingExperimental()) );
+	connect( &S11nClipboard::instance(), SIGNAL(signalUpdated()), this, SLOT(clipboardUpdated()) );
+
+	this->actionClearClipboard->setEnabled( 0 != S11nClipboard::instance().contents() );
+	connect( this->actionClearClipboard, SIGNAL(triggered(bool)), this, SLOT( clearClipboard() ) );
 
 #if 1
 	QWidget * cli = this->clientArea;
@@ -101,6 +106,29 @@ MainWindowImpl::~MainWindowImpl()
 {
 	delete impl;
 }
+
+void MainWindowImpl::clearClipboard()
+{
+    delete( S11nClipboard::instance().take() );
+}
+
+void MainWindowImpl::clipboardUpdated()
+{
+    QString msg("Clipboard updated: ");
+    S11nNode const * c = S11nClipboard::instance().contents();
+    if( !c )
+    {
+	msg += "cleared";
+	this->actionClearClipboard->setEnabled( false );
+    }
+    else
+    {
+	msg += QString("type = ")+QString(S11nNodeTraits::class_name(*c).c_str());
+	this->actionClearClipboard->setEnabled( true );
+    }
+    this->statusBar()->showMessage( msg );
+}
+
 
 #include "utility.h"
 void MainWindowImpl::goHome()

@@ -291,7 +291,16 @@ void QGIGamePiece::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 		this->QGraphicsPixmapItem::mousePressEvent(ev);
 		return;
 	}
-	if( ev->buttons() & Qt::LeftButton )
+	else if( ev->buttons() & Qt::RightButton )
+	{
+	    // Weird: if we don't do this, the QGraphicsView
+	    // doesn't know how to keep us selected (if we're selected)
+	    // and also has trouble knowing whether to show a menu
+	    // or not.
+	    // qDebug() <<"QGIGamePiece::mousePressEvent() RMB:"<<ev;
+	    return;
+	}
+	else if( ev->buttons() & Qt::LeftButton )
 	{
 		ev->accept();
 		qreal zV = qboard::nextZLevel(this);
@@ -331,12 +340,14 @@ void QGIGamePiece::mouseReleaseEvent( QGraphicsSceneMouseEvent * ev )
 	}
 }
 
+#include <QGraphicsSceneContextMenuEvent>
+
 void QGIGamePiece::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
 {
-	//this->QGraphicsPixmapItem::contextMenuEvent(event);
 	event->accept();
 	MenuHandlerPiece mh;
 	mh.doMenu( this, event );
+	this->QGraphicsPixmapItem::contextMenuEvent(event);
 }
 void QGIGamePiece::destroyWithPiece()
 {
