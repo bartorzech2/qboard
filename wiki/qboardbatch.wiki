@@ -1,3 +1,5 @@
+#summary The qboardbatch gameset creation tool
+
 = qboardbatch =
 
 qboardbatch (we'll all it qbb for short) is part of the QBoard distribution. It is a command-line tool which reads in a simple batch scripting language for constructing games. Practice has shown that it is often useful to be able to create game data from existing sets of game files, and this tool was created to support that.
