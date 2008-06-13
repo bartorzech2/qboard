@@ -4,7 +4,7 @@ If you would like to contribute, please get in touch:
 
 http://wanderinghorse.net/home/stephan/
 
-Some particular areas i'd like to see _some else_ work are:
+Some particular areas i'd like to see _someone else_ work are:
 
   * Figuring out how to solve the weird bugs which show up in Qt4.3 but not 4.4.
   * A graphics wiz to help add more features to the QGraphicsView-based parts.
