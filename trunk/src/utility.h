@@ -6,9 +6,6 @@
 #include <QDir>
 #include <QColor>
 class QGraphicsItem;
-#ifndef QBOARD_VERSION
-#  define QBOARD_VERSION "Unknown"
-#endif
 
 namespace qboard
 {
@@ -82,6 +79,11 @@ namespace qboard
 		which is left out because it breaks my particular use case.
 	*/
 	QList<QColor> colorList();
+
+    /**
+       Returns the version of QBoard.
+    */
+    const QString versionString();
 
 }
 

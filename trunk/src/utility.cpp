@@ -3,8 +3,44 @@
 #include <QGraphicsScene>
 #include <QDebug>
 #include "QGIGamePiece.h" // a horrible, horrible dependency!
+#include <sstream>
+
+
+/************************************************************************
+The sad, sad story of the QBOARD_VERSION variable...
+
+Ideally, this var would be set by a configure script. However, we can't
+do that cross-platform with qmake. We can pass it as a #define, however.
+But... it is not possible to properly escape/quote the value of a string
+from here. i've seen cases where, e.g. an IDE which saves the .pro
+file will mangle the escaping, breaking the build.
+
+So... the current build process sets QBOARD_VERSION to 0 when we are
+in an svn checkout tree. We convert that 0 to some usable string. If
+QBOARD_VERSION is defined as non-zero then it is used as-is. e.g. in the
+source releases config.qmake is filtered to contain the release version.
+
+************************************************************************/
+
+#if defined(QBOARD_VERSION)
+#  if ! QBOARD_VERSION
+#  undef QBOARD_VERSION
+#  define QBOARD_VERSION "SVN [" __DATE__ " " __TIME__ "]"
+#  endif
+#endif
+
+#if !defined(QBOARD_VERSION)
+#  define QBOARD_VERSION "Unknown"
+#endif
 
 namespace qboard {
+
+    const QString versionString()
+    {
+	// Reminder: we do this .arg() bit so we can use a numeric or string QBOARD_VERSION
+	return QString("%1").arg(QBOARD_VERSION);
+    }
+
 	QDir home()
 	{
 		

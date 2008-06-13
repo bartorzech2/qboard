@@ -44,7 +44,7 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
     impl(new Impl)
 {
 	setupUi(this);
-	this->setWindowTitle( QString("QBoard v. %1").arg(QBOARD_VERSION) );
+	this->setWindowTitle( QString("QBoard v. %1").arg(qboard::versionString()) );
 	connect( this->actionSave, SIGNAL(triggered(bool)), this, SLOT(saveGame()) );
 	connect( this->actionLoad, SIGNAL(triggered(bool)), this, SLOT(loadGame()) );
 	connect( this->actionNewBoardView, SIGNAL(triggered(bool)), this, SLOT(launchNewBoardView()) );
