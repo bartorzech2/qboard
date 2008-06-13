@@ -1,0 +1,38 @@
+#summary Main page
+
+= Welcome to QBoard =
+
+
+QBoard is a UI for playing near-arbitrary board games. It is mainly intended as
+a prototyping platform for testing/playing my own boardgame designs.
+
+QBoard is a "re-imagining" of a much older project of mine called
+[http://qub.sourceforge.net|QUB, the Q Universal Boardgame]. QUB was quite monolithic, and its sheer size eventually caused its downfall. While QBoard originally aimed to be a fairly minimalistic application, Qt makes it pretty easy to just keep adding features, so QBoard already does a lot more than was originally planned.
+
+
+== Status ==
+
+QBoard is very much alpha software. It runs fine, but many features are
+as yet unimplemented, and some other things will change significantly.
+
+== Screenshots ==
+
+You can find screenshots over at: http://wanderinghorse.net/gaming/QBoard
+
+== Features ==
+
+  * A simple interface for quickly setting up and playing a boardgame.
+  * Has powerful and flexible save and load features, making it easy to add load/save support for new data types.
+  * A zoomable, rotatable playing area (game board + pieces).
+  * Full control over game piece background colors, transparency, rotation, and border (color, transparency, size, line style). Finally: translucent game pieces!
+  * Supports an arbitrary number of dockable "minimap" views, all fully interactive and synchronized in real time.
+  * On-board HTML widgets, so you can annotate your game as much as you like.
+  * On-board lines, with customizable colors, line size, and transparency level. Useful for marking movement paths (or histories), firing args, line of sight, and such.
+  * A very simple batch scripting tool for generating game setups (e.g. use shell scripts to generate games using existing graphics files).
+
+== Mis-features and significant TODOs ==
+
+  * Only allows 1 open board per app instance. (QUB used MDI, but this complicated the design significantly.)
+  * Any semblance of network play is a long, long way off, if it ever happens at all.
+
+See also: the TODOs Page (TODO! Port that page from the original repo!)
