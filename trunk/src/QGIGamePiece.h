@@ -9,7 +9,9 @@ class GamePiece;
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QVariant>
+class QGraphicsSceneDragDropEvent;
 #include "QGI.h"
+#include "Serializable.h"
 /**
 	A QGIGamePiece represents the main GUI component of a GamePiece.
 	
@@ -22,12 +24,14 @@ class GamePiece;
 	destructs. If a viewed piece is destroyed, the watching QGIGamePiece will
 	schedule its own destruction using QObject::deleteLater(). 
 */
-class QGIGamePiece : public QObject, public QGraphicsPixmapItem
+class QGIGamePiece : public QObject, public QGraphicsPixmapItem,
+    public Serializable
 {
 Q_OBJECT
 private:
 	QGIGamePiece( QGIGamePiece const & ); // not implemented
 	QGIGamePiece & operator=(QGIGamePiece const &); // not implemented
+    void setup();
 public:
 	/**
 		Points this view at pc. If sc is not null then this
@@ -35,6 +39,11 @@ public:
 		object to sc.
 	*/
 	QGIGamePiece( GamePiece * pc, QGraphicsScene * sc );
+    /**
+       Creates an empty object, useful only as the target of
+       deserialization operations.
+     */
+	QGIGamePiece();
 	virtual ~QGIGamePiece();
 	/**
 		Points this object at pc.
@@ -56,6 +65,10 @@ public:
 	void updatePiecePos( bool onlyIfNotSet );
 	virtual int type() const { return QGITypes::GamePiece; }
 	virtual bool event( QEvent * e );
+
+    virtual bool serialize( S11nNode & dest ) const;
+    virtual bool deserialize( S11nNode const & src );
+
 public Q_SLOTS:
 	/** Uses QObject::deleteLater() to delete this object and the underlying GamePiece. */
 	void destroyWithPiece();
@@ -67,6 +80,7 @@ protected:
 	virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent * event );
 	virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
 
+    virtual void dragMoveEvent( QGraphicsSceneDragDropEvent * event );
 private Q_SLOTS:
 	/** Catches GamePiece::::piecePropertySet(). */
 	void piecePropertySet( char const * );
@@ -84,5 +98,11 @@ private:
 	struct Impl;
 	Impl * impl;
 };
+
+// Register QGIGamePiece with s11n:
+#define S11N_TYPE QGIGamePiece
+#define S11N_BASE_TYPE Serializable
+#define S11N_TYPE_NAME "QGIGamePiece"
+#include <s11n.net/s11n/reg_s11n_traits.hpp>
 
 #endif // __QGIGAMEPIECE_H__

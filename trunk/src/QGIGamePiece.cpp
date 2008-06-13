@@ -30,15 +30,32 @@ struct QGIGamePiece::Impl
 
 #include <QGraphicsScene>
 QGIGamePiece::QGIGamePiece(GamePiece * pc, QGraphicsScene * sc )
-	: QGraphicsPixmapItem(),
-		m_pc(0),
-		impl(new QGIGamePiece::Impl)
+    : QObject(),
+      QGraphicsPixmapItem(),
+      Serializable("QGIGamePiece"),
+      m_pc(0),
+      impl(new QGIGamePiece::Impl)
 {
-	this->setFlag(QGraphicsItem::ItemIsMovable, true);
-	this->setFlag(QGraphicsItem::ItemIsSelectable, true);
-	this->setPiece( pc );
-	this->setShapeMode( QGraphicsPixmapItem::BoundingRectShape );
-	sc->addItem(this);
+    this->setup();
+    this->setPiece(pc);
+    if( sc ) sc->addItem( this );
+}
+
+QGIGamePiece::QGIGamePiece()
+    : QObject(),
+      QGraphicsPixmapItem(),
+      Serializable("QGIGamePiece"),
+      m_pc(0),
+      impl( new QGIGamePiece::Impl )
+{
+    this->setup();
+}
+
+void QGIGamePiece::setup()
+{
+    this->setFlag(QGraphicsItem::ItemIsMovable, true);
+    this->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    this->setShapeMode( QGraphicsPixmapItem::BoundingRectShape );
 }
 
 QGIGamePiece::~QGIGamePiece()
@@ -407,4 +424,25 @@ void QGIGamePiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * o
 	}
 	// Let parent draw selection borders and such:
 	this->QGraphicsPixmapItem::paint(painter,option,widget);
+}
+
+#include <QGraphicsSceneDragDropEvent>
+void QGIGamePiece::dragMoveEvent( QGraphicsSceneDragDropEvent * event )
+{
+    this->ensureVisible();
+    qDebug() << "QGIGamePiece::dragMoveEvent() pos="<<event->pos();
+    this->QGraphicsPixmapItem::dragMoveEvent(event);
+}
+
+
+bool QGIGamePiece::serialize( S11nNode & dest ) const
+{
+    if( (!m_pc) || ! this->Serializable::serialize( dest ) ) return false;
+    return s11nlite::serialize_subnode<GamePiece>( dest, "piece", *m_pc );
+}
+bool QGIGamePiece::deserialize( S11nNode const & src )
+{
+    if( ! this->Serializable::deserialize( src ) ) return false;
+    this->setPiece( new GamePiece );
+    return s11nlite::deserialize_subnode<GamePiece>( src, "piece", *m_pc );
 }

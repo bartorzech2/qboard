@@ -15,6 +15,7 @@
 #include "S11nClipboard.h"
 
 
+
 struct MenuHandlerPiece::Impl
 {
 	QGraphicsScene * scene; 
@@ -63,6 +64,13 @@ void MenuHandlerPiece::doMenu( QGIGamePiece * pv, QGraphicsSceneContextMenuEvent
 	{
 		mBrd->addMenu( PiecePropertyMenu::makeIntListMenu("Size",pv,"borderSize",0,8) );
 	}
+#if 1
+	m->addSeparator();
+	MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( pv, m );
+	m->addAction(QIcon(":/QBoard/icon/editcopy.png"),"Copy",clipper,SLOT(clipboardCopy()) );
+	m->addAction(QIcon(":/QBoard/icon/editcut.png"),"Cut",clipper,SLOT(clipboardCut()) );
+#endif
+
 	m->exec( ev->screenPos() );
 	delete m;
 }

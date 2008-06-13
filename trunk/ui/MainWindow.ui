@@ -65,11 +65,13 @@
    </widget>
    <widget class="QMenu" name="menuEdit" >
     <property name="enabled" >
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="title" >
      <string>Edit</string>
     </property>
+    <addaction name="actionSelectAll" />
+    <addaction name="separator" />
     <addaction name="actionCopy" />
     <addaction name="actionCut" />
     <addaction name="actionPaste" />
@@ -229,6 +231,9 @@
    </property>
   </action>
   <action name="actionPaste" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
    <property name="icon" >
     <iconset>
      <normalon>:/QBoard/icon/editpaste.png</normalon>
@@ -242,6 +247,9 @@
    </property>
   </action>
   <action name="actionClearClipboard" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
    <property name="icon" >
     <iconset>
      <normalon>:/QBoard/icon/editshred.png</normalon>
@@ -483,6 +491,17 @@
    </property>
    <property name="text" >
     <string>Add &amp;Line item</string>
+   </property>
+  </action>
+  <action name="actionSelectAll" >
+   <property name="enabled" >
+    <bool>true</bool>
+   </property>
+   <property name="text" >
+    <string>Select &amp;all</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+A</string>
    </property>
   </action>
  </widget>
