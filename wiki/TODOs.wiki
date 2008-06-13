@@ -1,3 +1,5 @@
+#summary notable TODOs
+
 Notable TODOs, in no particular order:
 
   *  Copy/paste. The copy/cut support works, but paste is trickier because the target of the paste has to accommodate multiple types of Serializables and/or QGraphicsItems types.
