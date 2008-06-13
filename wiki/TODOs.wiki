@@ -1,7 +1,7 @@
 Bugs specific to Qt 4.3.0-4.3.5: 
 
   *  Most of the app icons don't appear! i can't explain why, nor find a pattern amongst the icons which do show up vs. those which don't!
-  *  Board doesn't scale properly. It stretches the bg image in unsired ways.
+  *  Board doesn't scale properly. It stretches the bg image in undesired ways.
   *  Help browser is disabled (QWebKit missing). Need to re-implement using a QTextBrowser (or similar).
 
 Notable TODOs, in no particular order:
