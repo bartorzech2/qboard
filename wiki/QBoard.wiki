@@ -35,7 +35,7 @@ You can find screenshots over at: http://wanderinghorse.net/gaming/QBoard
   * Only allows 1 open board per app instance. (QUB used MDI, but this complicated the design significantly.)
   * Any semblance of network play is a long, long way off, if it ever happens at all.
 
-See also: the TODOs Page (TODO! Port that page from the original repo!)
+See also: the [TODOs] Page
 
 
 == Requirements ==
