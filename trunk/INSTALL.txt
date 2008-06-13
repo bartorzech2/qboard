@@ -13,6 +13,39 @@ Then just type:
      qmake
      make
 
-The binary/binaries will be in ./bin, and can be run from there or
-copied to a directory of your choice.
+The binaries will be in ./bin, and can be run from there or copied to
+a directory of your choice.
 
+When you first start QBoars, it checks for the directory ~/.QBoard,
+prompting you to create it if needed. For QBoard to be useful, you'll
+need to copy some gaming materials (graphics files) into that
+directory. The setup wizard will remind you of what needs to be done.
+
+To make sure the Help->Manual feature of the app works, you'll need to
+copy resources/manual/*.* to ~/.QBoard/QBoard/manual/. If you don't,
+QBoard will work but the manual won't be available.
+
+========================================================================
+
+Some notes about the source tree:
+
+The tree *should* be arranged into subdirs for a couple libs and then
+the main app. But it's not because...
+
+The second core-most component, behind Qt, is libs11n. libs11n cannot
+work properly as a DLL on Win32 platforms because of the requirements
+that ALL types which are to be visible from outside the DLL be
+properly "exported". S11n's templates-heavy implementation makes it
+impossible to conform to those rules. So...
+
+The build tree instead is comprised of subdirs which each build to a
+single app, and those apps all share the same OBJECT files. Linking
+each app to the object files, as opposed to DLLs, is a workaround to
+allow the s11n components to work properly on Windows platforms.
+
+The down-side of that is that 'make clean' for one app is likely to
+remove all (or many) of the .o files needed by the other apps, which
+causes them to be rebuilt. But in practice this has, so far, been only
+slightly annoying.
+
+For examples, see the stuff under apps/...
