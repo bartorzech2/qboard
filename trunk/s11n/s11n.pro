@@ -7,6 +7,7 @@
 # the generated .so/.dll altogether.
 include(../config.qmake)
 VERSION = QBoardDummy
+TARGET = dummy
 QT =
 CONFIG = debug
 OBJECTS_DIR = $$S11N_OBJ_DIR
