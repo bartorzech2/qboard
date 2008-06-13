@@ -362,7 +362,8 @@ namespace QBatch {
 	typedef a_set_toeocmd type;
 	static void matched( parser_state &, std::string const & m, State & st )
 	{
-	    st.toeocmd = m;
+	    QString tmp( QString(m.c_str()).simplified() );
+	    st.toeocmd = tmp.isEmpty() ? "" : tmp.toAscii().constData();
 	}
     };
     /**
@@ -499,7 +500,7 @@ namespace QBatch {
 	    switch( Mode )
 	    {
 	      case SetValToEocmd:
-		  var = propToVariant( st.key, m, st.vtype );
+		  var = propToVariant( st.key, st.toeocmd, st.vtype );
 		  break;
 	      case SetValString:
 		  var = propToVariant( st.key, st.theString, st.vtype );
