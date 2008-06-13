@@ -48,9 +48,7 @@ REL_SRCDIR = $$(PWD)
 REL_SRCDIR=$$replace(REL_SRCDIR,$$TOP_SRCDIR/,)
 REL_SRCDIR=$$replace(REL_SRCDIR,[^/]+,..)
 
-# qmake bug? feature? If you use CONFIG= instead of += the various
-# Qt -Includes and such don't get added.
-CONFIG += stl warn_on debug_and_release ordered 
+CONFIG += stl warn_on debug_and_release ordered
 
 # Reminder: i'd rather use %Y.%m.%d as QBOARD_VERSION, but apparently
 # it's impossible to properly escape that to a string from here. i had
@@ -62,17 +60,17 @@ message(QBoard version $$QBOARD_VERSION)
 message(QT_VERSION $$QT_VERSION)
 
 RESOURCES_DIR = $$REL_SRCDIR/resources
-UI_DIR = $$REL_SRCDIR/build
-DESTDIR = $$REL_SRCDIR/bin
 UI_SRCDIR = $$REL_SRCDIR/ui
+UI_DIR = $$REL_SRCDIR/build/$$QT_VERSION
+OBJECTS_DIR = $$REL_SRCDIR/build/$$QT_VERSION
+DESTDIR = $$REL_SRCDIR/bin/$$QT_VERSION
+MOC_DIR = $$REL_SRCDIR/build/$$QT_VERSION
 SRC_DIR = $$REL_SRCDIR/src
 S11N_DIR = $$REL_SRCDIR/s11n
 S11N_INCLUDES = -I$$S11N_DIR/include
 S11N_CXXFLAGS = $$S11N_INCLUDES
+S11N_OBJ_DIR = $$OBJECTS_DIR/s11n/$$QT_VERSION
 QBOARD_CXXFLAGS = $$S11N_CXXFLAGS -DQBOARD_VERSION=$$QBOARD_VERSION -I$$REL_SRCDIR/src
-MOC_DIR = $$REL_SRCDIR/build
-OBJECTS_DIR = $$REL_SRCDIR/build
-S11N_OBJ_DIR = $$OBJECTS_DIR/s11n
 
 QBOARD_INCLUDES = -I$$REL_SRCDIR/src -I$$MOC_DIR -I$$UI_DIR
 S11N_DIR = $$REL_SRCDIR/s11n
