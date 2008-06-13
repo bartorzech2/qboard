@@ -1,0 +1,64 @@
+<html>
+  <head>
+    <title>QBoard User's Guide</title><style></style>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+  </head>
+<style></style>
+  <body>
+<h1>Welcome to QBoard</h1>
+<h2>Home page: <a href='http://wanderinghorse.net/gaming/QBoard/'>http://wanderinghorse.net/gaming/QBoard/</a></h2>
+
+QBoard is a program for setting up and playing nearly arbitrary board-style games.
+Just like a real board game, it knows nothing about the rules. Instead, it provides
+a "playing surface" on top of which can be done whatever one wishes.
+
+<br/><br/>
+
+As QBoard is based on the <a href='http://www.trolltech.com/qt'>Qt4 library</a>, QBoard is implicitly
+released under the terms of the GNU General Public License, version 2 or 3.
+
+
+<h2>Brief HOWTO</h2>
+A brief guide on how to do thing in QBoard...
+
+<h3>The QBoard home directory:</h3>
+
+  To allow us to save relative paths in our data files, we need a common root directory which is portable
+across platforms. To that end, we request that you store all QBoard-related data files under the QBoard
+home directory (<tt></tt>~/.QBoard</tt>). QBoard tries its best to make sure you stay inside the home directory. For example,
+when loading graphics files for pieces and boards, it uses a path relative to the home, if possible, as this makes
+the saved data portable to other machines (or if the QBoard home dir changes).
+
+<br/><br/>
+
+Before getting started with QBoard, you will need to put some files in the home dir, namely:
+
+<ul>
+<LI>Graphics for boards.</LI>
+<LI>Graphics for pieces.</LI>
+<LI>Any .txt or .html files you may want to load from within QBoard.</LI>
+</ul>
+
+You may structure your data however you like under the home directory, with the exception that the
+subdirectory named <tt>QBoard</tt> is reserved for use with QBoard-specific application data.
+
+<h3>Loading</h3>
+
+<ul>
+<LI>Double-clicking an image file will load it as a game board (if it is bigger than 10KB) or a game piece (if it is smaller).</LI>
+<LI>Double-clicking on files named *.GameState, *.QBoard, or *.QBoardPiece will load a game, a board, or a piece. The
+same happens when using the Open File menu/button.
+</LI>
+<li>Double-clicking a .txt or .html file will open it in a browser.</li>
+</ul>
+
+<h3>Saving</h3>
+
+<ul>
+<li>To save a game, click the Save button or File->Save menu item. That will save the entire game state.
+</li>
+</ul>
+
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+To build QBoard you need one of:
+
+ - Qt 4.4.0+
+ - Qt 4.3.5+ (it might work with 4.3.0-4.3.4)
+
+You will need to edit the file config.qmake and set the top-most value
+(TOP_SRCIDR) to THIS directory (unfortunately, we can't seem to
+programatically get a proper absolute path to the top srcdir from
+subdirs in qmake)
+
+Then just type:
+
+     qmake
+     make
+
+The binary/binaries will be in ./bin, and can be run from there or
+copied to a directory of your choice.
+
