@@ -6,6 +6,7 @@
 #include <cassert>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 #include <vector>
 #include <list>
 #include <set>
