@@ -4,41 +4,61 @@
 #include <s11n.net/s11n/s11nlite.hpp>
 class S11nClipboard : public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 public:
-	typedef s11nlite::node_type S11nNode;
-		typedef s11nlite::node_traits S11nNodeTraits;
-	S11nClipboard();
-	virtual ~S11nClipboard();
-	static S11nClipboard & instance();
-	S11nNode * contents();
-	template <typename SerializableType>
-	SerializableType * deserialize()
+    typedef s11nlite::node_type S11nNode;
+    typedef s11nlite::node_traits S11nNodeTraits;
+    S11nClipboard();
+    virtual ~S11nClipboard();
+    static S11nClipboard & instance();
+    S11nNode * contents();
+
+    /** 
+	Transfers ownership of the clipboard contents
+	(which may be 0) to the caller. Before the transfer,
+	signalUpdated() is fired if the content is not 0.
+    */
+    S11nNode * take();
+
+
+    /**
+       Tries to deserialize the contents as the given type.  The
+       caller owns the returned object.
+    */
+    template <typename SerializableType>
+    SerializableType * deserialize()
+    {
+	return m_node
+	    ? s11nlite::deserialize<SerializableType>( *m_node )
+	    : 0;
+    }
+    /**
+       Similar to slotCopy(), but takes a Serializable instead of
+       an S11nNode.
+    */
+    template <typename SerializableType>
+    bool serialize( SerializableType & ser )
+    {
+	if( m_node ) S11nNodeTraits::clear(*m_node);
+	else m_node = S11nNodeTraits::create("clipboard");
+	if( s11nlite::serialize( *m_node, ser ) )
 	{
-		return m_node
-			? s11nlite::deserialize<SerializableType>( *m_node )
-			: 0;
+	    emit signalUpdated();
+	    return true;
 	}
-	template <typename SerializableType>
-	bool serialize( SerializableType & ser )
-	{
-		if( m_node ) S11nNodeTraits::clear(*m_node);
-		else m_node = S11nNodeTraits::create("clipboard");
-		return s11nlite::serialize( *m_node, ser );
-	}
+	return false;
+    }
 public Q_SLOTS:
-	/* transfers ownership of 'take' to this object. */
-	void slotCut( S11nNode * take );
-	/* makes a copy of the given node. */
-	void slotCopy( S11nNode const * copy );
-	/* Clears the clipboard contents. */
-	void slotClear();
-Q_SIGNALS:
-	void signalCopy();
-	void signalCut();
-	void signalClear();
+   /* transfers ownership of 'take' to this object. */
+   void slotCut( S11nNode * take );
+    /* makes a copy of the given node. */
+    void slotCopy( S11nNode const * copy );
+    /* Clears the clipboard contents. */
+    void slotClear();
+    Q_SIGNALS:
+    void signalUpdated();
 private:
-	S11nNode * m_node;
+    S11nNode * m_node;
 };
 
 #endif // __S11NCLIPBOARD_H__

@@ -7,8 +7,8 @@ class GamePiece;
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
-#include <QGraphicsSceneContextMenuEvent>
 #include <QVariant>
+class QGraphicsSceneContextMenuEvent;
 class QGraphicsSceneDragDropEvent;
 #include "QGI.h"
 #include "Serializable.h"
