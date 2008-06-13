@@ -36,3 +36,12 @@ You can find screenshots over at: http://wanderinghorse.net/gaming/QBoard
   * Any semblance of network play is a long, long way off, if it ever happens at all.
 
 See also: the TODOs Page (TODO! Port that page from the original repo!)
+
+
+== Requirements ==
+
+  * Patience. It's alpha software.
+  * Qt 4.4 with STL support enabled. It works with Qt 4.3.0-4.3.5, but has some significantly weird behaviours in those versions which don't show up on 4.4.
+  * Platforms: it tries to be platform-independent, and it "should" work on any Qt platform which supports all the big Qt features (e.g. QWebKit, STL, etc.). i would love to hear from anyone who tries it on on-Linux platforms.
+  * Some graphics which you can use as game boards and playing pieces. We've got some free gaming maps at http://wanderinghorse.net/gaming/maps and free counters (playing pieces) at http://wanderinghorse.net/gaming/counters.
+  * [http://s11n.net libs11n] 1.2.7+. It comes with a standalone copy of s11n, so you don't need to download it. (A copy is used because libs11n can't work as a DLL on Windows due to broken linking conventions on those platforms.) s11n requires a fairly recent C++ compiler - gcc 4.1+ are believed to be okay.
