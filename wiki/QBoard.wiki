@@ -12,8 +12,9 @@ QBoard is a "re-imagining" of a much older project of mine called
 
 == Status ==
 
-QBoard is very much alpha software. It runs fine, but many features are
-as yet unimplemented, and some other things will change significantly.
+QBoard is very much beta software. It runs fine, but some important
+features are as yet unimplemented, and some other things will probably
+change significantly.
 
 == Screenshots ==
 
