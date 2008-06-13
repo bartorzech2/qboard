@@ -128,7 +128,7 @@ int do_setup()
 
 int main(int argc, char ** argv)
 {
-	s11nlite::serializer_class("funxml");
+	s11nlite::serializer_class("parens");
 	QApplication app( argc, argv );
 	try
 	{

@@ -4,10 +4,12 @@
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
-#include <QWheelEvent>
-#include <QMouseEvent>
-#include <QPainter>
+class QWheelEvent;
+class QMouseEvent;
+class QPainter;
+class QDragMoveEvent;
 #include "QBoard.h"
+
 class QBoardView : public QGraphicsView
 {
 Q_OBJECT
@@ -26,9 +28,11 @@ public Q_SLOTS:
 	/* If handMode is true then grabbing-hand-style drag is used,
 	otherwise rubber-band-style is used. */
 	void setHandDragMode(bool handMode);
+    void selectAll();
 protected:
 	virtual void drawBackground( QPainter *, const QRectF & );
 	virtual void mousePressEvent ( QMouseEvent * event );
+    virtual void dragMoveEvent( QDragMoveEvent * event );
 private:
 	QBoard & m_b;
 	qreal m_scale;

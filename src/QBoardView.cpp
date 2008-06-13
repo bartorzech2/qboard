@@ -2,9 +2,18 @@
 #include <QImage>
 #include <cmath>
 #include <QDebug>
+#include <QPainter>
+#include <QWheelEvent>
+#include <QMouseEvent>
+#include <QDragMoveEvent>
 
 #if ! defined(QBOARDVIEW_USE_OPENGL)
-#  define QBOARDVIEW_USE_OPENGL 1
+#  define QBOARDVIEW_USE_OPENGL 0
+/**
+   Using GL mode for QBoardView seems to make many operations much
+   faster, especially when zoomed/rotated.  However, the screen is not
+   always updated properly in GL mode. :(
+*/
 #endif
 #if QBOARDVIEW_USE_OPENGL
 #include <QGLWidget>
@@ -202,4 +211,23 @@ void QBoardView::mousePressEvent ( QMouseEvent * event )
 		return;
 	}
 	this->QGraphicsView::mousePressEvent(event);
+}
+
+void QBoardView::dragMoveEvent( QDragMoveEvent * ev )
+{
+    ev->ignore();
+    qDebug() << "QBoardView::dragMoveEvent() pos =="<<ev->pos();
+    return QGraphicsView::dragMoveEvent(ev);
+}
+
+void QBoardView::selectAll()
+{
+    QGraphicsScene * sc = this->scene();
+    if( sc )
+    {
+	QPainterPath path;
+	path.addRect( sc->itemsBoundingRect() );
+	sc->setSelectionArea( path, Qt::IntersectsItemShape );
+    }
+
 }
