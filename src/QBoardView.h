@@ -61,12 +61,12 @@ public Q_SLOTS:
 	otherwise rubber-band-style is used. */
 	void setHandDragMode(bool handMode);
     void selectAll();
-    /** Toggled OpenGL mode, which is faster for many operations
+    /** Sets or unsets OpenGL mode, which is faster for many operations
 	but often misses important screen updates.
 	If QBOARDVIEW_USE_OPENGL is false then this function does
 	nothing.
     */
-    void toggleGLMode();
+    void setGLMode(bool);
 
 protected:
 	virtual void drawBackground( QPainter *, const QRectF & );
