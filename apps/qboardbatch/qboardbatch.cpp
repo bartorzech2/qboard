@@ -46,7 +46,12 @@ int main(int argc, char ** argv)
 
     try
     {
-	QBBatch::process_scripts(argc-1,argv+1);
+	QStringList slist;
+	for( int i = 1; i < argc; ++i )
+	{
+	    slist << argv[i];
+	}
+	QBBatch::process_scripts(0,slist);
     }
     catch( std::exception const & ex )
     {
