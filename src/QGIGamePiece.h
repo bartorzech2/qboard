@@ -66,7 +66,15 @@ public:
 	virtual int type() const { return QGITypes::GamePiece; }
 	virtual bool event( QEvent * e );
 
+    /**
+       Serializes this object (AND piece()) to dest.
+    */
     virtual bool serialize( S11nNode & dest ) const;
+    /**
+       Deserializes this object. If this object is already connected
+       to a piece, THAT piece will be used as the target of deserialization,
+       otherwise a new piece is created.
+    */
     virtual bool deserialize( S11nNode const & src );
 
 public Q_SLOTS:
