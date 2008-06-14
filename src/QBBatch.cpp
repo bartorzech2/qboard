@@ -630,7 +630,7 @@ namespace QBBatch {
 
     void process_script( GameState * gs, QString const & fn )
     {
-	QBBatch::State st(gs);
+	State st(gs);
 	process_script(st,fn);
     }
 
