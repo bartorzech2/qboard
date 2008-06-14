@@ -166,7 +166,7 @@ bool MainWindowImpl::saveGame( QString const & fn )
     std::ostringstream os;
     try
     {
-	b = impl->gstate.save( fn );
+	b = impl->gstate.save( fn, true );
 	os << "failed for unknown reason.";
     }
     catch( std::exception const & ex )
@@ -263,7 +263,16 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 		QStringList li;
 		li << "-v"
 		   << fn;
-		QBBatch::process_scripts( &impl->gstate, li );
+		/**
+		   FIXME: when we pass impl->gstate, it WORKS in
+		   principal, but the pieces do not appear. They are
+		   there - they can be serialized - but they are not visible until
+		   the same is saved and loaded again. So we will avoid that problem
+		   for now by not allowing QBBatch to modify our state...
+		*/
+		GameState bogo;
+		QBBatch::process_scripts( &bogo, li );
+		impl->fb->reloadDir();// in case script generated anything.
 		worked = true;
 	    }
 	    catch(std::exception const & ex)
