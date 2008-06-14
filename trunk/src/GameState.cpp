@@ -26,10 +26,12 @@ struct GameState::Impl
     mutable GamePieceList pieces;
     QBoard board;
     mutable QGraphicsScene * scene;
-    Impl()
-	: pieces(),
-	  board(),
-	  scene( new QGraphicsScene( QRectF(0,0,200,200) ) )
+    QGraphicsItem * lameKludge;
+    Impl() :
+	pieces(),
+	board(),
+	scene( new QGraphicsScene( QRectF(0,0,200,200) ) ),
+	lameKludge(0)
     {
     }
     ~Impl()
@@ -59,14 +61,15 @@ QGraphicsScene * GameState::scene()
     return impl->scene;
 }
 
-void GameState::pieceAdded( GamePiece * pc )
+QGraphicsItem * GameState::addPiece( GamePiece * pc )
 {
-    QGIGamePiece * pv = new QGIGamePiece(pc,impl->scene);
-    //pv->setVisible(true);
-    //pv->update();
-    qDebug() << "GameState::pieceAdded() added QGIGamePiece"
-	     << static_cast<QObject*>(pv);
-    //impl->scene->update();
+    impl->pieces.addPiece(pc);
+    return impl->lameKludge;
+}
+QGraphicsItem * GameState::pieceAdded( GamePiece * pc )
+{
+    return (impl->lameKludge = new QGIGamePiece(pc,impl->scene));
+    //qDebug() << "GameState::pieceAdded() added QGIGamePiece" << static_cast<QObject*>(pv);
 }
 void GameState::pieceRemoved( GamePiece * )
 {

@@ -18,6 +18,7 @@
 #include "GamePiece.h"
 class QBoard;
 #include <QGraphicsScene>
+class QGraphicsItem;
 class GameState : public QObject, public Serializable
 {
     Q_OBJECT
@@ -62,13 +63,22 @@ public:
     */
     QGraphicsScene * scene();
 
+    /**
+       This is functionally identical to calling
+       pieces().addPiece(pc), but this returns
+       the new QGraphicsItem associated with the
+       piece.
+    */
+    QGraphicsItem * addPiece( GamePiece * pc );
+
+
 public Q_SLOTS:
     void clear();
 private Q_SLOTS:
     /**
        Creates a new View for pc and adds it to the scene.
     */
-    void pieceAdded( GamePiece * pc );
+    QGraphicsItem * pieceAdded( GamePiece * pc );
     /**
        Currently does nothing. It should find the associated
        View and remove it.
