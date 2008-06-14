@@ -116,8 +116,7 @@ int do_setup()
     std::ostringstream os;
     os << "Warning: your QBoard was built against Qt 4.3.x. While it will be basically functional, "
        << "there are known weird behaviours under Qt 4.3 which don't show up in Qt 4.4. For example, "
-       << "most of the application icons simply don't appear under 4.3, and the game board stretches "
-       << "to fit the window, even though it should not.";
+       << "the game board stretches to fit the window, even though it should not.";
     QMessageBox::warning( 0, "Qt 4.3.x warning", os.str().c_str(),
 			  QMessageBox::Ok, QMessageBox::Ok );
 			  
