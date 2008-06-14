@@ -174,6 +174,7 @@ void GamePieceList::clearPieces()
 	for( ; it != this->end(); ++it )
 	{
 		this->disconnect(*it);
+		emit pieceRemoved(*it);
 		delete (*it);
 	}
 	this->m_list.clear();
@@ -231,6 +232,7 @@ bool GamePieceList::deserialize( S11nNode const & src )
 	typedef std::auto_ptr<GamePiece> GP;
 	for( ; et != it; ++it )
 	{
+	    qDebug() <<"GamePieceList::deserialize() doing child...";
 		GP gp( new GamePiece );
 		if( ! s11n::deserialize<S11nNode,GamePiece>( *(*it), *gp ) )
 		{
