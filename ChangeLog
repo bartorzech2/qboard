@@ -5,11 +5,18 @@ are at the top.
 
 2008 June 14:
 
+- Fixed the broken app icons for qt 4.3. This was caused by an inconsistency
+in how Qt Designer 4.3/4.4 handle icons associated with QActions.
+
 - Too many little changes to remember.
 
 - Added initial copy/cut support.  Paste is on the todo list, but
 pasting is inherently target- and source-specific, so that'll take a
 bit of work.
+
+- Board now has a popup menu with a couple options. You wouldn't believe
+what a bitch it was to get the event handling right in conjunction with 
+overlapping pieces and the board.
 
 
 2008 June 13:
