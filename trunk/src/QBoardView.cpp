@@ -217,7 +217,14 @@ void QBoardView::mousePressEvent( QMouseEvent * event )
     }
     if( event->button() & Qt::RightButton )
     {
-	event->ignore();
+	/**
+	   If we don't do this then right-clicking
+	   a selected item will cause the selection to be unselected.
+	   Whether we accept() the event or not appears to make
+	   no difference whatsoever.
+
+	   Took me a frigging hour to find the cause of it.
+	*/
 	return;
     }
     this->QGraphicsView::mousePressEvent(event);
@@ -251,12 +258,8 @@ void QBoardView::selectAll()
 #include "MenuHandlerBoard.h"
 void QBoardView::contextMenuEvent( QContextMenuEvent * event )
 {
-    //     this->QGraphicsView::contextMenuEvent(event);
-    //     return;
     // i can't believe this is the only way to know if the menu event
     // needs to be passed to an item!
-    // FUCK! It propagates to all stacked children no matter
-    // what i do!!!!
     QGraphicsItem * it = this->itemAt( event->pos() );
     if( ! it )
     {
@@ -265,7 +268,11 @@ void QBoardView::contextMenuEvent( QContextMenuEvent * event )
     }
     else
     {
-	event->accept();
+	// This will pass on the event to that item. Somehow.
+	// Not quite sure why, but it works.
+	// There is no public API for doing the proper
+	// context menu type conversion, so we have to rely
+	// on this voodoo.
 	this->QGraphicsView::contextMenuEvent(event);
     }
 }
