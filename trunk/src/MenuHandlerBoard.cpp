@@ -67,7 +67,7 @@ void MenuHandlerBoard::doCopy()
 }
 void MenuHandlerBoard::doPaste()
 {
-#if 0 // we have to handle back to the game state!
+#if 0 // we have no handle back to the game state!
     S11nClipboard & cl( S11nClipboard::instance() );
     s11n::cleanup_ptr<Serializable> ap( cl.deserialize<Serializable>() );
     if( ! ap.get() ) return;
@@ -86,7 +86,9 @@ void MenuHandlerBoard::doMenu( QBoardView * pv, QContextMenuEvent * ev )
     m.addSeparator();
     m.addAction(QIcon(":/QBoard/icon/editcopy.png"),"Copy board (not pieces)",this,SLOT(doCopy()) );
     //m.addAction(QIcon(":/QBoard/icon/editpaste.png"),"Paste",this,SLOT(doPaste()) );
-
+    QAction * ac = m.addAction("Toggle OpenGL Mode",pv, SLOT(toggleGLMode()) );
+    ac->setCheckable( true );
+    ac->setChecked( pv->isGLMode() );
     try
     {
 	m.exec( ev->globalPos() );
