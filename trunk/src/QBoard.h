@@ -32,6 +32,10 @@ public:
 public Q_SLOTS:
 	virtual bool load( QString const & );
 	virtual bool save( QString const & ) const;
+    /**
+       Clears the state of the board.
+    */
+    void clear();
 Q_SIGNALS:
 	void loaded();
 private:
