@@ -3,7 +3,9 @@
 
 = Introduction =
 
-QBoard _could_ have been implemented as a library and a thin wrapper client app around it, but it's not. Maybe someday it will be restructured to be so, but today it's not. Here is an overview of the app parts and major classes:
+QBoard _could_ have been implemented as a library and a thin wrapper client app around it, but it's not. Maybe someday it will be restructured to be so, but today it's not. This page provides an overview of the app parts and major classes.
+
+QBoard essentially uses MVC - Model/View/Controller - as its primary UI mechanism. Game pieces and the game board are represented by non-graphical objects. The Controller (the main app) creates Views to visualize those underlying objects. There are exceptions to this (game components which are themselves QGraphicsItems (Views)), but the core-most parts try to be MVC.
 
 === GamePiece / QGIGamePiece ===
 
