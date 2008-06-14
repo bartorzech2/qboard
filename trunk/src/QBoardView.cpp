@@ -83,7 +83,7 @@ bool QBoardView::isGLMode() const
 	: false;
 }
 
-void QBoardView::toggleGLMode()
+void QBoardView::setGLMode(bool on)
 {
 #if QBOARDVIEW_USE_OPENGL
     /**
@@ -100,11 +100,10 @@ void QBoardView::toggleGLMode()
        A bug report has been filed with trolltech, but i now can't
        find it in their tracker. :/
     */
-    QWidget * w = impl->glmode
+    QWidget * w = (impl->glmode=on)
 	? new QGLWidget // (QGLFormat(QGL::SampleBuffers))
 	: new QWidget; 
     w->setObjectName( "QBoardViewViewport");
-    impl->glmode = !impl->glmode;
     setViewport( w );
 #endif
 }
@@ -236,7 +235,7 @@ void QBoardView::zoom( qreal z )
     //these resets reset our pos to (0,0) and undoes rotation, which is annoying. But we need one of them. :/
     this->resetTransform(); 
     //this->resetMatrix();
-    this->resize(isz.toSize());
+    //this->resize(isz.toSize());
     this->scale( impl->scale, impl->scale );
 #endif
     this->updateGeometry(); // without this, scrollbars get out of sync.
