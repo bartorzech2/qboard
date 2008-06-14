@@ -8,6 +8,7 @@ http://wanderinghorse.net/home/stephan/
 
 Some particular areas i'd like to see _someone else_ work are:
 
+  * i18n. There's not terribly much text in the app, so there's no much actual translation work to do. Someone with knowledge of how to set up the translations infrastructure would be really appreciated, though.
   * Figuring out how to solve the weird bugs which show up in Qt4.3 but not 4.4.
   * A graphics wiz to help add more features to the QGraphicsView-based parts.
   * Custom game graphics would be really cool. i've actually got tons of them, but i'm no graphics artist and have no real talent for making _nice looking_ graphics.
