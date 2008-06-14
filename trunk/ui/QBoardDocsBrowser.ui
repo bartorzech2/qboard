@@ -40,7 +40,7 @@
           <string/>
          </property>
          <property name="icon" >
-          <iconset resource="../resources/icons.qrc" >
+          <iconset resource="../resources/icon/icons.qrc" >
            <normaloff>:/QBoard/icon/1leftarrow.png</normaloff>:/QBoard/icon/1leftarrow.png</iconset>
          </property>
         </widget>
@@ -57,7 +57,7 @@
           <string/>
          </property>
          <property name="icon" >
-          <iconset resource="../resources/icons.qrc" >
+          <iconset resource="../resources/icon/icons.qrc" >
            <normaloff>:/QBoard/icon/folder_home.png</normaloff>:/QBoard/icon/folder_home.png</iconset>
          </property>
         </widget>
@@ -74,7 +74,7 @@
           <string/>
          </property>
          <property name="icon" >
-          <iconset resource="../resources/icons.qrc" >
+          <iconset resource="../resources/icon/icons.qrc" >
            <normaloff>:/QBoard/icon/reload.png</normaloff>:/QBoard/icon/reload.png</iconset>
          </property>
         </widget>
@@ -91,7 +91,7 @@
           <string/>
          </property>
          <property name="icon" >
-          <iconset resource="../resources/icons.qrc" >
+          <iconset resource="../resources/icon/icons.qrc" >
            <normaloff>:/QBoard/icon/stop.png</normaloff>:/QBoard/icon/stop.png</iconset>
          </property>
          <property name="checkable" >
@@ -105,7 +105,7 @@
           <string/>
          </property>
          <property name="icon" >
-          <iconset resource="../resources/icons.qrc" >
+          <iconset resource="../resources/icon/icons.qrc" >
            <normaloff>:/QBoard/icon/1rightarrow.png</normaloff>:/QBoard/icon/1rightarrow.png</iconset>
          </property>
         </widget>
@@ -144,7 +144,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/icons.qrc" />
+  <include location="../resources/icon/icons.qrc" />
  </resources>
  <connections>
   <connection>

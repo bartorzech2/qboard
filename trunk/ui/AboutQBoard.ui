@@ -13,12 +13,6 @@
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2" >
-   <property name="margin" >
-    <number>2</number>
-   </property>
-   <property name="spacing" >
-    <number>2</number>
-   </property>
    <item row="0" column="0" >
     <widget class="QLabel" name="labelHeader" >
      <property name="font" >
@@ -53,8 +47,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>530</width>
-        <height>368</height>
+        <width>516</width>
+        <height>346</height>
        </rect>
       </property>
       <attribute name="title" >
@@ -79,7 +73,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">Home page:&lt;/span>&lt;/p>
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;">&lt;a href="http://code.google.com/p/qboard">&lt;span style=" font-weight:400; text-decoration: underline; color:#0000ff;">http://code.google.com/p/qboard&lt;/span>&lt;/a>&lt;/p>
 &lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">License:&lt;/span> GPLv3&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">License:&lt;/span> GPLv2 or GPLv3&lt;/p>
 &lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">Author:&lt;/span> Stephan Beal&lt;/p>
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;a href="http://wanderinghorse.net/home/stephan/">&lt;span style=" text-decoration: underline; color:#0000ff;">http://wanderinghorse.net/home/stephan/&lt;/span>&lt;/a>&lt;/p>
@@ -88,15 +82,14 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
       </layout>
-      <zorder>textBrowser</zorder>
      </widget>
      <widget class="QWidget" name="tab2" >
       <property name="geometry" >
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>530</width>
-        <height>368</height>
+        <width>516</width>
+        <height>346</height>
        </rect>
       </property>
       <attribute name="title" >
@@ -130,7 +123,10 @@ p, li { white-space: pre-wrap; }
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">Saving:&lt;/span>&lt;/p>
 &lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">- To save a game, click the Save button (&lt;img src=":/QBoard/icon/filesave.png" />) or File-&amp;gt;Save menu item.&lt;/p>
-&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>&lt;/body>&lt;/html></string>
+&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">More help:&lt;/span>&lt;/p>
+&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If you have saved the QBoard manual to &lt;span style=" font-family:'Courier New,courier';">~/.QBoard/QBoard/manual/index.html&lt;/span> then it will be available vie the Help menu.&lt;/p>&lt;/body>&lt;/html></string>
          </property>
         </widget>
        </item>
@@ -141,14 +137,20 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>530</width>
-        <height>368</height>
+        <width>516</width>
+        <height>346</height>
        </rect>
       </property>
       <attribute name="title" >
        <string>License</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4" >
+       <property name="margin" >
+        <number>2</number>
+       </property>
+       <property name="spacing" >
+        <number>2</number>
+       </property>
        <item row="0" column="0" >
         <widget class="QTextBrowser" name="textBrowserLicense" >
          <property name="html" >
@@ -160,7 +162,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Copyright (C) 2008 Stephan Beal (http://wanderinghorse.net/home/stephan/)&lt;/p>
 &lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 2 or 3 of the License, or (at your option) any later version.&lt;/p>
 &lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.&lt;/p>
 &lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;/p>
@@ -182,7 +184,7 @@ p, li { white-space: pre-wrap; }
   </layout>
  </widget>
  <resources>
-  <include location="../resources/icons.qrc" />
+  <include location="../resources/icon/icons.qrc" />
  </resources>
  <connections>
   <connection>
