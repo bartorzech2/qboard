@@ -208,36 +208,13 @@ void QBoardView::zoomOut()
 
 void QBoardView::zoom( qreal z )
 {
-    // i don't get why this is so much work. The examples in the qt docs
-    // make it look much simpler.
     if( (z < 0.10) || (z>4.01) ) return; // arbitrary! 
     if( z == impl->scale ) return;
     impl->scale = z;
-    qDebug() << "QBoardView::zoom()"<<impl->scale;
-#if 0
-    QSizeF isz(impl->board.pixmap().size());
-    if( 1.0 != z )
-    {
-	isz.scale( std::ceil( isz.width() * impl->scale ),
-		   std::ceil( isz.height() * impl->scale ),
-		   Qt::IgnoreAspectRatio );
-    }
-    this->resize(isz.toSize());
+    //qDebug() << "QBoardView::zoom()"<<impl->scale;
+    //resetTransform() undoes rotation, which is annoying. But we need it to get the behaviour i want. :/
+    this->resetTransform();
     this->scale( impl->scale, impl->scale );
-#else
-    QSizeF isz(impl->board.pixmap().size());
-    if( 1.0 != z )
-    {
-	isz.scale( std::ceil( isz.width() * impl->scale ),
-		   std::ceil( isz.height() * impl->scale ),
-		   Qt::IgnoreAspectRatio );
-    }
-    //these resets reset our pos to (0,0) and undoes rotation, which is annoying. But we need one of them. :/
-    this->resetTransform(); 
-    //this->resetMatrix();
-    //this->resize(isz.toSize());
-    this->scale( impl->scale, impl->scale );
-#endif
     this->updateGeometry(); // without this, scrollbars get out of sync.
 }
 

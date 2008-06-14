@@ -51,6 +51,7 @@ public:
        Returns true if this object is in OpenGL mode.
     */
     bool isGLMode() const;
+
 public Q_SLOTS:
 	void updateBoardPixmap();
 	void zoomOut();

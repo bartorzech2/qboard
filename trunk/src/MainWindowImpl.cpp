@@ -24,6 +24,7 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QMessageBox>
+#include <QScrollBar>
 #include <s11n.net/s11n/s11nlite.hpp>
 #if QT_VERSION >= 0x040400
 #include "QBoardDocsBrowser.h"
@@ -314,20 +315,61 @@ bool MainWindowImpl::loadPiece( QFileInfo const & fi )
 {
 	QString fn( fi.filePath() ); // absoluteFilePath() );
 	GamePiece * pc = new GamePiece;
-	impl->gstate.pieces().addPiece(pc);
 	if( pc->fileNameMatches( fn ) )
 	{
-		qDebug() << "NYI: loadPiece(*"<<pc->s11nFileExtension()<<")";
+	    if( ! pc->load( fn ) )
+	    {
 		delete pc;
+		QMessageBox::warning( this, "Load failed!",
+				      QString("Failed: MainWindowImpl::loadPiece(%1)").arg(fn),
+				      QMessageBox::Ok, QMessageBox::Ok );
+
 		return false;
+	    }
 	}
 	else
 	{
 		qDebug() << "loadPiece("<<fn<<")";
-		pc->setPieceProperty("pixmap", fn );
-		return true;
 	}
-	return false;
+	pc->setProperty( "pixmap", fn );
+	QRect rect( impl->gv->viewport()->geometry() );
+	// FIXME: we can't get the piece's size, because the size is part of the
+	// QGIGamePiece view object. That object won't get created until
+	// we add pc to the game. We need the size to set a 100% correct
+	// starting point.
+	QPoint pos;
+#if 0
+	const int fudge = -30;
+	pos = QPoint(rect.width()/2+fudge, rect.height() /2+fudge );
+#else
+	// Man, what a pain in the ass!
+	QScrollBar * sb = impl->gv->verticalScrollBar();
+	pos.setY( sb->sliderPosition() );
+	sb = impl->gv->horizontalScrollBar();
+	pos.setX( sb->sliderPosition() );
+	// And that's not valid when impl->gv is scaled. Aarrggh.
+	//pos.setX( pos.x() + fudge );
+
+#endif
+	//(rect.height() / 2) + 
+	// (rect.width() / 2) + 
+	// We must set a pos on the piece before adding it,
+	// or our next calculations won't work
+	//qDebug() << "loadPiece(): pos="<<pos;
+ 	//pos = impl->gv->mapFromScene(pos);
+	qDebug() << "loadPiece(): pos="<<pos;
+	//QGraphicsItem * pv =
+	impl->gstate.addPiece(pc);
+ 	//QRect vrect( pv->boundingRect().toRect() );
+	pos.setY( pos.y() + (rect.height()/2) ); // - (vrect.height() / 2) );
+	pos.setX( pos.x() + (rect.width()/2) ); // - (vrect.width() / 2) );
+	qDebug() << "loadPiece(): pos="<<pos;
+	pc->setPos( pos );
+// 	pos.setY( pos.y() - (vrect.height() / 2) );
+// 	pos.setX( pos.x() - (vrect.width() / 2 ) );
+// 	pc->setPos( pos );
+	//impl->gv->ensureVisible(pv);
+	return true;
 }
 
 bool MainWindowImpl::loadGame( QString const & fn )
