@@ -42,7 +42,7 @@ void GameState::pieceAdded( GamePiece * pc )
 }
 void GameState::pieceRemoved( GamePiece * )
 {
-    // FIXME: try to find the view for the piece
+    // We don't really care - the view will destroy itself when the piece goes.
 }
 
 void GameState::clear()
@@ -90,7 +90,11 @@ bool GameState::serialize( S11nNode & dest ) const
 	if( ! v )
 	{
 	    Serializable * ser = dynamic_cast<Serializable*>( *it );
-	    if( ! ser ) continue;
+	    if( ! ser )
+	    {
+		qDebug() << "WARNING: GameState::serialize(): skipping non-Serializable QGraphicsItem:"<<*it;
+		continue;
+	    }
 	    nonPiece.push_back(ser);
 	    continue;
 	}
