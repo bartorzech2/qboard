@@ -10,6 +10,7 @@
 #include <QRegExp>
 #include <QGraphicsView>
 #include <QGraphicsScene>
+#include <QMessageBox>
 #include <s11n.net/s11n/s11nlite.hpp>
 #if QT_VERSION >= 0x040400
 #include "QBoardDocsBrowser.h"
@@ -24,6 +25,7 @@
 #include "QGILine.h"
 #include "utility.h"
 #include "S11nClipboard.h"
+#include "QBBatch.h"
 struct MainWindowImpl::Impl
 {
 	GameState gstate;
@@ -158,17 +160,34 @@ void MainWindowImpl::launchHelp()
 }
 bool MainWindowImpl::saveGame( QString const & fn )
 {
-	bool b = impl->gstate.save( fn );
-	if( b )
-	{
-		this->statusBar()->showMessage("Saved: "+fn);
-	}
-	else
-	{
-		this->statusBar()->showMessage("Save FAILED: "+fn);
-	}
-	this->actionRefreshFileList->activate( QAction::Trigger );
-	return b;
+    bool b = false;
+    std::ostringstream os;
+    try
+    {
+	b = impl->gstate.save( fn );
+	os << "failed for unknown reason.";
+    }
+    catch( std::exception const & ex )
+    {
+	b = false;
+	os << "Save failed! The error text is:\n"
+	   << "<div style='color:red;'>"
+	   << ex.what()
+	   << "</div>";
+    }
+
+    if( b )
+    {
+	    this->statusBar()->showMessage("Saved: "+fn);
+    }
+    else
+    {
+	this->statusBar()->showMessage("Save FAILED: "+fn);
+	QMessageBox::warning( 0, "Save failed!", os.str().c_str(),
+			      QMessageBox::Ok, QMessageBox::Ok );
+    }
+    this->actionRefreshFileList->activate( QAction::Trigger );
+    return b;
 	
 }
 bool MainWindowImpl::saveGame()
@@ -197,7 +216,7 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 		worked = gpl.load(fn);
 		if( worked )
 		{
-			impl->gstate.takePieces(gpl);
+		    impl->gstate.pieces().takePieces(gpl);
 		}
 	}
 	else if( impl->gstate.board().fileNameMatches(fn) )
@@ -235,6 +254,28 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 			worked = this->impl->gstate.board().load(fn); // fi.absoluteFilePath());
 		}
 	}
+	else if ( -1 != QRegExp("\\.QBBatch$", Qt::CaseInsensitive).indexIn(fn) )
+	{
+	    try
+	    {
+		QStringList li;
+		li << "-v"
+		   << fn;
+		QBBatch::process_scripts( &impl->gstate, li );
+		worked = true;
+	    }
+	    catch(std::exception const & ex)
+	    {
+		worked = false;
+		std::ostringstream os;
+		os << "Script threw an exception! The error text is:\n"
+		   << "<div style='color:red;'>"
+		   << ex.what()
+		   << "</div>";
+		QMessageBox::warning( 0, "Script failed!", os.str().c_str(),
+				      QMessageBox::Ok, QMessageBox::Ok );
+	    }
+	}
 	if( worked )
 	{
 		this->statusBar()->showMessage("Loaded: "+fn); // fi.absoluteFilePath());
@@ -250,7 +291,6 @@ bool MainWindowImpl::loadPiece( QFileInfo const & fi )
 	QString fn( fi.filePath() ); // absoluteFilePath() );
 	GamePiece * pc = new GamePiece;
 	impl->gstate.pieces().addPiece(pc);
-	// FIXME: we currently leak pc! We need a list to store them in.
 	if( pc->fileNameMatches( fn ) )
 	{
 		qDebug() << "NYI: loadPiece(*"<<pc->s11nFileExtension()<<")";
@@ -260,13 +300,7 @@ bool MainWindowImpl::loadPiece( QFileInfo const & fi )
 	else
 	{
 		qDebug() << "loadPiece("<<fn<<")";
-		//QPixmap pix( fn );
-		//if( pix.isNull() ) return false;
-		//pc->setPieceProperty("color",QColor(100,100,255));
-		//pc->setPieceProperty("borderColor",QColor(255,0,0));
 		pc->setPieceProperty("pixmap", fn );
-		new QGIGamePiece(pc, impl->gstate.scene());
-		// Reminder: impl->gstate.scene() takes over ownership.
 		return true;
 	}
 	return false;
@@ -388,22 +422,8 @@ void MainWindowImpl::doSomethingExperimental()
 		//impl->gstate.scene()->addItem(ln);
 		//impl->gstate.scene()->addItem(rn);
 	}
-
-	if(1)
-	{
-		GamePiece * pc = new GamePiece;
-		pc->setPieceProperty("pixmap","counters/cgme/Joe/transparent-rip.png");
-		new QGIGamePiece(pc,impl->gstate.scene());
-		//pc->setPieceProperty("borderSize",3);
-		pc->setBorderSize(3);
-		pc->setBorderStyle(Qt::DotLine);
-		pc->setBorderColor(QColor("#ff00dd"));
-		pc->setColor("#aaffaa");
-		pc->setAngle(45);
-		impl->gstate.pieces().addPiece( pc );
-		s11nlite::save( *pc, std::cout );
-	}
 }
+
 #include <QMessageBox>
 void MainWindowImpl::clearBoard()
 {
