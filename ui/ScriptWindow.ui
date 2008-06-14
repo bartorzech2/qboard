@@ -309,7 +309,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionLoad" >
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
+    <iconset resource="../resources/icon/icons.qrc" >
      <normaloff>:/QBoard/icon/fileopen.png</normaloff>
      <normalon>:/icon/fileopen.png</normalon>:/QBoard/icon/fileopen.png</iconset>
    </property>
@@ -381,7 +381,7 @@ p, li { white-space: pre-wrap; }
   </action>
  </widget>
  <resources>
-  <include location="../resources/icons.qrc" />
+  <include location="../resources/icon/icons.qrc" />
  </resources>
  <connections>
   <connection>
