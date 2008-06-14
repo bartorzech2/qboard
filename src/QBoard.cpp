@@ -97,6 +97,12 @@ QSize QBoard::size() const
 {
     return m_px.size();
 }
+void QBoard::clear()
+{
+    m_px = QPixmap();
+    m_file = "";
+}
+
 bool QBoard::save( QString const & fn) const
 {
     return this->Serializable::save(fn);
