@@ -47,7 +47,7 @@ GamePiece::GamePiece() : Serializable("GamePiece"),impl(new Impl)
 GamePiece::~GamePiece() 
 {
 	impl->destructing = true;
-	//qDebug() << "~GamePiece() pixmap="<<this->property("pixmap");
+	QBOARD_VERBOSE_DTOR << "~GamePiece() pixmap="<<this->property("pixmap");
 	emit destructing(this);
 	emit destroyed(); // we do this here to ensure that the proper polymorphic type is available when destroyed() is fired.
 	delete impl;
@@ -155,8 +155,8 @@ GamePieceList::GamePieceList() : Serializable("GamePieceList")
 }
 GamePieceList::~GamePieceList()
 {
-    //qDebug() << "~GamePieceList()";
-	this->clearPieces();
+    QBOARD_VERBOSE_DTOR << "~GamePieceList()";
+    this->clearPieces();
 }
 
 void GamePieceList::connect( GamePiece * gp )
@@ -203,13 +203,12 @@ bool GamePieceList::removePiece( GamePiece * gp )
 
 void GamePieceList::takePieces( GamePieceList &other )
 {
-	ListType tmp( other.m_list );
-	other.m_list.clear();
-	iterator it = tmp.begin();
-	iterator et = tmp.end();
+	iterator it = other.m_list.begin();
+	iterator et = other.m_list.end();
 	for( ; et != it; ++it )
 	{
-		this->addPiece(*it);
+	    other.removePiece(*it);
+	    this->addPiece(*it);
 	}
 }
 

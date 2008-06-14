@@ -1,11 +1,14 @@
-#ifndef __UTILITY_H__
-#define __UTILITY_H__
+#ifndef QBOARD_UTILITY_H_INCLUDED
+#define QBOARD_UTILITY_H_INCLUDED
 
 #include <QString>
 #include <QList>
 #include <QDir>
 #include <QColor>
+#include <QDebug>
 class QGraphicsItem;
+
+#define QBOARD_VERBOSE_DTOR if(1) qDebug()
 
 namespace qboard
 {
@@ -87,4 +90,4 @@ namespace qboard
 
 }
 
-#endif // __UTILITY_H__
+#endif // QBOARD_UTILITY_H_INCLUDED

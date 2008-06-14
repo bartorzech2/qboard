@@ -33,12 +33,13 @@ public:
 	/** Deserializes src to this object. */
 	virtual bool deserialize( S11nNode const & src );
 	QGraphicsScene * scene();
-	/* Moves all pieces from other into this->pieces() and
-	creates QGIPieceView objects for them. Returns the number
-	of pieces it takes. */
-	size_t takePieces( GamePieceList & other );
+
 public Q_SLOTS:
 	void clear();
+private Q_SLOTS:
+    void pieceAdded( GamePiece * pc );
+    void pieceRemoved( GamePiece * pc );
+
 private:
 	mutable GamePieceList m_pc;
 	QBoard m_b;
