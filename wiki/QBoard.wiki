@@ -29,11 +29,6 @@ http://wh/gaming/QBoard/thumbs/qboard-20080611-veg.jpg
   * On-board lines, with customizable colors, line size, and transparency level. Useful for marking movement paths (or histories), firing args, line of sight, and such.
   * A very simple batch scripting tool for generating game setups (e.g. use shell scripts to generate games using existing graphics files).
 
-== Mis-features and significant TODOs ==
-
-  * Only allows 1 open board per app instance. (QUB used MDI, but this complicated the design significantly.)
-  * Any semblance of network play is a long, long way off, if it ever happens at all.
-
 See also: the [TODOs] Page
 
 
