@@ -1,5 +1,18 @@
 #ifndef __S11NQTLIST_H__
 #define __S11NQTLIST_H__
+/*
+ * This file is (or was, at some point) part of the QBoard project
+ * (http://code.google.com/p/qboard)
+ *
+ * Copyright (c) 2008 Stephan Beal (http://wanderinghorse.net/home/stephan/)
+ *
+ * This file may be used under the terms of the GNU General Public
+ * License versions 2.0 or 3.0 as published by the Free Software
+ * Foundation and appearing in the files LICENSE.GPL2 and LICENSE.GPL3
+ * included in the packaging of this file.
+ *
+ */
+
 /**
 	S11n routines specific to the QList/QVector types. Unfortunately we have to copy a large
 	chunk of the s11n::list source code here just because the QList types don't have a

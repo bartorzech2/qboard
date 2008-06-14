@@ -1,12 +1,28 @@
-#ifndef SERIALIZABLE_H
-#define SERIALIZABLE_H
-// Proxies for serializing certain types using libs11n.
+#ifndef __QBOARD_SERIALIZABLE_H_INCLUDED__
+#define __QBOARD_SERIALIZABLE_H_INCLUDED__
+/*
+ * This file is (or was, at some point) part of the QBoard project
+ * (http://code.google.com/p/qboard)
+ *
+ * Copyright (c) 2008 Stephan Beal (http://wanderinghorse.net/home/stephan/)
+ *
+ * This file may be used under the terms of the GNU General Public
+ * License versions 2.0 or 3.0 as published by the Free Software
+ * Foundation and appearing in the files LICENSE.GPL2 and LICENSE.GPL3
+ * included in the packaging of this file.
+ *
+ */
+
+
 #include "S11n.h"
 #include <QString>
 #include <string>
 #include <iostream>
 /**
    Base type for polymorphic QBoard serializable types.
+   We use the libs11n serialization framework to do
+   the leg work, so see those docs for the significance
+   of types like S11nNode.
 */
 class Serializable
 {
@@ -45,6 +61,9 @@ public:
        deserialization will fail.
 
        Returns true on success, false on error.
+
+       Subclasses may reimplement to, e.g., support other
+       file types.
     */
     virtual bool load( QString const & );
     /**
@@ -133,6 +152,8 @@ protected:
 private:
     //std::string m_cname;
     char const * m_cname;
+    // File extension. i'd rather have (char const *),
+    // but we need to be able to prepend a '.' to it.
     std::string m_ext;
 	
 };
@@ -173,4 +194,4 @@ namespace s11n {
 #define S11N_FACREG_TYPE_IS_ABSTRACT 1
 #include <s11n.net/s11n/factory_reg.hpp>
 
-#endif // SERIALIZABLE_H
+#endif // __QBOARD_SERIALIZABLE_H_INCLUDED__
