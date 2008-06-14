@@ -155,7 +155,9 @@ void MainWindowImpl::launchHelp()
 #if QT_VERSION >= 0x040400
 	(new QBoardDocsBrowser)->show();
 #else
-	qDebug() << "FIXME: MainWindowImpl::launchHelp() not implemented for Qt < 4.4";
+	QMessageBox::warning( this, "Not implemented!",
+			      "MainWindowImpl::launchHelp() not implemented for Qt < 4.4",
+			      QMessageBox::Ok, QMessageBox::Ok );
 #endif
 }
 bool MainWindowImpl::saveGame( QString const & fn )
@@ -171,9 +173,7 @@ bool MainWindowImpl::saveGame( QString const & fn )
     {
 	b = false;
 	os << "Save failed! The error text is:\n"
-	   << "<div style='color:red;'>"
-	   << ex.what()
-	   << "</div>";
+	   << ex.what();
     }
 
     if( b )
@@ -183,7 +183,7 @@ bool MainWindowImpl::saveGame( QString const & fn )
     else
     {
 	this->statusBar()->showMessage("Save FAILED: "+fn);
-	QMessageBox::warning( 0, "Save failed!", os.str().c_str(),
+	QMessageBox::warning( this, "Save failed!", os.str().c_str(),
 			      QMessageBox::Ok, QMessageBox::Ok );
     }
     this->actionRefreshFileList->activate( QAction::Trigger );
@@ -236,7 +236,9 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 		b->show();
 		worked = true;
 #else
-		qDebug() << "FIXME: MainWindowImpl::loadFile(*.{txt,html}) not implemented for Qt < 4.4";
+		QMessageBox::warning( this, "Not implemented!",
+				      "MainWindowImpl::loadFile(*.{txt,html}) not implemented for Qt < 4.4",
+				      QMessageBox::Ok, QMessageBox::Ok );
 		worked = false;
 #endif
 	}
@@ -269,10 +271,8 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 		worked = false;
 		std::ostringstream os;
 		os << "Script threw an exception! The error text is:\n"
-		   << "<div style='color:red;'>"
-		   << ex.what()
-		   << "</div>";
-		QMessageBox::warning( 0, "Script failed!", os.str().c_str(),
+		   << ex.what();
+		QMessageBox::warning( this, "Script failed!", os.str().c_str(),
 				      QMessageBox::Ok, QMessageBox::Ok );
 	    }
 	}
@@ -331,7 +331,9 @@ bool MainWindowImpl::loadGame()
 
 void MainWindowImpl::launchNewBoardView()
 {
+    const qreal zm(0.20);
 	QBoardView * v = new QBoardView( this->impl->gstate.board(), impl->gstate.scene() );
+	v->zoom(zm);
 	QDockWidget * win = new QDockWidget( "QBoard View", this );
 	win->setAttribute(Qt::WA_DeleteOnClose);
 #if 1
@@ -341,9 +343,7 @@ void MainWindowImpl::launchNewBoardView()
 	lay->setContentsMargins(2,2,2,2);
 	lay->addWidget( v );
 	win->setWidget(frame);
-	qreal zm = 0.20;
 	this->addDockWidget(Qt::RightDockWidgetArea, win );
-	v->persistentZoom(zm);
 	//QSizeF sz(v->sizeHint());
 	//sz.scale( sz.width()+10, sz.height()+20, Qt::IgnoreAspectRatio);
 	//win->resize( sz.toSize() );
