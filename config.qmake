@@ -116,6 +116,11 @@ QBOARD_HEADERS_LIB = \
  $$SRC_DIR/MenuHandlerBoard.h \
  $$SRC_DIR/MenuHandlerGeneric.h \
  $$SRC_DIR/MenuHandlerPiece.h \
+ $$SRC_DIR/parsepp.hpp \
+ $$SRC_DIR/parsepp_strings.hpp \
+ $$SRC_DIR/parsepp_typelist_10.hpp \
+ $$SRC_DIR/parsepp_typelist.hpp \
+ $$SRC_DIR/QBBatch.h \
  $$SRC_DIR/QBoard.h \
  $$SRC_DIR/QBoardView.h \
  $$SRC_DIR/QGI.h \
@@ -139,6 +144,7 @@ QBOARD_SOURCES_LIB = \
  $$SRC_DIR/MenuHandlerBoard.cpp \
  $$SRC_DIR/MenuHandlerGeneric.cpp \
  $$SRC_DIR/MenuHandlerPiece.cpp \
+ $$SRC_DIR/QBBatch.cpp \
  $$SRC_DIR/QBoard.cpp \
  $$SRC_DIR/QBoardView.cpp \
  $$SRC_DIR/QGIGamePiece.cpp \
