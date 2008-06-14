@@ -14,8 +14,8 @@
  */
 
 
-#include <QGraphicsScene>
 #include <QGraphicsView>
+class QGraphicsScene;
 class QBoard;
 class QWheelEvent;
 class QMouseEvent;
@@ -23,6 +23,18 @@ class QPainter;
 class QDragMoveEvent;
 class QContextMenuEvent;
 
+/**
+   Using GL mode for QBoardView makes many paint operations much
+   faster, especially when zoomed/rotated.  However, the screen is not
+   always updated properly in GL mode. :(
+*/
+#if ! defined(QBOARDVIEW_USE_OPENGL)
+#  ifndef QT_NO_OPENGL
+#    define QBOARDVIEW_USE_OPENGL 1
+#  else
+#    define QBOARDVIEW_USE_OPENGL 0
+#  endif
+#endif
 class QBoardView : public QGraphicsView
 {
 Q_OBJECT
@@ -35,6 +47,10 @@ public:
        This object's board. Ownership is not changed.
     */
     QBoard & board();
+    /**
+       Returns true if this object is in OpenGL mode.
+    */
+    bool isGLMode() const;
 public Q_SLOTS:
 	void updateBoardPixmap();
 	void zoomOut();
@@ -45,6 +61,13 @@ public Q_SLOTS:
 	otherwise rubber-band-style is used. */
 	void setHandDragMode(bool handMode);
     void selectAll();
+    /** Toggled OpenGL mode, which is faster for many operations
+	but often misses important screen updates.
+	If QBOARDVIEW_USE_OPENGL is false then this function does
+	nothing.
+    */
+    void toggleGLMode();
+
 protected:
 	virtual void drawBackground( QPainter *, const QRectF & );
 	virtual void mousePressEvent ( QMouseEvent * event );
@@ -52,7 +75,7 @@ protected:
     virtual void contextMenuEvent( QContextMenuEvent * event );
 
 private:
-	QBoard & m_b;
-	qreal m_scale;
+    struct Impl;
+    Impl * impl;
 };
 #endif // __QBOARDVIEW_H__

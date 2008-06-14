@@ -19,31 +19,37 @@
 #include <QWheelEvent>
 #include <QMouseEvent>
 #include <QDragMoveEvent>
+#include <QGraphicsScene>
 
-#if ! defined(QBOARDVIEW_USE_OPENGL)
-#  define QBOARDVIEW_USE_OPENGL 0
-/**
-   Using GL mode for QBoardView seems to make many operations much
-   faster, especially when zoomed/rotated.  However, the screen is not
-   always updated properly in GL mode. :(
-*/
-#endif
+#include "QBoardView.h"
 #if QBOARDVIEW_USE_OPENGL
 #include <QGLWidget>
 #endif
 
 
-#include "QBoardView.h"
 #include "QBoard.h"
 #include "utility.h"
 
+struct QBoardView::Impl
+{
+    QBoard & board;
+    qreal scale;
+    bool glmode;
+
+    Impl(QBoard &b)
+	: board(b),
+	  scale(1.0),
+	  glmode(false)
+    {
+    }
+};
+
 QBoardView::QBoardView( QBoard & b, QGraphicsScene * par ) :
     QGraphicsView(par),
-    m_b(b),
-    m_scale(1.0)
+    impl( new Impl(b) )
 {
     //this->setCacheMode(QGraphicsView::CacheBackground);
-    connect( &m_b, SIGNAL(loaded()), this, SLOT(updateBoardPixmap()) );
+    connect( &impl->board, SIGNAL(loaded()), this, SLOT(updateBoardPixmap()) );
     this->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     this->setInteractive(true);
     this->setTransformationAnchor(QGraphicsView::NoAnchor);
@@ -53,16 +59,13 @@ QBoardView::QBoardView( QBoard & b, QGraphicsScene * par ) :
     this->setDragMode(QGraphicsView::RubberBandDrag);
     this->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     this->setBackgroundBrush(QColor("#abb8fb"));
-#if QBOARDVIEW_USE_OPENGL
-    // Speeds up rendering a lot, especially for scaled views:
-    this->setViewport( new QGLWidget );
-#endif
-
+    this->viewport()->setObjectName( "QBoardViewViewport");
 }
 
 QBoardView::~QBoardView()
 {
     QBOARD_VERBOSE_DTOR << "~QBoardView()";
+    delete impl;
 }
 
 void QBoardView::setHandDragMode(bool handMode )
@@ -72,16 +75,50 @@ void QBoardView::setHandDragMode(bool handMode )
 		       : QGraphicsView::RubberBandDrag);
 }
 
+
+bool QBoardView::isGLMode() const
+{
+    return QBOARDVIEW_USE_OPENGL
+	? impl->glmode
+	: false;
+}
+
+void QBoardView::toggleGLMode()
+{
+#if QBOARDVIEW_USE_OPENGL
+    /**
+       This code causes a warning from Qt at runtime:
+
+       QObject: Do not delete object, 'QBoardViewViewport', during its
+       event handler!
+
+       It's caused by QAbstractScrollArea::setViewport() deleting the
+       original viewport, which is ACTUALLY where the event comes from
+       which triggers this function in the first place. Thus the
+       warning.
+
+       A bug report has been filed with trolltech, but i now can't
+       find it in their tracker. :/
+    */
+    QWidget * w = impl->glmode
+	? new QGLWidget // (QGLFormat(QGL::SampleBuffers))
+	: new QWidget; 
+    w->setObjectName( "QBoardViewViewport");
+    impl->glmode = !impl->glmode;
+    setViewport( w );
+#endif
+}
+
 QSize QBoardView::sizeHint() const
 {
     QSizeF sz;
-    if( ! this->m_b.pixmap().isNull() )
+    if( ! this->impl->board.pixmap().isNull() )
     {
-	sz = this->m_b.pixmap().size();
-	if( m_scale != 1.0 )
+	sz = this->impl->board.pixmap().size();
+	if( impl->scale != 1.0 )
 	{
-	    sz.setWidth( sz.width() * m_scale );
-	    sz.setHeight( sz.height() * m_scale );
+	    sz.setWidth( sz.width() * impl->scale );
+	    sz.setHeight( sz.height() * impl->scale );
 	}
     }
     else
@@ -93,26 +130,26 @@ QSize QBoardView::sizeHint() const
 }
 void QBoardView::updateBoardPixmap()
 {
-    //this->setBackgroundBrush(m_b.pixmap());
-    if( m_b.pixmap().isNull() ) return;
-    QSize isz = m_b.pixmap().size();
+    //this->setBackgroundBrush(impl->board.pixmap());
+    if( impl->board.pixmap().isNull() ) return;
+    QSize isz = impl->board.pixmap().size();
     this->resetTransform();
     this->resetMatrix();
     QRectF rect( 0, 0, isz.width(),  isz.height() );
     this->setSceneRect( rect );
-    //this->setBackgroundBrush(m_b.pixmap());
+    //this->setBackgroundBrush(impl->board.pixmap());
     this->updateGeometry();
 }
 
 void QBoardView::drawBackground( QPainter *p, const QRectF & rect )
 {
-    if( this->m_b.pixmap().isNull() )
+    if( this->impl->board.pixmap().isNull() )
     {
 	this->QGraphicsView::drawBackground(p,rect);
 	return;
     }
     p->fillRect( rect, this->backgroundBrush() );
-    p->drawPixmap(rect,m_b.pixmap(),rect);
+    p->drawPixmap(rect,impl->board.pixmap(),rect);
 }
 
 void QBoardView::wheelEvent(QWheelEvent *event)
@@ -161,13 +198,13 @@ void QBoardView::wheelEvent(QWheelEvent *event)
 static const double BoardZoomScaleFactor = 0.25;
 void QBoardView::zoomIn()
 {
-    this->zoom( m_scale + BoardZoomScaleFactor );
+    this->zoom( impl->scale + BoardZoomScaleFactor );
 }
 
 
 void QBoardView::zoomOut()
 {
-    this->zoom( m_scale - BoardZoomScaleFactor );
+    this->zoom( impl->scale - BoardZoomScaleFactor );
 }
 
 void QBoardView::zoom( qreal z )
@@ -175,32 +212,32 @@ void QBoardView::zoom( qreal z )
     // i don't get why this is so much work. The examples in the qt docs
     // make it look much simpler.
     if( (z < 0.10) || (z>4.01) ) return; // arbitrary! 
-    if( z == m_scale ) return;
-    m_scale = z;
-    qDebug() << "QBoardView::zoom()"<<m_scale;
+    if( z == impl->scale ) return;
+    impl->scale = z;
+    qDebug() << "QBoardView::zoom()"<<impl->scale;
 #if 0
-    QSizeF isz(m_b.pixmap().size());
+    QSizeF isz(impl->board.pixmap().size());
     if( 1.0 != z )
     {
-	isz.scale( std::ceil( isz.width() * m_scale ),
-		   std::ceil( isz.height() * m_scale ),
+	isz.scale( std::ceil( isz.width() * impl->scale ),
+		   std::ceil( isz.height() * impl->scale ),
 		   Qt::IgnoreAspectRatio );
     }
     this->resize(isz.toSize());
-    this->scale( m_scale, m_scale );
+    this->scale( impl->scale, impl->scale );
 #else
-    QSizeF isz(m_b.pixmap().size());
+    QSizeF isz(impl->board.pixmap().size());
     if( 1.0 != z )
     {
-	isz.scale( std::ceil( isz.width() * m_scale ),
-		   std::ceil( isz.height() * m_scale ),
+	isz.scale( std::ceil( isz.width() * impl->scale ),
+		   std::ceil( isz.height() * impl->scale ),
 		   Qt::IgnoreAspectRatio );
     }
     //these resets reset our pos to (0,0) and undoes rotation, which is annoying. But we need one of them. :/
     this->resetTransform(); 
     //this->resetMatrix();
     this->resize(isz.toSize());
-    this->scale( m_scale, m_scale );
+    this->scale( impl->scale, impl->scale );
 #endif
     this->updateGeometry(); // without this, scrollbars get out of sync.
 }
@@ -243,7 +280,7 @@ void QBoardView::mousePressEvent( QMouseEvent * event )
 
 QBoard & QBoardView::board()
 {
-    return m_b;
+    return impl->board;
 }
 
 void QBoardView::dragMoveEvent( QDragMoveEvent * ev )
