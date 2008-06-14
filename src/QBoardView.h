@@ -18,7 +18,6 @@ public:
 	QBoardView( QBoard & b, QGraphicsScene * parent = 0 );
 	virtual ~QBoardView();
 	virtual void wheelEvent(QWheelEvent *event);
-	void persistentZoom( qreal );
 	virtual QSize sizeHint () const;
     /**
        This object's board. Ownership is not changed.
@@ -43,6 +42,5 @@ protected:
 private:
 	QBoard & m_b;
 	qreal m_scale;
-	qreal m_pzoom;
 };
 #endif // __QBOARDVIEW_H__
