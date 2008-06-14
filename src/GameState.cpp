@@ -1,3 +1,16 @@
+/*
+ * This file is (or was, at some point) part of the QBoard project
+ * (http://code.google.com/p/qboard)
+ *
+ * Copyright (c) 2008 Stephan Beal (http://wanderinghorse.net/home/stephan/)
+ *
+ * This file may be used under the terms of the GNU General Public
+ * License versions 2.0 or 3.0 as published by the Free Software
+ * Foundation and appearing in the files LICENSE.GPL2 and LICENSE.GPL3
+ * included in the packaging of this file.
+ *
+ */
+
 #include "GameState.h"
 #include <QDebug>
 #include <QGraphicsItem>
@@ -6,16 +19,31 @@
 #include "S11nQtList.h"
 #include "QGIGamePiece.h"
 #include "utility.h"
-GameState::GameState(  ) :
-    Serializable("GameState"),
-    m_pc(),
-    m_b(),
-    m_sc( new QGraphicsScene( QRectF(0,0,200,200) ) )
-{
+#include "QBoard.h"
 
-    QObject::connect( &m_pc, SIGNAL(pieceAdded(GamePiece*)),
+struct GameState::Impl
+{
+    mutable GamePieceList pieces;
+    QBoard board;
+    mutable QGraphicsScene * scene;
+    Impl()
+	: pieces(),
+	  board(),
+	  scene( new QGraphicsScene( QRectF(0,0,200,200) ) )
+    {
+    }
+    ~Impl()
+    {
+	delete this->scene;
+    }
+};
+GameState::GameState() :
+    Serializable("GameState"),
+    impl(new Impl)
+{
+    QObject::connect( &impl->pieces, SIGNAL(pieceAdded(GamePiece*)),
 		      this, SLOT(pieceAdded(GamePiece*)) );
-    QObject::connect( &m_pc, SIGNAL(pieceRemoved(GamePiece*)),
+    QObject::connect( &impl->pieces, SIGNAL(pieceRemoved(GamePiece*)),
 		      this, SLOT(pieceRemoved(GamePiece*)) );
 }
 
@@ -23,22 +51,22 @@ GameState::GameState(  ) :
 GameState::~GameState()
 {
     this->clear();
-    delete m_sc;
+    delete impl;
 }
 
 QGraphicsScene * GameState::scene()
 {
-    return m_sc;
+    return impl->scene;
 }
 
 void GameState::pieceAdded( GamePiece * pc )
 {
-    QGIGamePiece * pv = new QGIGamePiece(pc,m_sc);
+    QGIGamePiece * pv = new QGIGamePiece(pc,impl->scene);
     //pv->setVisible(true);
     //pv->update();
     qDebug() << "GameState::pieceAdded() added QGIGamePiece"
 	     << static_cast<QObject*>(pv);
-    //m_sc->update();
+    //impl->scene->update();
 }
 void GameState::pieceRemoved( GamePiece * )
 {
@@ -49,20 +77,20 @@ void GameState::clear()
 {
     // Pieces should be cleared first, to avoid potential double or otherwise inappropriate
     // deletes due to the use QObject::deleteLater() in QGIGamePiece.
-    m_b.clear();
+    impl->board.clear();
     this->pieces().clearPieces();
-    QList<QGraphicsItem *> ql(m_sc->items()); 
+    QList<QGraphicsItem *> ql(impl->scene->items()); 
     //qDebug() <<"GameState::clear() trying to clear"<<ql.size()<<" QGI items";
     qboard::destroy( ql );
 }
 
 GamePieceList & GameState::pieces()
 {
-    return m_pc;
+    return impl->pieces;
 }
 QBoard & GameState::board()
 {
-    return m_b;
+    return impl->board;
 }
 
 bool GameState::serialize( S11nNode & dest ) const
@@ -73,7 +101,7 @@ bool GameState::serialize( S11nNode & dest ) const
     // look at all QGIGamePieces and sync their position properties. So lame.
     // This is why members of this type are mutable.
     typedef QList<QGraphicsItem *> QL;
-    QL ql( this->m_sc->items() );
+    QL ql( this->impl->scene->items() );
     QL::iterator it = ql.begin();
     QL::iterator et = ql.end();
     QList<Serializable*> nonPiece;
@@ -107,8 +135,8 @@ bool GameState::serialize( S11nNode & dest ) const
 	    // ^^^^ Note that we do not use setPieceProperty() to avoid triggering a piecePropertySet() signal. 
 	}
     }
-    return s11n::serialize_subnode( dest, "board", this->m_b )
-	&& s11n::serialize_subnode( dest, "pieces", this->m_pc )
+    return s11n::serialize_subnode( dest, "board", this->impl->board )
+	&& s11n::serialize_subnode( dest, "pieces", this->impl->pieces )
 	&& (nonPiece.isEmpty() ? true : s11nlite::serialize_subnode( dest, "graphicsitems", nonPiece ) )
 	;
 }
@@ -117,13 +145,13 @@ bool GameState::deserialize(  S11nNode const & src )
 {
     if( ! this->Serializable::deserialize( src ) ) return false;
 #if QT_VERSION >= 0x040400
-    m_sc->clear();
+    impl->scene->clear();
 #else
-    m_sc->destroyItemGroup( m_sc->createItemGroup( m_sc->items() ));
+    impl->scene->destroyItemGroup( impl->scene->createItemGroup( impl->scene->items() ));
 #endif
-    if( ! s11n::deserialize_subnode( src, "board", this->m_b ) ) return false;
-    if( ! s11n::deserialize_subnode( src, "pieces", this->m_pc ) ) return false;
-    //qDebug() << "GameState::deserialize() got"<<m_pc.size()<<"pieces.";
+    if( ! s11n::deserialize_subnode( src, "board", this->impl->board ) ) return false;
+    if( ! s11n::deserialize_subnode( src, "pieces", this->impl->pieces ) ) return false;
+    //qDebug() << "GameState::deserialize() got"<<impl->pieces.size()<<"pieces.";
     S11nNode const * ch = s11n::find_child_by_name(src, "graphicsitems");
     if( ch )
     {
@@ -140,7 +168,7 @@ bool GameState::deserialize(  S11nNode const & src )
 		s11n::cleanup_serializable( li );
 		return false;
 	    }
-	    m_sc->addItem( gi );
+	    impl->scene->addItem( gi );
 	}
     }
     return true;

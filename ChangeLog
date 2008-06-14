@@ -3,7 +3,16 @@ are at the top.
 
 ========================================================================
 
-2008 Jun 13:
+2008 June 14:
+
+- Too many little changes to remember.
+
+- Added initial copy/cut support.  Paste is on the todo list, but
+pasting is inherently target- and source-specific, so that'll take a
+bit of work.
+
+
+2008 June 13:
 
 - Initial release via Google Code.
 
