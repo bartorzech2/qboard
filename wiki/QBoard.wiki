@@ -35,7 +35,7 @@ See also: the [TODOs] Page
 == Requirements ==
 
   * Patience. It's alpha software.
-  * Qt 4.4 with STL support enabled. It works with Qt 4.3.0-4.3.5, but has some significantly weird behaviours in those versions which don't show up on 4.4.
+  * Qt 4.3.x or 4.4.x with STL support enabled and optionally with OpenGL. QBoard works with Qt 4.3.0-4.3.5, but has some significantly weird behaviours in those versions which don't show up on 4.4 (e.g. the board always scales itself to fit a larger window, which it shouldn't do).
   * Platforms: it tries to be platform-independent, and it "should" work on any Qt platform which supports all the big Qt features (e.g. QWebKit, STL, etc.). i would love to hear from anyone who tries it on non-Linux platforms.
   * Some graphics which you can use as game boards and playing pieces. We've got some free gaming maps at http://wanderinghorse.net/gaming/maps and free counters (playing pieces) at http://wanderinghorse.net/gaming/counters.
   * [http://s11n.net libs11n] 1.2.7+. It comes with a standalone copy of s11n, so you don't need to download it. (A copy is used because libs11n can't work as a DLL on Windows due to broken linking conventions on those platforms, so we have to compile it directly in.) s11n requires a fairly recent C++ compiler - gcc 4.1+ are believed to be okay, as are newer MS compilers.
@@ -49,7 +49,7 @@ change significantly.
 
 The copy of the source code in Subversion may or may not work at any given
 moment (normally it does, though). Occasionally it reaches a point where we say, "it works! Ship it!" Those are the "official" releases (available via the
-downloads link), and are believed to be free of major defects
+downloads link), and are _believed_ to be free of major defects
 (e.g. crashes or other data loss).
 
 That said - there will be times when a release is not strictly backwards-compatible (i.e. cannot read all data written with an earlier version). This will probably be minimal, however, because the i/o layer allows us to easily support multiple versions of an object's i/o format in many cases. There are *never* any guarantees that an older version of QBoard can read all data written by a newer version.
