@@ -14,11 +14,11 @@ class Serializable
 public:
     virtual ~Serializable();
     /**
-       This default implementation sets the polymorphic
-       type's class name in dest. Subclasses should always
-       call this implementation as their first serialization
-       operation, and return false or throw if this function
-       fails. 
+       This default implementation sets the polymorphic type's class
+       name in dest. Subclasses should always call this implementation
+       (or, more properly, that of their direct Serializable ancestor)
+       as their first serialization operation, and return false or
+       throw if this function fails.
     */
     virtual bool serialize( S11nNode & dest ) const;
     /** Deserializes src to this object.
@@ -47,16 +47,25 @@ public:
        Returns true on success, false on error.
     */
     virtual bool load( QString const & );
+    /**
+       Loads this object from the given stream.
+     */
     virtual bool load( std::istream & );
     /**
-       Serializes this object's state to the given file.
-       If a s11nFileExtension() has been set, it is automatically
-       appended to the name if the name doesn't have that
-       extension already.
+       Serializes this object's state to the given file.  If a
+       s11nFileExtension() has been set and autoAddFileExtension is
+       true, the extension is automatically appended to the name if
+       the name doesn't have that extension already.
 
        Returns true on success, false on error.
+
+       The autoAddFileExtension parameter SHOULD default to true,
+       but i don't like the idea of virtuals having default values.
     */
-    virtual bool save( QString const & ) const;
+    virtual bool save( QString const &, bool autoAddFileExtension ) const;
+    /**
+       Saves this object to the given stream using serialize().
+    */
     virtual bool save( std::ostream & ) const;
     /**
        Returns the file extension associated with this type.
@@ -82,9 +91,17 @@ public:
     Serializable * clone() const;
 protected:
     /**
+       Implemented using this->copy(rhs).
+    */
+    Serializable & operator=( Serializable const & rhs );
+    /**
+       Implemented using this->copy(rhs).
+    */
+    Serializable( Serializable const & );
+    /**
        Uses de/serialize() to create a polymorphic copy of rhs.
        On error (e.g. an attempt to copy between two different
-       types) it throws.
+       polymorphic types) it throws.
     */
     Serializable & copy( Serializable const & rhs );
     /** This sets s11nClass(cn) and sets s11nFileExtension()
