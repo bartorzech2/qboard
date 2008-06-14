@@ -1,6 +1,6 @@
 #summary Want to contribute? Here's how!
 
-The main reason for moving QBoard to Google Code was to help attract other developers. With more developers, each with their own views of right and wrong, which QLayout to use, and which shade of pink looks best on Madonna, really increases the innovation level of a project.
+The main reason for moving QBoard to Google Code was to help attract other developers. With more developers, each with their own views of right and wrong, which QLayout to use, and which shade of blue looks best on Jennifer Connelly, really increases the innovation level of a project.
 
 If you would like to contribute, please get in touch:
 
