@@ -86,9 +86,11 @@ void QGIGamePiece::updatePiecePos(bool onlyIfNotSet)
 	    }
 	}
 	m_pc->setPos( this->pos().toPoint() );
+#if 0
 	qDebug() << "QGIGamePiece::updatePiecePos("
 		 <<onlyIfNotSet<<") ="<<this->pos().toPoint()
 		 << "var="<<var;
+#endif
 	//m_pc->setPos(this->pos().toPoint());
 }
 
