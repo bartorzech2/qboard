@@ -470,6 +470,6 @@ bool QGIGamePiece::serialize( S11nNode & dest ) const
 bool QGIGamePiece::deserialize( S11nNode const & src )
 {
     if( ! this->Serializable::deserialize( src ) ) return false;
-    this->setPiece( new GamePiece );
+    if( ! m_pc ) this->setPiece( new GamePiece );
     return s11nlite::deserialize_subnode<GamePiece>( src, "piece", *m_pc );
 }
