@@ -438,7 +438,7 @@ namespace QBBatch {
 	    //COUT << "Saving to ["<<rol<<"]\n";
 	    bool worked = (rol.empty() || (rol=="-"))
 		? st.gstate->save( std::cout )
-		: st.gstate->save( QString(rol.c_str()) );
+		: st.gstate->save( QString(rol.c_str()), true );
 	    if( worked )
 	    {
 		QBB_VERBOSE << "Saved game state to ["

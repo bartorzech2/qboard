@@ -105,9 +105,9 @@ void QBoard::clear()
 
 bool QBoard::save( QString const & fn) const
 {
-    return this->Serializable::save(fn);
+    return this->Serializable::save(fn, true);
 }
-bool QBoard::load( QString const & fn)
+bool QBoard::load( QString const & fn )
 {
     this->m_file = fn;
     if( this->fileNameMatches(fn) )

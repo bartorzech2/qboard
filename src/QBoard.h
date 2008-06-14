@@ -30,8 +30,11 @@ public:
 	virtual bool event( QEvent * e );
 
 public Q_SLOTS:
-	virtual bool load( QString const & );
-	virtual bool save( QString const & ) const;
+    /**
+       Reimplemented to accept image files as an argument.
+    */
+    virtual bool load( QString const & );
+    virtual bool save( QString const & ) const;
     /**
        Clears the state of the board.
     */
