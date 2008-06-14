@@ -12,7 +12,7 @@ QBoard::QBoard()
 
 QBoard::~QBoard()
 {
-    qDebug() << "~QBoard()";
+    //qDebug() << "~QBoard()";
 }
 #include <QDynamicPropertyChangeEvent>
 bool QBoard::event( QEvent * e )

@@ -12,6 +12,11 @@ GameState::GameState(  ) :
 	m_b(),
 	m_sc( new QGraphicsScene( QRectF(0,0,200,200) ) )
 {
+
+    QObject::connect( &m_pc, SIGNAL(pieceAdded(GamePiece*)),
+		      this, SLOT(pieceAdded(GamePiece*)) );
+    QObject::connect( &m_pc, SIGNAL(pieceRemoved(GamePiece*)),
+		      this, SLOT(pieceRemoved(GamePiece*)) );
 }
 
 
@@ -26,6 +31,20 @@ QGraphicsScene * GameState::scene()
 	return m_sc;
 }
 
+void GameState::pieceAdded( GamePiece * pc )
+{
+    QGIGamePiece * pv = new QGIGamePiece(pc,m_sc);
+    //pv->setVisible(true);
+    //pv->update();
+    qDebug() << "GameState::pieceAdded() added QGIGamePiece"
+	     << static_cast<QObject*>(pv);
+    //m_sc->update();
+}
+void GameState::pieceRemoved( GamePiece * )
+{
+    // FIXME: try to find the view for the piece
+}
+
 void GameState::clear()
 {
 	// Pieces should be cleared first, to avoid potential double or otherwise inappropriate
@@ -34,27 +53,8 @@ void GameState::clear()
 	QList<QGraphicsItem *> ql(m_sc->items()); 
 	//qDebug() <<"GameState::clear() trying to clear"<<ql.size()<<" QGI items";
 	qboard::destroy( ql );
-
 }
 
-size_t GameState::takePieces( GamePieceList &other )
-{
-	GamePieceList tmp;
-	tmp.blockSignals(true);
-	tmp.takePieces( other );
-	qDebug() << tmp.size() << other.size();
-	GamePieceList::iterator it = tmp.begin();
-	GamePieceList::iterator et = tmp.end();
-	size_t ret = 0;
-	for( ; et != it; ++it, ++ret )
-	{
-		GamePiece * pc = *it;
-		this->pieces().addPiece(*it);
-		new QGIGamePiece(pc,this->m_sc);
-	}
-	tmp.clearNoDelete();
-	return ret;
-}
 GamePieceList & GameState::pieces()
 {
 	return m_pc;
@@ -95,8 +95,12 @@ bool GameState::serialize( S11nNode & dest ) const
 		}
 		GamePiece * pc = v->piece();
 		if( ! pc ) continue;
-		pc->setProperty("pos",v->pos());
-		// ^^^^ Note that we do not use setPieceProperty() to avoid triggering a piecePropertySet() signal. 
+		QVariant ppos( pc->property("pos") );
+		if( ! ppos.isValid() )
+		{
+		    pc->setProperty("pos",v->pos().toPoint() );
+		    // ^^^^ Note that we do not use setPieceProperty() to avoid triggering a piecePropertySet() signal. 
+		}
 	}
 	return s11n::serialize_subnode( dest, "board", this->m_b )
 		&& s11n::serialize_subnode( dest, "pieces", this->m_pc )
@@ -107,7 +111,6 @@ bool GameState::serialize( S11nNode & dest ) const
 bool GameState::deserialize(  S11nNode const & src )
 {
 	if( ! this->Serializable::deserialize( src ) ) return false;
-	m_pc.clearPieces();
 #if QT_VERSION >= 0x040400
 	m_sc->clear();
 #else
@@ -116,12 +119,6 @@ bool GameState::deserialize(  S11nNode const & src )
 	if( ! s11n::deserialize_subnode( src, "board", this->m_b ) ) return false;
 	if( ! s11n::deserialize_subnode( src, "pieces", this->m_pc ) ) return false;
 	//qDebug() << "GameState::deserialize() got"<<m_pc.size()<<"pieces.";
-	GamePieceList::iterator it = m_pc.begin();
-	GamePieceList::iterator et = m_pc.end();
-	for( ; et != it; ++it )
-	{
-		new QGIGamePiece((*it),m_sc);
-	}
 	S11nNode const * ch = s11n::find_child_by_name(src, "graphicsitems");
 	if( ch )
 	{

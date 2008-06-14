@@ -4,6 +4,8 @@
 #include <QDebug>
 #include <QFont>
 #include "MenuHandlerPiece.h"
+#include "utility.h"
+
 struct QGIGamePiece::Impl
 {
 	QColor backgroundColor;
@@ -60,7 +62,7 @@ void QGIGamePiece::setup()
 
 QGIGamePiece::~QGIGamePiece()
 {
-	qDebug() << "~QGIGamePiece()";
+	QBOARD_VERBOSE_DTOR << "~QGIGamePiece()";
 #if 1
 	if( m_pc )
 	{
@@ -75,9 +77,19 @@ QGIGamePiece::~QGIGamePiece()
 void QGIGamePiece::updatePiecePos(bool onlyIfNotSet)
 {
 	if( ! m_pc ) return;
-	if( onlyIfNotSet && m_pc->hasProperty("pos")) return;
-	//m_pc->setProperty("pos", this->pos() );
-	m_pc->setPos(this->pos().toPoint());
+	QVariant var = m_pc->property("pos");
+	if( onlyIfNotSet )
+	{
+	    if( var.isValid() )
+	    {
+		this->setPos( var.toPointF() );
+	    }
+	}
+	m_pc->setPos( this->pos().toPoint() );
+	qDebug() << "QGIGamePiece::updatePiecePos("
+		 <<onlyIfNotSet<<") ="<<this->pos().toPoint()
+		 << "var="<<var;
+	//m_pc->setPos(this->pos().toPoint());
 }
 
 void QGIGamePiece::connect( GamePiece * gp )
@@ -286,7 +298,7 @@ void QGIGamePiece::piecePropertySet( char const *pname )
 #include <QGraphicsItem>
 void QGIGamePiece::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 {
-	if( (!m_pc) || (!(ev->buttons() & Qt::LeftButton)) )
+    if( (!m_pc) ) //  || (!(ev->buttons() & Qt::LeftButton)) )
 	{
 		this->QGraphicsPixmapItem::mousePressEvent(ev);
 		return;
@@ -298,6 +310,8 @@ void QGIGamePiece::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 	    // and also has trouble knowing whether to show a menu
 	    // or not.
 	    // qDebug() <<"QGIGamePiece::mousePressEvent() RMB:"<<ev;
+	    // ev->ignore(); it doesn't matter if i accept or not!
+	    // ev->accept();
 	    return;
 	}
 	else if( ev->buttons() & Qt::LeftButton )
@@ -347,7 +361,7 @@ void QGIGamePiece::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
 	event->accept();
 	MenuHandlerPiece mh;
 	mh.doMenu( this, event );
-	this->QGraphicsPixmapItem::contextMenuEvent(event);
+	//this->QGraphicsPixmapItem::contextMenuEvent(event);
 }
 void QGIGamePiece::destroyWithPiece()
 {
