@@ -650,7 +650,7 @@ bool QObjectProperties_s11n::operator()( S11nNode & dest, QObject const & src ) 
 	for( ; et != it; ++it )
 	{
 		char const * key = it->constData();
-		if( *key == '_' ) continue; // Qt reserves "_q_" prefix, so we'll elaborate on that.
+		if( !key || (*key == '_') ) continue; // Qt reserves the "_q_" prefix, so we'll elaborate on that.
 		if( ! s11n::serialize_subnode( dest, key, src.property( key ) ) )
 		{
 			return false;
@@ -660,19 +660,34 @@ bool QObjectProperties_s11n::operator()( S11nNode & dest, QObject const & src ) 
 }
 bool QObjectProperties_s11n::operator()( S11nNode const & src, QObject & dest ) const
 {
-	typedef S11nNodeTraits::child_list_type CLT;
-	CLT::const_iterator it = S11nNodeTraits::children(src).begin();
-	CLT::const_iterator et = S11nNodeTraits::children(src).end();
-	QString key;
-	S11nNode const * node = 0;
-	std::string nname;
+
+    {
+	// First we need to ensure a clean slate by removing all properties from dest:
+	typedef QList<QByteArray> QL;
+	QL ql( dest.dynamicPropertyNames() );
+	QL::const_iterator it( ql.begin() );
+	QL::const_iterator et( ql.end() );
 	for( ; et != it; ++it )
 	{
-		node = *it;
-		QVariant vari;
-		if( ! s11n::deserialize( *node, vari ) ) return false;
-		nname = S11nNodeTraits::name(*node);
-		dest.setProperty( nname.c_str(), vari ); 
+	    char const * key = it->constData();
+	    if( *key == '_' ) continue; // Qt reserves the "_q_" prefix, so we'll elaborate on that.
+	    dest.setProperty( key, QVariant() );
 	}
-	return true;
+    }
+
+    typedef S11nNodeTraits::child_list_type CLT;
+    CLT::const_iterator it = S11nNodeTraits::children(src).begin();
+    CLT::const_iterator et = S11nNodeTraits::children(src).end();
+    QString key;
+    S11nNode const * node = 0;
+    std::string nname;
+    for( ; et != it; ++it )
+    {
+	node = *it;
+	QVariant vari;
+	if( ! s11n::deserialize( *node, vari ) ) return false;
+	nname = S11nNodeTraits::name(*node);
+	dest.setProperty( nname.c_str(), vari ); 
+    }
+    return true;
 }
