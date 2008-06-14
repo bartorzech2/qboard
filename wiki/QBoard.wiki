@@ -41,11 +41,11 @@ See also: the [TODOs] Page
   * [http://s11n.net libs11n] 1.2.7+. It comes with a standalone copy of s11n, so you don't need to download it. (A copy is used because libs11n can't work as a DLL on Windows due to broken linking conventions on those platforms, so we have to compile it directly in.) s11n requires a fairly recent C++ compiler - gcc 4.1+ are believed to be okay, as are newer MS compilers.
 
 
-== Status ==
+== Development Status ==
 
 QBoard is very much beta software. It runs fine, but some important
 features are as yet unimplemented, and some other things will probably
-change significantly.
+change significantly over time. QBoard is not a project which aims to ever have a "1.0" release, and to that end it uses the release date, in YYYYMMDD format, as a version number.
 
 The copy of the source code in Subversion may or may not work at any given
 moment (normally it does, though). Occasionally it reaches a point where we say, "it works! Ship it!" Those are the "official" releases (available via the
