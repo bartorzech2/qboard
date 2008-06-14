@@ -26,8 +26,7 @@
 QBoardView::QBoardView( QBoard & b, QGraphicsScene * par ) :
     QGraphicsView(par),
     m_b(b),
-    m_scale(1.0),
-    m_pzoom(-1.0)
+    m_scale(1.0)
 {
     //this->setCacheMode(QGraphicsView::CacheBackground);
     connect( &m_b, SIGNAL(loaded()), this, SLOT(updateBoardPixmap()) );
@@ -51,13 +50,6 @@ QBoardView::~QBoardView()
 {
     QBOARD_VERBOSE_DTOR << "~QBoardView()";
 }
-void QBoardView::persistentZoom( qreal r)
-{
-    // this->zoom( (this->m_pzoom = r) ); // doing this alone causes scrollbars to disappear in some cases?
-    this->m_pzoom = r;
-    this->updateBoardPixmap(); // kludge to work around missing scrollbars
-
-}
 
 void QBoardView::setHandDragMode(bool handMode )
 {
@@ -72,10 +64,10 @@ QSize QBoardView::sizeHint() const
     if( ! this->m_b.pixmap().isNull() )
     {
 	sz = this->m_b.pixmap().size();
-	if( this->m_pzoom > 0.0 )
+	if( m_scale != 1.0 )
 	{
-	    sz.setHeight( sz.height() * m_pzoom );
-	    sz.setWidth( sz.width() * m_pzoom );
+	    sz.setWidth( sz.width() * m_scale );
+	    sz.setHeight( sz.height() * m_scale );
 	}
     }
     else
@@ -90,23 +82,12 @@ void QBoardView::updateBoardPixmap()
     //this->setBackgroundBrush(m_b.pixmap());
     if( m_b.pixmap().isNull() ) return;
     QSize isz = m_b.pixmap().size();
-    if( this->m_pzoom <= 0.0 )
-    {
-	this->resize(isz);
-    }
     this->resetTransform();
     this->resetMatrix();
     QRectF rect( 0, 0, isz.width(),  isz.height() );
     this->setSceneRect( rect );
     //this->setBackgroundBrush(m_b.pixmap());
-    if( this->m_pzoom > 0.0 )
-    {
-	this->zoom( m_pzoom );
-    }
-    else
-    {
-	this->updateGeometry();
-    }
+    this->updateGeometry();
 }
 
 void QBoardView::drawBackground( QPainter *p, const QRectF & rect )
@@ -182,6 +163,18 @@ void QBoardView::zoom( qreal z )
     if( (z < 0.10) || (z>4.01) ) return; // arbitrary! 
     if( z == m_scale ) return;
     m_scale = z;
+    qDebug() << "QBoardView::zoom()"<<m_scale;
+#if 0
+    QSizeF isz(m_b.pixmap().size());
+    if( 1.0 != z )
+    {
+	isz.scale( std::ceil( isz.width() * m_scale ),
+		   std::ceil( isz.height() * m_scale ),
+		   Qt::IgnoreAspectRatio );
+    }
+    this->resize(isz.toSize());
+    this->scale( m_scale, m_scale );
+#else
     QSizeF isz(m_b.pixmap().size());
     if( 1.0 != z )
     {
@@ -194,6 +187,7 @@ void QBoardView::zoom( qreal z )
     //this->resetMatrix();
     this->resize(isz.toSize());
     this->scale( m_scale, m_scale );
+#endif
     this->updateGeometry(); // without this, scrollbars get out of sync.
 }
 
@@ -204,11 +198,13 @@ void QBoardView::zoomReset()
 
 void QBoardView::mousePressEvent( QMouseEvent * event )
 {
+#if 0
     if (QGraphicsItem *item = itemAt(event->pos())) {
 	qDebug() << "QBoardView::mousePressEvent(): You clicked on item" << item;
     } else {
 	qDebug() << "QBoardView::mousePressEvent(): You didn't click on an item.";
     }
+#endif
     if( event->button() & Qt::MidButton )
     { // center view on clicked pos.
 	event->accept();
@@ -218,12 +214,13 @@ void QBoardView::mousePressEvent( QMouseEvent * event )
     if( event->button() & Qt::RightButton )
     {
 	/**
-	   If we don't do this then right-clicking
-	   a selected item will cause the selection to be unselected.
-	   Whether we accept() the event or not appears to make
-	   no difference whatsoever.
+	   If we don't do this then right-clicking a selected item
+	   will cause the selection to be unselected. Whether we
+	   accept() the event or not appears to make no difference
+	   whatsoever.
 
-	   Took me a frigging hour to find the cause of it.
+	   Took me a frigging hour to find the cause of my selections
+	   being lost.
 	*/
 	return;
     }
@@ -237,8 +234,7 @@ QBoard & QBoardView::board()
 
 void QBoardView::dragMoveEvent( QDragMoveEvent * ev )
 {
-    ev->ignore();
-    qDebug() << "QBoardView::dragMoveEvent() pos =="<<ev->pos();
+    //qDebug() << "QBoardView::dragMoveEvent() pos =="<<ev->pos();
     return QGraphicsView::dragMoveEvent(ev);
 }
 
@@ -260,8 +256,7 @@ void QBoardView::contextMenuEvent( QContextMenuEvent * event )
 {
     // i can't believe this is the only way to know if the menu event
     // needs to be passed to an item!
-    QGraphicsItem * it = this->itemAt( event->pos() );
-    if( ! it )
+    if( ! this->itemAt( event->pos() ) )
     {
 	MenuHandlerBoard mh;
 	mh.doMenu( this, event );
