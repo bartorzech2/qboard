@@ -88,7 +88,7 @@ bool GamePiece::setPieceProperty( char const * name, QVariant const & v)
 {
 	if( ! QVariant_s11n::canHandle( v.type() ) )
 	{
-		qDebug() << "GamePiece::setPieceProperty(["<<name<<"],["<<v<<"]) rejecting unknown QVariant type.";
+	        qDebug() << "GamePiece::setPieceProperty(["<<name<<"],["<<v<<"]) rejecting unknown QVariant type.";
 		return false;
 	}
 	bool ret = this->setProperty(name,v);
@@ -245,13 +245,12 @@ bool GamePieceList::deserialize( S11nNode const & src )
 	typedef std::auto_ptr<GamePiece> GP;
 	for( ; et != it; ++it )
 	{
-	    qDebug() <<"GamePieceList::deserialize() doing child...";
-		GP gp( new GamePiece );
-		if( ! s11n::deserialize<S11nNode,GamePiece>( *(*it), *gp ) )
-		{
-			return false;
-		}
-		this->addPiece(gp.release());
+	    GP gp( s11nlite::deserialize<GamePiece>( *(*it) ) );
+	    if( ! gp.get() )
+	    {
+		return false;
+	    }
+	    this->addPiece(gp.release());
 	}
 	return true;
 }
