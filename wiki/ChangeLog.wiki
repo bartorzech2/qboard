@@ -7,6 +7,16 @@ are at the top.
 
 ----
 
+2008 June 15:
+
+- Fixed a major bug under Qt 4.3 which caused non-piece gameboard items
+to be not removed. The end effect was duplicate or extra items at
+load-time.
+
+- The main app can now process .qbbatch script files (the same files
+read by qboardbatch).
+
+
 2008 June 14:
 
 - Fixed the broken app icons for qt 4.3. This was caused by an inconsistency
