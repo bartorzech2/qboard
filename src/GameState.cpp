@@ -147,10 +147,14 @@ bool GameState::serialize( S11nNode & dest ) const
 bool GameState::deserialize(  S11nNode const & src )
 {
     if( ! this->Serializable::deserialize( src ) ) return false;
+#if 1
+    this->clear();
+#else
 #if QT_VERSION >= 0x040400
     impl->scene->clear();
 #else
     impl->scene->destroyItemGroup( impl->scene->createItemGroup( impl->scene->items() ));
+#endif
 #endif
     if( ! s11n::deserialize_subnode( src, "board", this->impl->board ) ) return false;
     if( ! s11n::deserialize_subnode( src, "pieces", this->impl->pieces ) ) return false;
