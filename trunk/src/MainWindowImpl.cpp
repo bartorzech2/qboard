@@ -289,7 +289,11 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 		GameState bogo;
 		QBBatch::process_scripts( &bogo, li );
 		impl->fb->reloadDir();// in case script generated anything.
-		worked = true;
+		S11nNode node;
+		if( bogo.serialize(node) && impl->gstate.deserialize(node) )
+		{
+		    worked = true;
+		}
 	    }
 	    catch(std::exception const & ex)
 	    {
