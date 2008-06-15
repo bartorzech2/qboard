@@ -127,20 +127,14 @@ namespace qboard {
 	void destroy( QList<QGraphicsItem *> & tops )
 	{
 		typedef QList<QGraphicsItem *> QL;
+		QGraphicsScene * sc = 0;
 		for( QL::iterator it = tops.begin(); tops.end() != it; ++it )
 		{
 			if( (*it)->parentItem() )
 			{
-				qDebug() << "qboard::destroy(QList) skipping parented item.";
+			    //qDebug() << "qboard::destroy(QList) skipping parented item.";
 				continue;
 			}
-#if 0 // unfortunate klude for now
-			if( QGIGamePiece * pcv = dynamic_cast<QGIGamePiece*>(*it) )
-			{ // this needs to go away!!!!
-				pcv->destroyWithPiece();
-				continue;
-			}
-#endif
 #if 1 // i don't like this, but it avoids some crashes!
 			if( QObject * obj = dynamic_cast<QObject*>(*it) )
 			{ // kludge to help avoid stepping on self during Destroy/Delete actions
@@ -149,8 +143,14 @@ namespace qboard {
 			}
 			else
 			{
-				qDebug() << "qboard::destroy(QList) delete *it:"<<*it;
-				delete *it;
+			    sc = (*it)->scene();
+			    if( sc )
+			    {
+				qDebug() << "qboard::destroy(QList) asking Scene to remove *it:"<<*it;
+				sc->removeItem(*it);
+			    }
+			    qDebug() << "qboard::destroy(QList) delete *it:" <<*it;
+			    delete *it;
 			}
 #else
 			qDebug() << "qboard::destroy(QList) delete *it:"<<*it;
