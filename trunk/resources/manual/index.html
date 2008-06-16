@@ -1,7 +1,70 @@
 <html>
   <head>
-    <title>QBoard User's Guide</title><style></style>
-<link rel="stylesheet" href="style.css" type="text/css"/>
+    <title>QBoard User's Guide</title><style>
+body {
+  background: #fff;
+  font-family: sans-serif, Verdana, Arial, serif, Tahoma;
+  color: #003;
+	margin: 0 0 0 0;
+}
+
+a:link { color: #002; text-decoration: underline; }
+a:visited { color: #002; text-decoration: underline;}
+a:hover { background: #002; color:#fff; text-decoration: underline;}
+
+hr {
+  height: 3px;
+  border-top: 1px dashed #005;
+  border-bottom: 1px dashed #005;
+  border-left: none;
+  border-right: none;
+}
+
+h1 {
+  font-size: 18pt;
+  padding: 2px 1em 2px 1em;
+  color: #585830;
+  background-color: #cccc99;
+  text-align: center;
+  border: 1px solid #000;
+  padding: 0.3em;
+  background-image: url('/img/wh-logo-tiny.png');
+  background-repeat: no-repeat;
+  background-position: 98% center;
+}
+
+h2 {
+  font-size: 14pt;
+  padding: 2px 1em 2px 1em;
+  border: 1px solid #000;
+  color: #585830;
+  background-color: #cccc99;
+}
+
+h3 {
+  color: inherited;
+  font-size: 12pt;
+}
+
+.highlight1 {
+  color: #000000;
+  background: #fff;
+}
+
+.highlight0 {
+  color: #000000;
+  background: #f0f0f0;
+}
+
+.achtung {
+  color: #ff0000;
+  background: #ffff00;
+  border: 1px inset #ff0000;
+  padding: 5px;
+  font-style: italic;
+}
+
+</style>
   </head>
 <style></style>
   <body>
@@ -12,10 +75,11 @@ QBoard is a program for setting up and playing nearly arbitrary board-style game
 Just like a real board game, it knows nothing about the rules. Instead, it provides
 a "playing surface" on top of which can be done whatever one wishes.
 
+
 <br/><br/>
 
 As QBoard is based on the <a href='http://www.trolltech.com/qt'>Qt4 library</a>,
-QBoard is released under the terms of the GNU General Public License 3.
+QBoard is released under the terms of the GNU General Public License version 2 or 3.
 
 
 <h2>Brief HOWTO</h2>
@@ -26,7 +90,7 @@ A brief guide on how to do thing in QBoard...
 To allow us to save relative paths in our data files, we need a common
 root directory which is portable across platforms. To that end, we
 request that you store all QBoard-related data files under the QBoard
-home directory (<tt></tt>~/.QBoard</tt>). QBoard tries its best to
+home directory (<tt>~/.QBoard</tt>). QBoard tries its best to
 make sure you stay inside the home directory. For example, when
 loading graphics files for pieces and boards, it uses a path relative
 to the home, if possible, as this makes the saved data portable to
@@ -67,6 +131,11 @@ compiled against Qt 4.4!).</li>
 </li>
 </ul>
 
+<h3>More...</h3>
+
+The QBoard documentation is maintained as a Wiki page at the project's web site:<br/><br/>
+
+<a href='http://code.google.com/p/qboard'>http://code.google.com/p/qboard</a>
 
 </body>
 </html>
