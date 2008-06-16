@@ -1,4 +1,5 @@
 #summary Getting started with QBoard
+#labels Featured
 = HOWTO: getting started with QBoard =
 
 This guide gives a brief overview of how to get started with QBoard.
