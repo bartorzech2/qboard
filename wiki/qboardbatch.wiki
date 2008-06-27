@@ -31,7 +31,7 @@ set color 128 128 255
 set pos 10 20
 
 // Save the game:
-save
+save mygame
 // If you want to save to stdout instead of a file,
 // just leave off the 'mygame' part.
 }}}
