@@ -37,7 +37,7 @@ See also: the [TODOs] Page
 
 == Requirements ==
 
-  * Patience. It's alpha software.
+  * Patience. It's beta software.
   * Qt 4.3.x or 4.4.x with STL support enabled and optionally with OpenGL. QBoard works with Qt 4.3.0-4.3.5, but has some significantly weird behaviours in those versions which don't show up on 4.4 (e.g. the board always scales itself to fit a larger window, which it shouldn't do).
   * Platforms: it tries to be platform-independent, and it "should" work on any Qt platform which supports all the big Qt features (e.g. QWebKit, STL, etc.). i would love to hear from anyone who tries it on non-Linux platforms.
   * Some graphics which you can use as game boards and playing pieces. We've got some free gaming maps at http://wanderinghorse.net/gaming/maps and free counters (playing pieces) at http://wanderinghorse.net/gaming/counters.
