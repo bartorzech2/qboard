@@ -6,6 +6,10 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top.
 
 ----
+2008 August 9:
+
+- Corrected several compile warnings caught by gcc 4.2.3.
+
 
 2008 June 15:
 
