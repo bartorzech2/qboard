@@ -6,30 +6,40 @@ A "gameset", in the context of QBoard, is simply a collection of graphics and/or
 text files for use with a specific game. QBoard places no inherent limitations
 on the structure of the directories in a gameset or the names of its files.
 
-Below is a short description of the gamesets released via the downloads page. To
+Below are short descriptions of the gamesets released via the downloads page. To
 install a given gameset, simply unpack it to your QBoard home directory.
 
-== CGME Joe ==
-
-*Joe* is a simple strategy combat game where little plastic army men
-do combat on a chessboard. Joe is an original title, created as
-part of the CounterMoves project.
-
-== Steve Jackson's Ogre/G.E.V. ==
-
-[http://sjgames.com/ogre/ Ogre/G.E.V.] are class sci-fi strategy games
-by [http://sjgames.com Steve Jackson]. This set includes a compilation
-of playing pieces and maps for use with the game. The maps were originally
-distributed as part of the V_MAP Ogre gameset, but V_MAP has long be defunct.
-The pieces come in two forms - 35x35-pixel (small) pieces from the V_MAP set,
-or 48x48-pixel (1/2 inch) pieces originally intended as printable replacements
-for the original game counters.
 
 == [http://www.classicbattletech.com/ BattleTech](tm) and friends ==
 
-This set includes pieces (not maps) compatible with the [http://www.classicbattletech.com/ BattleTech line of games]. They can also be used for other games with mecha, of course.
+This set includes lots of pieces (but no maps) compatible with the [http://www.classicbattletech.com/ BattleTech line of games]. They can also be used for other games with mecha, of course.
 You can actually find many BattleTech maps in PDF format at:
 
 [http://www.classicbattletech.com/index.php?action=downloads]
 
 Search that page for "map". But you'll need to extract them from the PDFs before using them with QBoard (their license doesn't allow us to redistribute them here).
+
+
+== CGME Joe ==
+
+*Joe* is a simple strategy combat game where little plastic army men
+do combat on a chessboard. Joe is an original title, created as
+part of the CounterMoves project. It can be learned and played in under
+half an hour.
+
+== Steve Jackson's Ogre/G.E.V. ==
+
+[http://sjgames.com/ogre/ Ogre/G.E.V.] are classic sci-fi strategy games
+by [http://sjgames.com Steve Jackson] depicting armored combat in near-future
+nuclear battlefields. This set includes a compilation of playing pieces and
+maps for use with those games. The maps were originally
+distributed as part of the V_MAP Ogre gameset, but V_MAP has long be defunct.
+The pieces come in two forms:
+
+  * The V_MAP set: 35x35-pixel (small) pieces from the V_MAP set.
+  * The "Cisco" set: 48x48-pixel (1/2 inch) pieces created by Francisco "Cisco" Cestero, originally intended as printable replacements for the official game counters. The "Cisco" counters (48x48 pixels) are best used with enlarged copies of the included maps, as they are larger than the hexes of those maps. Even better, use a scanned copy of the original maps (which look a lot better than the included ones, but cannot be legally redistributed).
+
+While QBoard won't stop you from using those two sets can be used together, they use
+different graphics styles and scales, so interchanging them is not recommended.
+
+The counters all come in the classical black-on-white and white-on-black combinations, plus with transparent backgrounds, so one can use custom colors.
