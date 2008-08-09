@@ -29,6 +29,12 @@ You can actually find many !BattleTech maps in PDF format at:
 Search that page for "map". But you'll need to extract them from the PDFs before using them with QBoard (their license doesn't allow us to redistribute them here).
 
 
+== Hex ==
+
+Hex is a very simple strategy game for two players, with a whopping 1 paragraph
+of rules. Each player places tokens on a hexagon-based board and attempts to
+connect to the far side, blocking his opponent as he goes.
+
 == CGME Joe ==
 
 *Joe* is a simple strategy combat game where little plastic army men
