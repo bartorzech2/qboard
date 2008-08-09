@@ -1,4 +1,5 @@
 #summary Overview of available gamesets
+#labels Featured
 
 = QBoard gamesets =
 
