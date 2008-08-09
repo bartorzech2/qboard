@@ -28,3 +28,8 @@ for the original game counters.
 == [http://www.classicbattletech.com/ BattleTech](tm) and friends ==
 
 This set includes pieces (not maps) compatible with the [http://www.classicbattletech.com/ BattleTech line of games]. They can also be used for other games with mecha, of course.
+You can actually find many BattleTech maps in PDF format at:
+
+[http://www.classicbattletech.com/index.php?action=downloads]
+
+Search that page for "map". But you'll need to extract them from the PDFs before using them with QBoard (their license doesn't allow us to redistribute them here).
