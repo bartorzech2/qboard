@@ -3,8 +3,9 @@
 = QBoard gamesets =
 
 A "gameset", in the context of QBoard, is simply a collection of graphics and/or
-text files for use with a specific game. QBoard places no inherent limitations
-on the structure of the directories in a gameset or the names of its files.
+text files for use with a specific game. They are normally put into a directory
+of their own, and this directory lives under the QBoard home directory.
+QBoard places no inherent limitations on the directory structure of a gameset or the names of its files.
 
 
 = Creating your own sets =
@@ -30,23 +31,23 @@ Search that page for "map". But you'll need to extract them from the PDFs before
 == CGME Joe ==
 
 *Joe* is a simple strategy combat game where little plastic army men
-do combat on a chessboard. Joe is an original title, created as
-part of the CounterMoves project. It can be learned and played in under
-half an hour.
+do combat on a chessboard. Joe is an original title, by yours truly.
+It can be learned and played in under half an hour, and should be flexible
+enough to support a variety of play styles and options.
 
-== Steve Jackson's Ogre/G.E.V. ==
+== Ogre(tm) and G.E.V.(tm) ==
 
-[http://sjgames.com/ogre/ Ogre/G.E.V.] are classic sci-fi strategy games
+[http://sjgames.com/ogre/ Ogre and G.E.V.] are classic sci-fi strategy games
 by [http://sjgames.com Steve Jackson] depicting armored combat in near-future
-nuclear battlefields. This set includes a compilation of playing pieces and
-maps for use with those games. The maps were originally
-distributed as part of the V_MAP Ogre gameset, but V_MAP has long be defunct.
+nuclear battlefields. This set includes a compilation of maps and playing pieces
+(some "official", some not) for use with those games. The maps were originally
+distributed as part of the V_MAP Ogre gameset, but V_MAP has long been defunct.
 The pieces come in two forms:
 
-  * The V_MAP set: 35x35-pixel (small) pieces from the V_MAP set.
-  * The "Cisco" set: 48x48-pixel (1/2 inch) pieces created by Francisco "Cisco" Cestero, originally intended as printable replacements for the official game counters. The "Cisco" counters (48x48 pixels) are best used with enlarged copies of the included maps, as they are larger than the hexes of those maps. Even better, use a scanned copy of the original maps (which look a lot better than the included ones, but cannot be legally redistributed).
+  * The V_MAP set: 35x35-pixel (small) pieces from the venerable V_MAP set, created by Todd Zircher (author of V_MAP).
+  * The "Cisco" set: 48x48-pixel (1/2 inch) pieces created by Francisco "Cisco" Cestero, originally intended as printable replacements for the official game counters. These counters are larger than the hexes on the supplied maps, but can be used on custom maps or printed out.
 
-While QBoard won't stop you from using those two sets can be used together, they use
-different graphics styles and scales, so interchanging them is not recommended.
+While QBoard won't stop you from using those two sets together, they use
+different graphics styles and scales, so interchanging them is not recommended. (One notable exception is that the Cisco Ogre counters might be appropriate for use with the V_MAP sets.)
 
-The counters all come in the classical black-on-white and white-on-black combinations, plus with transparent backgrounds, so one can use custom colors.
+The counters all come in the classical black-on-white and white-on-black combinations, plus with black and white on transparent backgrounds, so one can use custom background colors and translucency.
