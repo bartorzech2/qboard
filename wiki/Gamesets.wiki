@@ -25,6 +25,6 @@ The pieces come in two forms - 35x35-pixel (small) pieces from the V_MAP set,
 or 48x48-pixel (1/2 inch) pieces originally intended as printable replacements
 for the original game counters.
 
-== [http://www.classicbattletech.com/ BattleTech(tm)] and friend ==
+== [http://www.classicbattletech.com/ BattleTech](tm) and friends ==
 
 This set includes pieces (not maps) compatible with the [http://www.classicbattletech.com/ BattleTech line of games]. They can also be used for other games with mecha, of course.
