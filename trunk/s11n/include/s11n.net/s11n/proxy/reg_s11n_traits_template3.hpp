@@ -70,7 +70,7 @@ namespace s11n {
 	static bool cl_reg_placeholder; 
 	static const std::string class_name( const serializable_type * )
 	{
-	    if( cl_reg_placeholder == true ); // just to reference it. w/o this cl reg never happens :(
+	  if( cl_reg_placeholder == true ){1;}; // just to reference it. w/o this cl reg never happens :(
 	    return S11N_TEMPLATE_TYPE_NAME;
 	}
     };
