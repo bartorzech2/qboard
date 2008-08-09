@@ -22,7 +22,7 @@ install a given gameset, simply unpack it to your QBoard home directory.
 == !BattleTech(tm) and friends ==
 
 This set includes lots of pieces (but no maps) compatible with the [http://www.classicbattletech.com/ BattleTech line of games]. They can also be used for other games with mecha, of course.
-You can actually find many BattleTech maps in PDF format at:
+You can actually find many !BattleTech maps in PDF format at:
 
 [http://www.classicbattletech.com/index.php?action=downloads]
 
