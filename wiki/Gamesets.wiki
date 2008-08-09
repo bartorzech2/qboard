@@ -6,9 +6,16 @@ A "gameset", in the context of QBoard, is simply a collection of graphics and/or
 text files for use with a specific game. QBoard places no inherent limitations
 on the structure of the directories in a gameset or the names of its files.
 
+
+= Creating your own sets =
+
+Creating gamesets is trivial - you simply need some graphics and/or text/html files for content. Take a look at the above sets below to see a few possible ways to structure sets.
+QBoard is very free-form and will allow you to use any directory structure you like. A set with only a few graphics might just put them all in one directory. A set with 20 different types of pieces might break then down by category or team team, for example.
+
+= Available sets =
+
 Below are short descriptions of the gamesets released via the downloads page. To
 install a given gameset, simply unpack it to your QBoard home directory.
-
 
 == [http://www.classicbattletech.com/ BattleTech](tm) and friends ==
 
