@@ -1,5 +1,5 @@
 #summary Overview of available gamesets
-#labels Featured
+#labels Featured,Docs-User
 
 = QBoard gamesets =
 
