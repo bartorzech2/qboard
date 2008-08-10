@@ -1,4 +1,5 @@
 #summary The qboardbatch gameset creation tool
+#labels Docs-User
 
 = qboardbatch =
 
