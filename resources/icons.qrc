@@ -1,6 +1,8 @@
 <RCC>
   <qresource prefix="/QBoard" >
     <file>icon/1leftarrow.png</file>
+    <file>icon/unlock.png</file>
+    <file>icon/lock.png</file>
     <file>icon/1rightarrow.png</file>
     <file>icon/button_cancel.png</file>
     <file>icon/button_fewer.png</file>
