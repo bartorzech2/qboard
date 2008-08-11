@@ -115,9 +115,16 @@ contains(QT_VERSION, ^4\.4\..+ ){
 }
 QT = core gui $$QBOARD_QT44
 # FIXME: how to determine dynamically whether to enable OpenGL here?
-#contains(QMAKE_CXXFLAGS,GL){ # ???
-  QT += opengl
-#}
+# QT += opengl
+
+contains(QT,opengl){
+  #DEFINES += QBOARD_USE_OPENGL=1
+  message(Enabling OpenGL support.)
+}
+!contains(QT,opengl){
+  #DEFINES += QBOARD_USE_OPENGL=0
+  message(Disabling OpenGL support.)
+}
 
 
 ########################################################################
