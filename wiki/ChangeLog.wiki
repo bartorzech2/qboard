@@ -6,10 +6,16 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top.
 
 ----
+2008 August 11:
+
+- Added "piece templates" to the main UI. The appearance of the
+currently-selected template is used as the basis when loading piece
+graphics from files. All changed made to the piece templates are
+persistant across QBoard sessions.
+
 2008 August 9:
 
 - Corrected several compile warnings caught by gcc 4.2.3.
-
 
 2008 June 15:
 
