@@ -19,6 +19,7 @@ public:
     GameState & state();
     GameState const & state() const;
     QGraphicsView * view();
+    void applyCurrentTemplate( GamePiece * target );
 public Q_SLOTS:
     /**
        Clears the state of the widget.
@@ -26,8 +27,8 @@ public Q_SLOTS:
     void clear();
 private:
     void setupUI();
-    GameState m_gs;
-    QGraphicsView * m_gv;
+    class Impl;
+    Impl * impl;
 };
 // Register PieceAppearanceWidget with s11n:
 #define S11N_TYPE PieceAppearanceWidget
