@@ -20,6 +20,7 @@ public:
     GameState const & state() const;
     QGraphicsView * view();
     void applyCurrentTemplate( GamePiece * target );
+    void setupDefaultTemplates();
 public Q_SLOTS:
     /**
        Clears the state of the widget.

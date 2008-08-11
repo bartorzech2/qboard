@@ -49,35 +49,47 @@ struct MainWindowImpl::Impl
     PieceAppearanceWidget *paw;
     QWidget * sidebar;
     static char const * fileName;
+    static char const * persistanceClass;
     Impl() : gstate(),
 	     gv(0),
 	     fb(0),
 	     paw(new PieceAppearanceWidget),
 	     sidebar(0)
     {
-	QDir pdir = qboard::persistenceDir( paw->s11nClass() );
+	QDir pdir = qboard::persistenceDir( persistanceClass );
 	QString fn = pdir.canonicalPath() + "/" + fileName;
 	try
 	{
-	    paw->load(fn);
+	    if( ! paw->load(fn) )
+	    {
+		paw->setupDefaultTemplates();
+	    }
 	}
-	catch(...){}
+	catch(...)
+	{
+	    paw->setupDefaultTemplates();
+	}
     }
     ~Impl()
     {
-	/** Reminder: we rely on the fact that the member QWidgets
-	    will be assigned to parent widgets, and we don't delete
-	    them from here. */
-	QDir pdir = qboard::persistenceDir( paw->s11nClass() );
+	QDir pdir = qboard::persistenceDir( persistanceClass );
 	QString fn = pdir.canonicalPath() + "/" + fileName;
 	try
 	{
 	    paw->save(fn,false);
 	}
 	catch(...){}
+	/** Reminder: we could rely on the fact that the member QWidgets
+	    will be assigned to parent widgets, and we don't need delete
+	    them from here. Call me old fashioned. */
+	delete paw;
+	delete gv;
+	delete fb;
+	delete sidebar;
     }
 };
-char const * MainWindowImpl::Impl::fileName = "defaults.PieceAppearanceWidget";
+char const * MainWindowImpl::Impl::fileName = "default-templates";
+char const * MainWindowImpl::Impl::persistanceClass = "MainWindow";
 
 MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f) 
     : QMainWindow(parent, f),

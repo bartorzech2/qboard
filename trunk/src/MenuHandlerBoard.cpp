@@ -87,7 +87,7 @@ void MenuHandlerBoard::doMenu( QBoardView * pv, QContextMenuEvent * ev )
     m.addSeparator();
     m.addAction(QIcon(":/QBoard/icon/editcopy.png"),"Copy board (not pieces)",this,SLOT(doCopy()) );
     //m.addAction(QIcon(":/QBoard/icon/editpaste.png"),"Paste",this,SLOT(doPaste()) );
-#if QBOARDVIEW_USE_OPENGL
+#if QBOARD_USE_OPENGL
     {
 	QAction * ac = m.addAction("Toggle OpenGL Mode",pv, SLOT(setGLMode(bool)) );
 	ac->setCheckable( true );
