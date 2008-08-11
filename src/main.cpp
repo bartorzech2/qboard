@@ -112,10 +112,11 @@ void try_s11n()
 #include <sstream>
 int do_setup()
 {
-#if 0 && (QT_VERSION < 0x040400)
+#if (QT_VERSION < 0x040400)
     std::ostringstream os;
     os << "Warning: your QBoard was built against Qt 4.3.x. While it will be basically functional, "
-       << "there may be weird behaviours under Qt 4.3 which don't show up in Qt 4.4.";
+       << "some features are missing and there may be weird behaviours under Qt 4.3 "
+       << "which don't show up in Qt 4.4.";
     QMessageBox::warning( 0, "Qt 4.3.x warning", os.str().c_str(),
 			  QMessageBox::Ok, QMessageBox::Ok );
 			  
