@@ -283,7 +283,7 @@ void QGIGamePiece::piecePropertySet( char const *pname )
 		setTransform(QTransform().translate(x, y).rotate(ang).translate(-x, -y));
 		return;
 	}
-	if( "posLocked" == key )
+	if( "dragDisabled" == key )
 	{
 	    if( var.isValid() )
 	    {
