@@ -80,12 +80,12 @@ void MenuHandlerPiece::doMenu( QGIGamePiece * pv, QGraphicsSceneContextMenuEvent
 	if(1 && pc)
 	{
 	    QMenu * mMisc = m->addMenu("Misc.");
-	    QVariant lock = pc->property("posLocked");
+	    QVariant lock = pc->property("dragDisabled");
 	    bool locked = lock.isValid()
 		? (lock.toInt() ? true : false)
 		: false;
 	    QVariant newVal = locked ? QVariant(int(0)) : QVariant(int(1));
-	    PiecePropertyAction * act = new PiecePropertyAction(pv,"posLocked",newVal);
+	    PiecePropertyAction * act = new PiecePropertyAction(pv,"dragDisabled",newVal);
 	    act->setIcon(QIcon(":/QBoard/icon/unlock.png"));
 	    act->setCheckable( true );
 	    act->blockSignals(true);

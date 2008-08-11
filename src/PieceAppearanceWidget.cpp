@@ -73,7 +73,7 @@ void PieceAppearanceWidget::setupDefaultTemplates()
 	qgi = this->impl->gs.addPiece( pc );
 	pc->setPieceProperty("size",QSize(step,step));
 	pc->setPieceProperty("pos",QPoint(x,y));
-	pc->setPieceProperty("posLocked",int(1));
+	pc->setPieceProperty("dragDisabled",int(1));
 	//x += step + space;
 	x += step + space;
 	if( ++pos >= (count/rows) )
@@ -197,7 +197,7 @@ void PieceAppearanceWidget::applyCurrentTemplate( GamePiece * tgt )
 
     QVariant pix( tgt->property("pixmap") );
     QVariant pos( tgt->property("pos") );
-    QVariant posLocked( tgt->property("posLocked") );
+    QVariant dragDisabled( tgt->property("dragDisabled") );
     {
 	S11nNode n;
 	impl->pc->serialize( n );
@@ -205,5 +205,5 @@ void PieceAppearanceWidget::applyCurrentTemplate( GamePiece * tgt )
     }
     tgt->setPieceProperty("pos", pos );
     tgt->setPieceProperty("pixmap", pix );
-    tgt->setPieceProperty("posLocked", posLocked );
+    tgt->setPieceProperty("dragDisabled", dragDisabled );
 }
