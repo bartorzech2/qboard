@@ -22,12 +22,12 @@ class QMouseEvent;
 class QPainter;
 class QDragMoveEvent;
 class QContextMenuEvent;
-
+class GameState;
 class QBoardView : public QGraphicsView
 {
 Q_OBJECT
 public:
-	QBoardView( QBoard & b, QGraphicsScene * parent = 0 );
+	QBoardView( GameState & st );
 	virtual ~QBoardView();
 	virtual void wheelEvent(QWheelEvent *event);
 	virtual QSize sizeHint () const;
@@ -35,6 +35,7 @@ public:
        This object's board. Ownership is not changed.
     */
     QBoard & board();
+    GameState & state();
     /**
        Returns true if this object is in OpenGL mode.
     */

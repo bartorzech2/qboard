@@ -22,6 +22,7 @@
 #include <QGraphicsScene>
 
 #include "QBoardView.h"
+#include "GameState.h"
 #include "GL.h"
 #if QBOARD_USE_OPENGL
 #include <QGLWidget>
@@ -33,21 +34,23 @@
 
 struct QBoardView::Impl
 {
+    GameState & gs;
     QBoard & board;
     qreal scale;
     bool glmode;
 
-    Impl(QBoard &b)
-	: board(b),
+    Impl(GameState & s)
+	: gs(s),
+	  board(s.board()),
 	  scale(1.0),
 	  glmode(false)
     {
     }
 };
 
-QBoardView::QBoardView( QBoard & b, QGraphicsScene * par ) :
-    QGraphicsView(par),
-    impl( new Impl(b) )
+QBoardView::QBoardView( GameState & gs ) :
+    QGraphicsView(gs.scene()),
+    impl( new Impl(gs) )
 {
     //this->setCacheMode(QGraphicsView::CacheBackground);
     connect( &impl->board, SIGNAL(loaded()), this, SLOT(updateBoardPixmap()) );
@@ -76,6 +79,10 @@ void QBoardView::setHandDragMode(bool handMode )
 		       : QGraphicsView::RubberBandDrag);
 }
 
+GameState & QBoardView::state()
+{
+    return impl->gs;
+}
 
 bool QBoardView::isGLMode() const
 {
@@ -152,7 +159,8 @@ void QBoardView::drawBackground( QPainter *p, const QRectF & rect )
 	return;
     }
     p->fillRect( rect, this->backgroundBrush() );
-    p->drawPixmap(rect,impl->board.pixmap(),rect);
+    QRect bogo = impl->board.pixmap().rect();
+    p->drawPixmap(bogo, impl->board.pixmap(), bogo );
 }
 
 void QBoardView::wheelEvent(QWheelEvent *event)
