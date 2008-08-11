@@ -29,7 +29,7 @@ http://wanderinghorse.net/gaming/QBoard/thumbs/qboard-20080611-veg.jpg
   * Full control over game piece background colors, transparency, rotation, and border (color, transparency, size, line style). Finally: translucent game pieces!
   * Supports an arbitrary number of dockable "minimap" views, all fully interactive and synchronized in real time.
   * On-board HTML widgets, so you can annotate your game as much as you like.
-  * On-board lines, with customizable colors, line size, and transparency level. Useful for marking movement paths (or histories), firing args, line of sight, and such.
+  * On-board lines, with customizable colors, line size, and transparency level. Useful for marking movement paths (or histories), firing ranges or arcs, line of sight, and such.
   * A very simple batch scripting tool for generating game setups (e.g. use shell scripts to generate games using existing graphics files).
 
 See also: the [TODOs] Page
