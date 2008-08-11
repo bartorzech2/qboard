@@ -23,18 +23,6 @@ class QPainter;
 class QDragMoveEvent;
 class QContextMenuEvent;
 
-/**
-   Using GL mode for QBoardView makes many paint operations much
-   faster, especially when zoomed/rotated.  However, the screen is not
-   always updated properly in GL mode. :(
-*/
-#if ! defined(QBOARDVIEW_USE_OPENGL)
-#  ifndef QT_NO_OPENGL
-#    define QBOARDVIEW_USE_OPENGL 1
-#  else
-#    define QBOARDVIEW_USE_OPENGL 0
-#  endif
-#endif
 class QBoardView : public QGraphicsView
 {
 Q_OBJECT
@@ -64,7 +52,7 @@ public Q_SLOTS:
     void selectAll();
     /** Sets or unsets OpenGL mode, which is faster for many operations
 	but often misses important screen updates.
-	If QBOARDVIEW_USE_OPENGL is false then this function does
+	If QBOARD_USE_OPENGL is false then this function does
 	nothing.
     */
     void setGLMode(bool);
