@@ -24,7 +24,7 @@ http://wanderinghorse.net/gaming/QBoard/thumbs/qboard-20080611-veg.jpg
   * A simple interface for quickly setting up and playing a boardgame.
   * Has powerful and flexible save and load features, making it easy to add load/save support for new data types.
   * Get right to playing - there is no tedious separate setup of "gameset" and "scenario" files, as there is in, e.g., [http://cyberboard.brainiac.com/ CyberBoard] (arguably the most well-known application in this category).
-  * As QBoard has only a fluid concept of what a "game" is, it is possible to mix and match pieces from arbitrary gamesets in the same session.
+  * As QBoard has only a fluid concept of what a "game" is, it is possible to mix and match pieces from arbitrary [Gamesets] in the same session.
   * A zoomable, rotatable playing area (game board + pieces).
   * Full control over game piece background colors, transparency, rotation, and border (color, transparency, size, line style). Finally: translucent game pieces!
   * Supports an arbitrary number of dockable "minimap" views, all fully interactive and synchronized in real time.
