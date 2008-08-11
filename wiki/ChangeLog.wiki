@@ -13,6 +13,8 @@ currently-selected template is used as the basis when loading piece
 graphics from files. All changed made to the piece templates are
 persistant across QBoard sessions.
 
+- Fixed the mis-scaling of boards in Qt 4.3.
+
 2008 August 9:
 
 - Corrected several compile warnings caught by gcc 4.2.3.
