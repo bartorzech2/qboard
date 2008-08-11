@@ -49,6 +49,7 @@ perl -pe "s|^\s*QBOARD_VERSION.+|QBOARD_VERSION=${VERSION}|" < config.qmake > $D
 
 echo "Removing a few unwanted files..."
 find $DEST -name 'qrc_*.cpp' | xargs rm -f
+find $DEST -name nono -o -name release -o -name debug | xargs rm -fr
 
 echo "Tarring...";
 TF=$DEST.tar.bz2
