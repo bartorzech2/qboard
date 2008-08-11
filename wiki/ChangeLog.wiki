@@ -15,6 +15,9 @@ persistant across QBoard sessions.
 
 - Fixed the mis-scaling of boards in Qt 4.3.
 
+- Minimaps now keep their scale when a new board is loaded.
+
+
 2008 August 9:
 
 - Corrected several compile warnings caught by gcc 4.2.3.
