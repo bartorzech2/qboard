@@ -283,6 +283,18 @@ void QGIGamePiece::piecePropertySet( char const *pname )
 		setTransform(QTransform().translate(x, y).rotate(ang).translate(-x, -y));
 		return;
 	}
+	if( "posLocked" == key )
+	{
+	    if( var.isValid() )
+	    {
+		this->setFlag( QGraphicsItem::ItemIsMovable, var.toInt() ? false : true );
+	    }
+	    else
+	    {
+		this->setFlag( QGraphicsItem::ItemIsMovable, true );
+	    }
+	    return;
+	}
 	if( "pixmap" == key )
 	{
 		QPixmap pix;
@@ -404,6 +416,7 @@ void QGIGamePiece::destroyWithPiece()
 }
 QRectF QGIGamePiece::boundingRect() const
 {
+#if 0
     if( impl->pixmap.isNull() )
     {
 	const int def = 20;
@@ -411,10 +424,10 @@ QRectF QGIGamePiece::boundingRect() const
 	QVariant var = m_pc->property("size");
 	QSize sz = var.isValid() ? var.value<QSize>() : QSize(def,def);
 	QRect g = QRect( QPoint(0,0), sz );
-	qDebug() << "QGIGamePiece::boundingRect() using"
-		 <<g;
+	//qDebug() << "QGIGamePiece::boundingRect() using"<<g;
 	return g;
     }
+#endif
     return impl->pixmap.rect();
 }
 
