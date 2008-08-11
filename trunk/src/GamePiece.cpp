@@ -86,14 +86,14 @@ bool GamePiece::hasProperty( char const * key )
 
 bool GamePiece::setPieceProperty( char const * name, QVariant const & v)
 {
-	if( ! QVariant_s11n::canHandle( v.type() ) )
-	{
-	        qDebug() << "GamePiece::setPieceProperty(["<<name<<"],["<<v<<"]) rejecting unknown QVariant type.";
-		return false;
-	}
-	bool ret = this->setProperty(name,v);
-	emit piecePropertySet( name, this );
-	return ret;
+    if( v.isValid() && ! QVariant_s11n::canHandle( v.type() ) )
+    {
+	qDebug() << "GamePiece::setPieceProperty(["<<name<<"],["<<v<<"]) rejecting unknown QVariant type.";
+	return false;
+    }
+    bool ret = this->setProperty(name,v);
+    emit piecePropertySet( name, this );
+    return ret;
 }
 
 bool GamePiece::event( QEvent * e )
