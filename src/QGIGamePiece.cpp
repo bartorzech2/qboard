@@ -261,6 +261,19 @@ void QGIGamePiece::piecePropertySet( char const *pname )
 		this->update();
 		return;
 	}
+	if( "size" == key )
+	{
+	    if( impl->pixmap.isNull() )
+	    {
+		QPixmap bogus( var.toSize() );
+		bogus.fill( QColor(Qt::transparent) );
+		impl->pixmap = bogus;
+		// Kludge to ensure bounding rect is kept intact
+		this->setPixmap(bogus);
+
+	    }
+	    return;
+	}
 	if( "angle" == key )
 	{
 		qreal ang( var.toDouble() );
@@ -391,9 +404,18 @@ void QGIGamePiece::destroyWithPiece()
 }
 QRectF QGIGamePiece::boundingRect() const
 {
-	return QRectF( impl->pixmap.isNull()
-		? (m_pc ? m_pc->geom() : QRect(0,0,40,40))
-		: impl->pixmap.rect() );
+    if( impl->pixmap.isNull() )
+    {
+	const int def = 20;
+	if( ! m_pc ) return QRectF(0,0,def,def);
+	QVariant var = m_pc->property("size");
+	QSize sz = var.isValid() ? var.value<QSize>() : QSize(def,def);
+	QRect g = QRect( QPoint(0,0), sz );
+	qDebug() << "QGIGamePiece::boundingRect() using"
+		 <<g;
+	return g;
+    }
+    return impl->pixmap.rect();
 }
 
 QVariant QGIGamePiece::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
