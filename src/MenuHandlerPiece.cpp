@@ -77,6 +77,26 @@ void MenuHandlerPiece::doMenu( QGIGamePiece * pv, QGraphicsSceneContextMenuEvent
 	{
 		mBrd->addMenu( PiecePropertyMenu::makeIntListMenu("Size",pv,"borderSize",0,8) );
 	}
+
+	QMenu * mMisc = m->addMenu("Misc.");
+	GamePiece * pc = pv->piece();
+	if(1 && pc)
+	{
+	    QVariant lock = pc->property("posLocked");
+	    bool locked = lock.isValid()
+		? (lock.toInt() ? true : false)
+		: false;
+	    QVariant newVal = locked ? QVariant(int(0)) : QVariant(int(1));
+	    PiecePropertyAction * act = new PiecePropertyAction(pv,"posLocked",newVal);
+	    act->setIcon(QIcon(":/QBoard/icon/unlock.png"));
+	    act->setCheckable( true );
+	    act->blockSignals(true);
+	    act->setChecked( locked );
+	    act->blockSignals(false);
+	    act->setText(locked ? "Unlock position" : "Lock to position");
+	    mMisc->addAction(act);
+	}
+
 #if 1
 	m->addSeparator();
 	MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( pv, m );

@@ -34,27 +34,8 @@ struct PieceAppearanceWidget::Impl
     }
 };
 
-void PieceAppearanceWidget::setupUI()
+void PieceAppearanceWidget::setupDefaultTemplates()
 {
-    QLayout * lay = new QGridLayout( this );
-    lay->setSpacing(0);
-    lay->setContentsMargins(0,0,0,0);
-    QGraphicsView * v = this->impl->gv = new QGraphicsView( impl->gs.scene() );
-	//new QBoardView(impl->board(), impl->scene());
-
-    v->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-    v->setInteractive(true); // required to get mouse events to the children
-    v->setTransformationAnchor(QGraphicsView::NoAnchor);
-    //v->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
-    v->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
-    v->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
-    //v->setDragMode(QGraphicsView::ScrollHandDrag);
-    v->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-    v->setBackgroundBrush(QColor("#abb8fb"));
-    v->viewport()->setObjectName( "PieceAppearanceWidget");
-
-    lay->addWidget( v );
-
     typedef QList<QColor> QCL;
     QCL cl;
     cl << QColor(255,0,0)
@@ -72,7 +53,7 @@ void PieceAppearanceWidget::setupUI()
        << QColor(127,0,0)
        << QColor(0,127,0)
        << QColor(0,0,127)
-       << QColor(127,127,0)
+       << QColor(64,64,0)
        << QColor(0,0,0,0)
 
 	;
@@ -105,6 +86,28 @@ void PieceAppearanceWidget::setupUI()
 	pc->setPieceProperty("borderSize",1);
 	pc->setPieceProperty("borderColor",QColor(0,0,0));
     }
+
+}
+void PieceAppearanceWidget::setupUI()
+{
+    QLayout * lay = new QGridLayout( this );
+    lay->setSpacing(0);
+    lay->setContentsMargins(0,0,0,0);
+    QGraphicsView * v = this->impl->gv = new QGraphicsView( impl->gs.scene() );
+	//new QBoardView(impl->board(), impl->scene());
+
+    v->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    v->setInteractive(true); // required to get mouse events to the children
+    v->setTransformationAnchor(QGraphicsView::NoAnchor);
+    //v->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
+    v->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
+    v->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
+    //v->setDragMode(QGraphicsView::ScrollHandDrag);
+    v->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    v->setBackgroundBrush(QColor("#abb8fb"));
+    v->viewport()->setObjectName( "PieceAppearanceWidget");
+
+    lay->addWidget( v );
 
     QStringList tip;
     tip << "<html><body>These widgets are appearance templates for game pieces.\n"
