@@ -18,7 +18,6 @@
 #include <QDockWidget>
 #include <QDebug>
 #include <QFileDialog>
-#include <QSplitter>
 #include <QScrollArea>
 #include <QRegExp>
 #include <QGraphicsView>
@@ -41,21 +40,44 @@
 #include "S11nClipboard.h"
 #include "QBBatch.h"
 #include "QBoard.h"
+#include "PieceAppearanceWidget.h"
 struct MainWindowImpl::Impl
 {
-	GameState gstate;
-	QGraphicsView * gv;
-	FileBrowser * fb;
-	Impl() : gstate(),
-		gv(0),
-		fb(0)
+    GameState gstate;
+    QGraphicsView * gv;
+    FileBrowser * fb;
+    PieceAppearanceWidget *paw;
+    QWidget * sidebar;
+    static char const * fileName;
+    Impl() : gstate(),
+	     gv(0),
+	     fb(0),
+	     paw(new PieceAppearanceWidget),
+	     sidebar(0)
+    {
+	QDir pdir = qboard::persistenceDir( paw->s11nClass() );
+	QString fn = pdir.canonicalPath() + "/" + fileName;
+	try
 	{
+	    paw->load(fn);
 	}
-	~Impl()
+	catch(...){}
+    }
+    ~Impl()
+    {
+	/** Reminder: we rely on the fact that the member QWidgets
+	    will be assigned to parent widgets, and we don't delete
+	    them from here. */
+	QDir pdir = qboard::persistenceDir( paw->s11nClass() );
+	QString fn = pdir.canonicalPath() + "/" + fileName;
+	try
 	{
-		delete gv;
+	    paw->save(fn,false);
 	}
+	catch(...){}
+    }
 };
+char const * MainWindowImpl::Impl::fileName = "defaults.PieceAppearanceWidget";
 
 MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f) 
     : QMainWindow(parent, f),
@@ -79,24 +101,26 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	this->actionClearClipboard->setEnabled( 0 != S11nClipboard::instance().contents() );
 	connect( this->actionClearClipboard, SIGNAL(triggered(bool)), this, SLOT( clearClipboard() ) );
 
-#if 1
 	QWidget * cli = this->clientArea;
 	QLayout * lay = new QGridLayout( cli );
 	lay->setSpacing(0);
 	lay->setContentsMargins(2,2,2,2);
 	QSplitter * splitter = new QSplitter( Qt::Horizontal, cli );
 	lay->addWidget( splitter );
-	splitter->setHandleWidth(8);
-#else
-	QSplitter * sp = splitter = this->clientArea;
-#endif
+	splitter->setHandleWidth(4);
+
+	QSplitter * vsplit = new QSplitter( Qt::Vertical, cli );
+	impl->sidebar = vsplit;
+	splitter->addWidget( vsplit );
+	vsplit->setHandleWidth(4);
 
 	FileBrowser * fb = this->impl->fb = new FileBrowser( "*", 0 );
-	splitter->addWidget(fb);
+	vsplit->addWidget(fb);
 	connect( this->actionRefreshFileList, SIGNAL(triggered(bool)), fb, SLOT(reloadDir()) );
 	connect( fb, SIGNAL(pickedFile(QFileInfo const &)), this, SLOT(loadFile(QFileInfo const &)) );
 	//connect( fb, SIGNAL(pickedDir(QDir const &)), this, SLOT(chdir(QDir const &)) );
-	connect( this->actionToggleBrowserView, SIGNAL(toggled(bool)), fb, SLOT(setVisible(bool)) );
+	//connect( this->actionToggleBrowserView, SIGNAL(toggled(bool)), fb, SLOT(setVisible(bool)) );
+	connect( this->actionToggleBrowserView, SIGNAL(toggled(bool)), this, SLOT(toggleSidebarVisible(bool)) );
 	impl->gv = new QBoardView( impl->gstate.board(), impl->gstate.scene() );
 	connect( this->actionToggleBoardDragMode, SIGNAL(toggled(bool)),
 		impl->gv, SLOT(setHandDragMode(bool)) );
@@ -117,9 +141,18 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 		splitter->addWidget(frenchy);
 	}
 
+	if(1)
+	{
+	    vsplit->addWidget( impl->paw );
+	}
+
 	splitter->setStretchFactor(0,1);
 	splitter->setStretchFactor(1,3);
+
+	vsplit->setStretchFactor(0,3);
+	vsplit->setStretchFactor(1,1);
 }
+
 MainWindowImpl::~MainWindowImpl()
 {
 	delete impl;
@@ -334,8 +367,9 @@ bool MainWindowImpl::loadPiece( QFileInfo const & fi )
 	else
 	{
 		qDebug() << "loadPiece("<<fn<<")";
+		impl->paw->applyCurrentTemplate( pc );
+		pc->setProperty( "pixmap", fn );
 	}
-	pc->setProperty( "pixmap", fn );
 	QRect rect( impl->gv->viewport()->geometry() );
 	// FIXME: we can't get the piece's size, because the size is part of the
 	// QGIGamePiece view object. That object won't get created until
@@ -465,6 +499,7 @@ void MainWindowImpl::addLine()
 
 }
 
+#include "PieceAppearanceWidget.h"
 void MainWindowImpl::doSomethingExperimental()
 {
 	qDebug() << "MainWindowImpl::doSomethingExperimental()";
@@ -472,6 +507,26 @@ void MainWindowImpl::doSomethingExperimental()
 	//impl->gstate.scene()->addItem(  );
 	//impl->gstate.scene()->addWidget( new QFrame );
 	if(1)
+	{
+	    PieceAppearanceWidget * paw = new PieceAppearanceWidget;
+
+	    GamePiece * pc = new GamePiece;
+	    paw->state().addPiece( pc );
+	    //pc->setPieceProperty("pixmap", "00-counter.png" );
+
+#if 0
+	    QGraphicsItem * bv = new QGraphicsTextItem("Hi, world");
+	    bv->setPos( 20, 20 );
+	    paw->state().scene()->addItem(bv);
+	    paw->state().scene()->addText("WTF?");
+#endif
+	    QDockWidget * win = new QDockWidget( "Piece Templates", this );
+	    win->setAttribute(Qt::WA_DeleteOnClose);
+	    win->setWidget(paw);
+	    this->addDockWidget(Qt::RightDockWidgetArea, win );
+
+	}
+	if(0)
 	{
 		QGILineNode * ln = new QGILineNode;
 		QGILineNode * rn = new QGILineNode;
@@ -538,4 +593,9 @@ void MainWindowImpl::addQGIHtml()
 void MainWindowImpl::rotate90()
 {
 	impl->gv->rotate( 90 );
+}
+
+void MainWindowImpl::toggleSidebarVisible(bool b)
+{
+    impl->sidebar->setVisible( b );
 }
