@@ -133,7 +133,7 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	//connect( fb, SIGNAL(pickedDir(QDir const &)), this, SLOT(chdir(QDir const &)) );
 	//connect( this->actionToggleBrowserView, SIGNAL(toggled(bool)), fb, SLOT(setVisible(bool)) );
 	connect( this->actionToggleBrowserView, SIGNAL(toggled(bool)), this, SLOT(toggleSidebarVisible(bool)) );
-	impl->gv = new QBoardView( impl->gstate.board(), impl->gstate.scene() );
+	impl->gv = new QBoardView( impl->gstate );
 	connect( this->actionToggleBoardDragMode, SIGNAL(toggled(bool)),
 		impl->gv, SLOT(setHandDragMode(bool)) );
 	this->actionToggleBoardDragMode->setChecked(false);
@@ -448,7 +448,7 @@ bool MainWindowImpl::loadGame()
 void MainWindowImpl::launchNewBoardView()
 {
     const qreal zm(0.20);
-	QBoardView * v = new QBoardView( this->impl->gstate.board(), impl->gstate.scene() );
+	QBoardView * v = new QBoardView( this->impl->gstate );
 	v->zoom(zm);
 	QDockWidget * win = new QDockWidget( "QBoard View", this );
 	win->setAttribute(Qt::WA_DeleteOnClose);
