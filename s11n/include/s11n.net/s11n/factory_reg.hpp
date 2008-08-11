@@ -80,7 +80,7 @@ namespace {
 	{
 		s11n_factory_reg_context()
 		{
-		  if( true == placeholder ){1;}; // weird workaround, just to reference the var. 
+		  if( true == placeholder ){} // weird workaround, just to reference the var. 
 		}
 		/**
 		   Placeholder variable for automatic factory
