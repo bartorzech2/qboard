@@ -15,7 +15,7 @@
  */
 
 
-#include <Qt/qconfig.h>
+#include <Qt/qglobal.h>
 
 /**
    Using GL mode for QBoardView makes many paint operations much
@@ -23,10 +23,12 @@
    always updated properly in GL mode. :(
 */
 #if ! defined(QBOARD_USE_OPENGL)
-#  ifndef QT_NO_OPENGL
+#  if defined(QT_OPENGL_LIB) && !defined(QT_NO_OPENGL)
 #    define QBOARD_USE_OPENGL 1
+// #  warning "QBOARD_USE_OPENGL == 1"
 #  else
 #    define QBOARD_USE_OPENGL 0
+// #  warning "QBOARD_USE_OPENGL == 0"
 #  endif
 #endif
 
