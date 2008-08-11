@@ -65,7 +65,7 @@ void MenuHandlerPiece::doMenu( QGIGamePiece * pv, QGraphicsSceneContextMenuEvent
 	if(1)
 	{
 		
-		PiecePropertyMenu * pm = PiecePropertyMenu::makeIntListMenu("Rotate",pv,"angle",0,360,45);
+		PiecePropertyMenu * pm = PiecePropertyMenu::makeIntListMenu("Rotate",pv,"angle",0,360,15);
 		pm->setIcon(QIcon(":/QBoard/icon/rotate_cw.png"));
 		m->addMenu(pm);
 	}
