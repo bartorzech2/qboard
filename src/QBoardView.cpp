@@ -22,7 +22,8 @@
 #include <QGraphicsScene>
 
 #include "QBoardView.h"
-#if QBOARDVIEW_USE_OPENGL
+#include "GL.h"
+#if QBOARD_USE_OPENGL
 #include <QGLWidget>
 #endif
 
@@ -78,14 +79,17 @@ void QBoardView::setHandDragMode(bool handMode )
 
 bool QBoardView::isGLMode() const
 {
-    return QBOARDVIEW_USE_OPENGL
+    return QBOARD_USE_OPENGL
 	? impl->glmode
 	: false;
 }
 
-void QBoardView::setGLMode(bool on)
+void QBoardView::setGLMode
+#if ! QBOARD_USE_OPENGL
+(bool) {}
+#else
+(bool on)
 {
-#if QBOARDVIEW_USE_OPENGL
     /**
        This code causes a warning from Qt at runtime:
 
@@ -105,8 +109,8 @@ void QBoardView::setGLMode(bool on)
 	: new QWidget; 
     w->setObjectName( "QBoardViewViewport");
     setViewport( w );
-#endif
 }
+#endif
 
 QSize QBoardView::sizeHint() const
 {
