@@ -58,12 +58,18 @@ QBoardView::QBoardView( GameState & gs ) :
     this->setInteractive(true);
     this->setTransformationAnchor(QGraphicsView::NoAnchor);
     //this->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
+#if 1
     this->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
     this->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
+#else
+    this->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
+    this->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
+#endif
     this->setDragMode(QGraphicsView::RubberBandDrag);
     this->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     this->setBackgroundBrush(QColor("#abb8fb"));
     this->viewport()->setObjectName( "QBoardViewViewport");
+    this->updateBoardPixmap();
 }
 
 QBoardView::~QBoardView()
@@ -121,6 +127,7 @@ void QBoardView::setGLMode
 
 QSize QBoardView::sizeHint() const
 {
+#if 1
     QSizeF sz;
     if( ! this->impl->board.pixmap().isNull() )
     {
@@ -135,8 +142,10 @@ QSize QBoardView::sizeHint() const
     {
 	sz = this->QGraphicsView::sizeHint();
     }
-
     return sz.toSize();
+#else
+    return this->QGraphicsView::sizeHint();
+#endif
 }
 void QBoardView::updateBoardPixmap()
 {
@@ -148,7 +157,9 @@ void QBoardView::updateBoardPixmap()
     QRectF rect( 0, 0, isz.width(),  isz.height() );
     this->setSceneRect( rect );
     //this->setBackgroundBrush(impl->board.pixmap());
-    this->updateGeometry();
+    // Kludge to get minimaps to keep their scale on a reload:
+    impl->scale -= 0.01;
+    this->zoom( impl->scale + 0.01 );
 }
 
 void QBoardView::drawBackground( QPainter *p, const QRectF & rect )
@@ -158,7 +169,10 @@ void QBoardView::drawBackground( QPainter *p, const QRectF & rect )
 	this->QGraphicsView::drawBackground(p,rect);
 	return;
     }
+#if 0
+    // todo: only fillRect for pixmaps with alpha
     p->fillRect( rect, this->backgroundBrush() );
+#endif
     QRect bogo = impl->board.pixmap().rect();
     p->drawPixmap(bogo, impl->board.pixmap(), bogo );
 }
