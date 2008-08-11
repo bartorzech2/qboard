@@ -1,52 +1,5 @@
-This is the informal ChangeLog for the QBoard project. Newest items
-are at the top.
+The QBoard ChangeLog is maintained as a Wiki Page on the project's web
+site:
 
-========================================================================
-
-2008 August 11:
-
-- Added "piece templates" to the main UI. The appearance of the
-currently-selected template is used as the basis when loading piece
-graphics from files. All changed made to the piece templates are
-persistant across QBoard sessions.
-
-- Fixed the mis-scaling of boards in Qt 4.3.
-
-- Minimaps now keep their scale when a new board is loaded.
-
-
-2008 August 9:
-
-- Corrected several compile warnings caught by gcc 4.2.3.
-
-
-2008 June 15:
-
-- Fixed a major bug under Qt 4.3 which caused non-piece gameboard items
-to be not removed. The end effect was duplicate or extra items at
-load-time.
-
-- The main app can now process .qbbatch script files (the same files
-read by qboardbatch).
-
-
-2008 June 14:
-
-- Fixed the broken app icons for qt 4.3. This was caused by an inconsistency
-in how Qt Designer 4.3/4.4 handle icons associated with QActions.
-
-- Too many little changes to remember.
-
-- Added initial copy/cut support.  Paste is on the todo list, but
-pasting is inherently target- and source-specific, so that'll take a
-bit of work.
-
-- Board now has a popup menu with a couple options. You wouldn't believe
-what a bitch it was to get the event handling right in conjunction with 
-overlapping pieces and the board.
-
-
-2008 June 13:
-
-- Initial release via Google Code.
+http://code.google.com/p/qboard/wiki/ChangeLog
 
