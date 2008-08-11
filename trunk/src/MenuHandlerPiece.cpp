@@ -27,8 +27,6 @@
 #include "S11nQtList.h"
 #include "S11nClipboard.h"
 
-
-
 struct MenuHandlerPiece::Impl
 {
 	QGraphicsScene * scene; 
@@ -78,10 +76,10 @@ void MenuHandlerPiece::doMenu( QGIGamePiece * pv, QGraphicsSceneContextMenuEvent
 		mBrd->addMenu( PiecePropertyMenu::makeIntListMenu("Size",pv,"borderSize",0,8) );
 	}
 
-	QMenu * mMisc = m->addMenu("Misc.");
 	GamePiece * pc = pv->piece();
 	if(1 && pc)
 	{
+	    QMenu * mMisc = m->addMenu("Misc.");
 	    QVariant lock = pc->property("posLocked");
 	    bool locked = lock.isValid()
 		? (lock.toInt() ? true : false)
@@ -93,7 +91,7 @@ void MenuHandlerPiece::doMenu( QGIGamePiece * pv, QGraphicsSceneContextMenuEvent
 	    act->blockSignals(true);
 	    act->setChecked( locked );
 	    act->blockSignals(false);
-	    act->setText(locked ? "Unlock position" : "Lock to position");
+	    act->setText(locked ? "Unlock position" : "Lock position");
 	    mMisc->addAction(act);
 	}
 
