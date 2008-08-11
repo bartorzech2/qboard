@@ -41,6 +41,7 @@ public Q_SLOTS:
 	void launchNewWindow();
 	void addQGIHtml();
 	void addLine();
+	void toggleSidebarVisible(bool);
 protected:
 	//bool eventFilter(QObject *obj, QEvent *ev);	
 private Q_SLOTS:
