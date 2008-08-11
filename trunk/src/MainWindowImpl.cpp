@@ -144,6 +144,7 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	connect( this->actionZoomReset, SIGNAL(triggered(bool)), impl->gv, SLOT(zoomReset()) );
 
 
+#if 0
 	{
 		QWidget * frenchy = new QWidget();
 		QGridLayout * gl = new QGridLayout(frenchy);
@@ -152,6 +153,11 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 		gl->addWidget(impl->gv);
 		splitter->addWidget(frenchy);
 	}
+#else
+	{
+	    splitter->addWidget( impl->gv );
+	}
+#endif
 
 	if(1)
 	{
@@ -448,22 +454,18 @@ bool MainWindowImpl::loadGame()
 void MainWindowImpl::launchNewBoardView()
 {
     const qreal zm(0.20);
-	QBoardView * v = new QBoardView( this->impl->gstate );
-	v->zoom(zm);
+    QBoardView * v = new QBoardView( this->impl->gstate );
+    v->zoom(zm);
 	QDockWidget * win = new QDockWidget( "QBoard View", this );
 	win->setAttribute(Qt::WA_DeleteOnClose);
-#if 1
-	QFrame * frame = new QFrame();
+#if 0
+	QWidget * frame = new QWidget();
 	QGridLayout * lay = new QGridLayout(frame);
 	lay->setSpacing(1);
 	lay->setContentsMargins(2,2,2,2);
 	lay->addWidget( v );
 	win->setWidget(frame);
 	this->addDockWidget(Qt::RightDockWidgetArea, win );
-	//QSizeF sz(v->sizeHint());
-	//sz.scale( sz.width()+10, sz.height()+20, Qt::IgnoreAspectRatio);
-	//win->resize( sz.toSize() );
-	//win->show();
 #else
 	win->setWidget( v );
 	this->addDockWidget(Qt::RightDockWidgetArea, win );
