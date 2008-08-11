@@ -17,6 +17,8 @@ persistant across QBoard sessions.
 
 - Minimaps now keep their scale when a new board is loaded.
 
+- Added basic support for locking a piece's position (simply disables dragging for the piece).
+
 
 2008 August 9:
 
