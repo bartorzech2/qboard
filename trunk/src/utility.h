@@ -27,12 +27,26 @@ namespace qboard
 	/** Returns the path to the QBoard home dir (~/.QBoard).
 	*/
 	QDir home();
+
 	/**
 		If fn is absolute and under home() then the home() part
 		is stripped from fn and that path is returned, otherwise
 		fn is returned as-is.
 	*/
 	QString homeRelative( QString const & fn );
+
+
+    /**
+       Returns the directory (from somewhere under home()/QBoard/...)
+       which can be used as a class-specific storage location for persistant
+       data. The directory is created if needed, and this function throws
+       a std::runtime_error() if the dir can be neither accessed nor created.
+
+       The intention is to give plugins and add-ons a place to store session
+       information.
+    */
+    QDir persistenceDir( QString const & className );
+
 	
 	/**
 		Compares the zLevel of the given QGraphicsItem to those items

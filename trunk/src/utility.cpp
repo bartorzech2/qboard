@@ -203,4 +203,22 @@ namespace qboard {
 		}
 		return colors;
 	}
+
+    QDir persistenceDir( QString const & className )
+    {
+	QDir dir( home().canonicalPath() + QString("/QBoard/persistance/") +
+		 className );
+	QString dname( dir.absolutePath() );
+	// dir.canonicalDir() gives me an empty string?
+	//qDebug() << "persistenceDir("<<className<<") =?"<<dname<<"=?"<<dir;
+	if( (! dir.exists()) && (! dir.mkpath(dname)) )
+	{
+	    QString msg = QString("Could not access or create directory [%1]").arg(dname);
+	    throw std::runtime_error( msg.toAscii().constData() );
+	}
+	return dir;
+    }
+
+
+
 } // namespace
