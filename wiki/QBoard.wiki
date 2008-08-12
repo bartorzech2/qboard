@@ -12,12 +12,7 @@ QBoard is a "re-imagining" of a much older project of mine called
 
 == Screenshots ==
 
-You can find screenshots over at: http://wanderinghorse.net/gaming/QBoard
-
-Here's one to get you started:
-
-[http://wanderinghorse.net/gaming/QBoard/qboard-20080611-veg.jpg http://wanderinghorse.net/gaming/QBoard/thumbs/qboard-20080611-veg.jpg]
-
+You can find screenshots on the [Screenshots screenshots page].
 
 == Features ==
 
