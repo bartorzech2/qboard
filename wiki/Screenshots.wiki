@@ -3,21 +3,21 @@
 
 = The obligatory screenshots... =
 
-Here is a small collection of QBoard screenshots. You can find the complete collection over at: http://wanderinghorse.net/wh/gaming/QBoard/
+Here is a small collection of QBoard screenshots. You can find the complete collection over at: http://wanderinghorse.net/gaming/QBoard/
 
 The first screenshot ever taken of QBoard:
 
-[http://wanderinghorse.net/wh/gaming/QBoard/qboard-20080604.jpg http://wanderinghorse.net/wh/gaming/QBoard/thumbs/qboard-20080604.jpg]
+[http://wanderinghorse.net/gaming/QBoard/qboard-20080604.jpg http://wanderinghorse.net/gaming/QBoard/thumbs/qboard-20080604.jpg]
 
 This screenshot demonstrates multiple board views, each with independent scaling levels:
 
-[http://wanderinghorse.net/wh/gaming/QBoard/qboard-20080608-lines.jpg http://wanderinghorse.net/wh/gaming/QBoard/thumbs/qboard-20080608-lines.jpg]
+[http://wanderinghorse.net/gaming/QBoard/qboard-20080608-lines.jpg http://wanderinghorse.net/gaming/QBoard/thumbs/qboard-20080608-lines.jpg]
 
 
 Here's a demo of translucent playing pieces:
 
-[http://wanderinghorse.net/wh/gaming/QBoard/qboard-20080609-alpha.jpg http://wanderinghorse.net/wh/gaming/QBoard/thumbs/qboard-20080609-alpha.jpg]
+[http://wanderinghorse.net/gaming/QBoard/qboard-20080609-alpha.jpg http://wanderinghorse.net/gaming/QBoard/thumbs/qboard-20080609-alpha.jpg]
 
 Here we see how to set color and transparency levels:
 
-[http://wanderinghorse.net/wh/gaming/QBoard/qboard-20080610-menus.jpg http://wanderinghorse.net/wh/gaming/QBoard/thumbs/qboard-20080610-menus.jpg]
+[http://wanderinghorse.net/gaming/QBoard/qboard-20080610-menus.jpg http://wanderinghorse.net/gaming/QBoard/thumbs/qboard-20080610-menus.jpg]
