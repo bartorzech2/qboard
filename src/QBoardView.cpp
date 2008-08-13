@@ -78,6 +78,11 @@ QBoardView::QBoardView( GameState & gs ) :
     this->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     this->setBackgroundBrush(QColor("#abb8fb"));
     this->viewport()->setObjectName( "QBoardViewViewport");
+    this->setGLMode(false);
+    /** ^^^^ gl mode seems to perform better but misses some updates,
+	causing some pieces to become invisible until manually
+	updating the display.
+     */
     this->updateBoardPixmap();
 
 }
@@ -191,44 +196,7 @@ void QBoardView::drawBackground( QPainter *p, const QRectF & rect )
 	QRect bogo = impl->board.pixmap().rect();
 	p->drawPixmap(bogo, impl->board.pixmap(), bogo );
     }
-#if 0
-    if( 1 )
-    { // temporary workaround while i work out a crash bug in QGIPiecePlacemarker:
-	QColor color( Qt::yellow );
-	QColor xline( Qt::red );
-	const int rad = 12;
-	//QRect brect( -rad,-rad,2*rad,2*rad);
-	int w = 2*rad;
-	int step = int(w / 6);
-	int stopX = impl->placeAt.x();
-	int x = stopX - rad;
-	int y = impl->placeAt.y()-rad;
-	int w2 = w;
-	int h2 = 2*rad;
-	bool which = true;
-	p->setPen( QPen( Qt::NoPen ) );
-	while( x < stopX )
-	{
-	    QColor c( which ? xline : color );
-	    which = !which;
-#if 1
-	    QRadialGradient grad(0,0,x);
-	    //grad.setFocalPoint(-(w2/3),-(h2/3));
-	    grad.setColorAt( 0, c );
-	    grad.setColorAt( 1, c.light(130) );
-	    p->setBrush( grad );
-#else
-	    p->setBrush( c );
-#endif
-	    p->drawEllipse( x, y, w2, h2 );
-	    x += step;
-	    y += step;
-	    w2 -= 2*step;
-	    h2 -= 2*step;
-	}
-    }
-#endif // draw placemarker
-    
+   
 }
 
 void QBoardView::wheelEvent(QWheelEvent *event)
@@ -305,6 +273,13 @@ void QBoardView::zoomReset()
 
 void QBoardView::placemarkerDestroyed()
 {
+    /**
+       This bit of kludgery is to work around impl->placer being
+       destroyed when game state is cleared (destroying all
+       QGraphicsItems), as that leads to a dangling impl->placer in
+       this class. When that happens, we re-create the placemarker
+       if we had one active already.
+    */
     if( impl->placer ) // now (or soon) a dangling pointer
     {
 	impl->placer = 0;
@@ -445,7 +420,7 @@ void QBoardView::enablePlacemarker( bool en )
 	    impl->gs.scene()->addItem( impl->placer );
 	    QStringList help;
 	    help << "<html><body>This is a \"piece placemarker\"."
-		 << "To move it, middle-click the board to move it or drag it around."
+		 << "To move it, middle-click the board or drag it around."
 		 << "Pieces which are loaded from individual files (as opposed to being part of a game)"
 		 << "start out at this position."
 		 << "</body></html>"
