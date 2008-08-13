@@ -7,11 +7,17 @@ class QString;
 class GameState;
 class QWidget;
 
-// class QBoardPluginInfo
-// {
-//     QBoardPluginInfo();
-//     ~QBoardPluginInfo();
-// };
+struct QBoardPluginInfo
+{
+    QBoardPluginInfo();
+    ~QBoardPluginInfo();
+    QString name;
+    QString license;
+    QString url;
+    QString author;
+    QString version;
+};
+
 /**
    Basic plugin interface for QBoard plugins.
 
@@ -40,6 +46,8 @@ public:
        of the state.
     */
     virtual void setGameState( GameState * ) = 0;
+
+    virtual QBoardPluginInfo pluginInfo() = 0;
 };
 Q_DECLARE_INTERFACE(QBoardPlugin,
 		    "com.google.code/p/qboard/QBoardPlugin/1.0"

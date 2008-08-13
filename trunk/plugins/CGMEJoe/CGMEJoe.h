@@ -17,7 +17,12 @@ public:
     virtual ~CGMEJoe();
     virtual QWidget * widget();
     virtual void setGameState(GameState *);
-
+    virtual QBoardPluginInfo pluginInfo();
+private Q_SLOTS:
+    void widgetDestroyed();
+private:
+    struct Impl;
+    Impl * impl;
 };
 
 #endif // CGMEJOE_H_INCLUDED

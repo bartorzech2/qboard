@@ -51,7 +51,8 @@ REL_SRCDIR = $$(PWD)
 REL_SRCDIR=$$replace(REL_SRCDIR,$$TOP_SRCDIR/,)
 REL_SRCDIR=$$replace(REL_SRCDIR,[^/]+,..)
 
-CONFIG += stl warn_on debug_and_release ordered
+CONFIG += stl warn_on debug ordered
+# CONFIG += debug_and_release
 
 VERSION = $$QBOARD_VERSION
 message(QBoard version $$QBOARD_VERSION)
@@ -62,6 +63,8 @@ UI_SRCDIR = $$REL_SRCDIR/ui
 UI_DIR = $$REL_SRCDIR/build/$$QT_VERSION
 OBJECTS_DIR = $$REL_SRCDIR/build/$$QT_VERSION
 DESTDIR = $$REL_SRCDIR/bin/$$QT_VERSION
+# DLLDESTDIR = $$DESTDIR/plugins
+QBOARD_PLUGINS_DESTDIR = $$DESTDIR/plugins
 MOC_DIR = $$REL_SRCDIR/build/$$QT_VERSION
 SRC_DIR = $$REL_SRCDIR/src
 S11N_DIR = $$REL_SRCDIR/s11n
@@ -71,7 +74,7 @@ S11N_OBJ_DIR = $$OBJECTS_DIR/s11n
 QBOARD_CXXFLAGS = $$S11N_CXXFLAGS -DQBOARD_VERSION=$$QBOARD_VERSION -I$$REL_SRCDIR/src
 
 QBOARD_INCLUDES = -I$$REL_SRCDIR/src -I$$MOC_DIR -I$$UI_DIR
-
+# INCLUDES += $$QBOARD_INCLUDES
 ########################################################################
 # S11N_xxx have to do with the libs11n code.
 S11N_DIR = $$REL_SRCDIR/s11n
@@ -138,6 +141,7 @@ QBOARD_HEADERS_LIB = \
  $$SRC_DIR/PieceAppearanceWidget.h \
  $$SRC_DIR/QBBatch.h \
  $$SRC_DIR/QBoard.h \
+ $$SRC_DIR/QBoardPlugin.h \
  $$SRC_DIR/QBoardView.h \
  $$SRC_DIR/QGI.h \
  $$SRC_DIR/QGIGamePiece.h \
@@ -164,6 +168,7 @@ QBOARD_SOURCES_LIB = \
  $$SRC_DIR/PieceAppearanceWidget.cpp \
  $$SRC_DIR/QBBatch.cpp \
  $$SRC_DIR/QBoard.cpp \
+ $$SRC_DIR/QBoardPlugin.cpp \
  $$SRC_DIR/QBoardView.cpp \
  $$SRC_DIR/QGIGamePiece.cpp \
  $$SRC_DIR/QGIHtml.cpp \
@@ -175,21 +180,28 @@ QBOARD_SOURCES_LIB = \
  $$SRC_DIR/SetupQBoard.cpp \
  $$SRC_DIR/utility.cpp
 
+QBOARD_SOURCES_GAMESETS = 
+QBOARD_HEADERS_GAMESETS = 
+
 ########################################################################
 # Sources related to the main GUI.
 QBOARD_SOURCES_WINDOW = \
  $$SRC_DIR/AboutQBoardImpl.cpp \
  $$SRC_DIR/FileBrowser.cpp \
  $$SRC_DIR/MainWindowImpl.cpp \
+ $$QBOARD_SOURCES_GAMESETS \
  $$QBOARD_SOURCES_QT44
 
 QBOARD_HEADERS_WINDOW = \
  $$SRC_DIR/AboutQBoardImpl.h \
  $$SRC_DIR/FileBrowser.h \
  $$SRC_DIR/MainWindowImpl.h \
+ $$QBOARD_HEADERS_GAMESETS \
  $$QBOARD_HEADERS_QT44
+
 
 ########################################################################
 # The main() code for QBoard (not for other apps, e.g. qboardbatch)
 QBOARD_SOURCES_MAINAPP = \
  $$SRC_DIR/main.cpp
+
