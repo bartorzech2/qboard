@@ -13,8 +13,8 @@ in the file browser will be set to the placemarker's position.~~ The placemarker
 causes a dangling pointer when game state is cleaned, and we don't have a
 reasonable workaround for it.
 
-- New pieces are now placed wherever you last middle-cliced on the board.
-There is currently no visual indication (see above).
+- New pieces are now placed wherever you last middle-clicked on the board.
+There is currently no visual indication of that position (see above).
 
 
 2008 August 11:
