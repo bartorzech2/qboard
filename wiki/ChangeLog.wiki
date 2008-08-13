@@ -6,6 +6,12 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top.
 
 ----
+2008 August 13:
+
+- Add a "placemarker" to the board. Pieces loaded via double-clicking
+in the file browser will be set to the placemarker's position.
+
+
 2008 August 11:
 
 - Added "piece templates" to the main UI. The appearance of the
