@@ -12,9 +12,6 @@ are at the top.
 in the file browser will be set to the placemarker's position. To move
 the placemarker, middle-click the board or drag the placemarker around.
 
-- For board views, OpenGL is now turned on by default is QBoard was built
-with OpenGL support. To disable it, right-click the board.
-
 
 2008 August 11:
 
