@@ -1,0 +1,23 @@
+<RCC>
+  <qresource prefix="/QBoard/games/CGMEJoe" >
+    <file>counters/001-captain.png</file>
+    <file>counters/002-bazooka.png</file>
+    <file>counters/004-grenade.png</file>
+    <file>counters/005-sniper.png</file>
+    <file>counters/006-kneeler.png</file>
+    <file>counters/010-average1.png</file>
+    <file>counters/011-average2.png</file>
+    <file>counters/012-average3.png</file>
+    <file>counters/013-average4.png</file>
+    <file>counters/014-average5.png</file>
+    <file>counters/090-token.png</file>
+    <file>counters/092-kia.png</file>
+    <file>counters/grenade.png</file>
+    <file>counters/rip.png</file>
+    <file>counters/tank-green.png</file>
+    <file>counters/tank-red.png</file>
+    <file>counters/WAgun1.png</file>
+    <file>counters/WAgun2.png</file>
+    <file>counters/WAgun3.png</file>
+  </qresource>
+</RCC>
