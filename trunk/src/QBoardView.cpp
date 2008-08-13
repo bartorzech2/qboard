@@ -85,6 +85,10 @@ QBoardView::QBoardView( GameState & gs ) :
 QBoardView::~QBoardView()
 {
     QBOARD_VERBOSE_DTOR << "~QBoardView()";
+    if( impl->placer )
+    {
+	QObject::disconnect( impl->placer, SIGNAL(destroyed(QObject*)), this, SLOT(placemarkerDestroyed()) );
+    }
     delete impl;
 }
 
@@ -299,6 +303,15 @@ void QBoardView::zoomReset()
     this->zoom(1.0);
 }
 
+void QBoardView::placemarkerDestroyed()
+{
+    if( impl->placer ) // now (or soon) a dangling pointer
+    {
+	impl->placer = 0;
+	this->enablePlacemarker(true);
+    }
+}
+
 void QBoardView::mousePressEvent( QMouseEvent * event )
 {
 #if 0
@@ -426,7 +439,9 @@ void QBoardView::enablePlacemarker( bool en )
 	if( ! impl->placer )
 	{
 	    impl->placer = new QGIPiecePlacemarker;
-	    impl->placer->setPos(20,20);
+	    connect( impl->placer, SIGNAL(destroyed(QObject*)), this, SLOT(placemarkerDestroyed()) );
+	    
+	    impl->placer->setPos(impl->placeAt);
 	    impl->gs.scene()->addItem( impl->placer );
 	    QStringList help;
 	    help << "<html><body>This is a \"piece placemarker\"."
@@ -438,6 +453,10 @@ void QBoardView::enablePlacemarker( bool en )
 	    impl->placer->setToolTip( help.join(" ") );
 	}
 	return;
+    }
+    if( impl->placer )
+    {
+	QObject::disconnect( impl->placer, SIGNAL(destroyed(QObject*)), this, SLOT(placemarkerDestroyed()) );
     }
     delete impl->placer;
     impl->placer = 0;
