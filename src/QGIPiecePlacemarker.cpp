@@ -51,8 +51,8 @@ QGIPiecePlacemarker::QGIPiecePlacemarker() :
 #endif
     impl(new Impl)
 {
-    this->setProperty("color",QColor(Qt::yellow));
-    this->setProperty("lineColor",QColor(Qt::red));
+    this->setProperty("color1",QColor(Qt::yellow));
+    this->setProperty("color2",QColor(Qt::red));
     this->setFlags( QGraphicsItem::ItemIsMovable );
     this->setFlag( QGraphicsItem::ItemIsSelectable, false );
 #if QT_VERSION >= 0x040400
@@ -108,11 +108,12 @@ bool QGIPiecePlacemarker::event( QEvent * e )
 	}
 	return QObject::event(e);
 }
+#include <QRadialGradient>
 void QGIPiecePlacemarker::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-	QVariant var = this->property("color");
+	QVariant var = this->property("color1");
 	QColor color = (var.isValid() ? var.value<QColor>() : Qt::yellow);
-	var = this->property("lineColor");
+	var = this->property("color2");
 	QColor xline = (var.isValid() ? var.value<QColor>() : Qt::red);
 	QRectF brect( this->boundingRect() );
 	int fudge = 4; // try to avoid lopped off borders
@@ -123,13 +124,21 @@ void QGIPiecePlacemarker::paint(QPainter *painter, const QStyleOptionGraphicsIte
 	int w2 = w;
 	int h2 = int(brect.height()-fudge);
 	bool which = true;
+	painter->setPen( QPen( Qt::NoPen ) );
 	while( x < 0 )
 	{
 	    QColor c( which ? xline : color );
 	    which = !which;
+#if 1
+	    QRadialGradient grad(0,0,x);
+	    grad.setFocalPoint(-(w2/3),-(h2/3));
+	    grad.setColorAt( 0, c );
+	    grad.setColorAt( 1, c.light(130) );
+	    painter->setBrush( grad );
+#else
 	    painter->setBrush( c );
-	    painter->setPen(QPen( c, Qt::SolidLine));
-	    painter->drawEllipse(x,y,w2,h2);
+#endif
+	    painter->drawEllipse( x, y, w2, h2 );
 	    x += step;
 	    y += step;
 	    w2 -= 2*step;

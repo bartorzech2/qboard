@@ -41,12 +41,14 @@ struct QBoardView::Impl
     qreal scale;
     bool glmode;
     QGIPiecePlacemarker * placer;
+    QPoint placeAt;
     Impl(GameState & s)
 	: gs(s),
 	  board(s.board()),
 	  scale(1.0),
 	  glmode(false),
-	  placer(0)
+	  placer(0),
+	  placeAt(20,20)
     {
     }
     ~Impl()
@@ -175,14 +177,54 @@ void QBoardView::drawBackground( QPainter *p, const QRectF & rect )
     if( this->impl->board.pixmap().isNull() )
     {
 	this->QGraphicsView::drawBackground(p,rect);
-	return;
+    }
+    else
+    {
+#if 0
+	// todo: only fillRect for pixmaps with alpha
+	p->fillRect( rect, this->backgroundBrush() );
+#endif
+	QRect bogo = impl->board.pixmap().rect();
+	p->drawPixmap(bogo, impl->board.pixmap(), bogo );
     }
 #if 0
-    // todo: only fillRect for pixmaps with alpha
-    p->fillRect( rect, this->backgroundBrush() );
+    if( 1 )
+    { // temporary workaround while i work out a crash bug in QGIPiecePlacemarker:
+	QColor color( Qt::yellow );
+	QColor xline( Qt::red );
+	const int rad = 12;
+	//QRect brect( -rad,-rad,2*rad,2*rad);
+	int w = 2*rad;
+	int step = int(w / 6);
+	int stopX = impl->placeAt.x();
+	int x = stopX - rad;
+	int y = impl->placeAt.y()-rad;
+	int w2 = w;
+	int h2 = 2*rad;
+	bool which = true;
+	p->setPen( QPen( Qt::NoPen ) );
+	while( x < stopX )
+	{
+	    QColor c( which ? xline : color );
+	    which = !which;
+#if 1
+	    QRadialGradient grad(0,0,x);
+	    //grad.setFocalPoint(-(w2/3),-(h2/3));
+	    grad.setColorAt( 0, c );
+	    grad.setColorAt( 1, c.light(130) );
+	    p->setBrush( grad );
+#else
+	    p->setBrush( c );
 #endif
-    QRect bogo = impl->board.pixmap().rect();
-    p->drawPixmap(bogo, impl->board.pixmap(), bogo );
+	    p->drawEllipse( x, y, w2, h2 );
+	    x += step;
+	    y += step;
+	    w2 -= 2*step;
+	    h2 -= 2*step;
+	}
+    }
+#endif // draw placemarker
+    
 }
 
 void QBoardView::wheelEvent(QWheelEvent *event)
@@ -268,17 +310,19 @@ void QBoardView::mousePressEvent( QMouseEvent * event )
 #endif
     if( event->button() & Qt::MidButton )
     {
+	impl->placeAt = this->mapToScene(event->pos()).toPoint();
 	if( impl->placer )
 	{
-	    QPointF p1( event->pos() - impl->placer->pos() );
-	    impl->placer->moveBy( p1.x(), p1.y() );
+ 	    impl->placer->setPos( impl->placeAt );
 	}
+#if 0
 	else
 	{
 	    // center view on clicked pos.
-	    event->accept();
-	    this->centerOn( this->mapToScene(event->pos()) );
+	    this->centerOn( impl->placeAt );
 	}
+#endif
+	event->accept();
 	return;
     }
     if( event->button() & Qt::RightButton )
@@ -364,11 +408,12 @@ void QBoardView::addPiece( GamePiece * pc )
     }
     else
     {
-	QScrollBar * sb = this->verticalScrollBar();
-	pos.setY( sb->sliderPosition() );
-	sb = this->horizontalScrollBar();
-	pos.setX( sb->sliderPosition() );
-	// ^^^ this isn't valid when we're scaled!
+	pos = impl->placeAt;
+// 	QScrollBar * sb = this->verticalScrollBar();
+// 	pos.setY( sb->sliderPosition() );
+// 	sb = this->horizontalScrollBar();
+// 	pos.setX( sb->sliderPosition() );
+// 	// ^^^ this isn't valid when we're scaled!
     }
     qDebug() << "QBoardView::addPiece() pos ="<<pos;
     pc->setPieceProperty("pos", pos );
