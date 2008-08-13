@@ -12,6 +12,12 @@ are at the top.
 in the file browser will be set to the placemarker's position. To move
 the placemarker, middle-click the board or drag the placemarker around.
 
+- Added basic skeleton code for plugins support, using Qt's plugins framework.
+It's not well integrated yet (you can't select plugins to open), but i was able
+to load a plugin which had compiled-in PNG files (as resources), and was able
+to use those resources as pixmap sources for in-play pieces. So the basics
+seem to work, anyway.
+
 
 2008 August 11:
 
