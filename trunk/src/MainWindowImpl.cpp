@@ -24,14 +24,17 @@
 #include <QGraphicsScene>
 #include <QMessageBox>
 #include <QScrollBar>
+#include <QPrinter>
+#include <QPrintDialog>
+#include <QDialog>
+#include <QMessageBox>
+
+#include <cmath>
 #include <s11n.net/s11n/s11nlite.hpp>
-#if QT_VERSION >= 0x040400
-#include "QBoardDocsBrowser.h"
-#endif
+
 #include "GamePiece.h"
 #include "QBoardView.h"
 #include "QGIGamePiece.h"
-#include <cmath>
 #include "QGIHtml.h"
 #include "GameState.h"
 #include "FileBrowser.h"
@@ -41,6 +44,11 @@
 #include "QBBatch.h"
 #include "QBoard.h"
 #include "PieceAppearanceWidget.h"
+#include "AboutQBoardImpl.h"
+
+#if QT_VERSION >= 0x040400
+#include "QBoardDocsBrowser.h"
+#endif
 
 struct MainWindowImpl::Impl
 {
@@ -135,10 +143,7 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	//connect( this->actionToggleBrowserView, SIGNAL(toggled(bool)), fb, SLOT(setVisible(bool)) );
 	connect( this->actionToggleBrowserView, SIGNAL(toggled(bool)), this, SLOT(toggleSidebarVisible(bool)) );
 	impl->gv = new QBoardView( impl->gstate );
-#if 1
-	// causes a crash when the board is placemarker updated after clearing the game state:
 	impl->gv->enablePlacemarker(true);
-#endif
 	connect( this->actionToggleBoardDragMode, SIGNAL(toggled(bool)),
 		impl->gv, SLOT(setHandDragMode(bool)) );
 	this->actionToggleBoardDragMode->setChecked(false);
@@ -149,32 +154,15 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	connect( this->actionZoomReset, SIGNAL(triggered(bool)), impl->gv, SLOT(zoomReset()) );
 
 
-#if 0
-	{
-		QWidget * frenchy = new QWidget();
-		QGridLayout * gl = new QGridLayout(frenchy);
-		lay->setSpacing(0);
-		lay->setContentsMargins(2,2,2,2);
-		gl->addWidget(impl->gv);
-		splitter->addWidget(frenchy);
-	}
-#else
-	{
-	    splitter->addWidget( impl->gv );
-	}
-#endif
-
-	if(1)
-	{
-	    vsplit->addWidget( impl->paw );
-	}
+	splitter->addWidget( impl->gv );
 
 	splitter->setStretchFactor(0,1);
 	splitter->setStretchFactor(1,3);
 
+	vsplit->addWidget( impl->paw );
+
 	vsplit->setStretchFactor(0,3);
 	vsplit->setStretchFactor(1,1);
-
 
 }
 
@@ -211,13 +199,11 @@ void MainWindowImpl::clipboardUpdated()
 }
 
 
-#include "utility.h"
 void MainWindowImpl::goHome()
 {
 	this->chdir( qboard::home() );
 	impl->fb->setDir(".");
 }
-#include "AboutQBoardImpl.h"
 void MainWindowImpl::aboutQBoard()
 {
 	AboutQBoardImpl dlg(this);
@@ -447,9 +433,6 @@ void MainWindowImpl::launchNewBoardView()
 	this->addDockWidget(Qt::RightDockWidgetArea, win );
 #endif
 }
-#include <QPrinter>
-#include <QPrintDialog>
-#include <QDialog>
 void MainWindowImpl::printGame()
 {
 	QPrinter printer(QPrinter::HighResolution);
@@ -489,14 +472,39 @@ void MainWindowImpl::addLine()
 
 }
 
-#include "PieceAppearanceWidget.h"
+#include "QBoardPlugin.h"
+#include <QPluginLoader>
 void MainWindowImpl::doSomethingExperimental()
 {
 	qDebug() << "MainWindowImpl::doSomethingExperimental()";
 	//new QGraphicsLineItem( 0,0, 200, 200 )
 	//impl->gstate.scene()->addItem(  );
 	//impl->gstate.scene()->addWidget( new QFrame );
-
+#if 1
+	if(1)
+	{
+	    QBoardPlugin * plug = 0;
+	    QDir pluginsDir(qApp->applicationDirPath());
+	    QString fname = pluginsDir.absoluteFilePath("libCGMEJoe.so");
+	    qDebug() << "fname =="<<fname;
+	    qDebug() << "pluginsDir =="<<pluginsDir;
+	    QPluginLoader loader(fname);
+	    loader.load();
+	    qDebug() << "loader.errorString() =="<<loader.errorString();
+	    qDebug() << "isLoaded =="<<loader.isLoaded();
+	    QObject *inst = loader.instance();
+	    if (inst) {
+		plug = qobject_cast<QBoardPlugin *>(inst);
+	    }
+	    qDebug() << "inst =="<<inst;
+	    qDebug() << "plugin =="<<plug;
+// 	    if( plug )
+// 	    {
+// 		delete plug;
+// 	    }
+	    //loader.unload();
+         }
+#endif
 	if(0)
 	{
 		QGILineNode * ln = new QGILineNode;
@@ -520,7 +528,6 @@ void MainWindowImpl::doSomethingExperimental()
 	}
 }
 
-#include <QMessageBox>
 void MainWindowImpl::clearBoard()
 {
 	QString msg("Really clear the board? This will delete all pieces!");
