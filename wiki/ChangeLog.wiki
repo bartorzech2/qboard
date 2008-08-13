@@ -8,8 +8,10 @@ are at the top.
 ----
 2008 August 13:
 
-- Add a "placemarker" to the board. Pieces loaded via double-clicking
-in the file browser will be set to the placemarker's position.
+- ~~~Added a "placemarker" to the board. Pieces loaded via double-clicking
+in the file browser will be set to the placemarker's position.~~~ The placemarker
+causes a dangling pointer when game state is cleaned, and we don't have a
+reasonable workaround for it.
 
 
 2008 August 11:
