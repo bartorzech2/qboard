@@ -41,10 +41,11 @@
 #include "QBBatch.h"
 #include "QBoard.h"
 #include "PieceAppearanceWidget.h"
+
 struct MainWindowImpl::Impl
 {
     GameState gstate;
-    QGraphicsView * gv;
+    QBoardView * gv;
     FileBrowser * fb;
     PieceAppearanceWidget *paw;
     QWidget * sidebar;
@@ -134,6 +135,7 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	//connect( this->actionToggleBrowserView, SIGNAL(toggled(bool)), fb, SLOT(setVisible(bool)) );
 	connect( this->actionToggleBrowserView, SIGNAL(toggled(bool)), this, SLOT(toggleSidebarVisible(bool)) );
 	impl->gv = new QBoardView( impl->gstate );
+	impl->gv->enablePlacemarker(true);
 	connect( this->actionToggleBoardDragMode, SIGNAL(toggled(bool)),
 		impl->gv, SLOT(setHandDragMode(bool)) );
 	this->actionToggleBoardDragMode->setChecked(false);
@@ -169,12 +171,19 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 
 	vsplit->setStretchFactor(0,3);
 	vsplit->setStretchFactor(1,1);
+
+
 }
 
 MainWindowImpl::~MainWindowImpl()
 {
 	delete impl;
 }
+
+// bool MainWindowImpl::eventFilter( QObject * obj, QEvent * ev )
+// {
+//     return QMainWindow::eventFilter(obj,ev);
+// }
 
 void MainWindowImpl::clearClipboard()
 {
@@ -183,7 +192,7 @@ void MainWindowImpl::clearClipboard()
 
 void MainWindowImpl::clipboardUpdated()
 {
-    QString msg("Clipboard updated: ");
+  QString msg(tr("Clipboard updated: "));
     S11nNode const * c = S11nClipboard::instance().contents();
     if( !c )
     {
@@ -222,7 +231,7 @@ void MainWindowImpl::launchHelp()
 #if QT_VERSION >= 0x040400
 	(new QBoardDocsBrowser)->show();
 #else
-	QMessageBox::warning( this, "Not implemented!",
+	QMessageBox::warning( this, tr("Not implemented!"),
 			      "MainWindowImpl::launchHelp() not implemented for Qt < 4.4",
 			      QMessageBox::Ok, QMessageBox::Ok );
 #endif
@@ -388,43 +397,7 @@ bool MainWindowImpl::loadPiece( QFileInfo const & fi )
 		impl->paw->applyCurrentTemplate( pc );
 		pc->setProperty( "pixmap", fn );
 	}
-	QRect rect( impl->gv->viewport()->geometry() );
-	// FIXME: we can't get the piece's size, because the size is part of the
-	// QGIGamePiece view object. That object won't get created until
-	// we add pc to the game. We need the size to set a 100% correct
-	// starting point.
-	QPoint pos;
-#if 0
-	const int fudge = -30;
-	pos = QPoint(rect.width()/2+fudge, rect.height() /2+fudge );
-#else
-	// Man, what a pain in the ass!
-	QScrollBar * sb = impl->gv->verticalScrollBar();
-	pos.setY( sb->sliderPosition() );
-	sb = impl->gv->horizontalScrollBar();
-	pos.setX( sb->sliderPosition() );
-	// And that's not valid when impl->gv is scaled. Aarrggh.
-	//pos.setX( pos.x() + fudge );
-
-#endif
-	//(rect.height() / 2) + 
-	// (rect.width() / 2) + 
-	// We must set a pos on the piece before adding it,
-	// or our next calculations won't work
-	//qDebug() << "loadPiece(): pos="<<pos;
- 	//pos = impl->gv->mapFromScene(pos);
-	qDebug() << "loadPiece(): pos="<<pos;
-	//QGraphicsItem * pv =
-	impl->gstate.addPiece(pc);
- 	//QRect vrect( pv->boundingRect().toRect() );
-	pos.setY( pos.y() + (rect.height()/2) ); // - (vrect.height() / 2) );
-	pos.setX( pos.x() + (rect.width()/2) ); // - (vrect.width() / 2) );
-	qDebug() << "loadPiece(): pos="<<pos;
-	pc->setPos( pos );
-// 	pos.setY( pos.y() - (vrect.height() / 2) );
-// 	pos.setX( pos.x() - (vrect.width() / 2 ) );
-// 	pc->setPos( pos );
-	//impl->gv->ensureVisible(pv);
+	impl->gv->addPiece(pc);
 	return true;
 }
 
@@ -520,26 +493,7 @@ void MainWindowImpl::doSomethingExperimental()
 	//new QGraphicsLineItem( 0,0, 200, 200 )
 	//impl->gstate.scene()->addItem(  );
 	//impl->gstate.scene()->addWidget( new QFrame );
-	if(1)
-	{
-	    PieceAppearanceWidget * paw = new PieceAppearanceWidget;
 
-	    GamePiece * pc = new GamePiece;
-	    paw->state().addPiece( pc );
-	    //pc->setPieceProperty("pixmap", "00-counter.png" );
-
-#if 0
-	    QGraphicsItem * bv = new QGraphicsTextItem("Hi, world");
-	    bv->setPos( 20, 20 );
-	    paw->state().scene()->addItem(bv);
-	    paw->state().scene()->addText("WTF?");
-#endif
-	    QDockWidget * win = new QDockWidget( "Piece Templates", this );
-	    win->setAttribute(Qt::WA_DeleteOnClose);
-	    win->setWidget(paw);
-	    this->addDockWidget(Qt::RightDockWidgetArea, win );
-
-	}
 	if(0)
 	{
 		QGILineNode * ln = new QGILineNode;

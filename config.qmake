@@ -14,9 +14,8 @@
 #
 # It is important that all QBoard qmake code not use ANY platform-specific
 # commands (e.g. $$system(date)). While the code is currently untested
-# on Windows, building it there is a priority and using platform-specific
-# constructs make that more difficult. The obligatory exception to this rule
-# is the use of platform scopes provided by qmake, e.g.:
+# on Windows, building it there is a priority. The obligatory exception
+# to this rule is the use of platform scopes provided by qmake, e.g.:
 #
 #  unix { ... }
 #
@@ -36,7 +35,6 @@
 # impossible to reliably escape that to a string from here. i had it
 # working once and qdevelop hosed the quoting when it re-saved the
 # .pro file.
-# QBOARD_VERSION = 20080811
 QBOARD_VERSION = 0
 QBOARD_CONF = config.qmake # THIS file
 TOP_SRCDIR=$$PWD
@@ -45,10 +43,6 @@ TOP_SRCDIR=$$PWD
 	absolute path of the top-most directory of this source tree (the dir \
 	containing $$QBOARD_CONF)")
 }
-
-########################################################################
-# You should need to touch anything after that unless you're a QBoard
-# maintainer.
 
 ########################################################################
 # Construct a relative dir to the root. This won't work for TOP_SRCDIR,
@@ -149,6 +143,7 @@ QBOARD_HEADERS_LIB = \
  $$SRC_DIR/QGIGamePiece.h \
  $$SRC_DIR/QGIHtml.h \
  $$SRC_DIR/QGILine.h \
+ $$SRC_DIR/QGIPiecePlacemarker.h \
  $$SRC_DIR/S11n.h \
  $$SRC_DIR/S11nClipboard.h \
  $$SRC_DIR/S11nQt.h \
@@ -173,6 +168,7 @@ QBOARD_SOURCES_LIB = \
  $$SRC_DIR/QGIGamePiece.cpp \
  $$SRC_DIR/QGIHtml.cpp \
  $$SRC_DIR/QGILine.cpp \
+ $$SRC_DIR/QGIPiecePlacemarker.cpp \
  $$SRC_DIR/S11nClipboard.cpp \
  $$SRC_DIR/S11nQt.cpp \
  $$SRC_DIR/Serializable.cpp \
