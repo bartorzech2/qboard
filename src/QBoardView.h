@@ -75,6 +75,9 @@ protected:
     virtual void dragMoveEvent( QDragMoveEvent * event );
     virtual void contextMenuEvent( QContextMenuEvent * event );
 
+private Q_SLOTS:
+    void placemarkerDestroyed();
+
 private:
     struct Impl;
     Impl * impl;

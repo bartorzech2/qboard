@@ -49,6 +49,7 @@ public:
 // 	QPainterPath shape() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
  	virtual bool event( QEvent * e );
+
 protected:
 	//virtual void mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event );
 	//virtual void focusOutEvent( QFocusEvent * event );

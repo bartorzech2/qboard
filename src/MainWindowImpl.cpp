@@ -135,7 +135,7 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	//connect( this->actionToggleBrowserView, SIGNAL(toggled(bool)), fb, SLOT(setVisible(bool)) );
 	connect( this->actionToggleBrowserView, SIGNAL(toggled(bool)), this, SLOT(toggleSidebarVisible(bool)) );
 	impl->gv = new QBoardView( impl->gstate );
-#if 0
+#if 1
 	// causes a crash when the board is placemarker updated after clearing the game state:
 	impl->gv->enablePlacemarker(true);
 #endif
