@@ -485,7 +485,7 @@ void MainWindowImpl::doSomethingExperimental()
 	{
 	    QBoardPlugin * plug = 0;
 	    QDir pluginsDir(qApp->applicationDirPath());
-	    QString fname = pluginsDir.absoluteFilePath("libCGMEJoe.so");
+	    QString fname = pluginsDir.absoluteFilePath("plugins/libCGMEJoe.so");
 	    qDebug() << "fname =="<<fname;
 	    qDebug() << "pluginsDir =="<<pluginsDir;
 	    QPluginLoader loader(fname);
@@ -498,10 +498,18 @@ void MainWindowImpl::doSomethingExperimental()
 	    }
 	    qDebug() << "inst =="<<inst;
 	    qDebug() << "plugin =="<<plug;
-// 	    if( plug )
-// 	    {
-// 		delete plug;
-// 	    }
+ 	    if( plug )
+ 	    {
+		QWidget * v = plug->widget();
+		qDebug() << "plugin widget =="<<v;
+		if( v )
+		{
+		    QDockWidget * win = new QDockWidget( "Plugin", this );
+		    win->setAttribute(Qt::WA_DeleteOnClose);
+		    win->setWidget( v );
+		    this->addDockWidget(Qt::RightDockWidgetArea, win );
+		}
+ 	    }
 	    //loader.unload();
          }
 #endif
