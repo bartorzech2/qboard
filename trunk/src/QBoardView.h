@@ -23,6 +23,7 @@ class QPainter;
 class QDragMoveEvent;
 class QContextMenuEvent;
 class GameState;
+class GamePiece;
 class QBoardView : public QGraphicsView
 {
 Q_OBJECT
@@ -50,6 +51,16 @@ public Q_SLOTS:
 	/* If handMode is true then grabbing-hand-style drag is used,
 	otherwise rubber-band-style is used. */
 	void setHandDragMode(bool handMode);
+    /**
+
+    */
+    void enablePlacemarker( bool );
+    /**
+       Adds the given piece to the game state (transfering ownership).
+       The piece's position is set to that of the placemarker if the
+       placemarker is enabled, otherwise it is not changed.
+    */
+    void addPiece( GamePiece * );
     void selectAll();
     /** Sets or unsets OpenGL mode, which is faster for many operations
 	but often misses important screen updates.

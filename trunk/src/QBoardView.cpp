@@ -23,6 +23,7 @@
 
 #include "QBoardView.h"
 #include "GameState.h"
+#include "GamePiece.h"
 #include "GL.h"
 #if QBOARD_USE_OPENGL
 #include <QGLWidget>
@@ -31,6 +32,7 @@
 
 #include "QBoard.h"
 #include "utility.h"
+#include "QGIPiecePlacemarker.h"
 
 struct QBoardView::Impl
 {
@@ -38,13 +40,18 @@ struct QBoardView::Impl
     QBoard & board;
     qreal scale;
     bool glmode;
-
+    QGIPiecePlacemarker * placer;
     Impl(GameState & s)
 	: gs(s),
 	  board(s.board()),
 	  scale(1.0),
-	  glmode(false)
+	  glmode(false),
+	  placer(0)
     {
+    }
+    ~Impl()
+    {
+	delete placer;
     }
 };
 
@@ -70,6 +77,7 @@ QBoardView::QBoardView( GameState & gs ) :
     this->setBackgroundBrush(QColor("#abb8fb"));
     this->viewport()->setObjectName( "QBoardViewViewport");
     this->updateBoardPixmap();
+
 }
 
 QBoardView::~QBoardView()
@@ -259,9 +267,18 @@ void QBoardView::mousePressEvent( QMouseEvent * event )
     }
 #endif
     if( event->button() & Qt::MidButton )
-    { // center view on clicked pos.
-	event->accept();
-	this->centerOn( this->mapToScene(event->pos()) );
+    {
+	if( impl->placer )
+	{
+	    QPointF p1( event->pos() - impl->placer->pos() );
+	    impl->placer->moveBy( p1.x(), p1.y() );
+	}
+	else
+	{
+	    // center view on clicked pos.
+	    event->accept();
+	    this->centerOn( this->mapToScene(event->pos()) );
+	}
 	return;
     }
     if( event->button() & Qt::RightButton )
@@ -323,4 +340,60 @@ void QBoardView::contextMenuEvent( QContextMenuEvent * event )
 	// on this voodoo.
 	this->QGraphicsView::contextMenuEvent(event);
     }
+}
+
+void QBoardView::addPiece( GamePiece * pc )
+{
+    QPoint pos;
+    if( impl->placer )
+    {
+	QPoint p(impl->placer->pos().toPoint());
+	// If the size is set, use it. Since pc is
+	// very unlikely to have a view so far, its
+	// size is not likely to be set.
+	QVariant var( pc->property("size") );
+	if( var.isValid() )
+	{
+	    QSize sz(var.toSize() );
+	    pos = p - QPoint( sz.width()/2, sz.height()/2 );
+	}
+	else
+	{
+	    pos = p;
+	}
+    }
+    else
+    {
+	QScrollBar * sb = this->verticalScrollBar();
+	pos.setY( sb->sliderPosition() );
+	sb = this->horizontalScrollBar();
+	pos.setX( sb->sliderPosition() );
+	// ^^^ this isn't valid when we're scaled!
+    }
+    qDebug() << "QBoardView::addPiece() pos ="<<pos;
+    pc->setPieceProperty("pos", pos );
+    impl->gs.addPiece(pc);
+}
+void QBoardView::enablePlacemarker( bool en )
+{
+    if( en )
+    {
+	if( ! impl->placer )
+	{
+	    impl->placer = new QGIPiecePlacemarker;
+	    impl->placer->setPos(20,20);
+	    impl->gs.scene()->addItem( impl->placer );
+	    QStringList help;
+	    help << "<html><body>This is a \"piece placemarker\"."
+		 << "To move it, middle-click the board to move it or drag it around."
+		 << "Pieces which are loaded from individual files (as opposed to being part of a game)"
+		 << "start out at this position."
+		 << "</body></html>"
+		;
+	    impl->placer->setToolTip( help.join(" ") );
+	}
+	return;
+    }
+    delete impl->placer;
+    impl->placer = 0;
 }
