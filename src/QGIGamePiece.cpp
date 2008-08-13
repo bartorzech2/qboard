@@ -16,6 +16,7 @@
 #include "utility.h"
 #include <QDebug>
 #include <QFont>
+#include <QGraphicsItem>
 #include "MenuHandlerPiece.h"
 #include "utility.h"
 
@@ -185,7 +186,7 @@ void QGIGamePiece::piecePropertySet( char const *pname )
 {
     // FIXME: treat QVariant::Invalid as an unset operation
 	QVariant var( m_pc->property(pname) );
-	qDebug() << "GamePiece::piecePropertySet("<<pname<<")[block="<<impl->block<<"] val="<<var;
+	//qDebug() << "QGIGamePiece::piecePropertySet("<<pname<<")[block="<<impl->block<<"] val="<<var;
 	if( impl->block ) return;
 	std::string key( pname );
 	if( "zLevel" == key )
@@ -336,7 +337,6 @@ void QGIGamePiece::piecePropertySet( char const *pname )
 		return;
 	}
 }
-#include <QGraphicsItem>
 void QGIGamePiece::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 {
     if( (!m_pc) ) //  || (!(ev->buttons() & Qt::LeftButton)) )
