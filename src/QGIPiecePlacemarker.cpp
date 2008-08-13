@@ -108,7 +108,7 @@ bool QGIPiecePlacemarker::event( QEvent * e )
 	}
 	return QObject::event(e);
 }
-#include <QRadialGradient>
+
 void QGIPiecePlacemarker::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
 	QVariant var = this->property("color1");
@@ -116,7 +116,7 @@ void QGIPiecePlacemarker::paint(QPainter *painter, const QStyleOptionGraphicsIte
 	var = this->property("color2");
 	QColor xline = (var.isValid() ? var.value<QColor>() : Qt::red);
 	QRectF brect( this->boundingRect() );
-	int fudge = 4; // try to avoid lopped off borders
+	int fudge = 0; // try to avoid lopped off borders
 	int w = int(brect.width()-fudge);
 	int x = int(brect.x())+(fudge/2);
 	int y = int(brect.y())+(fudge/2);
