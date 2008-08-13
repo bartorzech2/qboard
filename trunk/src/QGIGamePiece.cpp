@@ -183,6 +183,7 @@ bool QGIGamePiece::event( QEvent * e )
 
 void QGIGamePiece::piecePropertySet( char const *pname )
 {
+    // FIXME: treat QVariant::Invalid as an unset operation
 	QVariant var( m_pc->property(pname) );
 	qDebug() << "GamePiece::piecePropertySet("<<pname<<")[block="<<impl->block<<"] val="<<var;
 	if( impl->block ) return;
