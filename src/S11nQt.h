@@ -24,6 +24,21 @@
 #define S11N_SERIALIZE_FUNCTOR QColor_s11n
 #include "reg_qt_s11n.h"
 
+#include <QDate>
+/* Register QDate_s11n as a proxy for QDate. */
+#define S11N_TYPE QDate
+#define S11N_TYPE_NAME "QDate"
+#define S11N_SERIALIZE_FUNCTOR QDate_s11n
+#include "reg_qt_s11n.h"
+
+#include <QDateTime>
+/* Register QDateTime_s11n as a proxy for QDateTime. */
+#define S11N_TYPE QDateTime
+#define S11N_TYPE_NAME "QDateTime"
+#define S11N_SERIALIZE_FUNCTOR QDateTime_s11n
+#include "reg_qt_s11n.h"
+
+
 #include <QFont>
 /* s11n proxy for QFont.
 
@@ -158,6 +173,14 @@ struct QString_s11n
 #define S11N_SERIALIZE_FUNCTOR QStringList_s11n
 #include "reg_qt_s11n.h"
 
+#include <QTime>
+/* Register QTime_s11n as a proxy for QTime. */
+#define S11N_TYPE QTime
+#define S11N_TYPE_NAME "QTime"
+#define S11N_SERIALIZE_FUNCTOR QTime_s11n
+#include "reg_qt_s11n.h"
+
+
 #include <QVariant>
 /* s11n proxy for QVariant.
 
@@ -171,6 +194,7 @@ It supports the following QVariant types:
 - Int, UInt
 - Line, LineF
 - LongLong, ULongLong
+- Time, Date, DateTime
 
 If an attempt is made to serialize a different type, serialization
 will fail. If, upon deserialization, the integer values defined by

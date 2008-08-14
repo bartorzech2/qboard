@@ -60,6 +60,56 @@ bool QColor_s11n::operator()( S11nNode const & src, QColor & dest )
 	return true;	
 }
 
+
+bool QDate_s11n::operator()( S11nNode & dest, QDate const & src ) const
+{
+	typedef S11nNodeTraits NT;
+	std::ostringstream os;
+	os << ' ' <<  src.year()
+	   << ' ' <<  src.month()
+	   << ' ' <<  src.day();
+	NT::set( dest, "ymd", os.str() );
+	return true;
+}
+bool QDate_s11n::operator()( S11nNode const & src, QDate & dest )
+{
+	typedef S11nNodeTraits NT;
+	std::istringstream is(NT::get( src, "ymd", std::string() ));
+	if( ! is.good() ) return false;
+	int y;
+	is >> y;
+	if( ! is.good() ) return false;
+	int m;
+	is >> m;
+	if( ! is.good() ) return false;
+	int d;
+	is >> d;
+	dest.setDate( y, m, d );
+	return true;	
+}
+
+bool QDateTime_s11n::operator()( S11nNode & dest, QDateTime const & src ) const
+{
+    return s11n::serialize_subnode( dest, "date", src.date() )
+	&& s11n::serialize_subnode( dest, "time", src.time() );
+}
+
+bool QDateTime_s11n::operator()( S11nNode const & src, QDateTime & dest )
+{
+    QDate d;
+    QTime t;
+    if( ! ( s11n::deserialize_subnode( src, "date", d )
+	    && s11n::deserialize_subnode( src, "time", t ) ) )
+    {
+	return false;
+    }
+    dest.setDate(d);
+    dest.setTime(t);
+    return true;
+}
+
+
+
 bool QFont_s11n::operator()( S11nNode & dest, QFont const & src ) const
 {
 	typedef s11nlite::node_traits NT;
@@ -229,7 +279,6 @@ bool QSizeF_s11n::operator()( S11nNode const & src, QSizeF & dest )
 {
 	typedef S11nNodeTraits NT;
 	QSizeF nil;
-	std::string val(  );
 	std::istringstream is(NT::get( src, "wh", std::string() ));
 	if( ! is.good() ) return false;
 	qreal fl;
@@ -399,10 +448,44 @@ bool QStringList_s11n::operator()( S11nNode const & src, QStringList & dest )
 }
 
 
+bool QTime_s11n::operator()( S11nNode & dest, QTime const & src ) const
+{
+	typedef S11nNodeTraits NT;
+	std::ostringstream os;
+	os << src.hour()
+	   << ' ' <<  src.minute()
+	   << ' ' <<  src.second()
+	   << ' ' <<  src.msec();
+	NT::set( dest, "hmsm", os.str() );
+	return true;
+}
+bool QTime_s11n::operator()( S11nNode const & src, QTime & dest )
+{
+	typedef S11nNodeTraits NT;
+	std::istringstream is(NT::get( src, "hmsm", std::string() ));
+	if( ! is.good() ) return false;
+	int h;
+	is >> h;
+	if( ! is.good() ) return false;
+	int m;
+	is >> m;
+	if( ! is.good() ) return false;
+	int s;
+	is >> s;
+	if( ! is.good() ) return false;
+	int ms;
+	is >> ms;
+	dest.setHMS( h, m, s, ms );
+	return true;	
+}
+
+
 bool QVariant_s11n::canHandle( QVariant::Type t )
 {
 	return 
 		(t == QVariant::Color)
+		|| (t == QVariant::Date)
+		|| (t == QVariant::DateTime)
 		|| (t == QVariant::Double)
 		|| (t == QVariant::Int)
 		|| (t == QVariant::Line)
@@ -413,8 +496,10 @@ bool QVariant_s11n::canHandle( QVariant::Type t )
 		|| (t == QVariant::Point)
 		|| (t == QVariant::PointF)
 		|| (t == QVariant::Size)
+		|| (t == QVariant::SizeF)
 		|| (t == QVariant::String)
 		|| (t == QVariant::StringList)
+		|| (t == QVariant::Time)
 		|| (t == QVariant::ULongLong)
 		|| (t == QVariant::UInt)
 		;
@@ -447,6 +532,12 @@ bool QVariant_s11n::operator()( S11nNode & dest, QVariant const & src ) const
 			break;
 		case QVariant::Color:
 			ret = s11n::serialize_subnode( dest, "val", QColor(src.value<QColor>()) );
+			break;
+		case QVariant::Date:
+			ret = s11n::serialize_subnode( dest, "val", src.toDate() );
+			break;
+		case QVariant::DateTime:
+			ret = s11n::serialize_subnode( dest, "val", src.toDateTime() );
 			break;
 		case QVariant::Double:
 			ret = true;
@@ -481,6 +572,9 @@ bool QVariant_s11n::operator()( S11nNode & dest, QVariant const & src ) const
 			break;
 		case QVariant::StringList:
 			ret = s11n::serialize_subnode( dest, "val", src.toStringList() );
+			break;
+		case QVariant::Time:
+			ret = s11n::serialize_subnode( dest, "val", src.toTime() );
 			break;
 		case QVariant::ULongLong:
 			ret = true;
