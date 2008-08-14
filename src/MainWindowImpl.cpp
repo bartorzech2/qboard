@@ -50,6 +50,8 @@
 #include "QBoardDocsBrowser.h"
 #endif
 
+#define QBOARD_MAINWINDOW_PERSISTENCE_CLASS "MainWindow"
+
 struct MainWindowImpl::Impl
 {
     GameState gstate;
@@ -116,7 +118,13 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	connect( this->actionPrint, SIGNAL(triggered(bool)), this, SLOT(printGame()) );
 	connect( this->actionHelp, SIGNAL(triggered(bool)), this, SLOT(launchHelp()) );
 	connect( this->actionClearBoard, SIGNAL(triggered(bool)), this, SLOT(clearBoard()) );
+	connect( this->actionQuickSave, SIGNAL(triggered(bool)), this, SLOT(quickSave()) );
+	connect( this->actionQuickLoad, SIGNAL(triggered(bool)), this, SLOT(quickLoad()) );
+
+#if ! QBOARD_VERSION
+	// For "end user builds" we won't show this action.
 	connect( this->actionExperiment, SIGNAL(triggered(bool)), this, SLOT(doSomethingExperimental()) );
+#endif
 	connect( &S11nClipboard::instance(), SIGNAL(signalUpdated()), this, SLOT(clipboardUpdated()) );
 
 	this->actionClearClipboard->setEnabled( 0 != S11nClipboard::instance().contents() );
@@ -328,6 +336,7 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 		QStringList li;
 		li << "-v"
 		   << fn;
+#if 1
 		/**
 		   FIXME: when we pass impl->gstate, it WORKS in
 		   principal, but the pieces do not appear. They are
@@ -343,6 +352,12 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 		{
 		    worked = true;
 		}
+#else
+		// WTF won't this work right?
+		QBBatch::process_scripts( &(impl->gstate), li );
+		impl->fb->reloadDir();// in case script generated anything.
+		worked = true;
+#endif
 	    }
 	    catch(std::exception const & ex)
 	    {
@@ -364,6 +379,7 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 	}
 	return worked;
 }
+
 bool MainWindowImpl::loadPiece( QFileInfo const & fi )
 {
 	QString fn( fi.filePath() ); // absoluteFilePath() );
@@ -487,7 +503,9 @@ void MainWindowImpl::doSomethingExperimental()
 	    QDir pluginsDir(qApp->applicationDirPath());
 	    QString fname = pluginsDir.absoluteFilePath("plugins/libCGMEJoe.so");
 	    qDebug() << "fname =="<<fname;
+#if QT_VERSION >= 0x040400
 	    qDebug() << "pluginsDir =="<<pluginsDir;
+#endif
 	    QPluginLoader loader(fname);
 	    loader.load();
 	    qDebug() << "loader.errorString() =="<<loader.errorString();
@@ -584,4 +602,27 @@ void MainWindowImpl::rotate90()
 void MainWindowImpl::toggleSidebarVisible(bool b)
 {
     impl->sidebar->setVisible( b );
+}
+
+static QString quickSaveFileName( GameState & gs )
+{
+    static QString bob;
+    if( bob.isEmpty() )
+    {
+	QDir d( qboard::persistenceDir(QBOARD_MAINWINDOW_PERSISTENCE_CLASS) );
+	bob = QString("%1%2").
+	    arg(d.absoluteFilePath( "quicksave" )).
+	    arg(gs.s11nFileExtension());
+    }
+    return bob;
+}
+
+void MainWindowImpl::quickLoad()
+{
+    this->loadGame( quickSaveFileName(impl->gstate) );
+}
+
+void MainWindowImpl::quickSave()
+{
+    this->saveGame( quickSaveFileName(impl->gstate) );
 }
