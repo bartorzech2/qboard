@@ -256,7 +256,7 @@ void QBoardView::zoomOut()
 
 void QBoardView::zoom( qreal z )
 {
-    if( (z < 0.10) || (z>4.01) ) return; // arbitrary! 
+    if( (z < 0.10) || (z>5.01) ) return; // arbitrary! 
     if( z == impl->scale ) return;
     impl->scale = z;
     //qDebug() << "QBoardView::zoom()"<<impl->scale;
