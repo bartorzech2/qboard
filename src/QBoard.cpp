@@ -58,7 +58,6 @@ bool QBoard::event( QEvent * e )
 bool QBoard::serialize( S11nNode & dest ) const
 {
     if( ! this->Serializable::serialize( dest ) ) return false;
-    typedef S11nNodeTraits NT;
     return s11n::serialize_subnode( dest, "pixmap", this->m_file );
     //&& s11n::serialize_subnode( dest, "size", this->m_px.size() );
 }
@@ -66,13 +65,12 @@ bool QBoard::serialize( S11nNode & dest ) const
 bool QBoard::deserialize(  S11nNode const & src )
 {
     if( ! this->Serializable::deserialize( src ) ) return false;
-    typedef S11nNodeTraits NT;
     this->m_px = QPixmap();
-    // FIXME: save relative path to m_file.
-    S11nNode const * ch = s11n::find_child_by_name( src, "file" );
+    // FIXME? ensure we have a relative path for m_file?
+    S11nNode const * ch = s11n::find_child_by_name( src, "pixmap" );
     if( ! ch )
-    { // newer name
-	ch = s11n::find_child_by_name( src, "pixmap" );
+    { // try older name for this property...
+	ch = s11n::find_child_by_name( src, "file" );
     }
     if( ! ch || ! s11n::deserialize( *ch, this->m_file ) )
     {
@@ -112,8 +110,26 @@ QSize QBoard::size() const
 }
 void QBoard::clear()
 {
+#if 1
+    this->setProperty("pixmap",QVariant());
+#else
     m_px = QPixmap();
     m_file = "";
+#endif
+#if 0
+    // FIXME: clear all dynamic properties?
+    typedef QList<QByteArray> QL;
+    QL ql( src.dynamicPropertyNames() );
+    QL::const_iterator it( ql.begin() );
+    QL::const_iterator et( ql.end() );
+    for( ; et != it; ++it )
+    {
+	char const * key = it->constData();
+	if( !key || (*key == '_') ) continue; // Qt reserves the "_q_" prefix, so we'll elaborate on that.
+	this->setProperty(key,QVariant());
+	// ^^ setProperty() ends up triggering a call to this->event() on each change.
+    }
+#endif
 }
 
 bool QBoard::save( QString const & fn) const
