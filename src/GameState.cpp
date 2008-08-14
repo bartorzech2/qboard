@@ -100,6 +100,14 @@ bool GameState::serialize( S11nNode & dest ) const
 {
     if( ! this->Serializable::serialize( dest ) ) return false;
     typedef S11nNodeTraits NT;
+    /**
+       FIXME:
+
+       This code is largely here to accomodate different types of
+       Views for GamePiece- vs non-GamePiece objects. We need to
+       come up with a way to eliminate this special-case crap.
+    */
+    QList<Serializable*> nonPiece;
     // We need to make sure that the pieces have a 'pos' property set, so we will
     // look at all QGIGamePieces and sync their position properties. So lame.
     // This is why members of this type are mutable.
@@ -107,7 +115,6 @@ bool GameState::serialize( S11nNode & dest ) const
     QL ql( this->impl->scene->items() );
     QL::iterator it = ql.begin();
     QL::iterator et = ql.end();
-    QList<Serializable*> nonPiece;
     for( ; et != it; ++it )
     {
 	if( (*it)->parentItem() )
@@ -135,7 +142,8 @@ bool GameState::serialize( S11nNode & dest ) const
 	if( ! ppos.isValid() )
 	{
 	    pc->setProperty("pos",v->pos().toPoint() );
-	    // ^^^^ Note that we do not use setPieceProperty() to avoid triggering a piecePropertySet() signal. 
+	    // ^^^^ Note that we do not use setPieceProperty() to avoid triggering a piecePropertySet() signal.
+	    qDebug() << "WARNING: GameState::serialize() kludge: setting 'pos' property for piece.";
 	}
     }
     return s11n::serialize_subnode( dest, "board", this->impl->board )
