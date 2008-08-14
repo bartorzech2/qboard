@@ -12,6 +12,8 @@ are at the top.
 
 - Added ability to serialize QDate, QTime, and QDateTime properties.
 
+- The "Clear board" action now leaves the underlying board graphic intact. This was an accident, but i like it better this way, so it stays.
+
 
 2008 August 13:
 
