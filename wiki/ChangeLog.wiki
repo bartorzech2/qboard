@@ -6,6 +6,13 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top.
 
 ----
+2008 August 15:
+
+- Added quicksave/quickload (Alt-S and Alt-L), which save/load to/from a predefined game file.
+
+- Added ability to serialize QDate, QTime, and QDateTime properties.
+
+
 2008 August 13:
 
 - Added a "placemarker" to the board. Pieces loaded via double-clicking
