@@ -516,73 +516,56 @@ bool QVariant_s11n::operator()( S11nNode & dest, QVariant const & src ) const
 		//throw s11n::s11n_exception( "QVariant_s11n cannot serialize QVariants type() %d", vt );
 		return false;
 	}
+#define SER_PROP(Setter) \
+	ret = 0; NT::set(dest, "val", src.Setter); break;
+#define SER_OBJ(X) \
+	ret = s11n::serialize_subnode( dest, "val", X ); break;
+
 	switch( vt )
 	{
 		case QVariant::Int:
-			ret = true;
-			NT::set( dest, "val", src.toInt() );
-			break;
+		    SER_PROP(toInt());
 		case QVariant::UInt:
-			ret = true;
-			NT::set( dest, "val", src.toUInt() );
-			break;
+		    SER_PROP(toUInt());
 		case QVariant::LongLong:
-			ret = true;
-			NT::set( dest, "val", src.toLongLong() );
-			break;
+		    SER_PROP(toLongLong());
 		case QVariant::Color:
-			ret = s11n::serialize_subnode( dest, "val", QColor(src.value<QColor>()) );
-			break;
+		    SER_OBJ( QColor(src.value<QColor>()) );
 		case QVariant::Date:
-			ret = s11n::serialize_subnode( dest, "val", src.toDate() );
-			break;
+		    SER_OBJ( src.toDate() );
 		case QVariant::DateTime:
-			ret = s11n::serialize_subnode( dest, "val", src.toDateTime() );
-			break;
+		    SER_OBJ( src.toDateTime() );
 		case QVariant::Double:
-			ret = true;
-			NT::set( dest, "val", src.toDouble() );
-			break;
+		    SER_PROP(toDouble());
 		case QVariant::Line:
-			ret = s11n::serialize_subnode( dest, "val", src.toLine() );
-			break;
+		    SER_OBJ( src.toLine() );
 		case QVariant::LineF:
-			ret = s11n::serialize_subnode( dest, "val", src.toLineF() );
-			break;
+		    SER_OBJ( src.toLineF() );
 		case QVariant::Point:
-			ret = s11n::serialize_subnode( dest, "val", src.toPoint() );
-			break;
+		    SER_OBJ( src.toPoint() );
 		case QVariant::PointF:
-			ret = s11n::serialize_subnode( dest, "val", src.toPointF() );
-			break;
+		    SER_OBJ( src.toPointF() );
 		case QVariant::Rect:
-			ret = s11n::serialize_subnode( dest, "val", src.toRect() );
-			break;
+		    SER_OBJ( src.toRect() );
 		case QVariant::RectF:
-			ret = s11n::serialize_subnode( dest, "val", src.toRectF() );
-			break;
+		    SER_OBJ( src.toRectF() );
 		case QVariant::Size:
-			ret = s11n::serialize_subnode( dest, "val", src.toSize() );
-			break;
+		    SER_OBJ( src.toSize() );
 		case QVariant::SizeF:
-			ret = s11n::serialize_subnode( dest, "val", src.toSizeF() );
-			break;
+		    SER_OBJ( src.toSizeF() );
 		case QVariant::String:
-			ret = s11n::serialize_subnode( dest, "val", src.toString() );
-			break;
+		    SER_OBJ( src.toString() );
 		case QVariant::StringList:
-			ret = s11n::serialize_subnode( dest, "val", src.toStringList() );
-			break;
+		    SER_OBJ( src.toStringList() );
 		case QVariant::Time:
-			ret = s11n::serialize_subnode( dest, "val", src.toTime() );
-			break;
+		    SER_OBJ( src.toTime() );
 		case QVariant::ULongLong:
-			ret = true;
-			NT::set( dest, "val", src.toULongLong() );
-			break;
+		    SER_PROP(toULongLong());
 		default:
 			break;
 	};
+#undef SER_PROP
+#undef SER_OBJ
 	return ret;
 }
 bool QVariant_s11n::operator()( S11nNode const & src, QVariant & dest )
@@ -594,143 +577,39 @@ bool QVariant_s11n::operator()( S11nNode const & src, QVariant & dest )
 		return false;
 	}
 	bool ret = false;
+#define DESER_OBJ(Type) { Type tmp; \
+	    if( (ret = s11n::deserialize_subnode( src, "val", tmp ) ) ) \
+	    {dest = QVariant(tmp);} } break;
+#define DESER_PROP(Type,DefaultVal) 				\
+	{ Type i = NT::get( src, "val", DefaultVal );		\
+	    dest = QVariant( i );  ret = true; } break;
+
 	switch( vt )
 	{
-		case QVariant::Color:
-		{
-			QColor tmp; 
-			if( (ret = s11n::deserialize_subnode( src, "val", tmp ) ) )
-			{
-				dest = QVariant(tmp);
-			}
-		}
-			break;
-		case QVariant::Double:
-		{
-			double i = NT::get( src, "val", 0.0 );
-			dest = QVariant( i );
-			ret = true;
-		}
-			break;
-		case QVariant::Int:
-		{
-			int i = NT::get( src, "val", 0 );
-			dest = QVariant( i );
-			ret = true;
-		}
-			break;
-		case QVariant::Line:
-		{
-			QLine tmp; 
-			if( (ret = s11n::deserialize_subnode( src, "val", tmp ) ) )
-			{
-				dest = QVariant(tmp);
-			}
-		}
-		case QVariant::LineF:
-		{
-			QLineF tmp; 
-			if( (ret = s11n::deserialize_subnode( src, "val", tmp ) ) )
-			{
-				dest = QVariant(tmp);
-			}
-		}
-		case QVariant::LongLong:
-		{
-			qlonglong i = NT::get( src, "val", static_cast<qlonglong>(0) );
-			dest = QVariant( i );
-			ret = true;
-		}
-		break;
-		case QVariant::Point:
-		{
-			QPoint tmp; 
-			if( (ret = s11n::deserialize_subnode( src, "val", tmp ) ) )
-			{
-				dest = QVariant(tmp);
-			}
-		}
-			break;
-		case QVariant::PointF:
-		{
-			QPointF tmp; 
-			if( (ret = s11n::deserialize_subnode( src, "val", tmp ) ) )
-			{
-				dest = QVariant(tmp);
-			}
-		}
-			break;
-		case QVariant::Rect:
-		{
-			QRect tmp; 
-			if( (ret = s11n::deserialize_subnode( src, "val", tmp ) ) )
-			{
-				dest = QVariant(tmp);
-			}
-		}
-			break;
-		case QVariant::RectF:
-		{
-			QRectF tmp; 
-			if( (ret = s11n::deserialize_subnode( src, "val", tmp ) ) )
-			{
-				dest = QVariant(tmp);
-			}
-		}
-			break;
-		case QVariant::Size:
-		{
-			QSize tmp; 
-			if( (ret = s11n::deserialize_subnode( src, "val", tmp ) ) )
-			{
-				dest = QVariant(tmp);
-			}
-		}
-			break;
-		case QVariant::SizeF:
-		{
-			QSizeF tmp; 
-			if( (ret = s11n::deserialize_subnode( src, "val", tmp ) ) )
-			{
-				dest = QVariant(tmp);
-			}
-		}
-			break;
-		case QVariant::String:
-		{
-			QString tmp; 
-			if( (ret = s11n::deserialize_subnode( src, "val", tmp ) ) )
-			{
-				dest = QVariant(tmp);
-			}
-		}
-			break;
-		case QVariant::StringList:
-		{
-			QStringList tmp; 
-			if( (ret = s11n::deserialize_subnode( src, "val", tmp ) ) )
-			{
-				dest = QVariant(tmp);
-			}
-		}
-			break;
-		case QVariant::UInt:
-		{
-			uint i = NT::get( src, "val", static_cast<uint>(0) );
-			dest = QVariant( i );
-			ret = true;
-		}
-			break;
-		case QVariant::ULongLong:
-		{
-			qulonglong i = NT::get( src, "val", static_cast<qulonglong>(0) );
-			dest = QVariant( i );
-			ret = true;
-		}
-			break;
+		case QVariant::Color: DESER_OBJ(QColor);
+		case QVariant::Date: DESER_OBJ(QDate);
+		case QVariant::DateTime: DESER_OBJ(QDateTime);
+		case QVariant::Double: DESER_PROP(double,0.0);
+		case QVariant::Int: DESER_PROP(int,0);
+		case QVariant::Line: DESER_OBJ(QLine);
+		case QVariant::LineF: DESER_OBJ(QLineF);
+		case QVariant::LongLong: DESER_PROP(qlonglong,qlonglong(0));
+		case QVariant::Point: DESER_OBJ(QPoint);
+		case QVariant::PointF: DESER_OBJ(QPointF);
+		case QVariant::Rect: DESER_OBJ(QRect);
+		case QVariant::RectF: DESER_OBJ(QRectF);
+		case QVariant::Size: DESER_OBJ(QSize);
+		case QVariant::SizeF: DESER_OBJ(QSizeF);
+		case QVariant::String: DESER_OBJ(QString);
+		case QVariant::StringList: DESER_OBJ(QStringList);
+		case QVariant::Time: DESER_OBJ(QTime);
+		case QVariant::UInt: DESER_PROP(uint,uint(0));
+		case QVariant::ULongLong: DESER_PROP(qulonglong,qulonglong(0));
 		default:
 			break;
 	};
+#undef DESER_OBJ
+#undef DESER_PROP
 	return ret;
 }
 
