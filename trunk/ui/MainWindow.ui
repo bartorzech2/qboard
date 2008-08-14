@@ -13,18 +13,9 @@
    <string>MainWindow</string>
   </property>
   <property name="windowIcon" >
-   <iconset resource="../resources/icons.qrc" >
-    <normaloff>:/QBoard/icon/qub.png</normaloff>:/QBoard/icon/qub.png</iconset>
+   <iconset resource="../resources/icons.qrc" >:/QBoard/icon/qub.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget" >
-   <property name="geometry" >
-    <rect>
-     <x>0</x>
-     <y>53</y>
-     <width>675</width>
-     <height>416</height>
-    </rect>
-   </property>
    <layout class="QGridLayout" >
     <item row="1" column="0" >
      <widget class="QWidget" native="1" name="clientArea" >
@@ -44,7 +35,7 @@
      <x>0</x>
      <y>0</y>
      <width>675</width>
-     <height>19</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile" >
@@ -53,6 +44,8 @@
     </property>
     <addaction name="actionHome" />
     <addaction name="actionNewWindow" />
+    <addaction name="actionQuickSave" />
+    <addaction name="actionQuickLoad" />
     <addaction name="separator" />
     <addaction name="actionSave" />
     <addaction name="actionLoad" />
@@ -110,25 +103,8 @@
    <addaction name="menuPieces" />
    <addaction name="menu_Help" />
   </widget>
-  <widget class="QStatusBar" name="statusbar" >
-   <property name="geometry" >
-    <rect>
-     <x>0</x>
-     <y>469</y>
-     <width>675</width>
-     <height>19</height>
-    </rect>
-   </property>
-  </widget>
+  <widget class="QStatusBar" name="statusbar" />
   <widget class="QToolBar" name="toolBar" >
-   <property name="geometry" >
-    <rect>
-     <x>0</x>
-     <y>19</y>
-     <width>675</width>
-     <height>34</height>
-    </rect>
-   </property>
    <property name="windowTitle" >
     <string>toolBar</string>
    </property>
@@ -160,8 +136,7 @@
   </widget>
   <action name="actionSave" >
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/filesaveas.png</normaloff>:/QBoard/icon/filesaveas.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/filesaveas.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Save...</string>
@@ -172,8 +147,7 @@
   </action>
   <action name="actionLoad" >
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/fileopen.png</normaloff>:/QBoard/icon/fileopen.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/fileopen.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Load...</string>
@@ -187,8 +161,7 @@
     <bool>true</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/exit.png</normaloff>:/QBoard/icon/exit.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/exit.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Quit</string>
@@ -199,8 +172,7 @@
   </action>
   <action name="actionCopy" >
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/editcopy.png</normaloff>:/QBoard/icon/editcopy.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/editcopy.png</iconset>
    </property>
    <property name="text" >
     <string>Copy</string>
@@ -211,8 +183,7 @@
   </action>
   <action name="actionCut" >
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/editcut.png</normaloff>:/QBoard/icon/editcut.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/editcut.png</iconset>
    </property>
    <property name="text" >
     <string>Cut</string>
@@ -226,8 +197,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/editpaste.png</normaloff>:/QBoard/icon/editpaste.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/editpaste.png</iconset>
    </property>
    <property name="text" >
     <string>Paste</string>
@@ -241,8 +211,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/editshred.png</normaloff>:/QBoard/icon/editshred.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/editshred.png</iconset>
    </property>
    <property name="text" >
     <string>Clear clipboard</string>
@@ -250,8 +219,7 @@
   </action>
   <action name="actionZoomIn" >
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/viewmag+.png</normaloff>:/QBoard/icon/viewmag+.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/viewmag+.png</iconset>
    </property>
    <property name="text" >
     <string>Zoom &amp;in</string>
@@ -262,8 +230,7 @@
   </action>
   <action name="actionZoomOut" >
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/viewmag-.png</normaloff>:/QBoard/icon/viewmag-.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/viewmag-.png</iconset>
    </property>
    <property name="text" >
     <string>Zoom &amp;out</string>
@@ -274,8 +241,7 @@
   </action>
   <action name="actionZoomReset" >
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/viewmag1.png</normaloff>:/QBoard/icon/viewmag1.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/viewmag1.png</iconset>
    </property>
    <property name="text" >
     <string>Zoom &amp;100%</string>
@@ -289,8 +255,7 @@
     <bool>true</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/reload.png</normaloff>:/QBoard/icon/reload.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/reload.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Refresh file view</string>
@@ -313,8 +278,7 @@
     <bool>true</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/view_sidetree.png</normaloff>:/QBoard/icon/view_sidetree.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/view_sidetree.png</iconset>
    </property>
    <property name="text" >
     <string>Toggle file &amp;view</string>
@@ -325,8 +289,7 @@
   </action>
   <action name="actionNewBoardView" >
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/view_right.png</normaloff>:/QBoard/icon/view_right.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/view_right.png</iconset>
    </property>
    <property name="text" >
     <string>New &amp;board view</string>
@@ -337,8 +300,7 @@
   </action>
   <action name="actionExperiment" >
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/connect_creating.png</normaloff>:/QBoard/icon/connect_creating.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/connect_creating.png</iconset>
    </property>
    <property name="text" >
     <string>Experiment</string>
@@ -349,8 +311,7 @@
   </action>
   <action name="actionHome" >
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/gohome.png</normaloff>:/QBoard/icon/gohome.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/gohome.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Home</string>
@@ -361,8 +322,7 @@
   </action>
   <action name="actionAboutQt" >
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/qtlogo.png</normaloff>:/QBoard/icon/qtlogo.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/qtlogo.png</iconset>
    </property>
    <property name="text" >
     <string>About &amp;Qt</string>
@@ -370,8 +330,7 @@
   </action>
   <action name="actionAboutQBoard" >
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/qub-mini.png</normaloff>:/QBoard/icon/qub-mini.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/qub-mini.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;About QBoard</string>
@@ -379,8 +338,7 @@
   </action>
   <action name="actionPrint" >
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/fileprint.png</normaloff>:/QBoard/icon/fileprint.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/fileprint.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Print...</string>
@@ -391,8 +349,7 @@
   </action>
   <action name="actionHelp" >
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/contents.png</normaloff>:/QBoard/icon/contents.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/contents.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Help</string>
@@ -403,8 +360,7 @@
   </action>
   <action name="actionClearBoard" >
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/eraser.png</normaloff>:/QBoard/icon/eraser.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/eraser.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Clear board</string>
@@ -412,8 +368,7 @@
   </action>
   <action name="actionNewWindow" >
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/qub-mini.png</normaloff>:/QBoard/icon/qub-mini.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/qub-mini.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;New Window</string>
@@ -427,8 +382,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/mouse.png</normaloff>:/QBoard/icon/mouse.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/mouse.png</iconset>
    </property>
    <property name="text" >
     <string>Toggle board drag mode</string>
@@ -439,8 +393,7 @@
   </action>
   <action name="actionRotate90" >
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/rotate_cw.png</normaloff>:/QBoard/icon/rotate_cw.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/rotate_cw.png</iconset>
    </property>
    <property name="text" >
     <string>Rotate &amp;90 degrees</string>
@@ -451,8 +404,7 @@
   </action>
   <action name="actionAddQGIHtml" >
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/editclear.png</normaloff>:/QBoard/icon/editclear.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/editclear.png</iconset>
    </property>
    <property name="text" >
     <string>Add &amp;text item</string>
@@ -463,8 +415,7 @@
   </action>
   <action name="actionAddLine" >
    <property name="icon" >
-    <iconset resource="../resources/icons.qrc" >
-     <normaloff>:/QBoard/icon/color_line.png</normaloff>:/QBoard/icon/color_line.png</iconset>
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/color_line.png</iconset>
    </property>
    <property name="text" >
     <string>Add &amp;Line item</string>
@@ -479,6 +430,28 @@
    </property>
    <property name="shortcut" >
     <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionQuickSave" >
+   <property name="icon" >
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/fileexport.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Quick-save</string>
+   </property>
+   <property name="shortcut" >
+    <string>Alt+S</string>
+   </property>
+  </action>
+  <action name="actionQuickLoad" >
+   <property name="icon" >
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/fileimport.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Quick-load</string>
+   </property>
+   <property name="shortcut" >
+    <string>Alt+L</string>
    </property>
   </action>
  </widget>
