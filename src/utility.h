@@ -133,6 +133,20 @@ namespace qboard
     */
     void showHelpResource( QString const & title, QString const & res );
 
+    /**
+       If origin is not currently selected, then if it is-a
+       Serializable it is copied to the system clipboard.  If origin
+       is selected, all selected Serializables are copies. If the copy
+       parameter is set to false, the item(s) is(are) cut to the
+       clipboard instead of copied.
+
+       Returns false if there are no items to serialize or if
+       serialization fails. On success it updates the clipboard
+       and returns true.
+    */
+    bool clipboardGraphicsItems( QGraphicsItem * origin, bool copy );
+
+
 }
 
 #endif // QBOARD_UTILITY_H_INCLUDED

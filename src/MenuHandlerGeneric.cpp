@@ -22,11 +22,6 @@
 #include "utility.h"
 
 #include "S11nQtList.h"
-static S11nClipboard & clipboard()
-{
-    return S11nClipboard::instance();
-}
-
 MenuHandlerCopyCut::MenuHandlerCopyCut(QGraphicsItem * gi,QObject * parent)
     : QObject(parent),
       m_gi(gi)
@@ -37,80 +32,10 @@ MenuHandlerCopyCut::~MenuHandlerCopyCut()
 	
 }
 
+#include "utility.h"
 void MenuHandlerCopyCut::clipboard( QGraphicsItem * gvi, bool copy )
 {
-    if( ! gvi ) return;
-    //qDebug() <<"MenuHandlerCopyCut::clipboard(item,"<<copy<<")";
-    typedef QList<QGraphicsItem *> QL;
-    typedef QList<Serializable *> SL;
-    SL tops;
-    QL toCut;
-    if( gvi->isSelected() )
-    {
-	QL ql( gvi->scene()->selectedItems() );
-	for( QL::iterator it = ql.begin(); ql.end() != it; ++it )
-	{
-	    if( (*it)->parentItem() ) continue;
-	    //qDebug() <<"MenuHandlerCopyCut::clipboard() marking " << *it;
-	    if( !copy ) toCut.push_back(*it);
-	    Serializable * ser = dynamic_cast<Serializable*>(*it);
-	    if( ser )
-	    {
-		//qDebug() <<"MenuHandlerCopyCut::clipboard() marking for CUT " << *it;
-		tops.push_back(ser);
-	    }
-	}
-    }
-    else
-    {
-	//qDebug() <<"MenuHandlerCopyCut::clipboard() single object " << gvi;
-	if( ! copy ) toCut.push_back(gvi);
-	// Yet another QGIGamePiece special case.... we need to do something about that.
-	Serializable * ser = dynamic_cast<Serializable*>(gvi);
-	if( ! ser )
-	{
-	    qDebug() << (copy?"copy":"cut")<<"handler cannot handle non-Serializables."
-		     << "Skipping object "<<gvi;
-	}
-	else
-	{
-	    //qDebug() <<"MenuHandlerCopyCut::clipboard() single object is Serializable ??? " << ser;
-	    tops.push_back(ser);
-	}
-    }
-    if( tops.empty() ) return;
-    S11nNode * node = S11nNodeTraits::create("serializables");
-    try
-    {
-	if( ! s11nlite::serialize( *node, tops ) )
-	{
-	    delete node;
-	    return;
-	}
-    }
-    catch(std::exception const & ex)
-    {
-	delete node;
-	qDebug() << "MenuHandlerCopyCut::clipboard(): serialization threw:"<<ex.what();
-	return;
-    }
-    tops.clear();
-    ::clipboard().slotCut(node);
-    if( copy )
-    {
-	//qDebug() << "MenuHandlerCopyCut::clipboard() copied data.";
-    }
-    else
-    {
-	//qDebug() << "MenuHandlerCopyCut::clipboard() cut data.";
-	qboard::destroy( toCut );
-    }
-    S11nClipboard::S11nNode * cont = ::clipboard().contents();
-    if( cont )
-    {
-	qDebug() <<"Clipboard contents:";
-	s11nlite::save( *cont, std::cout );
-    }
+    qboard::clipboardGraphicsItems( gvi, copy );
 }
 void MenuHandlerCopyCut::clipboardCopy()
 {

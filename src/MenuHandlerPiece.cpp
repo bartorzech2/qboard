@@ -106,6 +106,7 @@ void MenuHandlerPiece::doMenu( QGIGamePiece * pv, QGraphicsSceneContextMenuEvent
 	m->addAction(QIcon(":/QBoard/icon/editcut.png"),"Cut",clipper,SLOT(clipboardCut()) );
 	m->addSeparator();
 #endif
+	m->addSeparator();
 	m->addAction(QIcon(":/QBoard/icon/help.png"),"Help...", this, SLOT(showHelp()) );
 	m->exec( ev->screenPos() );
 	delete m;
