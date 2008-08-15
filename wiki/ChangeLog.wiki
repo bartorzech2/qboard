@@ -17,6 +17,8 @@ are at the top.
 - Fixed: board view now updates properly when a new board graphic is loaded. That is,
 one no longer has to scroll the board to get the new image to show up.
 
+- Added "Help" context menu item to some in-game objects.
+
 
 2008 August 13:
 
