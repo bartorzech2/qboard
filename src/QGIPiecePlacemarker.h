@@ -14,8 +14,6 @@
  */
 
 #include <QGraphicsTextItem>
-#include "Serializable.h"
-#include "QGI.h"
 #include <QVariant>
 #include <QPointF>
 #include <QPair>
@@ -25,6 +23,11 @@ class QPainter;
 class QStyleOptionGraphicsItem;
 class QWidget;
 class QGraphicsSceneMouseEvent;
+class QMoveEvent;
+
+#include "Serializable.h"
+#include "QGI.h"
+class GameState;
 
 #define QGIPiecePlacemarker_IS_SERIALIZABLE 0
 /**
@@ -48,7 +51,11 @@ public:
 	QRectF boundingRect() const;
 // 	QPainterPath shape() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
- 	virtual bool event( QEvent * e );
+  	virtual bool event( QEvent * e );
+
+//     void setGameState( GameState & gs );
+
+    virtual int type() const { return QGITypes::PiecePlacemarker; }
 
 protected:
 	//virtual void mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event );

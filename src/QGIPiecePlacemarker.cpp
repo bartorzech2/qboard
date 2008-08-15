@@ -11,9 +11,6 @@
  *
  */
 
-#include "QGIPiecePlacemarker.h"
-#include "S11nQt.h"
-#include "utility.h"
 #include <QGraphicsSceneMouseEvent>
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsScene>
@@ -27,7 +24,13 @@
 #include <QPointF>
 #include <QMenu>
 #include <QEvent>
+#include <QMoveEvent>
+
 #include <cmath>
+
+#include "QGIPiecePlacemarker.h"
+#include "S11nQt.h"
+#include "utility.h"
 
 struct QGIPiecePlacemarker::Impl
 {
@@ -35,7 +38,6 @@ struct QGIPiecePlacemarker::Impl
     Impl() :
 	active(false)
 	{
-		
 	}
 	~Impl()
 	{
@@ -100,15 +102,27 @@ QRectF QGIPiecePlacemarker::boundingRect() const
 // }
 bool QGIPiecePlacemarker::event( QEvent * e )
 {
-	if( e->type() == QEvent::DynamicPropertyChange )
+#if 0
+    // We don't get Move events :(
+	if( e->type() == QEvent::Move )
 	{
 		e->accept();
-		this->update();
+		qDebug() << "QGIPiecePlacemarker::event("<<e<<")";
+		if( impl->gs )
+		{
+		    impl->gs->setPlacementPos( dynamic_cast<QMoveEvent*>(e)->pos() );
+		}
+		this->QObject::event(e);
+		//this->update();
 		return true;
+	}
+#endif
+	if( e->type() == QEvent::DynamicPropertyChange )
+	{
+		this->update();
 	}
 	return QObject::event(e);
 }
-
 void QGIPiecePlacemarker::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
 	QVariant var = this->property("color1");
@@ -145,7 +159,6 @@ void QGIPiecePlacemarker::paint(QPainter *painter, const QStyleOptionGraphicsIte
 	    h2 -= 2*step;
 	}
 }
-
 
 #if QGIPiecePlacemarker_IS_SERIALIZABLE
 bool QGIPiecePlacemarker::serialize( S11nNode & dest ) const
