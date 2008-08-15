@@ -47,6 +47,10 @@ public:
     */
     virtual void setGameState( GameState * ) = 0;
 
+    /**
+       Should return a populated QBoardPluginInfo object containing
+       plugin-specific data.
+    */
     virtual QBoardPluginInfo pluginInfo() = 0;
 };
 Q_DECLARE_INTERFACE(QBoardPlugin,
