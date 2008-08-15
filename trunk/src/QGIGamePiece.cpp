@@ -80,10 +80,7 @@ QGIGamePiece::~QGIGamePiece()
 #if 1
 	if( m_pc )
 	{
-		//GamePiece * pc = m_pc;
 		this->setPiece(0);
-		//pc->deleteLater();
-		//delete pc;
 	}
 #endif
 	delete this->impl;
@@ -91,9 +88,9 @@ QGIGamePiece::~QGIGamePiece()
 void QGIGamePiece::updatePiecePos(bool onlyIfNotSet)
 {
 	if( ! m_pc ) return;
-	QVariant var = m_pc->property("pos");
 	if( onlyIfNotSet )
 	{
+	    QVariant var = m_pc->property("pos");
 	    if( var.isValid() )
 	    {
 		this->setPos( var.toPointF() );
@@ -166,8 +163,8 @@ void QGIGamePiece::setPiece( GamePiece * pc )
 	}
 	if( pc )
 	{
-		this->connect(pc);
-		this->syncProperties();
+	    this->connect(pc);
+	    this->syncProperties();
 	}
 }
 
@@ -513,20 +510,29 @@ void QGIGamePiece::dragMoveEvent( QGraphicsSceneDragDropEvent * event )
 
 bool QGIGamePiece::serialize( S11nNode & dest ) const
 {
-    return m_pc
-	&& this->Serializable::serialize( dest )
-	&& s11nlite::serialize_subnode<GamePiece>( dest, "piece", *m_pc );
+    return this->Serializable::serialize( dest )
+	//&& m_pc && s11nlite::serialize_subnode<GamePiece>( dest, "piece", *m_pc )
+	;
 }
 bool QGIGamePiece::deserialize( S11nNode const & src )
 {
     if( ! this->Serializable::deserialize( src ) ) return false;
-    if( ! m_pc )
-    {
-	this->setPiece( s11nlite::deserialize_subnode<GamePiece>( src, "piece" ) );
-	return 0 != m_pc;
-    }
-    else
+    if( m_pc )
     {
 	return s11nlite::deserialize_subnode<GamePiece>( src, "piece", *m_pc );
     }
+    return true;
+// #if 0
+//     this->setPiece( s11nlite::deserialize_subnode<GamePiece>( src, "piece" ) );
+//     return 0 != m_pc;
+// #else
+//     S11nNode const * ch = s11n::find_child_by_name( src, "piece" );
+//     if( ch )
+//     {
+// 	GamePiece * pc = s11nlite::deserialize<GamePiece>( *ch );
+// 	this->setPiece( pc );
+// 	return 0 != pc;
+//     }
+//     return true;
+// #endif
 }
