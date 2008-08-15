@@ -180,6 +180,13 @@ void MenuHandlerQGIHtml::doMenu( QGIHtml * pv, QGraphicsSceneContextMenuEvent * 
 	ev->accept();
 	MenuHandlerCommon proxy;
 	QMenu * m = proxy.createMenu( pv );
+#if 1
+	m->addSeparator();
+	MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( pv, m );
+	m->addAction(QIcon(":/QBoard/icon/editcopy.png"),"Copy",clipper,SLOT(clipboardCopy()) );
+	m->addAction(QIcon(":/QBoard/icon/editcut.png"),"Cut",clipper,SLOT(clipboardCut()) );
+	m->addSeparator();
+#endif
 	m->addAction(QIcon(":/QBoard/icon/help.png"),"Help...", this, SLOT(showHelp()) );
 	m->exec( ev->screenPos() );
 	delete m;
