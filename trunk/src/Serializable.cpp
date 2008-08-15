@@ -19,15 +19,36 @@
 #include <s11n.net/s11n/functional.hpp>
 #include <QRegExp>
  
+struct Serializable::Impl
+{
+    char const * cname;
+    // File extension. i'd rather have (char const *),
+    // but we need to be able to prepend a '.' to it.
+    std::string ext;
+    Impl() :
+	cname(0),
+	ext()
+    {
+    }
+    ~Impl()
+    {
+    }
+};
 
 Serializable::Serializable( char const * cn ) :
-    m_cname(cn ? cn : "Serializable"),
-    m_ext( cn ? (std::string(".")+cn) : std::string() )
+    impl(new Impl)
 {
+    impl->cname = cn ? cn : "Serializable";
+    impl->ext = cn ? (std::string(".")+cn) : std::string();
+
 }
 
 Serializable::~Serializable()
 {
+    delete this->impl;
+    // ^^^ this means s11nClassName() and co. will crash if
+    // this object is used as part of a QObject::destroyed()
+    // handler.
 }
 
 Serializable & Serializable::operator=( Serializable const &rhs )
@@ -87,21 +108,21 @@ bool Serializable::deserialize(  S11nNode const & src )
 
 char const * Serializable::s11nClass() const
 {
-    return this->m_cname;
+    return impl->cname;
 }
 void Serializable::s11nClass( char const * cn )
 {
     if( (! cn) || (!*cn) ) return; 
-    this->m_cname = cn;
+    impl->cname = cn;
 }
 
 char const * Serializable::s11nFileExtension()
 {
-    return m_ext.c_str();
+    return impl->ext.c_str();
 }
 void Serializable::s11nFileExtension( char const * ext )
 {
-    m_ext = ext ? ext : "";
+    impl->ext = ext ? ext : "";
 }
 
 bool Serializable::save( std::ostream & os) const
@@ -120,13 +141,13 @@ bool Serializable::load( std::istream & is )
 bool Serializable::save( QString const & src, bool autoAddFileExtension ) const
 {
     QString rn( src );
-    if( autoAddFileExtension && ! this->m_ext.empty() )
+    if( autoAddFileExtension && ! impl->ext.empty() )
     {
-	QString extpat( this->m_ext.c_str() );
+	QString extpat( impl->ext.c_str() );
 	extpat.append( "$" );
 	if( QRegExp(extpat).indexIn(src) < 0 )
 	{
-	    rn = src + this->m_ext.c_str();
+	    rn = src + impl->ext.c_str();
 	}
     }
     return s11nlite::save<Serializable>( *this, rn.toAscii().constData() );
@@ -144,8 +165,8 @@ bool Serializable::load( QString const & fn)
 
 bool Serializable::fileNameMatches( QString const & fn ) const
 {
-    if( m_ext.empty() ) return false;
-    char const * ext = m_ext.c_str();
+    if( impl->ext.empty() ) return false;
+    char const * ext = impl->ext.c_str();
     QString pat(ext);
     pat.replace( ".", "\\." );
     pat.append("$");

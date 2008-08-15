@@ -150,12 +150,8 @@ protected:
     */
     void s11nFileExtension( char const * );
 private:
-    //std::string m_cname;
-    char const * m_cname;
-    // File extension. i'd rather have (char const *),
-    // but we need to be able to prepend a '.' to it.
-    std::string m_ext;
-	
+    struct Impl;
+    Impl * impl;
 };
 /**
    An s11n proxy for to forward de/serialization calls to
