@@ -168,37 +168,12 @@ MenuHandlerQGIHtml::MenuHandlerQGIHtml()
 MenuHandlerQGIHtml::~MenuHandlerQGIHtml()
 {
 }
-#include <QDialog>
-#include <QGridLayout>
-#include <QTextEdit>
-#include <QMessageBox>
+// #include <QMessageBox>
+// #include <QUrl>
+#include "utility.h"
 void MenuHandlerQGIHtml::showHelp()
 {
-	QDialog dlg;
-	QTextEdit * ed = new QTextEdit();
-	ed->setReadOnly(true);
-	QGridLayout * lay = new QGridLayout();
-	lay->setSpacing(2);
-	dlg.setLayout(lay);
-	lay->addWidget(ed);
-	QStringList li;
-	li << "<html><body>";
-	li << "<strong>Using the QGIHtml widget:</strong><br/><br/>"
-		<< "QGIHtml is a text/HTML widget for placing text directly onto a QBoard.<br/>"
-		<< "<strong>Tips:</strong>"
-		<< "<ul>"
-		  << "<li>Right-click to get the context menu.</li>" 
-		  << "<li>Double-click to edit it in-line.</li>"
-		  << "<li>Double-middle-click to open an editor dialog, where you can edit it as HTML.</li>"
-		<< "</ul>"
-		<< "Note that this widget supports only a subset of HTML, as described in the API"
-		<< "section named 'Supported HTML Subset' in the Qt Assistant documentation."
-		<< "Also note that QTextEdit::setHtml() likes to mangle your HTML a bit,"
-		<< "so don't be alarmed when it changes between edits."
-		;
-	li << "</body></html>";
-	ed->setHtml( li.join(" ") );
-	dlg.exec();
+    qboard::showHelpResource("QGIHtml widget", ":/QBoard/help/classes/QGIHtml.html");
 }
 void MenuHandlerQGIHtml::doMenu( QGIHtml * pv, QGraphicsSceneContextMenuEvent * ev )
 {

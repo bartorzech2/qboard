@@ -13,7 +13,7 @@ VERSION = QBoardDummy
 
 QT += script svg
 QMAKE_CXXFLAGS = $$QBOARD_CXXFLAGS
-RESOURCES = $$RESOURCES_DIR/icons.qrc
+# RESOURCES = $$RESOURCES_DIR/icons.qrc $$RESOURCES_DIR/help.qrc
 FORMS = \
  $$UI_SRCDIR/AboutQBoard.ui \
  $$UI_SRCDIR/MainWindow.ui \
