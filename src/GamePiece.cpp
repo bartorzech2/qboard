@@ -27,7 +27,6 @@
 #include "GamePiece.h"
 #include "utility.h"
 #include "S11nQt.h"
-
 /* s11n proxy for GamePieces.*/
 struct GamePiece_s11n
 {
@@ -47,7 +46,9 @@ struct GamePiece::Impl
 {
 	int viewCount;
 	bool destructing;
-	Impl() : viewCount(0),destructing(false)
+	Impl() :
+	    viewCount(0),
+	    destructing(false)
 	{}
 	~Impl(){}
 };
@@ -65,6 +66,8 @@ GamePiece::~GamePiece()
 	emit destroyed(); // we do this here to ensure that the proper polymorphic type is available when destroyed() is fired.
 	delete impl;
 }
+
+
 
 void GamePiece::addViewRef()
 {
@@ -181,20 +184,18 @@ void GamePieceList::disconnect( GamePiece * gp )
 	QObject::disconnect(gp,SIGNAL(destructing(GamePiece *)),this,SLOT(removePiece(GamePiece*)));
 }
 
-void GamePieceList::clearPieces()
+void GamePieceList::clearPieces( bool delThem )
 {
 	iterator it = this->begin();
 	for( ; it != this->end(); ++it )
 	{
 		this->disconnect(*it);
 		emit pieceRemoved(*it);
-		delete (*it);
+		if( delThem )
+		{
+		    delete (*it);
+		}
 	}
-	this->m_list.clear();
-}
-
-void GamePieceList::clearNoDelete()
-{
 	this->m_list.clear();
 }
 
