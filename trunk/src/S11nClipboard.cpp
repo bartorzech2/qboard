@@ -12,10 +12,13 @@
  */
 
 #include "S11nClipboard.h"
+#include <sstream>
 #include <QClipboard>
 #include <QApplication>
 S11nClipboard::S11nClipboard() : m_node(0)
 {
+    connect(QApplication::clipboard(),SIGNAL(dataChanged()),
+	    this,SLOT(syncFromQt()));
 }
 S11nClipboard::~S11nClipboard()
 {
@@ -31,19 +34,37 @@ S11nClipboard::S11nNode * S11nClipboard::contents()
 	return this->m_node;
 }
 
-void S11nClipboard::slotUpdateQClipboard()
+void S11nClipboard::syncToQt()
 {
     QClipboard * cb = QApplication::clipboard();
-    if( ! this->m_node )
-    {
-	cb->clear();
-    }
-    else
+    cb->clear();
+    if( this->m_node )
     {
 	std::ostringstream os;
-	s11nlite::save( *m_node, os );
-	cb->setText( os.str().c_str() );
+	if( s11nlite::save( *m_node, os ) )
+	{
+	    cb->setText( os.str().c_str() );
+	}
     }
+    emit signalUpdated();
+}
+
+void S11nClipboard::syncFromQt()
+{
+    QString data( QApplication::clipboard()->text( QClipboard::Clipboard ) );
+    delete m_node;
+    m_node = 0;
+    if( data.isEmpty() )
+    {
+	return;
+    }
+    S11nNode * node = 0;
+    {
+	char const * ascii = data.toAscii().data();
+	std::istringstream buf(ascii ? ascii : "");
+	node = s11nlite::load_node( buf );
+    }
+    m_node = node;
     emit signalUpdated();
 }
 
@@ -53,28 +74,28 @@ S11nClipboard::S11nNode * S11nClipboard::take()
     m_node = 0;
     if( x )
     {
-	this->slotUpdateQClipboard();
+	this->syncToQt();
     }
     return x;
 }
 
 void S11nClipboard::slotCut( S11nNode * take )
 {
-	if( (! take) || (take == this->m_node) ) return;
+	if( (take == this->m_node) ) return;
 	delete this->m_node;
 	this->m_node = take;
-	this->slotUpdateQClipboard();
+	this->syncToQt();
 }
 void S11nClipboard::slotCopy( S11nNode const * cp )
 {
-	if( (! cp) || (cp==this->m_node) ) return;
+	if( (cp==this->m_node) ) return;
 	delete this->m_node;
 	this->m_node = new S11nNode( *cp );
-	this->slotUpdateQClipboard();
+	this->syncToQt();
 }
 void S11nClipboard::slotClear()
 {
-  delete this->m_node;
-  this->m_node = 0;
-  this->slotUpdateQClipboard();
+    delete this->m_node;
+    this->m_node = 0;
+    this->syncToQt();
 }
