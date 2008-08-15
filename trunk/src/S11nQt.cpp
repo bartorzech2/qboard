@@ -517,7 +517,7 @@ bool QVariant_s11n::operator()( S11nNode & dest, QVariant const & src ) const
 		return false;
 	}
 #define SER_PROP(Setter) \
-	ret = 0; NT::set(dest, "val", src.Setter); break;
+	ret = true; NT::set(dest, "val", src.Setter); break;
 #define SER_OBJ(X) \
 	ret = s11n::serialize_subnode( dest, "val", X ); break;
 
