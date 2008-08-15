@@ -23,7 +23,8 @@ struct QGITypes
 	GamePiece,
 	Html,
 	LineNode,
-	LineNodeBinder
+	LineNodeBinder,
+	PiecePlacemarker
 	};
 };
 #endif // __QGI_H__
