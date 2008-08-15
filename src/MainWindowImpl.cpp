@@ -402,7 +402,10 @@ bool MainWindowImpl::loadPiece( QFileInfo const & fi )
 		impl->paw->applyCurrentTemplate( pc );
 		pc->setProperty( "pixmap", fn );
 	}
-	impl->gv->addPiece(pc);
+	//impl->gv->addPiece(pc);
+	//impl->gstate.addPiece(pc,true);
+	impl->gstate.setPlacementPos(impl->gv->placementPos());
+	impl->gstate.addPiece(pc,true);
 	return true;
 }
 

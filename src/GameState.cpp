@@ -20,16 +20,20 @@
 #include "QGIGamePiece.h"
 #include "utility.h"
 #include "QBoard.h"
+#include "S11nClipboard.h"
 
 struct GameState::Impl
 {
     mutable GamePieceList pieces;
     QBoard board;
+    QPoint placeAt;
     mutable QGraphicsScene * scene;
+    /** lameKludge exists for the "addPiece() QGraphicsItem return workaround" */
     QGraphicsItem * lameKludge;
     Impl() :
 	pieces(),
 	board(),
+	placeAt(0,0),
 	scene( new QGraphicsScene( QRectF(0,0,200,200) ) ),
 	lameKludge(0)
     {
@@ -39,6 +43,7 @@ struct GameState::Impl
 	delete this->scene;
     }
 };
+
 GameState::GameState() :
     Serializable("GameState"),
     impl(new Impl)
@@ -56,14 +61,30 @@ GameState::~GameState()
     delete impl;
 }
 
+QPoint GameState::placementPos() const
+{
+    return impl->placeAt;
+}
+
+void GameState::setPlacementPos( QPoint const & p )
+{
+    qDebug() <<"GameState::setPlacementPos("<<p<<")";
+    impl->placeAt = p;
+}
+
+
 QGraphicsScene * GameState::scene()
 {
     return impl->scene;
 }
 
-QGraphicsItem * GameState::addPiece( GamePiece * pc )
+QGraphicsItem * GameState::addPiece( GamePiece * pc, bool place )
 {
     impl->pieces.addPiece(pc);
+    if( place )
+    {
+	pc->setPieceProperty( "pos", impl->placeAt );
+    }
     return impl->lameKludge;
 }
 QGraphicsItem * GameState::pieceAdded( GamePiece * pc )
@@ -95,6 +116,7 @@ QBoard & GameState::board()
 {
     return impl->board;
 }
+
 
 bool GameState::serialize( S11nNode & dest ) const
 {
