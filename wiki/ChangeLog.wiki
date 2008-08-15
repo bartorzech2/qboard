@@ -14,6 +14,9 @@ are at the top.
 
 - The "Clear board" action now leaves the underlying board graphic intact. This was an accident, but i like it better this way, so it stays.
 
+- Fixed: board view now updates properly when a new board graphic is loaded. That is,
+one no longer has to scroll the board to get the new image to show up.
+
 
 2008 August 13:
 
