@@ -12,6 +12,8 @@
  */
 
 #include "S11nClipboard.h"
+#include <QClipboard>
+#include <QApplication>
 S11nClipboard::S11nClipboard() : m_node(0)
 {
 }
@@ -28,13 +30,30 @@ S11nClipboard::S11nNode * S11nClipboard::contents()
 {
 	return this->m_node;
 }
+
+void S11nClipboard::slotUpdateQClipboard()
+{
+    QClipboard * cb = QApplication::clipboard();
+    if( ! this->m_node )
+    {
+	cb->clear();
+    }
+    else
+    {
+	std::ostringstream os;
+	s11nlite::save( *m_node, os );
+	cb->setText( os.str().c_str() );
+    }
+    emit signalUpdated();
+}
+
 S11nClipboard::S11nNode * S11nClipboard::take()
 {
     S11nNode * x = m_node;
     m_node = 0;
     if( x )
     {
-	emit signalUpdated();
+	this->slotUpdateQClipboard();
     }
     return x;
 }
@@ -44,18 +63,18 @@ void S11nClipboard::slotCut( S11nNode * take )
 	if( (! take) || (take == this->m_node) ) return;
 	delete this->m_node;
 	this->m_node = take;
-	emit signalUpdated();
+	this->slotUpdateQClipboard();
 }
 void S11nClipboard::slotCopy( S11nNode const * cp )
 {
 	if( (! cp) || (cp==this->m_node) ) return;
 	delete this->m_node;
 	this->m_node = new S11nNode( *cp );
-	emit signalUpdated();
+	this->slotUpdateQClipboard();
 }
 void S11nClipboard::slotClear()
 {
   delete this->m_node;
   this->m_node = 0;
-  emit signalUpdated();
+  this->slotUpdateQClipboard();
 }
