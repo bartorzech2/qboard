@@ -513,12 +513,20 @@ void QGIGamePiece::dragMoveEvent( QGraphicsSceneDragDropEvent * event )
 
 bool QGIGamePiece::serialize( S11nNode & dest ) const
 {
-    if( (!m_pc) || ! this->Serializable::serialize( dest ) ) return false;
-    return s11nlite::serialize_subnode<GamePiece>( dest, "piece", *m_pc );
+    return m_pc
+	&& this->Serializable::serialize( dest )
+	&& s11nlite::serialize_subnode<GamePiece>( dest, "piece", *m_pc );
 }
 bool QGIGamePiece::deserialize( S11nNode const & src )
 {
     if( ! this->Serializable::deserialize( src ) ) return false;
-    if( ! m_pc ) this->setPiece( new GamePiece );
-    return s11nlite::deserialize_subnode<GamePiece>( src, "piece", *m_pc );
+    if( ! m_pc )
+    {
+	this->setPiece( s11nlite::deserialize_subnode<GamePiece>( src, "piece" ) );
+	return 0 != m_pc;
+    }
+    else
+    {
+	return s11nlite::deserialize_subnode<GamePiece>( src, "piece", *m_pc );
+    }
 }
