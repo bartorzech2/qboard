@@ -411,7 +411,6 @@ namespace QBBatch {
 	    {
 		QBB_VERBOSE << "Creating new piece.\n";
 		st.current = st.piece = new GamePiece;
-		st.piece->setPos( QPoint(10,10) );
 		st.gstate->pieces().addPiece( st.piece );
 		//COUT << "Created new game piece.\n";
 	    }
