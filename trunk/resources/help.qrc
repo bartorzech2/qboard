@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/QBoard" >
+    <file>help/style.css</file>
+    <file>help/classes/QGIHtml.html</file>
+  </qresource>
+</RCC>
