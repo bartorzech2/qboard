@@ -18,6 +18,7 @@
 #include "GamePiece.h"
 class QBoard;
 #include <QGraphicsScene>
+#include <QPoint>
 class QGraphicsItem;
 class GameState : public QObject, public Serializable
 {
@@ -68,12 +69,28 @@ public:
        pieces().addPiece(pc), but this returns
        the new QGraphicsItem associated with the
        piece.
+
+       If placePiece is true then pc is "moved"
+       (has its "pos" property set) to the current
+       position of placementPos().
     */
-    QGraphicsItem * addPiece( GamePiece * pc );
+    QGraphicsItem * addPiece( GamePiece * pc, bool placePiece = false );
+
+    /**
+       Returns the current placement position. See addPiece() for
+       details.
+    */
+    QPoint placementPos() const;
 
 
 public Q_SLOTS:
     void clear();
+    /**
+       Sets the "placement position". If addPiece(piece,true) is called,
+       the piece is moved to this position.
+    */
+    void setPlacementPos( QPoint const & );
+
 private Q_SLOTS:
     /**
        Creates a new View for pc and adds it to the scene.
