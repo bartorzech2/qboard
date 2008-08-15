@@ -363,7 +363,7 @@ void QBoardView::contextMenuEvent( QContextMenuEvent * event )
     if( ! this->itemAt( event->pos() ) )
     {
 	MenuHandlerBoard mh;
-	mh.doMenu( this, event );
+	mh.doMenu( impl->gs, this, event );
     }
     else
     {
@@ -437,4 +437,11 @@ void QBoardView::enablePlacemarker( bool en )
     }
     delete impl->placer;
     impl->placer = 0;
+}
+
+QPoint QBoardView::placementPos()
+{
+    return impl->placer
+	? impl->placer->pos().toPoint()
+	: QPoint(0,0);
 }

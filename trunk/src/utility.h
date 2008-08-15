@@ -18,7 +18,10 @@
 #include <QDir>
 #include <QColor>
 #include <QDebug>
+
+class QPoint;
 class QGraphicsItem;
+class GameState;
 
 #define QBOARD_VERBOSE_DTOR if(1) qDebug()
 
@@ -143,9 +146,34 @@ namespace qboard
        Returns false if there are no items to serialize or if
        serialization fails. On success it updates the clipboard
        and returns true.
+
+       The x/y coordinates of the origin object are stored in the
+       clipboard and are used by pasteGrapihcsItems() to calculate
+       a new position for all pasted objects.
+
+       Special cases:
+
+       - QGIGamePiece objects are not serialized directly. Instead
+       we serialize their viewed pieces. On deserialization, creation
+       of those pieces causes their views to be created. That means
+       that polymorphic QGIGamePiece objects are not supported here.
     */
     bool clipboardGraphicsItems( QGraphicsItem * origin, bool copy );
 
+    /**
+       This "undoes" the work done by clipboardGraphicsItems(). That is,
+       it pastes the clipboarded items back into the game state.
+
+       pos is used as the target for the past. The actual position of
+       pasted objects is relative to their initial position at
+       copy-time and the position of the initially-copied object (the
+       first parameter to clipboardGraphicsItems()). A delta is
+       calculated and applied to each pasted items' position. This
+       means that a selected group will paste back to its same
+       relative arrangement, if though the absolute positions have
+       changed.
+    */
+    bool pasteGraphicsItems( GameState & st, QPoint const & pos );
 
 }
 

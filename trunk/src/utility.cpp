@@ -24,6 +24,8 @@
 #include "S11nClipboard.h" // another horrible dep!
 #include "S11nQt.h"
 #include "S11nQtList.h"
+#include "GamePiece.h"
+#include "GameState.h"
 
 /************************************************************************
 The sad, sad story of the QBOARD_VERSION variable...
@@ -288,7 +290,7 @@ namespace qboard {
 #endif
     }
 
-    static char const * KeyS11nQGI = "GameStateGraphicsItems";
+    static char const * KeyS11nQGI = "GameStateClipboardData";
     bool clipboardGraphicsItems( QGraphicsItem * gvi, bool copy )
     {
 
@@ -296,54 +298,96 @@ namespace qboard {
 	//qDebug() <<"qboard::clipboardGraphicsItems(item,"<<copy<<")";
 	typedef QList<QGraphicsItem *> QGIL;
 	typedef QList<Serializable *> SerL;
-	SerL tops;
+	SerL seritems;
+	GamePieceList pieces;
 	QGIL toCut;
 	QPoint origin( gvi->pos().toPoint() );
 	if( gvi->isSelected() )
-	{
+	{ // handle all selected items:
 	    QGIL ql( gvi->scene()->selectedItems() );
 	    for( QGIL::iterator it = ql.begin(); ql.end() != it; ++it )
 	    {
 		if( (*it)->parentItem() ) continue;
 		//qDebug() <<"qboard::clipboardGraphicsItems() marking " << *it;
 		if( !copy ) toCut.push_back(*it); // FIXME? only cut serializables?
+		if( (*it)->type() == QGITypes::GamePiece )
+		{
+		    QGIGamePiece * pcv = dynamic_cast<QGIGamePiece*>(*it);
+		    GamePiece * pc = pcv ? pcv->piece() : 0;
+		    if( pc )
+		    {
+			pieces.addPiece(pc);
+			if(0) qDebug() <<"qboard::clipboardGraphicsItems() copy/cut object is GamePiece:" << pc;
+		    }
+		    else
+		    {
+			if(0) qDebug() << (copy?"copy":"cut")<<"handler found QGIGamePiece with no associated GamePiece!"
+				 << "Skipping object "<<*it;
+		    }
+		    continue;
+		}
 		Serializable * ser = dynamic_cast<Serializable*>(*it);
 		if( ser )
 		{
-		    //qDebug() <<"qboard::clipboardGraphicsItems() marking for CUT " << *it;
-		    tops.push_back(ser);
+		    //if(0) qDebug() <<"qboard::clipboardGraphicsItems() marking for CUT " << *it;
+		    seritems.push_back(ser);
 		}
 		else
 		{
-		    qDebug() << (copy?"copy":"cut")<<"handler cannot handle non-Serializables."
+		    if(0) qDebug() << (copy?"copy":"cut")<<"handler cannot handle non-Serializables."
 			     << "Skipping object "<<*it;
 		}
 	    }
 	}
 	else
-	{
-	    //qDebug() <<"qboard::clipboardGraphicsItems() single object " << gvi;
+	{ // a single non-selected item:
+	    //if(0) qDebug() <<"qboard::clipboardGraphicsItems() single object " << gvi;
 	    if( ! copy ) toCut.push_back(gvi);
-	    Serializable * ser = dynamic_cast<Serializable*>(gvi);
-	    if( ! ser )
+	    if( gvi->type() == QGITypes::GamePiece )
 	    {
-		qDebug() << (copy?"copy":"cut")<<"handler cannot handle non-Serializables."
-			 << "Skipping object "<<gvi;
+		QGIGamePiece * pcv = dynamic_cast<QGIGamePiece*>(gvi);
+		GamePiece * pc = pcv ? pcv->piece() : 0;
+		if( pc )
+		{
+		    pieces.addPiece(pc);
+		    if(0) qDebug() <<"qboard::clipboardGraphicsItems() single object is GamePiece:" << pc;
+		}
+		else
+		{
+		    if(0) qDebug() << (copy?"copy":"cut")<<"handler found QGIGamePiece with no associated GamePiece!"
+			     << "Skipping object!";
+		}
 	    }
 	    else
 	    {
-		//qDebug() <<"qboard::clipboardGraphicsItems() single object is Serializable ??? " << ser;
-		tops.push_back(ser);
+		Serializable * ser = dynamic_cast<Serializable*>(gvi);
+		if( ! ser )
+		{
+		    if(0) qDebug() << (copy?"copy":"cut")<<"handler cannot handle non-Serializables."
+			     << "Skipping object "<<gvi;
+		}
+		else
+		{
+		    //if(0) qDebug() <<"qboard::clipboardGraphicsItems() single object is Serializable ??? " << ser;
+		    seritems.push_back(ser);
+		}
 	    }
 	}
-	if( tops.empty() ) return false;
 	S11nNode * parent = S11nNodeTraits::create(KeyS11nQGI);
-	S11nNode & meta( s11n::create_child( *parent, "metadata") );
-	s11n::serialize_subnode( meta, "copyPos", origin );
-	S11nNode & ni( s11n::create_child( *parent, "graphicsitems") );
 	try
 	{
-	    if( ! s11nlite::serialize( ni, tops ) )
+	    bool ret = true;
+	    S11nNode & meta( s11n::create_child( *parent, "metadata") );
+	    ret = s11n::serialize_subnode( meta, "copyPos", origin );
+	    if( ret && ! pieces.empty() )
+	    {
+		ret = s11n::serialize_subnode( *parent, "pieces", pieces );
+	    }
+	    if( ret && ! seritems.isEmpty() )
+	    {
+		ret = s11n::serialize_subnode( *parent, "graphicsitems", seritems );
+	    }
+	    if( ! ret )
 	    {
 		delete parent;
 		return false;
@@ -351,30 +395,121 @@ namespace qboard {
 	}
 	catch(std::exception const & ex)
 	{
+	    pieces.clearPieces(false);
 	    delete parent;
-	    qDebug() << "qboard::clipboardGraphicsItems(): serialization threw:"<<ex.what();
+	    if(0) qDebug() << "qboard::clipboardGraphicsItems(): serialization threw:"<<ex.what();
 	    return false;
 	}
-	tops.clear();
+	pieces.clearPieces(false);
+	seritems.clear();
 	S11nClipboard & cb( S11nClipboard::instance() );
 	cb.slotCut(parent);
 	if( copy )
 	{
-	    //qDebug() << "qboard::clipboardGraphicsItems() copied data.";
+	    //if(0) qDebug() << "qboard::clipboardGraphicsItems() copied data.";
 	}
 	else
 	{
-	    //qDebug() << "qboard::clipboardGraphicsItems() cut data.";
+	    //if(0) qDebug() << "qboard::clipboardGraphicsItems() cut data.";
 	    qboard::destroy( toCut );
 	}
 	S11nClipboard::S11nNode * cont = cb.contents();
 	if( cont )
 	{
-	    qDebug() <<"Clipboard contents:";
+	    if(0) qDebug() <<"Clipboard contents:";
 	    s11nlite::save( *cont, std::cout );
 	}
 	return 0 != cont;
     }
 
+
+    bool pasteGraphicsItems( GameState & gs, QPoint const & pos )
+    {
+	typedef QList<QGraphicsItem *> QGIL;
+	typedef QList<Serializable *> SerL;
+	S11nNode * root = S11nClipboard::instance().contents();
+	typedef S11nNodeTraits TR;
+	if( (! root)
+	    || (TR::name(*root) != KeyS11nQGI ) )
+	{
+	    return false;
+	}
+	S11nNode * node = 0;
+	node = s11n::find_child_by_name(*root, "metadata");
+	QPoint cpos;
+	if( node )
+	{
+	    s11nlite::deserialize_subnode( *node, "copyPos", cpos );
+	}
+	QPoint pD;
+	if( ! pos.isNull() && ! cpos.isNull() )
+	{
+	    int xD = cpos.x() - pos.x();
+	    int yD = cpos.y() - pos.y();
+	    pD = QPoint( xD, yD );
+	}
+	node = s11n::find_child_by_name(*root, "pieces");
+	if( node )
+	{
+	    GamePieceList list;
+	    if( ! s11nlite::deserialize( *node, list ) )
+	    {
+		return false;
+	    }
+	    GamePiece * pc = 0;
+	    for( GamePieceList::iterator it = list.begin();
+		 list.end() != it;
+		 ++it )
+	    {
+		pc = *it;
+		QPoint newpos;
+		QVariant vpos( pc->property("pos") );
+		if( ! vpos.isValid() )
+		{
+		    newpos = pos;
+		}
+		else
+		{
+		    newpos = vpos.toPoint();
+		}
+		newpos -= pD;
+		pc->setPieceProperty("pos",newpos);
+		gs.pieces().addPiece( pc );
+		if(0) qDebug() << "qboard::pasteGraphicsItems() pasting piece:"<<pc
+			 << "\nclickpos ="<<cpos<<", reqpos ="<<pos<<", newpos ="<<newpos<<"delta ="<<pD;
+	    }
+	    list.clearPieces(false);
+	    //causing a crash: gs.pieces().takePieces( list );
+	}
+	node = s11n::find_child_by_name(*root, "graphicsitems");
+	if( node )
+	{
+	    if(0) qDebug() << "qboard::pasteGraphicsItems() pasting items";
+	    SerL list;
+	    if( ! s11nlite::deserialize( *node, list ) )
+	    {
+		if(0) qDebug() << "qboard::pasteGraphicsItems() pasting deserialization failed!";
+		return false;
+	    }
+	    for( SerL::iterator it = list.begin();
+		 it != list.end(); ++it )
+	    {
+		QGraphicsItem * qgi = dynamic_cast<QGraphicsItem*>( *it );
+		if( qgi )
+		{
+		    QPoint newpos( qgi->pos().toPoint() - pD );
+		    qgi->setPos( newpos );
+		    if(0) qDebug() << "qboard::pasteGraphicsItems() adding Serializable QGI to scene:"
+			     << "newpos ="<<newpos
+			     << qgi;
+		    gs.scene()->addItem(qgi);
+		    continue;
+		}
+		if(0) qDebug() << "qboard::pasteGraphicsItems() warning: skipping non-piece, non-QGI Serializable in input.";
+		delete( *it );
+	    }
+	}
+	return true;
+    }
 
 } // namespace

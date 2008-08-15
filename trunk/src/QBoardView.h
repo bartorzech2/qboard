@@ -69,6 +69,7 @@ public Q_SLOTS:
     */
     void setGLMode(bool);
 
+    QPoint placementPos();
 protected:
 	virtual void drawBackground( QPainter *, const QRectF & );
 	virtual void mousePressEvent ( QMouseEvent * event );

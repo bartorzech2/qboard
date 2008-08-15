@@ -404,8 +404,9 @@ bool MainWindowImpl::loadPiece( QFileInfo const & fi )
 	}
 	//impl->gv->addPiece(pc);
 	//impl->gstate.addPiece(pc,true);
-	impl->gstate.setPlacementPos(impl->gv->placementPos());
-	impl->gstate.addPiece(pc,true);
+	//impl->gstate.setPlacementPos(impl->gv->placementPos());
+	pc->setPieceProperty("pos",impl->gv->placementPos());
+	impl->gstate.addPiece(pc);
 	return true;
 }
 
@@ -629,3 +630,16 @@ void MainWindowImpl::quickSave()
 {
     this->saveGame( quickSaveFileName(impl->gstate) );
 }
+
+// void MainWindowImpl::slotCopy()
+// {
+//     qboard::clipboardGraphicsItems( impl->gv, true );
+// }
+// void MainWindowImpl::slotCut()
+// {
+//     qboard::clipboardGraphicsItems( impl->gv, false );
+// }
+// void MainWindowImpl::slotPaste()
+// {
+//     bool pasteGraphicsItems( impl->gstate, QPoint() );
+// }
