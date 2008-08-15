@@ -154,6 +154,7 @@ public Q_SLOTS:
 private Q_SLOTS:
 	/*
 	*/
+       void showHelp();
 	void scheduleLineDestruction();
 private:
 	struct Impl;
