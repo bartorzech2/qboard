@@ -169,16 +169,18 @@ QSize QBoardView::sizeHint() const
 void QBoardView::updateBoardPixmap()
 {
     //this->setBackgroundBrush(impl->board.pixmap());
-    if( impl->board.pixmap().isNull() ) return;
+    //if( impl->board.pixmap().isNull() ) return;
     QSize isz = impl->board.pixmap().size();
-    this->resetTransform();
-    this->resetMatrix();
-    QRectF rect( 0, 0, isz.width(),  isz.height() );
-    this->setSceneRect( rect );
+    if( isz.isValid() )
+    {
+	QRectF rect( 0, 0, isz.width(),  isz.height() );
+	this->setSceneRect( rect );
+    }
     //this->setBackgroundBrush(impl->board.pixmap());
-    // Kludge to get minimaps to keep their scale on a reload:
+    // Kludge to get boards to keep their scale on a reload:
     impl->scale -= 0.01;
     this->zoom( impl->scale + 0.01 );
+    this->viewport()->update(); // without this, viewport won't update until the board is manipulated
 }
 
 void QBoardView::drawBackground( QPainter *p, const QRectF & rect )
