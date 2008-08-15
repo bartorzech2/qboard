@@ -15,15 +15,31 @@
 
 #include <QObject>
 #include <s11n.net/s11n/s11nlite.hpp>
+/**
+   S11nClipboard provides clipboard features for any
+   Serializable type.
+
+   Bugs:
+
+   - Each instance updates the QApplication::clipboard()
+   independently, but does not look for "incoming" changes
+   made by other instances.
+*/
 class S11nClipboard : public QObject
 {
     Q_OBJECT
+private:
+    S11nClipboard();
+    virtual ~S11nClipboard();
 public:
     typedef s11nlite::node_type S11nNode;
     typedef s11nlite::node_traits S11nNodeTraits;
-    S11nClipboard();
-    virtual ~S11nClipboard();
     static S11nClipboard & instance();
+
+    /**
+       Returns the clipboard contents, which may be 0.
+       The returned object is owned by this object.
+    */
     S11nNode * contents();
 
     /** 
@@ -47,19 +63,21 @@ public:
     }
     /**
        Similar to slotCopy(), but takes a Serializable instead of
-       an S11nNode.
+       an S11nNode. If serialization of ser fails then the clipboard
+       is not updated.
     */
     template <typename SerializableType>
     bool serialize( SerializableType & ser )
     {
-	if( m_node ) S11nNodeTraits::clear(*m_node);
-	else m_node = S11nNodeTraits::create("clipboard");
-	if( s11nlite::serialize( *m_node, ser ) )
+	S11nNode tmp;
+	bool ret = s11nlite::serialize( tmp, ser );
+	if( ret )
 	{
-	    emit signalUpdated();
-	    return true;
+	    if( ! m_node ) m_node = S11nNodeTraits::create("clipboard");
+	    S11nNodeTraits::swap( *m_node, tmp );
+	    this->slotUpdateQClipboard();
 	}
-	return false;
+	return ret;
     }
 public Q_SLOTS:
    /* transfers ownership of 'take' to this object. */
@@ -70,6 +88,8 @@ public Q_SLOTS:
     void slotClear();
     Q_SIGNALS:
     void signalUpdated();
+private Q_SLOTS:
+    void slotUpdateQClipboard();
 private:
     S11nNode * m_node;
 };
