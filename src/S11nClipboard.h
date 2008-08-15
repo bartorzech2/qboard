@@ -75,7 +75,7 @@ public:
 	{
 	    if( ! m_node ) m_node = S11nNodeTraits::create("clipboard");
 	    S11nNodeTraits::swap( *m_node, tmp );
-	    this->slotUpdateQClipboard();
+	    this->syncToQt();
 	}
 	return ret;
     }
@@ -89,7 +89,8 @@ public Q_SLOTS:
     Q_SIGNALS:
     void signalUpdated();
 private Q_SLOTS:
-    void slotUpdateQClipboard();
+    void syncToQt();
+    void syncFromQt();
 private:
     S11nNode * m_node;
 };
