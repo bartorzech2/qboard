@@ -541,6 +541,11 @@ void MenuHandlerLineNode::scheduleLineDestruction()
 	//this->impl->delLine = true;
 }
 
+void MenuHandlerLineNode::showHelp()
+{
+    qboard::showHelpResource("Lines", ":/QBoard/help/classes/QGILine.html");
+}
+
 void MenuHandlerLineNode::doMenu( QGILineNode *gvi, QGraphicsSceneContextMenuEvent * ev )
 {
 	ev->accept();
@@ -579,6 +584,9 @@ void MenuHandlerLineNode::doMenu( QGILineNode *gvi, QGraphicsSceneContextMenuEve
 		act->setChecked(true);
 	}
 	menuArrows->addMenu( QObjectPropertyMenu::makeIntListMenu("Size", line, "arrowSize",8,24,2) );
+
+	menu->addSeparator();
+	menu->addAction(QIcon(":/QBoard/icon/help.png"),"Help...", this, SLOT(showHelp()) );
 
 	menu->exec( ev->screenPos() );
 	delete menu;
