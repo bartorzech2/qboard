@@ -20,6 +20,7 @@
 class QBoardView;
 class QGraphicsScene;
 class QContextMenuEvent;
+class GameState;
 /**
 	This is the default context menu handler for QBoardViews.
 */
@@ -31,7 +32,7 @@ public:
 	virtual ~MenuHandlerBoard();
 
 public Q_SLOTS:
-	void doMenu( QBoardView *, QContextMenuEvent * );
+	void doMenu( GameState & gs, QBoardView *, QContextMenuEvent * );
     void doCopy();
     void doPaste();
 private:

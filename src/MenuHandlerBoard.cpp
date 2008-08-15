@@ -10,11 +10,8 @@
  * included in the packaging of this file.
  *
  */
-
 #include "MenuHandlerBoard.h"
-//#include "MenuHandlerGeneric.h"
-#include "GamePiece.h"
-#include "QGIGamePiece.h"
+
 #include <QContextMenuEvent>
 #include <QAction>
 #include <QMenu>
@@ -22,6 +19,11 @@
 #include <QGraphicsScene>
 #include <QDebug>
 #include <QIcon>
+
+//#include "MenuHandlerGeneric.h"
+#include "GamePiece.h"
+#include "QGIGamePiece.h"
+#include "GameState.h"
 #include "utility.h"
 #include "S11nQt.h"
 #include "S11nQtList.h"
@@ -34,8 +36,12 @@
 struct MenuHandlerBoard::Impl
 {
     QBoard * board;
+    GameState * gs;
+    QPoint pastePos;
     Impl() :
-	board(0)
+	board(0),
+	gs(0),
+	pastePos(0,0)
     {
     }
     ~Impl()
@@ -68,25 +74,26 @@ void MenuHandlerBoard::doCopy()
 }
 void MenuHandlerBoard::doPaste()
 {
-#if 0 // we have no handle back to the game state!
-    S11nClipboard & cl( S11nClipboard::instance() );
-    s11n::cleanup_ptr<Serializable> ap( cl.deserialize<Serializable>() );
-    if( ! ap.get() ) return;
-    Serializable * top = ap.get();
-    //if( GamePiece * pc = dynamic_cast<
-#endif
-
+    if( ! impl->gs ) return;
+    qboard::pasteGraphicsItems( *impl->gs, impl->pastePos );
 }
 
-void MenuHandlerBoard::doMenu( QBoardView * pv, QContextMenuEvent * ev )
+void MenuHandlerBoard::doMenu( GameState & gs, QBoardView * pv, QContextMenuEvent * ev )
 {
     ev->accept();
+    impl->gs = & gs;
+    impl->pastePos = pv->mapToScene( ev->pos() ).toPoint();
     impl->board = &pv->board();
     QMenu m(pv);
     m.addAction("Board")->setEnabled(false);
     m.addSeparator();
     m.addAction(QIcon(":/QBoard/icon/editcopy.png"),"Copy board (not pieces)",this,SLOT(doCopy()) );
-    //m.addAction(QIcon(":/QBoard/icon/editpaste.png"),"Paste",this,SLOT(doPaste()) );
+    QAction * act = m.addAction(QIcon(":/QBoard/icon/editpaste.png"),"Paste",this,SLOT(doPaste()) );
+    S11nNode * cbc = S11nClipboard::instance().contents();
+    if( ! cbc )
+    {
+	act->setEnabled(false);
+    }
 #if QBOARD_USE_OPENGL
     {
 	QAction * ac = m.addAction("Toggle OpenGL Mode",pv, SLOT(setGLMode(bool)) );
