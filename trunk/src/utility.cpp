@@ -11,16 +11,19 @@
  *
  */
 
-#include "utility.h"
 #include <QGraphicsItem>
 #include <QGraphicsScene>
 #include <QDialog>
 #include <QGridLayout>
 #include <QTextEdit>
 #include <QDebug>
-#include "QGIGamePiece.h" // a horrible, horrible dependency!
 #include <sstream>
 
+#include "utility.h"
+#include "QGIGamePiece.h" // a horrible, horrible dependency!
+#include "S11nClipboard.h" // another horrible dep!
+#include "S11nQt.h"
+#include "S11nQtList.h"
 
 /************************************************************************
 The sad, sad story of the QBOARD_VERSION variable...
@@ -284,5 +287,94 @@ namespace qboard {
 	ed->show();
 #endif
     }
+
+    static char const * KeyS11nQGI = "GameStateGraphicsItems";
+    bool clipboardGraphicsItems( QGraphicsItem * gvi, bool copy )
+    {
+
+	if( ! gvi ) return false;
+	//qDebug() <<"qboard::clipboardGraphicsItems(item,"<<copy<<")";
+	typedef QList<QGraphicsItem *> QGIL;
+	typedef QList<Serializable *> SerL;
+	SerL tops;
+	QGIL toCut;
+	QPoint origin( gvi->pos().toPoint() );
+	if( gvi->isSelected() )
+	{
+	    QGIL ql( gvi->scene()->selectedItems() );
+	    for( QGIL::iterator it = ql.begin(); ql.end() != it; ++it )
+	    {
+		if( (*it)->parentItem() ) continue;
+		//qDebug() <<"qboard::clipboardGraphicsItems() marking " << *it;
+		if( !copy ) toCut.push_back(*it); // FIXME? only cut serializables?
+		Serializable * ser = dynamic_cast<Serializable*>(*it);
+		if( ser )
+		{
+		    //qDebug() <<"qboard::clipboardGraphicsItems() marking for CUT " << *it;
+		    tops.push_back(ser);
+		}
+		else
+		{
+		    qDebug() << (copy?"copy":"cut")<<"handler cannot handle non-Serializables."
+			     << "Skipping object "<<*it;
+		}
+	    }
+	}
+	else
+	{
+	    //qDebug() <<"qboard::clipboardGraphicsItems() single object " << gvi;
+	    if( ! copy ) toCut.push_back(gvi);
+	    Serializable * ser = dynamic_cast<Serializable*>(gvi);
+	    if( ! ser )
+	    {
+		qDebug() << (copy?"copy":"cut")<<"handler cannot handle non-Serializables."
+			 << "Skipping object "<<gvi;
+	    }
+	    else
+	    {
+		//qDebug() <<"qboard::clipboardGraphicsItems() single object is Serializable ??? " << ser;
+		tops.push_back(ser);
+	    }
+	}
+	if( tops.empty() ) return false;
+	S11nNode * parent = S11nNodeTraits::create(KeyS11nQGI);
+	S11nNode & meta( s11n::create_child( *parent, "metadata") );
+	s11n::serialize_subnode( meta, "copyPos", origin );
+	S11nNode & ni( s11n::create_child( *parent, "graphicsitems") );
+	try
+	{
+	    if( ! s11nlite::serialize( ni, tops ) )
+	    {
+		delete parent;
+		return false;
+	    }
+	}
+	catch(std::exception const & ex)
+	{
+	    delete parent;
+	    qDebug() << "qboard::clipboardGraphicsItems(): serialization threw:"<<ex.what();
+	    return false;
+	}
+	tops.clear();
+	S11nClipboard & cb( S11nClipboard::instance() );
+	cb.slotCut(parent);
+	if( copy )
+	{
+	    //qDebug() << "qboard::clipboardGraphicsItems() copied data.";
+	}
+	else
+	{
+	    //qDebug() << "qboard::clipboardGraphicsItems() cut data.";
+	    qboard::destroy( toCut );
+	}
+	S11nClipboard::S11nNode * cont = cb.contents();
+	if( cont )
+	{
+	    qDebug() <<"Clipboard contents:";
+	    s11nlite::save( *cont, std::cout );
+	}
+	return 0 != cont;
+    }
+
 
 } // namespace
