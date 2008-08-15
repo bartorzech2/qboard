@@ -14,6 +14,9 @@
 #include "utility.h"
 #include <QGraphicsItem>
 #include <QGraphicsScene>
+#include <QDialog>
+#include <QGridLayout>
+#include <QTextEdit>
 #include <QDebug>
 #include "QGIGamePiece.h" // a horrible, horrible dependency!
 #include <sstream>
@@ -206,8 +209,7 @@ namespace qboard {
 
     QDir persistenceDir( QString const & className )
     {
-	QDir dir( home().canonicalPath() + QString("/QBoard/persistance/") +
-		 className );
+	QDir dir( QString("%1/QBoard/persistance/%2").arg(home().canonicalPath()).arg(className) );
 	QString dname( dir.absolutePath() );
 	// dir.canonicalDir() gives me an empty string?
 	//qDebug() << "persistenceDir("<<className<<") =?"<<dname<<"=?"<<dir;
@@ -219,6 +221,68 @@ namespace qboard {
 	return dir;
     }
 
+//     QDir helpDir( QString const & className )
+//     {
+// 	QDir dir( QString("%1/QBoard/help/%2").arg(home().canonicalPath()).arg(className) );
+// 	QString dname( dir.absolutePath() );
+// 	if( (! dir.exists()) && (! dir.mkpath(dname)) )
+// 	{
+// 	    QString msg = QString("Could not access or create directory [%1]").arg(dname);
+// 	    throw std::runtime_error( msg.toAscii().constData() );
+// 	}
+// 	return dir;
+//     }
 
+    QString loadResourceText( QString const & res )
+    {
+	QFile inf(res);
+	if( ! inf.open(QIODevice::ReadOnly|QIODevice::Text) )
+	{
+	    qDebug() <<"qboard::loadResourceText() could not load help resource:"<<res;
+	    return QString();
+	}
+	QString buf;
+	while (!inf.atEnd())
+	{
+	    buf.append(inf.readLine());
+	}
+	return buf;
+    }
+
+    void showHelpResource( QString const & title, QString const & res )
+    {
+#if 1
+	QDialog dlg;
+	QTextEdit * ed = new QTextEdit();
+	ed->setReadOnly(true);
+	QGridLayout * lay = new QGridLayout();
+	lay->setSpacing(2);
+	dlg.setLayout(lay);
+	dlg.setWindowTitle( title );
+	dlg.setSizeGripEnabled(true);
+	lay->addWidget(ed);
+	QString txt( qboard::loadResourceText(res) );
+	if( txt.isEmpty() )
+	{
+	    txt = QString("Error loading text resource:<br/><tt>%1</tt>").arg(res);
+	}
+	ed->setHtml( txt );
+	dlg.exec();
+#else
+	// We can't set a reasonable starting position, or else i'd
+	// prefer to use this approach:
+	QTextEdit * ed = new QTextEdit();
+	ed->setAttribute( Qt::WA_DeleteOnClose, true );
+	ed->setReadOnly(true);
+	ed->setWindowTitle( title );
+	QString txt( qboard::loadResourceText(res) );
+	if( txt.isEmpty() )
+	{
+	    txt = QString("Error loading text resource:<br/><tt>%1</tt>").arg(res);
+	}
+	ed->setHtml( txt );
+	ed->show();
+#endif
+    }
 
 } // namespace

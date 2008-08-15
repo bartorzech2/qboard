@@ -47,6 +47,12 @@ namespace qboard
     */
     QDir persistenceDir( QString const & className );
 
+//     /**
+//        Like persistenceDir(), but returns a dir for storing class-specific
+//        help files.
+//     */
+//     QDir helpDir( QString const & className );
+
 	
 	/**
 		Compares the zLevel of the given QGraphicsItem to those items
@@ -113,6 +119,19 @@ namespace qboard
        Returns the version of QBoard.
     */
     const QString versionString();
+
+    /**
+       Tries to load the QBoard text resource with the given name and
+       returns its content as a string. An empty string can mean the
+       resource was not found or (less likely) empty content.
+    */
+    QString loadResourceText(QString const & resourceName);
+
+    /**
+       Calls loadResourceText() and shows the loaded text
+       in a new window.
+    */
+    void showHelpResource( QString const & title, QString const & res );
 
 }
 

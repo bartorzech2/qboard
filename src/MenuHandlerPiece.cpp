@@ -52,6 +52,10 @@ MenuHandlerPiece::~MenuHandlerPiece()
 }
 
 
+void MenuHandlerPiece::showHelp()
+{
+    qboard::showHelpResource("Game Pieces", ":/QBoard/help/classes/GamePiece.html");
+}
 void MenuHandlerPiece::doMenu( QGIGamePiece * pv, QGraphicsSceneContextMenuEvent * ev )
 {
 	MenuHandlerCommon proxy;
@@ -100,8 +104,9 @@ void MenuHandlerPiece::doMenu( QGIGamePiece * pv, QGraphicsSceneContextMenuEvent
 	MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( pv, m );
 	m->addAction(QIcon(":/QBoard/icon/editcopy.png"),"Copy",clipper,SLOT(clipboardCopy()) );
 	m->addAction(QIcon(":/QBoard/icon/editcut.png"),"Cut",clipper,SLOT(clipboardCut()) );
+	m->addSeparator();
 #endif
-
+	m->addAction(QIcon(":/QBoard/icon/help.png"),"Help...", this, SLOT(showHelp()) );
 	m->exec( ev->screenPos() );
 	delete m;
 }

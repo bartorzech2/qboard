@@ -32,6 +32,7 @@ public:
 	virtual ~MenuHandlerPiece();
 
 public Q_SLOTS:
+        void showHelp();
 	void doMenu( QGIGamePiece *, QGraphicsSceneContextMenuEvent * );
 private:
 	struct Impl;
