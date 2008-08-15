@@ -78,14 +78,13 @@ QGraphicsScene * GameState::scene()
     return impl->scene;
 }
 
-QGraphicsItem * GameState::addPiece( GamePiece * pc, bool place )
+QGraphicsItem * GameState::addPiece( GamePiece * pc )
 {
+    if( ! pc ) return 0;
     impl->pieces.addPiece(pc);
-    if( place )
-    {
-	pc->setPieceProperty( "pos", impl->placeAt );
-    }
-    return impl->lameKludge;
+    QGraphicsItem * x = impl->lameKludge;
+    impl->lameKludge = 0;
+    return x;
 }
 QGraphicsItem * GameState::pieceAdded( GamePiece * pc )
 {
@@ -194,18 +193,29 @@ bool GameState::deserialize(  S11nNode const & src )
     {
 	typedef QList<Serializable*> QL;
 	QL li;
-	if( ! s11n::deserialize( *ch, li ) ) return false;
-	QL::iterator it = li.begin();
-	QL::iterator et = li.end();
-	for( ; et != it; ++it )
+	try
 	{
-	    QGraphicsItem * gi = dynamic_cast<QGraphicsItem*>( *it );
-	    if( ! gi )
+	    if( ! s11n::deserialize( *ch, li ) ) return false;
+	    QL::iterator it = li.begin();
+	    QL::iterator et = li.end();
+	    for( ; et != it; ++it )
 	    {
-		s11n::cleanup_serializable( li );
-		return false;
+		QGraphicsItem * gi = dynamic_cast<QGraphicsItem*>( *it );
+		//li.erase(it);
+		if( ! gi )
+		{
+		    s11n::cleanup_serializable( li );
+		    return false;
+		}
+		impl->scene->addItem( gi );
 	    }
-	    impl->scene->addItem( gi );
+	    li.clear();
+	}
+	catch(...)
+	{
+	    s11n::cleanup_serializable( li );
+	    qDebug() << "GameState::deserialize() caught exception. Cleaning up and passing it on.";
+	    throw;
 	}
     }
     return true;

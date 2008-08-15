@@ -148,6 +148,7 @@ public Q_SLOTS:
 		an object).
 	*/
 	void removeViewRef();
+
 Q_SIGNALS:
 	/**
 		Signal fired when properties are changed via setPieceProperty().
@@ -157,6 +158,7 @@ Q_SIGNALS:
 		Signal emited when this object destructs.
 	*/
 	void destructing( GamePiece * gp );
+protected:
 private:
 	struct Impl;
 	Impl * impl;
@@ -217,14 +219,17 @@ public Q_SLOTS:
 	and false is returned.
 	*/
 	bool removePiece( GamePiece * gp );
-	/** Deletes all pieces in the list. */
-	void clearPieces();
-	/**
-		Clears the list without deleting the contained items. Ownership
-		is effectively undefined - make sure you get the items you need
-		before you do this.
-	*/
-	void clearNoDelete();
+	/** Deletes all pieces in the list. If deleteAsWell is true (the default)
+	 then all pieces are deleted. If it is false, they are not deleted and
+	the caller is responsible for ensuring proper ownership of the orphaned
+	pieces. */
+	void clearPieces( bool deleteAsWell = true );
+// 	/**
+// 		Clears the list without deleting the contained items. Ownership
+// 		is effectively undefined - make sure you get the items you need
+// 		before you do this.
+// 	*/
+// 	void clearNoDelete();
 private Q_SLOTS:
 	/** Connects gp to this	object's internal handlers. */ 
 	void connect( GamePiece *gp);

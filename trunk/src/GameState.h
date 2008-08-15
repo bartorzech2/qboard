@@ -68,13 +68,10 @@ public:
        This is functionally identical to calling
        pieces().addPiece(pc), but this returns
        the new QGraphicsItem associated with the
-       piece.
-
-       If placePiece is true then pc is "moved"
-       (has its "pos" property set) to the current
-       position of placementPos().
+       piece, which is owned by its QGraphicsScene
+       parent.
     */
-    QGraphicsItem * addPiece( GamePiece * pc, bool placePiece = false );
+    QGraphicsItem * addPiece( GamePiece * pc );
 
     /**
        Returns the current placement position. See addPiece() for
