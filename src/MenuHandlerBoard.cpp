@@ -67,15 +67,16 @@ void MenuHandlerBoard::doCopy()
     S11nClipboard & cl( S11nClipboard::instance() );
     if( cl.serialize<Serializable>( *impl->board ) )
     {
-	qDebug() << "Copied board to clipboard:";
-	s11nlite::save( *cl.contents(), std::cout );
+	//qDebug() << "Copied board to clipboard:";
+	//s11nlite::save( *cl.contents(), std::cout );
     }
 
 }
 void MenuHandlerBoard::doPaste()
 {
     if( ! impl->gs ) return;
-    qboard::pasteGraphicsItems( *impl->gs, impl->pastePos );
+    //qboard::pasteGraphicsItems( *impl->gs, impl->pastePos );
+    impl->gs->pasteClipboard( impl->pastePos );
 }
 
 void MenuHandlerBoard::doMenu( GameState & gs, QBoardView * pv, QContextMenuEvent * ev )
@@ -88,7 +89,9 @@ void MenuHandlerBoard::doMenu( GameState & gs, QBoardView * pv, QContextMenuEven
     m.addAction("Board")->setEnabled(false);
     m.addSeparator();
     m.addAction(QIcon(":/QBoard/icon/editcopy.png"),"Copy board (not pieces)",this,SLOT(doCopy()) );
-    QAction * act = m.addAction(QIcon(":/QBoard/icon/editpaste.png"),"Paste",this,SLOT(doPaste()) );
+    QAction * act = m.addAction(QIcon(":/QBoard/icon/editpaste.png"),
+				QString("Paste (%1)").arg( S11nClipboard::instance().contentLabel() ),
+				this,SLOT(doPaste()) );
     S11nNode * cbc = S11nClipboard::instance().contents();
     if( ! cbc )
     {

@@ -35,6 +35,8 @@ public:
        piece is destroyed.
      */
     GamePieceList & pieces();
+
+
     /**
        This object's game board.
     */
@@ -73,20 +75,28 @@ public:
     */
     QGraphicsItem * addPiece( GamePiece * pc );
 
-    /**
-       Returns the current placement position. See addPiece() for
-       details.
-    */
-    QPoint placementPos() const;
+//     /**
+//        Returns the current placement position. See addPiece() for
+//        details.
+//     */
+//     QPoint placementPos() const;
 
+    /**
+       Tries to paste the contents of the clipboard into the current
+       game. pos is a reference position, and the positions of clipboarded
+       data may be adjusted based on this pos.
+    */
+    bool pasteClipboard( QPoint const & pos );
+
+    static char const * KeyClipboard;
 
 public Q_SLOTS:
     void clear();
-    /**
-       Sets the "placement position". If addPiece(piece,true) is called,
-       the piece is moved to this position.
-    */
-    void setPlacementPos( QPoint const & );
+//     /**
+//        Sets the "placement position". If addPiece(piece,true) is called,
+//        the piece is moved to this position.
+//     */
+//     void setPlacementPos( QPoint const & );
 
 private Q_SLOTS:
     /**
@@ -100,6 +110,8 @@ private Q_SLOTS:
     void pieceRemoved( GamePiece * pc );
 
 private:
+    bool pasteTryHarder( S11nNode const & root,
+			 QPoint const & pos );
     struct Impl;
     Impl * impl;
 };

@@ -26,14 +26,14 @@ struct GameState::Impl
 {
     mutable GamePieceList pieces;
     QBoard board;
-    QPoint placeAt;
+//     QPoint placeAt;
     mutable QGraphicsScene * scene;
     /** lameKludge exists for the "addPiece() QGraphicsItem return workaround" */
     QGraphicsItem * lameKludge;
     Impl() :
 	pieces(),
 	board(),
-	placeAt(0,0),
+// 	placeAt(0,0),
 	scene( new QGraphicsScene( QRectF(0,0,200,200) ) ),
 	lameKludge(0)
     {
@@ -61,16 +61,16 @@ GameState::~GameState()
     delete impl;
 }
 
-QPoint GameState::placementPos() const
-{
-    return impl->placeAt;
-}
+// QPoint GameState::placementPos() const
+// {
+//     return impl->placeAt;
+// }
 
-void GameState::setPlacementPos( QPoint const & p )
-{
-    qDebug() <<"GameState::setPlacementPos("<<p<<")";
-    impl->placeAt = p;
-}
+// void GameState::setPlacementPos( QPoint const & p )
+// {
+//     qDebug() <<"GameState::setPlacementPos("<<p<<")";
+//     impl->placeAt = p;
+// }
 
 
 QGraphicsScene * GameState::scene()
@@ -221,3 +221,152 @@ bool GameState::deserialize(  S11nNode const & src )
     return true;
 }
 
+static void adjustPos( QObject * obj, QPoint const & pos )
+{
+    QVariant vpos( obj->property("pos") );
+    QPoint cpos = vpos.isValid() ? vpos.toPoint() : QPoint();
+    QPoint pD;
+    if( ! pos.isNull() && ! cpos.isNull() )
+    {
+	pD = cpos - pos;
+    }
+    QPoint newpos = cpos.isNull() ? pos : cpos;
+    if( (! pD.isNull()) && (newpos != cpos) )
+    {
+	newpos -= pD;
+	obj->setProperty("pos",newpos);
+    }
+
+}
+
+bool GameState::pasteTryHarder( S11nNode const & root,
+				QPoint const & pos )
+{
+    try {
+	if( impl->board.deserialize(root) )
+	{
+	    return true;
+	}
+    }
+    catch(...) {}
+    try {
+	GamePiece * pc = s11nlite::deserialize<GamePiece>(root);
+	if( pc )
+	{
+	    //adjustPos( pc, pos );
+	    pc->setPos( pos );
+	    this->addPiece(pc);
+	    return true;
+	}
+    }
+    catch(...) {}
+    // TODO: GamePieceList
+    return false;
+}
+
+
+char const * GameState::KeyClipboard = "GameStateClipboardData";
+bool GameState::pasteClipboard( QPoint const & pos )
+{
+    typedef QList<QGraphicsItem *> QGIL;
+    typedef QList<Serializable *> SerL;
+    S11nNode const * root = S11nClipboard::instance().contents();
+    typedef S11nNodeTraits TR;
+    if( ! root ) return false;
+    if( (TR::name(*root) != KeyClipboard ) )
+    {
+	return root ? this->pasteTryHarder(*root,pos) : false;
+    }
+    S11nNode const * node = 0;
+    node = s11n::find_child_by_name(*root, "metadata");
+    QPoint cpos;
+    if( node )
+    {
+	s11nlite::deserialize_subnode( *node, "copyPos", cpos );
+    }
+    QPoint pD;
+    if( ! pos.isNull() && ! cpos.isNull() )
+    {
+#if 0
+	int xD = cpos.x() - pos.x();
+	int yD = cpos.y() - pos.y();
+	pD = QPoint( xD, yD );
+#else
+	pD = cpos - pos;
+#endif
+    }
+    node = s11n::find_child_by_name(*root, "pieces");
+    if( node )
+    {
+	GamePieceList list;
+	if( ! s11nlite::deserialize( *node, list ) )
+	{
+	    return false;
+	}
+	GamePiece * pc = 0;
+	for( GamePieceList::iterator it = list.begin();
+	     list.end() != it;
+	     ++it )
+	{
+	    pc = *it;
+	    QPoint newpos;
+	    QVariant vpos( pc->property("pos") );
+	    if( ! vpos.isValid() )
+	    {
+		newpos = pos;
+	    }
+ 	    else
+ 	    {
+ 		newpos = vpos.toPoint();
+ 	    }
+	    if( ! pD.isNull() )
+	    {
+		newpos -= pD;
+		pc->setPieceProperty("pos",newpos);
+	    }
+	    this->pieces().addPiece( pc );
+	    if(0) qDebug() << "qboard::pasteGraphicsItems() pasting piece:"<<pc
+			   << "\nclickpos ="<<cpos<<", reqpos ="<<pos<<", newpos ="<<newpos<<"delta ="<<pD;
+	}
+	list.clearPieces(false);
+	//causing a crash: this->pieces().takePieces( list );
+    }
+    node = s11n::find_child_by_name(*root, "board");
+    if( node )
+    {
+	if( ! s11nlite::deserialize( *node, impl->board ) )
+	{
+	    if(1) qDebug() << "qboard::pasteGraphicsItems() pasting deserialization of board failed!";
+	    return false;
+	}
+    }
+    node = s11n::find_child_by_name(*root, "graphicsitems");
+    if( node )
+    {
+	if(0) qDebug() << "qboard::pasteGraphicsItems() pasting items";
+	SerL list;
+	if( ! s11nlite::deserialize( *node, list ) )
+	{
+	    if(1) qDebug() << "qboard::pasteGraphicsItems() pasting deserialization of graphicsitems failed!";
+	    return false;
+	}
+	for( SerL::iterator it = list.begin();
+	     it != list.end(); ++it )
+	{
+	    QGraphicsItem * qgi = dynamic_cast<QGraphicsItem*>( *it );
+	    if( qgi )
+	    {
+		QPoint newpos( qgi->pos().toPoint() - pD );
+		qgi->setPos( newpos );
+		if(0) qDebug() << "qboard::pasteGraphicsItems() adding Serializable QGI to scene:"
+			       << "newpos ="<<newpos
+			       << qgi;
+		this->scene()->addItem(qgi);
+		continue;
+	    }
+	    if(0) qDebug() << "qboard::pasteGraphicsItems() warning: skipping non-piece, non-QGI Serializable in input.";
+	    delete( *it );
+	}
+    }
+    return true;
+}
