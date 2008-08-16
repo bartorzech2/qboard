@@ -6,6 +6,11 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top.
 
 ----
+2008 August 16:
+
+- Added s11n support for QMap.
+
+
 2008 August 15:
 
 - Added quicksave/quickload (Alt-S and Alt-L), which save/load to/from a predefined game file.
