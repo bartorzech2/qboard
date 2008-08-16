@@ -15,6 +15,8 @@
 
 #include <QObject>
 #include <s11n.net/s11n/s11nlite.hpp>
+#include <QDebug>
+
 /**
    S11nClipboard provides clipboard features for any
    Serializable type.
@@ -77,6 +79,11 @@ public:
 	    S11nNodeTraits::swap( *m_node, tmp );
 	    this->syncToQt();
 	}
+	else
+	{
+	    qDebug() << "S11nClipboard::serialize() failed! Serializable class name is"
+		     << s11n::s11n_traits<SerializableType>::class_name(&ser).c_str();
+	}
 	return ret;
     }
 public Q_SLOTS:
@@ -86,10 +93,16 @@ public Q_SLOTS:
     void slotCopy( S11nNode const * copy );
     /* Clears the clipboard contents. */
     void slotClear();
-    Q_SIGNALS:
+Q_SIGNALS:
+    /** Tells listeners that this object's clipboard state has
+	(likely) been updated.*/
     void signalUpdated();
 private Q_SLOTS:
+    /** Copies the local s11n clipboard data to the Qt clipboard as text and emits signalUpdated(). */
     void syncToQt();
+    /** Reads the text content from the Qt clipboard and tries to
+    deserialize it, replacing the current data. If the source cannot
+    be deserialized then this clipboard is cleared. */
     void syncFromQt();
 private:
     S11nNode * m_node;

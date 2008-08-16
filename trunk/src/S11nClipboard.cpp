@@ -22,7 +22,7 @@ S11nClipboard::S11nClipboard() : m_node(0)
 }
 S11nClipboard::~S11nClipboard()
 {
-	delete this->m_node;	
+	delete this->m_node;
 }
 S11nClipboard & S11nClipboard::instance()
 {
@@ -37,7 +37,7 @@ S11nClipboard::S11nNode * S11nClipboard::contents()
 void S11nClipboard::syncToQt()
 {
     QClipboard * cb = QApplication::clipboard();
-    cb->clear();
+    // cb->clear(); doh! Ends up nuking m_node via signal to syncFromQt()!
     if( this->m_node )
     {
 	std::ostringstream os;
@@ -45,6 +45,10 @@ void S11nClipboard::syncToQt()
 	{
 	    cb->setText( os.str().c_str() );
 	}
+    }
+    else
+    {
+	cb->clear();
     }
     emit signalUpdated();
 }
@@ -56,6 +60,7 @@ void S11nClipboard::syncFromQt()
     m_node = 0;
     if( data.isEmpty() )
     {
+	emit signalUpdated();
 	return;
     }
     S11nNode * node = 0;
