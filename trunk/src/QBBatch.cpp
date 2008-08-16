@@ -535,11 +535,10 @@ namespace QBBatch {
 	switch( type )
 	{
 	  case QVariant::Color:{
-	      if( ! val.empty() && (val[0]=='#') )
-	      {
-		  var = QColor(vs);
-	      }
-	      else if( 0 == QRegExp("^[a-z]+").indexIn(vs) )
+	      if( (! val.empty() && (val[0]=='#'))
+		  || 
+		  ( 0 == QRegExp("^[a-z]+").indexIn(vs) )
+		  )
 	      {
 		  var = QColor(vs);
 	      }
