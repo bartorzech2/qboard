@@ -124,6 +124,9 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 #if ! QBOARD_VERSION
 	// For "end user builds" we won't show this action.
 	connect( this->actionExperiment, SIGNAL(triggered(bool)), this, SLOT(doSomethingExperimental()) );
+	this->actionExperiment->setEnabled(true);
+#else
+	this->actionExperiment->setEnabled(false);
 #endif
 	connect( &S11nClipboard::instance(), SIGNAL(signalUpdated()), this, SLOT(clipboardUpdated()) );
 
