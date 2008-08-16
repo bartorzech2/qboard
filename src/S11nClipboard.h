@@ -86,6 +86,7 @@ public:
 	try
 	{
 	    S11nNode tmp;
+	    S11nNodeTraits::name( tmp, "S11nClipboardData" );
 	    ret = s11nlite::serialize( tmp, ser );
 	    if( ret )
 	    {
@@ -105,6 +106,14 @@ public:
 	}
 	return ret;
     }
+
+    /**
+       If the content is set, it returns a string form of it's s11n
+       info, suitable for use as a quasi-informative label for the
+       contents.
+    */
+    QString contentLabel();
+
 public Q_SLOTS:
    /* Transfers ownership of 'take' to this object and sets it as the
       current clipboard content. */
