@@ -293,9 +293,8 @@ namespace qboard {
     static char const * KeyS11nQGI = "GameStateClipboardData";
     bool clipboardGraphicsItems( QGraphicsItem * gvi, bool copy )
     {
-
+	if(0) qDebug() <<"qboard::clipboardGraphicsItems("<<gvi<<","<<copy<<")";
 	if( ! gvi ) return false;
-	//qDebug() <<"qboard::clipboardGraphicsItems(item,"<<copy<<")";
 	typedef QList<QGraphicsItem *> QGIL;
 	typedef QList<Serializable *> SerL;
 	SerL seritems;
@@ -382,6 +381,7 @@ namespace qboard {
 	    if( ret && ! pieces.empty() )
 	    {
 		ret = s11n::serialize_subnode( *parent, "pieces", pieces );
+		pieces.clearPieces(false);
 	    }
 	    if( ret && ! seritems.isEmpty() )
 	    {
@@ -389,28 +389,29 @@ namespace qboard {
 	    }
 	    if( ! ret )
 	    {
-		delete parent;
-		return false;
+		throw s11n::s11n_exception("qboard::clipboardGraphicsItems(): serialization of one or more entries failed!");
+// 		delete parent;
+// 		return false;
 	    }
 	}
 	catch(std::exception const & ex)
 	{
 	    pieces.clearPieces(false);
 	    delete parent;
-	    if(0) qDebug() << "qboard::clipboardGraphicsItems(): serialization threw:"<<ex.what();
+	    qDebug() << "qboard::clipboardGraphicsItems(): serialization threw:"<<ex.what();
 	    return false;
 	}
-	pieces.clearPieces(false);
 	seritems.clear();
+	if(0) qDebug() <<"qboard::clipboardGraphicsItems() serialized data.";
 	S11nClipboard & cb( S11nClipboard::instance() );
 	cb.slotCut(parent);
 	if( copy )
 	{
-	    //if(0) qDebug() << "qboard::clipboardGraphicsItems() copied data.";
+	    if(0) qDebug() << "qboard::clipboardGraphicsItems() copied data.";
 	}
 	else
 	{
-	    //if(0) qDebug() << "qboard::clipboardGraphicsItems() cut data.";
+	    if(0) qDebug() << "qboard::clipboardGraphicsItems() cut data.";
 	    qboard::destroy( toCut );
 	}
 	S11nClipboard::S11nNode * cont = cb.contents();
