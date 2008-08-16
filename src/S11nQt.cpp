@@ -16,6 +16,7 @@
 #include <QChar>
 #include <s11n.net/s11n/functional.hpp>
 #include "S11nQtList.h"
+#include "S11nQtMap.h"
 
 bool QColor_s11n::operator()( S11nNode & dest, QColor const & src ) const
 {
@@ -539,6 +540,7 @@ bool QVariant_s11n::operator()( S11nNode & dest, QVariant const & src ) const
 	    CASE_OBJ(Line, src.toLine() );
 	    CASE_OBJ(LineF, src.toLineF() );
 	    CASE_OBJ(List, src.toList() );
+	    CASE_OBJ(Map, src.toMap() );
 	    CASE_OBJ(Point, src.toPoint() );
 	    CASE_OBJ(PointF, src.toPointF() );
 	    CASE_OBJ(Rect, src.toRect() );
@@ -588,6 +590,7 @@ bool QVariant_s11n::operator()( S11nNode const & src, QVariant & dest )
 	    CASE_OBJ(LineF,QLineF);
 	    CASE_OBJ(List,QList<QVariant>);
 	    CASE_PROP(LongLong,qlonglong,qlonglong(0));
+	    CASE_OBJ(Map,QVariantMap);
 	    CASE_OBJ(Point,QPoint);
 	    CASE_OBJ(PointF,QPointF);
 	    CASE_OBJ(Rect,QRect);

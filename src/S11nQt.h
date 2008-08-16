@@ -193,6 +193,7 @@ It supports the following QVariant types:
 - Rect, RectF
 - Int, UInt
 - Line, LineF
+- List, Map
 - LongLong, ULongLong
 - Time, Date, DateTime
 
