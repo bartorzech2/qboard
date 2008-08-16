@@ -195,7 +195,8 @@ void MainWindowImpl::clearClipboard()
 void MainWindowImpl::clipboardUpdated()
 {
   QString msg(tr("Clipboard updated: "));
-    S11nNode const * c = S11nClipboard::instance().contents();
+  S11nClipboard & cb( S11nClipboard::instance() );
+    S11nNode const * c = cb.contents();
     if( !c )
     {
 	msg += "cleared";
@@ -203,7 +204,7 @@ void MainWindowImpl::clipboardUpdated()
     }
     else
     {
-	msg += QString("type = ")+QString(S11nNodeTraits::class_name(*c).c_str());
+	msg += cb.contentLabel();
 	this->actionClearClipboard->setEnabled( true );
     }
     this->statusBar()->showMessage( msg );
