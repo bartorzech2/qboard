@@ -18,6 +18,7 @@
 #include <QDir>
 #include <QColor>
 #include <QDebug>
+#include <QtGlobal>
 
 class QPoint;
 class QGraphicsItem;
@@ -174,6 +175,11 @@ namespace qboard
        changed.
     */
     bool pasteGraphicsItems( GameState & st, QPoint const & pos );
+
+    /**
+       Transforms qgi to be rotated around its centerpoint.
+    */
+    void rotateCentered( QGraphicsItem * qgi, qreal angle );
 
 }
 

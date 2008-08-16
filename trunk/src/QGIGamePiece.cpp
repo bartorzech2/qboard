@@ -275,12 +275,8 @@ void QGIGamePiece::piecePropertySet( char const *pname )
 	}
 	if( "angle" == key )
 	{
-		qreal ang( var.toDouble() );
-		QRectF rec(this->boundingRect());
-		qreal x = rec.width()/2;
-		qreal y = rec.height()/2;
-		setTransform(QTransform().translate(x, y).rotate(ang).translate(-x, -y));
-		return;
+	    qboard::rotateCentered( this, var.toDouble() );
+	    return;
 	}
 	if( "dragDisabled" == key )
 	{
