@@ -223,6 +223,7 @@ bool GameState::deserialize(  S11nNode const & src )
 
 static void adjustPos( QObject * obj, QPoint const & pos )
 {
+    if( ! obj ) return;
     QVariant vpos( obj->property("pos") );
     QPoint cpos = vpos.isValid() ? vpos.toPoint() : QPoint();
     QPoint pD;
@@ -260,6 +261,26 @@ bool GameState::pasteTryHarder( S11nNode const & root,
 	}
     }
     catch(...) {}
+    try {
+	Serializable * ser = s11nlite::deserialize<Serializable>(root);
+	if( ser )
+	{
+	    QGraphicsItem * qgi = dynamic_cast<QGraphicsItem*>(ser);
+	    if( qgi )
+	    {
+		QObject * obj = dynamic_cast<QObject*>(ser);
+		if( obj )
+		{
+		    adjustPos( obj, pos );
+		    obj->setProperty( "pos", pos );
+		}
+		this->scene()->addItem( qgi );
+		return true;
+	    }
+	    s11n::cleanup_serializable<Serializable>( ser );
+	}
+    }
+    catch(...) {}
     // TODO: GamePieceList
     return false;
 }
@@ -284,6 +305,10 @@ bool GameState::pasteClipboard( QPoint const & pos )
     {
 	s11nlite::deserialize_subnode( *node, "copyPos", cpos );
     }
+    else
+    {
+	cpos = pos;
+    }
     QPoint pD;
     if( ! pos.isNull() && ! cpos.isNull() )
     {
@@ -296,6 +321,7 @@ bool GameState::pasteClipboard( QPoint const & pos )
 #endif
     }
     node = s11n::find_child_by_name(*root, "pieces");
+    QGIL newSelected;
     if( node )
     {
 	GamePieceList list;
@@ -324,7 +350,7 @@ bool GameState::pasteClipboard( QPoint const & pos )
 		newpos -= pD;
 		pc->setPieceProperty("pos",newpos);
 	    }
-	    this->pieces().addPiece( pc );
+	    newSelected.push_back( this->addPiece( pc ) );
 	    if(0) qDebug() << "qboard::pasteGraphicsItems() pasting piece:"<<pc
 			   << "\nclickpos ="<<cpos<<", reqpos ="<<pos<<", newpos ="<<newpos<<"delta ="<<pD;
 	}
@@ -337,7 +363,6 @@ bool GameState::pasteClipboard( QPoint const & pos )
 	if( ! s11nlite::deserialize( *node, impl->board ) )
 	{
 	    if(1) qDebug() << "qboard::pasteGraphicsItems() pasting deserialization of board failed!";
-	    return false;
 	}
     }
     node = s11n::find_child_by_name(*root, "graphicsitems");
@@ -361,12 +386,24 @@ bool GameState::pasteClipboard( QPoint const & pos )
 		if(0) qDebug() << "qboard::pasteGraphicsItems() adding Serializable QGI to scene:"
 			       << "newpos ="<<newpos
 			       << qgi;
+		newSelected.push_back(qgi);
 		this->scene()->addItem(qgi);
 		continue;
 	    }
 	    if(0) qDebug() << "qboard::pasteGraphicsItems() warning: skipping non-piece, non-QGI Serializable in input.";
 	    delete( *it );
 	}
+    }
+
+    if( ! newSelected.empty() )
+    {
+	this->scene()->clearSelection();
+	QGIL::iterator it = newSelected.begin();
+	for( ; newSelected.end() != it; ++it )
+	{
+	    (*it)->setSelected(true);
+	}
+	newSelected.clear();
     }
     return true;
 }
