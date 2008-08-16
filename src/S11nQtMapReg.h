@@ -25,11 +25,11 @@
 #endif
 
 #ifndef S11N_MAP_TYPE_PROXY
-#define S11N_MAP_TYPE_PROXY ::qboard::serialize_qmap_f
+#define S11N_MAP_TYPE_PROXY ::s11n::qt::serialize_qmap_f
 #endif
 
 #ifndef S11N_MAP_TYPE_DESER_PROXY
-#  define S11N_MAP_TYPE_DESER_PROXY ::qboard::deserialize_qmap_f
+#  define S11N_MAP_TYPE_DESER_PROXY ::s11n::qt::deserialize_qmap_f
 #endif
 
 

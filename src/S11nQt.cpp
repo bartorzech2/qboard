@@ -17,6 +17,7 @@
 
 #include "S11nQt.h"
 #include <s11n.net/s11n/functional.hpp>
+#include <s11n.net/s11n/proxy/pod/int.hpp>
 
 #include "S11nQtList.h"
 #include "S11nQtMap.h"
@@ -599,76 +600,160 @@ bool QVariant_s11n::canHandle( QVariant::Type t )
 		;
 }
 
-static char const * variantTypeToString( int vt )
+typedef QMap<int,QString> VariantTypeIDNameMap;
+typedef QMap<QString,int> VariantNameTypeIDMap;
+
+static VariantNameTypeIDMap & vNTMap()
 {
-    char const * ret = "Invalid";
-    switch( vt ) {
-      case QVariant::BitArray: ret = "BitArray"; break;
-      case QVariant::Bitmap: ret = "Bitmap"; break;
-      case QVariant::Bool: ret = "Bool"; break;
-      case QVariant::Brush: ret = "Brush"; break;
-      case QVariant::ByteArray: ret = "ByteArray"; break;
-      case QVariant::Char: ret = "Char"; break;
-      case QVariant::Color: ret = "Color"; break;
-      case QVariant::Cursor: ret = "Cursor"; break;
-      case QVariant::Date: ret = "Date"; break;
-      case QVariant::DateTime: ret = "DateTime"; break;
-      case QVariant::Double: ret = "Double"; break;
-      case QVariant::Font: ret = "Font"; break;
-      case QVariant::Icon: ret = "Icon"; break;
-      case QVariant::Image: ret = "Image"; break;
-      case QVariant::Int: ret = "Int"; break;
-      case QVariant::KeySequence: ret = "KeySequence"; break;
-      case QVariant::Line: ret = "Line"; break;
-      case QVariant::LineF: ret = "LineF"; break;
-      case QVariant::List: ret = "List"; break;
-      case QVariant::Locale: ret = "Locale"; break;
-      case QVariant::LongLong: ret = "LongLong"; break;
-      case QVariant::Map: ret = "Map"; break;
-      case QVariant::Matrix: ret = "Matrix"; break;
-      case QVariant::Transform: ret = "Transform"; break;
-      case QVariant::Palette: ret = "Palette"; break;
-      case QVariant::Pen: ret = "Pen"; break;
-      case QVariant::Pixmap: ret = "Pixmap"; break;
-      case QVariant::Point: ret = "Point"; break;
-      case QVariant::PointF: ret = "PointF"; break;
-      case QVariant::Polygon: ret = "Polygon"; break;
-      case QVariant::Rect: ret = "Rect"; break;
-      case QVariant::RectF: ret = "RectF"; break;
-      case QVariant::RegExp: ret = "RegExp"; break;
-      case QVariant::Region: ret = "Region"; break;
-      case QVariant::Size: ret = "Size"; break;
-      case QVariant::SizeF: ret = "SizeF"; break;
-      case QVariant::SizePolicy: ret = "SizePolicy"; break;
-      case QVariant::String: ret = "String"; break;
-      case QVariant::StringList: ret = "StringList"; break;
-      case QVariant::TextFormat: ret = "TextFormat"; break;
-      case QVariant::TextLength: ret = "TextLength"; break;
-      case QVariant::Time: ret = "Time"; break;
-      case QVariant::UInt: ret = "UInt"; break;
-      case QVariant::ULongLong: ret = "ULongLong"; break;
-      case QVariant::Url: ret = "Url"; break;
-      case QVariant::UserType: ret = "UserType"; break;
-      case QVariant::Invalid:
-      default:
-	  break;
+    static VariantNameTypeIDMap bob;
+    if( bob.isEmpty() )
+    {
+#define MAP(VT) \
+	bob[# VT] = QVariant::VT; \
+	bob[QString("%1").arg(QVariant::VT)] = QVariant::VT;
+
+	MAP(BitArray);
+	MAP(Bitmap);
+	MAP(Bool);
+	MAP(Brush);
+	MAP(ByteArray);
+	MAP(Char);
+	MAP(Color);
+	MAP(Cursor);
+	MAP(Date);
+	MAP(DateTime);
+	MAP(Double);
+	MAP(Font);
+	MAP(Icon);
+	MAP(Image);
+	MAP(Int);
+	MAP(Invalid);
+	MAP(KeySequence);
+	MAP(Line);
+	MAP(LineF);
+	MAP(List);
+	MAP(Locale);
+	MAP(LongLong);
+	MAP(Map);
+	MAP(Matrix);
+	MAP(Transform);
+	MAP(Palette);
+	MAP(Pen);
+	MAP(Pixmap);
+	MAP(Point);
+	MAP(PointF);
+	MAP(Polygon);
+	MAP(Rect);
+	MAP(RectF);
+	MAP(RegExp);
+	MAP(Region);
+	MAP(Size);
+	MAP(SizeF);
+	MAP(SizePolicy);
+	MAP(String);
+	MAP(StringList);
+	MAP(TextFormat);
+	MAP(TextLength);
+	MAP(Time);
+	MAP(UInt);
+	MAP(ULongLong);
+	MAP(Url);
+	MAP(UserType);
+#undef MAP
+// 	COUT << "vNTMap()==\n";
+// 	s11nlite::save(bob,std::cout);
     }
-    return ret;
+    return bob;
 }
+
+static VariantTypeIDNameMap & vTNMap()
+{
+    static VariantTypeIDNameMap bob;
+    if( bob.isEmpty() )
+    {
+#define MAP(VT) \
+	bob[QVariant::VT] = # VT;
+
+	MAP(BitArray);
+	MAP(Bitmap);
+	MAP(Bool);
+	MAP(Brush);
+	MAP(ByteArray);
+	MAP(Char);
+	MAP(Color);
+	MAP(Cursor);
+	MAP(Date);
+	MAP(DateTime);
+	MAP(Double);
+	MAP(Font);
+	MAP(Icon);
+	MAP(Image);
+	MAP(Int);
+	MAP(Invalid);
+	MAP(KeySequence);
+	MAP(Line);
+	MAP(LineF);
+	MAP(List);
+	MAP(Locale);
+	MAP(LongLong);
+	MAP(Map);
+	MAP(Matrix);
+	MAP(Transform);
+	MAP(Palette);
+	MAP(Pen);
+	MAP(Pixmap);
+	MAP(Point);
+	MAP(PointF);
+	MAP(Polygon);
+	MAP(Rect);
+	MAP(RectF);
+	MAP(RegExp);
+	MAP(Region);
+	MAP(Size);
+	MAP(SizeF);
+	MAP(SizePolicy);
+	MAP(String);
+	MAP(StringList);
+	MAP(TextFormat);
+	MAP(TextLength);
+	MAP(Time);
+	MAP(UInt);
+	MAP(ULongLong);
+	MAP(Url);
+	MAP(UserType);
+#undef MAP
+    }
+    return bob;
+}
+
+QString variantTypeName( int vt )
+{
+    return vTNMap().value( vt, "Invalid" );
+}
+
+int variantTypeID( QString const & vt )
+{
+    return vNTMap().value( vt, QVariant::Invalid );
+}
+
 
 #include "S11nQtList.h"
 bool QVariant_s11n::operator()( S11nNode & dest, QVariant const & src ) const
 {
 	const QVariant::Type vt = src.type();
 	typedef S11nNodeTraits NT;
-	NT::set( dest, "type", vt );
-	NT::set( dest, "typeName", variantTypeToString(vt) );
-	bool ret = false;
 	if( ! QVariant_s11n::canHandle(vt) )
 	{
 		//throw s11n::s11n_exception( "QVariant_s11n cannot serialize QVariants type() %d", vt );
 		return false;
 	}
+#if 1
+	NT::set( dest, "type", vt );
+#else
+	NT::set( dest, "type", variantTypeName(vt).toAscii().constData() );
+#endif
+	bool ret = false;
+
 #define CASE_PROP(T,Setter) \
 	case QVariant::T: \
 	ret = true; NT::set(dest, "val", src.Setter); \
@@ -709,19 +794,20 @@ bool QVariant_s11n::operator()( S11nNode & dest, QVariant const & src ) const
 #undef CASE_OBJ
 	return ret;
 }
+#include <QDebug>
 bool QVariant_s11n::operator()( S11nNode const & src, QVariant & dest ) const
 {
 	typedef S11nNodeTraits NT;
-#if 1
-	int vt = NT::get( src, "type", int(QVariant::Invalid) );
+	int vt = QVariant::Invalid;
+	{
+	    QString vtstr( NT::get( src, "type", std::string("0") ).c_str() );
+	    vt = variantTypeID(vtstr);
+	    qDebug() << "vtstr ="<<vtstr<<", vt ="<<vt;
+	}
 	if( ! QVariant_s11n::canHandle( QVariant::Type(vt) ) )
 	{
 		return false;
 	}
-#else
-	std::string vtstr( NT::get( src, "type", std::string() ) );
-	if( vtstr.empty() ) return false;
-#endif
 	bool ret = false;
 #define CASE_OBJ(VT,Type) \
 	case QVariant::VT: { \

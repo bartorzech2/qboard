@@ -25,11 +25,11 @@
 #endif
 
 #ifndef S11N_LIST_TYPE_PROXY
-#define S11N_LIST_TYPE_PROXY ::qboard::serialize_qlist_f
+#define S11N_LIST_TYPE_PROXY ::s11n::qt::serialize_qlist_f
 #endif
 
 #ifndef S11N_LIST_TYPE_DESER_PROXY
-#  define S11N_LIST_TYPE_DESER_PROXY ::qboard::deserialize_qlist_f
+#  define S11N_LIST_TYPE_DESER_PROXY ::s11n::qt::deserialize_qlist_f
 #endif
 
 

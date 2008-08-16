@@ -161,18 +161,15 @@ namespace s11n { namespace qt {
 }} // namespaces
 
 
-#define QTMAP_SERIALIZE_FUNCTOR s11n::qt::serialize_qmap_f
-#define QTMAP_DESERIALIZE_FUNCTOR s11n::qt::deserialize_qmap_f
 
 /* s11n proxy for QMap<SerializableT,SerializableT>. */
 #define S11N_MAP_TYPE QMap
 #define S11N_MAP_TYPE_NAME "QMap"
-#define S11N_MAP_TYPE_PROXY QTMAP_SERIALIZE_FUNCTOR
-#define S11N_MAP_TYPE_DESER_PROXY QTMAP_DESERIALIZE_FUNCTOR
 #include "S11nQtMapReg.h"
 
-
-#undef QTMAP_SERIALIZE_FUNCTOR
-#undef QTMAP_DESERIALIZE_FUNCTOR
+// #define QTMAP_SERIALIZE_FUNCTOR s11n::qt::serialize_qmap_f
+// #define QTMAP_DESERIALIZE_FUNCTOR s11n::qt::deserialize_qmap_f
+// #undef QTMAP_SERIALIZE_FUNCTOR
+// #undef QTMAP_DESERIALIZE_FUNCTOR
 
 #endif // __S11NQTMAP_H__
