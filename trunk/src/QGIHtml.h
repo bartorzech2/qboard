@@ -13,10 +13,14 @@
  *
  */
 
+
 #include <QGraphicsTextItem>
-class QGraphicsSceneContextMenuEvent;
+
 #include "Serializable.h"
 #include "QGI.h"
+
+class QGraphicsSceneContextMenuEvent;
+class QEvent;
 /**
 	QGIHtml implements a serializale QGraphicsTextItem which acts
 	as an on-board text/html widget.
@@ -39,6 +43,8 @@ protected:
 	virtual void focusOutEvent( QFocusEvent * event );
 	virtual void mousePressEvent ( QGraphicsSceneMouseEvent * event );
 	virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent * event );
+    virtual bool event( QEvent * e );
+
 private:
 	void setup();
 	struct Impl;
@@ -75,7 +81,6 @@ private:
 	Context menu handler for QGIHtml object.
 */
 class QGraphicsSceneContextMenuEvent;
-class QGIHtml;
 class MenuHandlerQGIHtml : public QObject
 {
 Q_OBJECT
