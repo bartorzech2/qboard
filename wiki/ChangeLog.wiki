@@ -8,7 +8,7 @@ are at the top.
 ----
 2008 August 16:
 
-- Added s11n support for QMap.
+- Added s11n support for QMap, QByteArray, and QPixmap.
 
 
 2008 August 15:
