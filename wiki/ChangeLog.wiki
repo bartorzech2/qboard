@@ -6,12 +6,23 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top.
 
 ----
-2008 August 16:
+*2008 August 17:*
 
-- Added s11n support for QMap, QByteArray, and QPixmap.
+- QGIHtml (the on-board text widgets) can now be rotated.
+
+- Improved pasting a bit. e.g.
+  * pasted objects are now selected by default, since the most common action after a paste is adjusting the position of the group.
+  * Can now paste more types of data into the game (namely GamePiece, QBoard, and Serializable QGraphicsItems).
+
+- Clipboard is now better synchronized with the global Qt/X11 clipboard.
 
 
-2008 August 15:
+*2008 August 16:*
+
+- Added s11n support for QMap, plus QByteArray and QPixmap with compression.
+
+
+*2008 August 15:*
 
 - Added quicksave/quickload (Alt-S and Alt-L), which save/load to/from a predefined game file.
 
@@ -27,7 +38,7 @@ one no longer has to scroll the board to get the new image to show up.
 - Copy/cut/paste is basically working. On-board lines don't paste in the proper location, but that's part of a bigger problem. Unfortunately, we can't currently bind keyboard shortcuts to copy/cut/paste because where those are caught we don't have access to the necessary widgets to initiate the copy/paste.
 
 
-2008 August 13:
+*2008 August 13:*
 
 - Added a "placemarker" to the board. Pieces loaded via double-clicking
 in the file browser will be set to the placemarker's position. To move
@@ -40,7 +51,7 @@ to use those resources as pixmap sources for in-play pieces. So the basics
 seem to work, anyway.
 
 
-2008 August 11:
+*2008 August 11:*
 
 - Added "piece templates" to the main UI. The appearance of the
 currently-selected template is used as the basis when loading piece
@@ -54,11 +65,11 @@ persistant across QBoard sessions.
 - Added basic support for locking a piece's position (simply disables dragging for the piece).
 
 
-2008 August 9:
+*2008 August 9:*
 
 - Corrected several compile warnings caught by gcc 4.2.3.
 
-2008 June 15:
+*2008 June 15:*
 
 - Fixed a major bug under Qt 4.3 which caused non-piece gameboard items
 to be not removed. The end effect was duplicate or extra items at
@@ -68,7 +79,7 @@ load-time.
 read by qboardbatch).
 
 
-2008 June 14:
+*2008 June 14:*
 
 - Fixed the broken app icons for qt 4.3. This was caused by an inconsistency
 in how Qt Designer 4.3/4.4 handle icons associated with QActions.
@@ -84,6 +95,6 @@ what a bitch it was to get the event handling right in conjunction with
 overlapping pieces and the board.
 
 
-2008 June 13:
+*2008 June 13:*
 
 - Initial release via Google Code.
