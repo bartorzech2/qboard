@@ -93,8 +93,10 @@ void PieceAppearanceWidget::setupUI()
     QLayout * lay = new QGridLayout( this );
     lay->setSpacing(0);
     lay->setContentsMargins(0,0,0,0);
-    QGraphicsView * v = this->impl->gv = new QGraphicsView( impl->gs.scene() );
-	//new QBoardView(impl->board(), impl->scene());
+    QGraphicsView * v = this->impl->gv =
+	//new QGraphicsView( impl->gs.scene() )
+	new QBoardView( impl->gs )
+	;
 
     v->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     v->setInteractive(true); // required to get mouse events to the children
