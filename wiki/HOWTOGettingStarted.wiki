@@ -28,8 +28,22 @@ QBoard-specific application data.
   * Double-clicking on files named .GameState, .QBoard, or .QBoardPiece will load a game, a board, or a piece. The same happens when using the Open File menu/button.
   * Double-clicking a .txt or .html file will open it in a browser (only when compiled against Qt 4.4!).
 
-
 == Saving ==
 
   * To save a game, click the Save button or File->Save menu item. That will save the entire game state.
   * It is in principal possible to save any in-game object individually (e.g. individual pieces or JUST the board, without the pieces), but there is currently no UI for doing so.
+
+== Tips and Tricks ==
+
+=== Piece style templates ==
+
+The colorful squares in the bottom/left of the main window are piece style templates. If you click one of those, newly-added pieces will take on that style. Use the right-click menu to edit them. You can also paste items copied from the board into this area, so you can customize your templates any way you like.
+
+The templates area is saved automatically when QBoard exits. If you have hosed your templates beyond repair and want to start with a new set, close QBoard, delete the file `~/.QBoard/QBoard/persistance/MainWindow/default-templates`, then start QBoard. Deleting or replacing the file while QBoard is open will have no effect and the file will be replaced or overwritten when QBoard exits.
+
+
+=== The clipboard ===
+
+Most in-play objects can be copied, cut, and pasted within the board. When objects are copied or cut, their data is available as text in the Qt clipboard, which means you can paste it into another application (e.g. a text editor). From there, you can edit it, copy it, and paste it back into QBoard.
+
+Unfortunately, QBoard currently has no keyboard shortcuts for Copy/Paste. This has to do with some objects not having enough access to other objects in the context of the events. Maybe it'll be fixed some day.
