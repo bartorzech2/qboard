@@ -186,7 +186,13 @@ namespace s11n {
 
 #include <QString>
 /**
-	s11n proxy for QStrings. See the tryAscii member for important notes.
+	s11n proxy for QStrings. See the tryAscii member for important
+	notes.
+
+	As a special convenience, it can deserialize QByteArray data,
+	in the assumption that it's a string. This can be used to take
+	advantage of QByteArray_s11n's compression when you know that
+	a given property will often contain large amounts of text.
 */
 struct QString_s11n
 {
@@ -287,6 +293,9 @@ struct QObjectProperties_s11n
 	of dest from src. If this routine returns false, dest may be partially
 	deserialized - its state is effectively undefined. */
 	bool operator()( S11nNode const & src, QObject & dest ) const;
+
+    static void clearProperties( QObject & obj );
+
 };
 
 #endif

@@ -487,11 +487,18 @@ bool QString_s11n::operator()( S11nNode const & src, QString & dest ) const
 		dest = QString( cp ? cp : "" );
 		return true;
 	}
-	if( ! NT::is_set( src, "len" ) )
+	else if( NT::is_set( src, "bin64" ) )
+	{ // allow QByteArray data
+	    QByteArray tmp;
+	    if( ! s11n::deserialize( src, tmp ) ) return false;
+	    dest = tmp;
+	    return true;
+	}
+	else if( ! NT::is_set( src, "len" ) )
 	{
 		return false;
 	}
-	size_t len = NT::get( src, "len", 0 );
+	size_t len = NT::get( src, "len", size_t(0) );
 	QString tmp;
 	if( len )
 	{
@@ -855,6 +862,20 @@ bool QVariant_s11n::operator()( S11nNode const & src, QVariant & dest ) const
 }
 
 
+void QObjectProperties_s11n::clearProperties( QObject & obj )
+{
+    typedef QList<QByteArray> QL;
+    QL ql( obj.dynamicPropertyNames() );
+    QL::const_iterator it( ql.begin() );
+    QL::const_iterator et( ql.end() );
+    for( ; et != it; ++it )
+    {
+	char const * key = it->constData();
+	if( key && (*key == '_') ) continue; // Qt reserves the "_q_" prefix, so we'll elaborate on that.
+	obj.setProperty( key, QVariant() );
+    }
+}
+
 bool QObjectProperties_s11n::operator()( S11nNode & dest, QObject const & src ) const
 {
 	typedef QList<QByteArray> QL;
@@ -875,21 +896,7 @@ bool QObjectProperties_s11n::operator()( S11nNode & dest, QObject const & src ) 
 }
 bool QObjectProperties_s11n::operator()( S11nNode const & src, QObject & dest ) const
 {
-
-    {
-	// First we need to ensure a clean slate by removing all properties from dest:
-	typedef QList<QByteArray> QL;
-	QL ql( dest.dynamicPropertyNames() );
-	QL::const_iterator it( ql.begin() );
-	QL::const_iterator et( ql.end() );
-	for( ; et != it; ++it )
-	{
-	    char const * key = it->constData();
-	    if( *key == '_' ) continue; // Qt reserves the "_q_" prefix, so we'll elaborate on that.
-	    dest.setProperty( key, QVariant() );
-	}
-    }
-
+    clearProperties( dest );
     typedef S11nNodeTraits::child_list_type CLT;
     CLT::const_iterator it = S11nNodeTraits::children(src).begin();
     CLT::const_iterator et = S11nNodeTraits::children(src).end();
