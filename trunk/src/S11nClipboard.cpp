@@ -104,3 +104,18 @@ void S11nClipboard::slotClear()
     this->m_node = 0;
     this->syncToQt();
 }
+
+
+QString S11nClipboard::contentLabel()
+{
+    if( m_node )
+    {
+	return QString("%1[%2]")
+	    .arg( S11nNodeTraits::name(*m_node).c_str() )
+	    .arg( S11nNodeTraits::class_name(*m_node).c_str() );
+    }
+    else
+    {
+	return QString("[empty]");
+    }
+}
