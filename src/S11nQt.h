@@ -16,6 +16,44 @@
 
 #include "S11n.h"
 
+#include <QByteArray>
+/**
+   An s11n proxy for QByteArrays. See the compressionThreshold member
+   for important notes.
+*/
+struct QByteArray_s11n
+{
+    /**
+       Serializes src to dest, saving the data in a bin64-encoded
+       string. If src.size() is greater than
+       QByteArray_s11n::compressionThreshold then the serialized
+       copy is compressed using qCompress().
+
+       See the compressionThreshold for more info.
+    */
+    bool operator()( S11nNode & dest, QByteArray const & src ) const;
+
+    /** Deserializes dest from src. */
+    bool operator()( S11nNode const & src, QByteArray & dest ) const;
+
+    /**
+       The value of compressionThreshold influences how the serialize
+       operator works.
+
+       It is intended that an application set this only once, and not
+       twiddle it back and forth.
+
+       If set to 0 then compression is disabled. The default value is
+       quite small - technically undefined, but "probably" around 100.
+    */
+    static unsigned short compressionThreshold;
+};
+/* s11n proxy for QByteArray. */
+#define S11N_TYPE QByteArray
+#define S11N_TYPE_NAME "QByteArray"
+#define S11N_SERIALIZE_FUNCTOR QByteArray_s11n
+#include <s11n.net/s11n/reg_s11n_traits.hpp>
+
 
 #include <QColor>
 /* s11n proxy for QColor. */
@@ -110,6 +148,14 @@ namespace s11n {
 	};
 }
 
+#include <QPixmap>
+/* s11n proxy for QPixmap. */
+#define S11N_TYPE QPixmap
+#define S11N_TYPE_NAME "QPixmap"
+#define S11N_SERIALIZE_FUNCTOR QPixmap_s11n
+#include "reg_qt_s11n.h"
+
+
 #include <QPoint>
 /* s11n proxy for QPoint. */
 #define S11N_TYPE QPoint
@@ -148,7 +194,7 @@ struct QString_s11n
 	bool operator()( S11nNode & dest, QString const & src ) const;
 	/** Deserializes dest from src. It can read either format of
 		serialized string (see tryAscii). */
-	bool operator()( S11nNode const & src, QString & dest );
+	bool operator()( S11nNode const & src, QString & dest ) const;
 	
 	/**
 		If tryAscii is true (the default) then serialized QStrings will be checked
@@ -196,6 +242,8 @@ It supports the following QVariant types:
 - List, Map
 - LongLong, ULongLong
 - Time, Date, DateTime
+- ByteArray
+- Pixmap
 
 If an attempt is made to serialize a different type, serialization
 will fail. If, upon deserialization, the integer values defined by
@@ -210,7 +258,7 @@ struct QVariant_s11n
 	dest is guaranteed to have not been modified. That is, if
 	this routine fails, dest's state is the same as it was
 	before this function was called. */
-	bool operator()( S11nNode const & src, QVariant & dest );
+	bool operator()( S11nNode const & src, QVariant & dest ) const;
 	/**
 		Returns true only if this type can de/serialize QVariants
 		of the given type.
