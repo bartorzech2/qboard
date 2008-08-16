@@ -56,6 +56,53 @@ QGIHtml::~QGIHtml()
 	delete impl;
 }
 
+
+bool QGIHtml::event( QEvent * e )
+{
+#if 1
+    typedef QMap<QString,bool> PropMarkMap;
+    static PropMarkMap map;
+    if( map.isEmpty() )
+    {
+	map["pos"] = 1;
+	map["html"] = 1;
+	map["angle"] = 1;
+    }
+    while( e->type() == QEvent::DynamicPropertyChange )
+    {
+	QDynamicPropertyChangeEvent *chev = dynamic_cast<QDynamicPropertyChangeEvent *>(e);
+	if( ! chev ) break; 
+	QByteArray bakey( chev->propertyName() );
+	const QString key( bakey );
+	qDebug() << "QGIHtml::event(): DynamicPropertyChange: propery key ="<<key;
+	if( ! map.contains(key) ) break;
+	char const * ckey = bakey.constData();
+	QVariant val( this->property(ckey) );
+	if( QString("pos") == key )
+	{
+	    this->setPos( val.toPoint() );
+	}
+	else if( QString("html") == key )
+	{
+	    this->setHtml( val.toString() );
+	}
+	else if( QString("angle") == key )
+	{
+	    qboard::rotateCentered( this, val.toDouble() );
+	}
+	else
+	{
+	    break;
+	}
+	e->accept();
+	this->update();
+	return true;
+    }
+#endif
+    return QObject::event(e);
+}
+
+
 void QGIHtml::mouseDoubleClickEvent( QGraphicsSceneMouseEvent * ev )
 {
 	if( ev->buttons() & Qt::LeftButton )
@@ -100,29 +147,59 @@ bool QGIHtml::serialize( S11nNode & dest ) const
 {
 	if( ! this->Serializable::serialize( dest ) ) return false;
 	typedef S11nNodeTraits NT;
+	NT::set( dest, "angle", this->property("angle").toInt() );
+#if 0
 	if( this->metaObject()->propertyCount() )
 	{
 		S11nNode & pr( s11n::create_child( dest, "properties" ) );
 		if( ! QObjectProperties_s11n()( pr, *this ) ) return false;
 	}
-	return s11n::serialize_subnode( dest, "pos", this->pos() )
-		&& s11n::serialize_subnode( dest, "html", this->toHtml() );
+#endif
+	const QString html( this->toHtml() );
+	const long thresh = 128;
+	bool ret = true;
+	if( html.size() > thresh )
+	{
+	    ret = s11n::serialize_subnode( dest, "html", html.toUtf8() );
+	}
+	else
+	{
+	    ret = s11n::serialize_subnode( dest, "html", html );
+	}
+	
+	return ret
+	    && s11n::serialize_subnode( dest, "pos", this->pos().toPoint() );
 }
 
 bool QGIHtml::deserialize(  S11nNode const & src )
 {
 	if( ! this->Serializable::deserialize( src ) ) return false;
 	typedef S11nNodeTraits NT;
-	QPointF p;
-	if( ! s11n::deserialize_subnode( src, "pos", p ) ) return false;
-	this->setPos( p );
-	QString html;
-	if( ! s11n::deserialize_subnode( src, "html", html ) ) return false;
-	this->setHtml(html);
+	this->setHtml("");
+	{
+	    QPointF p;
+	    if( ! s11n::deserialize_subnode( src, "pos", p ) ) return false;
+	    this->setProperty( "pos", p );
+	}
+	{
+	    QString html;
+	    if( ! s11n::deserialize_subnode( src, "html", html ) ) return false;
+	    this->setHtml(html);
+	}
+	{
+	    int angle = NT::get( src, "angle", int(0) );
+	    if( angle != 0.0 )
+	    {
+		this->setProperty("angle", QVariant(angle));
+	    }
+	}
+#if 0
 	S11nNode const * ch = s11n::find_child_by_name(src, "properties");
 	return ch
 		? QObjectProperties_s11n()( *ch, *this )
 		: true;
+#endif
+	return true;
 }
 
 void QGIHtml::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
@@ -151,8 +228,8 @@ void QGIHtmlEditor::textBold(bool b)
 
 void QGIHtmlEditor::accept()
 {
-	m_item->setHtml( this->textEdit->toPlainText() );
-	this->QDialog::accept(); 
+    m_item->setHtml( this->textEdit->toPlainText() );
+    this->QDialog::accept(); 
 }
 
 void QGIHtmlEditor::reject()
@@ -180,13 +257,19 @@ void MenuHandlerQGIHtml::doMenu( QGIHtml * pv, QGraphicsSceneContextMenuEvent * 
 	ev->accept();
 	MenuHandlerCommon proxy;
 	QMenu * m = proxy.createMenu( pv );
+	if(1)
+	{
+	    QObjectPropertyMenu * pm = QObjectPropertyMenu::makeIntListMenu("Rotate",pv,"angle",0,360,15);
+	    pm->setIcon(QIcon(":/QBoard/icon/rotate_cw.png"));
+	    m->addMenu(pm);
+	}
 #if 1
 	m->addSeparator();
 	MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( pv, m );
 	m->addAction(QIcon(":/QBoard/icon/editcopy.png"),"Copy",clipper,SLOT(clipboardCopy()) );
 	m->addAction(QIcon(":/QBoard/icon/editcut.png"),"Cut",clipper,SLOT(clipboardCut()) );
-	m->addSeparator();
 #endif
+	m->addSeparator();
 	m->addAction(QIcon(":/QBoard/icon/help.png"),"Help...", this, SLOT(showHelp()) );
 	m->exec( ev->screenPos() );
 	delete m;
