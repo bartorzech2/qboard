@@ -95,7 +95,7 @@ void S11nClipboard::slotCopy( S11nNode const * cp )
 {
 	if( (cp==this->m_node) ) return;
 	delete this->m_node;
-	this->m_node = new S11nNode( *cp );
+	this->m_node = cp ? new S11nNode( *cp ) : 0;
 	this->syncToQt();
 }
 void S11nClipboard::slotClear()
