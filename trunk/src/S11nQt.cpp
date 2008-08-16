@@ -50,10 +50,6 @@ bool QByteArray_s11n::operator()( S11nNode & dest, QByteArray const & src ) cons
     QByteArray b64( QByteArray( zIt
 				? qCompress(src)
 				: src ).toBase64() );
-    if( zIt )
-    {
-	NT::set( dest, "zIt", int(zIt) );
-    }
     b64.append('\0');
     NT::set( dest, "djb2", hash_cstring_djb2( b64.constData() ) );
     NT::set( dest, "bin64", std::string( b64.constData(), b64.count()-1 ) );
@@ -79,9 +75,8 @@ bool QByteArray_s11n::operator()( S11nNode const & src, QByteArray & dest ) cons
 	    }
 	}
 	tmp = QByteArray::fromBase64( tmp );
-	dest = ( NT::get( src, "zIt", int(0) ) )
-	    ? qUncompress( tmp )
-	    : tmp;
+	dest = qUncompress( tmp );
+	    ;
 	return true;
 }
 
@@ -516,7 +511,7 @@ bool QString_s11n::operator()( S11nNode const & src, QString & dest ) const
 bool QStringList_s11n::operator()( S11nNode & dest, QStringList const & src ) const
 {
 	std::for_each( src.begin(), src.end(),
-			s11n::ser_to_subnode_unary_f( dest, "string" ) );
+		       s11n::ser_to_subnode_unary_f( dest, "string" ) );
 #if 0
 	QStringList::const_iterator it = src.begin();
 	QStringList::const_iterator et = src.end();
@@ -528,15 +523,18 @@ bool QStringList_s11n::operator()( S11nNode & dest, QStringList const & src ) co
 		}
 	}
 #endif
-	return true;
+	long sz = src.size();
+	return (sz>=0) && (sz == long(S11nNodeTraits::children(dest).size()));
 }
 bool QStringList_s11n::operator()( S11nNode const & src, QStringList & dest ) const
 {
-	typedef S11nNodeTraits NT;
-	std::for_each( NT::children(src).begin(),
-		NT::children(src).end(),
-		s11n::deser_to_outiter_f<QString>( std::back_inserter(dest) ) ); 
-	return true;
+    dest.clear();
+    typedef S11nNodeTraits NT;
+    std::for_each( NT::children(src).begin(),
+		   NT::children(src).end(),
+		   s11n::deser_to_outiter_f<QString>( std::back_inserter(dest) ) ); 
+    long sz = dest.size();
+    return (sz>=0) && (sz == long(S11nNodeTraits::children(src).size()));
 }
 
 
@@ -588,6 +586,7 @@ bool QVariant_s11n::canHandle( QVariant::Type t )
 		|| (t == QVariant::Map)
 		|| (t == QVariant::Rect)
 		|| (t == QVariant::RectF)
+		|| (t == QVariant::Pixmap)
 		|| (t == QVariant::Point)
 		|| (t == QVariant::PointF)
 		|| (t == QVariant::Size)
@@ -747,7 +746,7 @@ bool QVariant_s11n::operator()( S11nNode & dest, QVariant const & src ) const
 		//throw s11n::s11n_exception( "QVariant_s11n cannot serialize QVariants type() %d", vt );
 		return false;
 	}
-#if 1
+#if 0
 	NT::set( dest, "type", vt );
 #else
 	NT::set( dest, "type", variantTypeName(vt).toAscii().constData() );
@@ -769,7 +768,7 @@ bool QVariant_s11n::operator()( S11nNode & dest, QVariant const & src ) const
 	    CASE_PROP(Int,toInt());
 	    CASE_PROP(UInt,toUInt());
 	    CASE_PROP(LongLong,toLongLong());
-	    CASE_OBJ(Color, QColor(src.value<QColor>()) );
+	    CASE_OBJ(Color, src.value<QColor>() );
 	    CASE_OBJ(Date, src.toDate() );
 	    CASE_OBJ(DateTime, src.toDateTime() );
 	    CASE_PROP(Double,toDouble());
@@ -777,6 +776,7 @@ bool QVariant_s11n::operator()( S11nNode & dest, QVariant const & src ) const
 	    CASE_OBJ(LineF, src.toLineF() );
 	    CASE_OBJ(List, src.toList() );
 	    CASE_OBJ(Map, src.toMap() );
+	    CASE_OBJ(Pixmap, src.value<QPixmap>() );
 	    CASE_OBJ(Point, src.toPoint() );
 	    CASE_OBJ(PointF, src.toPointF() );
 	    CASE_OBJ(Rect, src.toRect() );
@@ -802,11 +802,11 @@ bool QVariant_s11n::operator()( S11nNode const & src, QVariant & dest ) const
 	{
 	    QString vtstr( NT::get( src, "type", std::string("0") ).c_str() );
 	    vt = variantTypeID(vtstr);
-	    qDebug() << "vtstr ="<<vtstr<<", vt ="<<vt;
 	}
 	if( ! QVariant_s11n::canHandle( QVariant::Type(vt) ) )
 	{
-		return false;
+	    throw s11n::s11n_exception("QVariant_s11n::deserialize: cannot handle QVariant::Type #%d",vt); 
+	    //return false;
 	}
 	bool ret = false;
 #define CASE_OBJ(VT,Type) \
@@ -834,6 +834,7 @@ bool QVariant_s11n::operator()( S11nNode const & src, QVariant & dest ) const
 	    CASE_OBJ(List,QList<QVariant>);
 	    CASE_PROP(LongLong,qlonglong,qlonglong(0));
 	    CASE_OBJ(Map,QVariantMap);
+	    CASE_OBJ(Pixmap,QPixmap);
 	    CASE_OBJ(Point,QPoint);
 	    CASE_OBJ(PointF,QPointF);
 	    CASE_OBJ(Rect,QRect);
@@ -866,7 +867,8 @@ bool QObjectProperties_s11n::operator()( S11nNode & dest, QObject const & src ) 
 		if( !key || (*key == '_') ) continue; // Qt reserves the "_q_" prefix, so we'll elaborate on that.
 		if( ! s11n::serialize_subnode( dest, key, src.property( key ) ) )
 		{
-			return false;
+		    qDebug() << "QObjectProperties_s11n::serialize failed for key " <<QString(*it);
+		    return false;
 		}
 	}
 	return true;
