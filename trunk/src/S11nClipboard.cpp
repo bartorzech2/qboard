@@ -19,6 +19,7 @@ S11nClipboard::S11nClipboard() : m_node(0)
 {
     connect(QApplication::clipboard(),SIGNAL(dataChanged()),
 	    this,SLOT(syncFromQt()));
+    this->syncFromQt();
 }
 S11nClipboard::~S11nClipboard()
 {
