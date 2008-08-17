@@ -231,12 +231,27 @@ static void adjustPos( QObject * obj, QPoint const & pos )
     {
 	pD = cpos - pos;
     }
+#if 1
+    QPoint newpos = cpos.isNull() ?  pos : cpos;
+    qDebug() << "adjustPos("<<obj<<","<<pos<<"): delta="<<pD<<"cpos="<<cpos<<"newpos="<<newpos;
+    newpos -= pD;
+    qDebug() << "adjustPos("<<obj<<","<<pos<<"): delta="<<pD<<"cpos="<<cpos<<"newpos="<<newpos;
+    if( newpos != cpos )
+    {
+	obj->setProperty("pos", newpos);
+    }
+#else
     QPoint newpos = cpos.isNull() ? pos : cpos;
-    if( (! pD.isNull()) && (newpos != cpos) )
+    if( ! pD.isNull() )
     {
 	newpos -= pD;
-	obj->setProperty("pos",newpos);
+	qDebug() << "adjustPos("<<obj<<","<<pos<<"): delta="<<pD<<"cpos="<<cpos<<"newpos="<<newpos;
+	if( newpos != cpos )
+	{
+	    obj->setProperty("pos", newpos);
+	}
     }
+#endif
 
 }
 
@@ -255,12 +270,37 @@ bool GameState::pasteTryHarder( S11nNode const & root,
 	if( pc )
 	{
 	    //adjustPos( pc, pos );
-	    pc->setPos( pos );
+	    pc->setProperty( "pos", pos );
 	    this->addPiece(pc);
 	    return true;
 	}
     }
     catch(...) {}
+    GamePieceList * gli = 0;
+    try {
+	gli = s11nlite::deserialize<GamePieceList>(root);
+	if( gli )
+	{
+	    QPoint xpos( pos );
+	    QPoint step(8,8);
+	    //qDebug() << "GameState::pasteTryHarder(): pasting GamePieceList @"<<pos;
+	    impl->scene->clearSelection();
+	    for( GamePieceList::iterator it = gli->begin();
+		 it != gli->end(); ++it )
+	    {
+		(*it)->setProperty("pos", xpos);
+		this->addPiece( *it )->setSelected(true);
+		xpos += step;
+	    }
+	    gli->clearPieces(false);
+	    delete gli;
+	    return true;
+	}
+    }
+    catch(...) {
+	delete gli;
+	gli = 0;
+    }
     try {
 	Serializable * ser = s11nlite::deserialize<Serializable>(root);
 	if( ser )
@@ -274,6 +314,7 @@ bool GameState::pasteTryHarder( S11nNode const & root,
 		    adjustPos( obj, pos );
 		    obj->setProperty( "pos", pos );
 		}
+		qDebug() << "GameState::pasteTryHarder(): pasting Serializable QGI";
 		this->scene()->addItem( qgi );
 		return true;
 	    }
@@ -281,7 +322,7 @@ bool GameState::pasteTryHarder( S11nNode const & root,
 	}
     }
     catch(...) {}
-    // TODO: GamePieceList
+
     return false;
 }
 
