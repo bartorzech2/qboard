@@ -29,10 +29,12 @@
 
 struct MenuHandlerPiece::Impl
 {
-	QGraphicsScene * scene; 
-	Impl()
+	QGraphicsScene * scene;
+    QGIGamePiece * piece;
+    Impl() :
+	scene(0),
+	piece(0)
 	{
-		scene = 0;
 	}
 	~Impl()
 	{
@@ -52,12 +54,39 @@ MenuHandlerPiece::~MenuHandlerPiece()
 }
 
 
+void MenuHandlerPiece::copySelectedPieces()
+{
+    if( ! impl->scene ) return;
+    typedef QList<QGraphicsItem*> QGIL;
+    QGIL sel( impl->scene->selectedItems() );
+    GamePieceList pli;
+    for( QGIL::iterator it = sel.begin(); sel.end() != it; ++it )
+    {
+	QGIGamePiece * pcv = dynamic_cast<QGIGamePiece*>( *it );
+	if( ! pcv ) continue;
+	GamePiece * pc = pcv->piece();
+	if( ! pc ) continue;
+	pli.addPiece(pc);
+    }
+    try
+    {
+	S11nClipboard::instance().serialize( pli );
+    }
+    catch(...)
+    {
+    }
+    pli.clearPieces(false);
+}
+
 void MenuHandlerPiece::showHelp()
 {
     qboard::showHelpResource("Game Pieces", ":/QBoard/help/classes/GamePiece.html");
 }
 void MenuHandlerPiece::doMenu( QGIGamePiece * pv, QGraphicsSceneContextMenuEvent * ev )
 {
+    if( ! pv ) return;
+    impl->piece = pv;
+    impl->scene = pv->scene();
 	MenuHandlerCommon proxy;
 	ev->accept();
 	QMenu * m = proxy.createMenu( pv );
@@ -103,6 +132,11 @@ void MenuHandlerPiece::doMenu( QGIGamePiece * pv, QGraphicsSceneContextMenuEvent
 	m->addSeparator();
 	MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( pv, m );
 	m->addAction(QIcon(":/QBoard/icon/editcopy.png"),"Copy",clipper,SLOT(clipboardCopy()) );
+	if( pc && pv->isSelected() )
+	{
+	    QMenu * mcopy = m->addMenu("Copy...");
+	    mcopy->addAction(QIcon(":/QBoard/icon/editcopy.png"),"Pieces as GamePieceList",this,SLOT(copySelectedPieces()) );
+	}
 	m->addAction(QIcon(":/QBoard/icon/editcut.png"),"Cut",clipper,SLOT(clipboardCut()) );
 	m->addSeparator();
 #endif
