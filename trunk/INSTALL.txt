@@ -16,7 +16,7 @@ Then just type:
 The binaries will be in ./bin, and can be run from there or copied to
 a directory of your choice.
 
-When you first start QBoars, it checks for the directory ~/.QBoard,
+When you first start QBoard, it checks for the directory ~/.QBoard,
 prompting you to create it if needed. For QBoard to be useful, you'll
 need to copy some gaming materials (graphics files) into that
 directory. The setup wizard will remind you of what needs to be done.
