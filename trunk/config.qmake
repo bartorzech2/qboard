@@ -153,6 +153,8 @@ QBOARD_HEADERS_LIB = \
  $$SRC_DIR/S11nQt.h \
  $$SRC_DIR/S11nQtList.h \
  $$SRC_DIR/S11nQtListReg.h \
+ $$SRC_DIR/S11nQtMap.h \
+ $$SRC_DIR/S11nQtMapReg.h \
  $$SRC_DIR/Serializable.h \
  $$SRC_DIR/SetupQBoard.h \
  $$SRC_DIR/reg_qt_s11n.h \
