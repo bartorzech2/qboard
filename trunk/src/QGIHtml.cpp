@@ -74,7 +74,7 @@ bool QGIHtml::event( QEvent * e )
 	if( ! chev ) break; 
 	QByteArray bakey( chev->propertyName() );
 	const QString key( bakey );
-	qDebug() << "QGIHtml::event(): DynamicPropertyChange: propery key ="<<key;
+	if(0) qDebug() << "QGIHtml::event(): DynamicPropertyChange: propery key ="<<key;
 	if( ! map.contains(key) ) break;
 	char const * ckey = bakey.constData();
 	QVariant val( this->property(ckey) );
