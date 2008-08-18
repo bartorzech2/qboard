@@ -51,9 +51,9 @@ private Q_SLOTS:
 	void chdir(const QDir & dir);
     void clipboardUpdated();
     void clearClipboard();
-//     void slotCopy();
-//     void slotCut();
-//     void slotPaste();
+     void slotCopy();
+     void slotCut();
+     void slotPaste();
 private:
 	struct Impl;
 	Impl * impl;

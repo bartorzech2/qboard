@@ -120,6 +120,9 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	connect( this->actionClearBoard, SIGNAL(triggered(bool)), this, SLOT(clearBoard()) );
 	connect( this->actionQuickSave, SIGNAL(triggered(bool)), this, SLOT(quickSave()) );
 	connect( this->actionQuickLoad, SIGNAL(triggered(bool)), this, SLOT(quickLoad()) );
+	connect( this->actionCopy, SIGNAL(triggered(bool)), this, SLOT(slotCopy()) );
+	connect( this->actionCut, SIGNAL(triggered(bool)), this, SLOT(slotCut()) );
+	connect( this->actionPaste, SIGNAL(triggered(bool)), this, SLOT(slotPaste()) );
 
 #if ! QBOARD_VERSION
 	// For "end user builds" we won't show this action.
@@ -194,18 +197,19 @@ void MainWindowImpl::clearClipboard()
 
 void MainWindowImpl::clipboardUpdated()
 {
-  QString msg(tr("Clipboard updated: "));
-  S11nClipboard & cb( S11nClipboard::instance() );
-    S11nNode const * c = cb.contents();
-    if( !c )
+    QString msg(tr("Clipboard updated: "));
+    S11nClipboard & cb( S11nClipboard::instance() );
+    if( ! cb.contents() )
     {
 	msg += "cleared";
 	this->actionClearClipboard->setEnabled( false );
+	this->actionPaste->setEnabled( false );
     }
     else
     {
 	msg += cb.contentLabel();
 	this->actionClearClipboard->setEnabled( true );
+	this->actionPaste->setEnabled( true );
     }
     this->statusBar()->showMessage( msg );
 }
@@ -635,15 +639,95 @@ void MainWindowImpl::quickSave()
     this->saveGame( quickSaveFileName(impl->gstate) );
 }
 
-// void MainWindowImpl::slotCopy()
-// {
-//     qboard::clipboardGraphicsItems( impl->gv, true );
-// }
-// void MainWindowImpl::slotCut()
-// {
-//     qboard::clipboardGraphicsItems( impl->gv, false );
-// }
-// void MainWindowImpl::slotPaste()
-// {
-//     bool pasteGraphicsItems( impl->gstate, QPoint() );
-// }
+
+static QGraphicsItem * firstSelectedQGI( QGraphicsScene * sc )
+{
+    if( ! sc ) return 0;
+    typedef QList<QGraphicsItem *> QGIL;
+    QGIL li = sc->selectedItems();
+    QGraphicsItem * qgi = 0;
+    for( QGIL::iterator it = li.begin();
+	 li.end() != it; ++it )
+    {
+	if( (*it)->isSelected() )
+	{
+	    qgi = *it;
+	    break;
+	}
+    }
+    return qgi;
+}
+
+//! Don't use this!
+static QPoint calculateCenter( QGraphicsItem * qgi )
+{
+    typedef QList<QGraphicsItem*> QGIL;
+    QGIL li;
+    if( qgi->isSelected() )
+    {
+	li = qgi->scene()->selectedItems();
+    }
+    else
+    {
+	li.push_back(qgi);
+    }
+    QPoint ret;
+    // find a middle point.
+    int left = 0;
+    int right = 0;
+    int top = 0;
+    int bottom = 0;
+    for( QGIL::iterator it = li.begin();
+	 li.end() != it; ++it )
+    {
+	QGraphicsItem * gvi = *it;
+	QPoint ip( gvi->pos().toPoint() );
+	QRect ir( gvi->boundingRect().toRect() );
+	int tmp = ip.x() + (ir.width() - ir.x());
+	if( tmp > right ) right = tmp;
+	else if( tmp < left ) left = tmp;
+	tmp = ip.y() + (ir.height() - ir.y());
+	if( tmp < top ) top = tmp;
+	else if( tmp > bottom ) bottom = tmp;
+    }
+    return QPoint( (left + right) / 2, (top + bottom) / 2);
+}
+
+void MainWindowImpl::slotCopy()
+{
+    //qboard::clipboardGraphicsItems( impl->gv, true );
+    QGraphicsItem * qgi = firstSelectedQGI( impl->gstate.scene() );
+    if( qgi )
+    {
+	//qboard::clipboardScene( qgi->scene(), true, QPoint() );
+	//qboard::clipboardScene( qgi->scene(), true, qgi->pos().toPoint() );
+	qboard::clipboardScene( qgi->scene(), true, calculateCenter(qgi) );
+	this->statusBar()->showMessage( tr("Selected items were copied to the clipboard.") );
+    }
+    else
+    {
+	this->statusBar()->showMessage( tr("Copy: no on-board items selected") );
+    }
+}
+
+void MainWindowImpl::slotCut()
+{
+    QGraphicsItem * qgi = firstSelectedQGI( impl->gstate.scene() );
+    if( qgi )
+    {
+	qboard::clipboardScene( qgi->scene(), false, QPoint() );
+	//qboard::clipboardScene( qgi->scene(), false, qgi->pos().toPoint() );
+	qboard::clipboardScene( qgi->scene(), false, calculateCenter(qgi) );
+	this->statusBar()->showMessage( tr("Selected items were cut to the clipboard.") );
+    }
+    else
+    {
+	this->statusBar()->showMessage( tr("Cut: no on-board items selected") );
+    }
+}
+
+void MainWindowImpl::slotPaste()
+{
+    //bool pasteGraphicsItems( impl->gstate, QPoint() );
+    impl->gstate.pasteClipboard( QPoint() );
+}

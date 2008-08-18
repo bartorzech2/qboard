@@ -18,6 +18,10 @@
 #include <QMetaProperty>
 #include <QDebug>
 #include <QPalette>
+#include <QMap>
+#include <QPixmap>
+
+
 #include <s11n.net/s11n/s11n.hpp>
 #include <s11n.net/s11n/functional.hpp>
 
@@ -51,7 +55,30 @@ struct GamePiece::Impl
 	    destructing(false)
 	{}
 	~Impl(){}
+//     typedef QPair<int,QPixmap> PixRef;
+//     typedef QMap<QString,PixRef> MapType;
+//     static MapType & pixrefs();
+//     static void addPixmapRef( QString const & key );
+//     static void removePixmapRef( QString const & key );
 };
+
+
+// GamePiece::Impl::MapType & GamePiece::Impl::pixrefs()
+// {
+//     static GamePiece::Impl::MapType bob;
+//     return bob;
+// }
+
+// void GamePiece::Impl::addPixmapRef( QString const & key )
+// {
+//     MapType & m( pixrefs() );
+//     MapType::iterator it( m.find( key ) );
+//     if( 
+// }
+
+// void GamePiece::Impl::removePixmapRef( QString const & key )
+// {
+// }
 
 GamePiece::GamePiece() : Serializable("GamePiece"),impl(new Impl)
 {

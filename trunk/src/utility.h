@@ -23,6 +23,7 @@
 class QPoint;
 class QGraphicsItem;
 class GameState;
+class QGraphicsScene;
 
 #define QBOARD_VERBOSE_DTOR if(1) qDebug()
 
@@ -137,7 +138,10 @@ namespace qboard
     */
     void showHelpResource( QString const & title, QString const & res );
 
+    bool clipboardScene( QGraphicsScene * gsc, bool copy, QPoint const & origin );
     /**
+       NO LONGER TRUE:
+
        If origin is not currently selected, then if it is-a
        Serializable it is copied to the system clipboard.  If origin
        is selected, all selected Serializables are copies. If the copy

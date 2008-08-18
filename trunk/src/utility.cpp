@@ -310,92 +310,48 @@ namespace qboard {
 	qgi->setTransform(QTransform().translate(x, y).rotate(angle).translate(-x, -y));
     }
 
-    bool clipboardGraphicsItems( QGraphicsItem * gvi, bool copy )
+    bool clipboardScene( QGraphicsScene * gsc, bool copy, QPoint const & origin )
     {
-	if(0) qDebug() <<"qboard::clipboardGraphicsItems("<<gvi<<","<<copy<<")";
-	if( ! gvi ) return false;
+	if(1) qDebug() <<"qboard::clipboardScene("<<gsc<<","<<copy<<","<<origin<<")";
 	typedef QList<QGraphicsItem *> QGIL;
-	QGIL selected;
 	QGIL toCut;
 	S11nClipboard & cb( S11nClipboard::instance() );
-	bool multi = false;
-	if( gvi->isSelected() )
-	{
-	    selected = gvi->scene()->selectedItems();
-	    multi = (selected.size() > 1);
-	}
+	QGIL selected( gsc->selectedItems() );
 	typedef QList<Serializable *> SerL;
 	SerL seritems;
 	GamePieceList pieces;
-	QPoint origin( gvi->pos().toPoint() );
-	if( multi )
-	{ // handle all selected items:
-	    for( QGIL::iterator it = selected.begin(); selected.end() != it; ++it )
-	    {
-		if( (*it)->parentItem() ) continue;
-		//qDebug() <<"qboard::clipboardGraphicsItems() marking " << *it;
-		if( !copy ) toCut.push_back(*it); // FIXME? only cut serializables?
-		if( (*it)->type() == QGITypes::GamePiece )
-		{ // i frigging hate this special handling of QGIGamePiece.
-		    QGIGamePiece * pcv = dynamic_cast<QGIGamePiece*>(*it);
-		    GamePiece * pc = pcv ? pcv->piece() : 0;
-		    if( pc )
-		    {
-			pieces.addPiece(pc);
-			if(0) qDebug() <<"qboard::clipboardGraphicsItems() copy/cut object is GamePiece:" << pc;
-		    }
-		    else
-		    {
-			if(0) qDebug() << (copy?"copy":"cut")<<"handler found QGIGamePiece with no associated GamePiece!"
-				 << "Skipping object "<<*it;
-		    }
-		    continue;
-		}
-		Serializable * ser = dynamic_cast<Serializable*>(*it);
-		if( ser )
-		{
-		    //if(0) qDebug() <<"qboard::clipboardGraphicsItems() marking for CUT " << *it;
-		    seritems.push_back(ser);
-		}
-		else
-		{
-		    if(0) qDebug() << (copy?"copy":"cut")<<"handler cannot handle non-Serializables."
-			     << "Skipping object "<<*it;
-		}
-	    }
-	}
-	else
-	{ // a single non-selected item:
-	    //if(0) qDebug() <<"qboard::clipboardGraphicsItems() single object " << gvi;
-	    if( ! copy ) toCut.push_back(gvi);
-	    if( gvi->type() == QGITypes::GamePiece )
-	    {
-		QGIGamePiece * pcv = dynamic_cast<QGIGamePiece*>(gvi);
+	for( QGIL::iterator it = selected.begin(); selected.end() != it; ++it )
+	{
+	    if( (*it)->parentItem() ) continue;
+	    //qDebug() <<"qboard::clipboardGraphicsItems() marking " << *it;
+	    if( !copy ) toCut.push_back(*it); // FIXME? only cut serializables?
+	    if( (*it)->type() == QGITypes::GamePiece )
+	    { // FIXME: i frigging hate this special handling of QGIGamePiece! Remove it once we have a Better Way!
+		QGIGamePiece * pcv = dynamic_cast<QGIGamePiece*>(*it);
 		GamePiece * pc = pcv ? pcv->piece() : 0;
 		if( pc )
 		{
+		    pc->setProperty("pos",pcv->pos().toPoint()); // FIXME! This is a kludge!
 		    pieces.addPiece(pc);
-		    if(0) qDebug() <<"qboard::clipboardGraphicsItems() single object is GamePiece:" << pc;
+		    if(0) qDebug() <<"qboard::clipboardGraphicsItems() copy/cut object is GamePiece:" << pc;
 		}
 		else
 		{
 		    if(0) qDebug() << (copy?"copy":"cut")<<"handler found QGIGamePiece with no associated GamePiece!"
-			     << "Skipping object!";
+				   << "Skipping object "<<*it;
 		}
+		continue;
+	    }
+	    Serializable * ser = dynamic_cast<Serializable*>(*it);
+	    if( ser )
+	    {
+		//if(0) qDebug() <<"qboard::clipboardGraphicsItems() marking for CUT " << *it;
+		seritems.push_back(ser);
 	    }
 	    else
 	    {
-		Serializable * ser = dynamic_cast<Serializable*>(gvi);
-		if( ! ser )
-		{
-		    if(0) qDebug() << (copy?"copy":"cut")<<"handler cannot handle non-Serializables."
-			     << "Skipping object "<<gvi;
-		}
-		else
-		{
-		    //if(0) qDebug() <<"qboard::clipboardGraphicsItems() single object is Serializable ??? " << ser;
-		    seritems.push_back(ser);
-		}
+		if(0) qDebug() << (copy?"copy":"cut")<<"handler cannot handle non-Serializables."
+			       << "Skipping object "<<*it;
 	    }
 	}
 	S11nNode * parent = S11nNodeTraits::create(GameState::KeyClipboard);
@@ -403,7 +359,10 @@ namespace qboard {
 	{
 	    bool ret = true;
 	    S11nNode & meta( s11n::create_child( *parent, "metadata") );
-	    ret = s11n::serialize_subnode( meta, "copyPos", origin );
+	    if( 1 ) //! origin.isNull() )
+	    {
+		ret = s11n::serialize_subnode( meta, "originPoint", origin );
+	    }
 	    if( ret && ! pieces.empty() )
 	    {
 		ret = s11n::serialize_subnode( *parent, "pieces", pieces );
@@ -442,10 +401,19 @@ namespace qboard {
 	S11nClipboard::S11nNode * cont = cb.contents();
 	if( cont )
 	{
-	    if(0) qDebug() <<"Clipboard contents:";
-	    s11nlite::save( *cont, std::cout );
+	    if(0)
+	    {
+		qDebug() <<"Clipboard contents:";
+		s11nlite::save( *cont, std::cout );
+	    }
 	}
 	return 0 != cont;
+    }
+    bool clipboardGraphicsItems( QGraphicsItem * gvi, bool copy )
+    {
+	if(0) qDebug() <<"qboard::clipboardGraphicsItems("<<gvi<<","<<copy<<")";
+	if( ! gvi ) return false;
+	return clipboardScene( gvi->scene(), copy, gvi->pos().toPoint() );
     }
 
 

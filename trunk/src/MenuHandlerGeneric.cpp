@@ -35,7 +35,30 @@ MenuHandlerCopyCut::~MenuHandlerCopyCut()
 #include "utility.h"
 void MenuHandlerCopyCut::clipboard( QGraphicsItem * gvi, bool copy )
 {
-    qboard::clipboardGraphicsItems( gvi, copy );
+    if( ! gvi ) return;
+    if( gvi->isSelected() )
+    {
+	qboard::clipboardGraphicsItems( gvi, copy );
+    }
+    else
+    {
+	if( gvi->parentItem() ) return;
+	Serializable * ser = dynamic_cast<Serializable*>( gvi );
+	if( ! ser ) return;
+	S11nClipboard::instance().serialize( *ser );
+	if( ! copy )
+	{
+	    QObject * obj = dynamic_cast<QObject *>( ser );
+	    if( obj )
+	    {
+		obj->deleteLater();
+	    }
+	    else
+	    {
+		delete gvi;
+	    }
+	}
+    }
 }
 void MenuHandlerCopyCut::clipboardCopy()
 {
@@ -78,11 +101,7 @@ void SceneSelectionDestroyer::destroyItem()
 }
 QMenu * MenuHandlerCommon::createMenu( QGraphicsItem *gi ) //, QGraphicsSceneContextMenuEvent *ev )
 {
-    QString label("Item...");
-    if( gi->isSelected() )
-    {
-	label = "Selected items...";
-    }
+    QString label = gi->isSelected() ? tr("Item...") : tr("Selected items...");
 #if 0
     QVariant vp( QVariant::fromValue( gi ) );
     QGraphicsItem * gpt = vp.value<QGraphicsItem*>(); 
