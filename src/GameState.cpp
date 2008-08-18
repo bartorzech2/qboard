@@ -265,7 +265,7 @@ bool GameState::pasteTryHarder( S11nNode const & root,
 	}
     }
     catch(...) {}
-    try {
+   try {
 	GamePiece * pc = s11nlite::deserialize<GamePiece>(root);
 	if( pc )
 	{
@@ -328,8 +328,9 @@ bool GameState::pasteTryHarder( S11nNode const & root,
 
 
 char const * GameState::KeyClipboard = "GameStateClipboardData";
-bool GameState::pasteClipboard( QPoint const & pos )
+bool GameState::pasteClipboard( QPoint const & target )
 {
+    qDebug() << "GameState::pasteClipboard("<<target<<")";
     typedef QList<QGraphicsItem *> QGIL;
     typedef QList<Serializable *> SerL;
     S11nNode const * root = S11nClipboard::instance().contents();
@@ -337,29 +338,19 @@ bool GameState::pasteClipboard( QPoint const & pos )
     if( ! root ) return false;
     if( (TR::name(*root) != KeyClipboard ) )
     {
-	return root ? this->pasteTryHarder(*root,pos) : false;
+	return root ? this->pasteTryHarder(*root,target) : false;
     }
+    QPoint origin(0,0);
     S11nNode const * node = 0;
-    node = s11n::find_child_by_name(*root, "metadata");
-    QPoint cpos;
-    if( node )
+    if( (node = s11n::find_child_by_name(*root, "metadata")) )
     {
-	s11nlite::deserialize_subnode( *node, "copyPos", cpos );
-    }
-    else
-    {
-	cpos = pos;
+	s11nlite::deserialize_subnode( *node, "originPoint", origin );
+	node = 0;
     }
     QPoint pD;
-    if( ! pos.isNull() && ! cpos.isNull() )
+    if( ! origin.isNull() ) // && !target.isNull()
     {
-#if 0
-	int xD = cpos.x() - pos.x();
-	int yD = cpos.y() - pos.y();
-	pD = QPoint( xD, yD );
-#else
-	pD = cpos - pos;
-#endif
+	pD = origin - target;
     }
     node = s11n::find_child_by_name(*root, "pieces");
     QGIL newSelected;
@@ -371,29 +362,59 @@ bool GameState::pasteClipboard( QPoint const & pos )
 	    return false;
 	}
 	GamePiece * pc = 0;
+	bool gotOrigin = false;
 	for( GamePieceList::iterator it = list.begin();
 	     list.end() != it;
 	     ++it )
 	{
 	    pc = *it;
-	    QPoint newpos;
+	    QPoint pcpos;
 	    QVariant vpos( pc->property("pos") );
 	    if( ! vpos.isValid() )
 	    {
-		newpos = pos;
+		pcpos = target;
 	    }
  	    else
  	    {
- 		newpos = vpos.toPoint();
+ 		pcpos = vpos.toPoint();
  	    }
-	    if( ! pD.isNull() )
+	    if( ! gotOrigin )
 	    {
-		newpos -= pD;
-		pc->setPieceProperty("pos",newpos);
+		gotOrigin = true;
+		if( ! origin.isNull() )
+		{
+		    if( target.isNull() )
+		    {
+			pD = QPoint();
+		    }
+		    else
+		    {
+			pD = origin - target;
+		    }
+		}
+		else
+		{
+		    if( target.isNull() )
+		    {
+			pD = QPoint();
+			origin = pcpos;
+		    }
+		    else
+		    {
+			origin = pcpos;
+			pD = pcpos - target;
+		    }
+// 		    pD = (target.isNull()
+// 			  ? pcpos
+// 			  : target)
+// 			- target;
+		}
 	    }
+	    pcpos -= pD;
+	    pc->setPieceProperty("pos",pcpos);
 	    newSelected.push_back( this->addPiece( pc ) );
 	    if(0) qDebug() << "qboard::pasteGraphicsItems() pasting piece:"<<pc
-			   << "\nclickpos ="<<cpos<<", reqpos ="<<pos<<", newpos ="<<newpos<<"delta ="<<pD;
+			   << "\norigin ="<<origin<<", target ="<<target<<", pcpos ="<<pcpos<<"delta ="<<pD;
 	}
 	list.clearPieces(false);
 	//causing a crash: this->pieces().takePieces( list );

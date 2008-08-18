@@ -35,7 +35,7 @@ public Q_SLOTS:
         void showHelp();
 	void doMenu( QGIGamePiece *, QGraphicsSceneContextMenuEvent * );
 private Q_SLOTS:
-    void copySelectedPieces();
+    void copyPieceList();
 private:
 	struct Impl;
 	Impl * impl;

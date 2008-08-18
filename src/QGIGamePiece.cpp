@@ -170,12 +170,14 @@ void QGIGamePiece::setPiece( GamePiece * pc )
 
 bool QGIGamePiece::event( QEvent * e )
 {
+#if 0
 	if( e->type() == QEvent::DynamicPropertyChange )
 	{
 		e->accept();
 		this->update();
 		return true;
 	}
+#endif
 	return QObject::event(e);
 }
 
@@ -293,9 +295,15 @@ void QGIGamePiece::piecePropertySet( char const *pname )
 	if( "pixmap" == key )
 	{
 		QPixmap pix;
-		QString fname( var.toString() );
-		if( pix.load( fname ) && m_pc )
+		if( var.canConvert<QPixmap>() )
 		{
+		    impl->pixmap = var.value<QPixmap>();
+		}
+		else if( var.canConvert<QString>() )
+		{
+		    QString fname( var.toString() );
+		    if( pix.load( fname ) && m_pc )
+		    {
 			// FIXME: this can theoretically ping-png forever if
 			// two views are watching the same piece, as they only
 			// block their own updates. We can't just call
@@ -304,31 +312,32 @@ void QGIGamePiece::piecePropertySet( char const *pname )
 			impl->block = true;
 			m_pc->setPieceProperty("size",pix.size());
 			impl->block = false;
-		}
-		else
-		{
+		    }
+		    else
+		    {
 			pix = QPixmap(300,40);
 			QPainter pain(&pix);
 			pain.fillRect( pix.rect(), Qt::yellow );
-			QFont font( "courier", 9 );
+			QFont font( "courier", 8 );
 			pain.setFont( font ); 
 			pain.setPen( QPen(Qt::red) );
 			pain.drawText(5,font.pointSize()+6,"Error loading pixmap:");
 			pain.drawText(5,pix.height()-6,fname);
-		}
+		    }
+		} // var.canConvert<QString>()
 		this->impl->pixmap = pix;
 		if(1)
 		{
-			// Kludge to ensure that this type's shape is properly set. We don't want
-			// the parent class to have the real pixmap, so that we can control all
-			// painting ourselves.
-			QPixmap bogus( pix.size() );
-			bogus.fill( QColor(Qt::transparent) );
-			this->setPixmap(bogus);
+		    // Kludge to ensure that this type's shape is properly set. We don't want
+		    // the parent class to have the real pixmap, so that we can control all
+		    // painting ourselves.
+		    QPixmap bogus( pix.size() );
+		    bogus.fill( QColor(Qt::transparent) );
+		    this->setPixmap(bogus);
 		}
 		this->update();
 		return;
-	}
+	} // pixmap property
 }
 void QGIGamePiece::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 {
@@ -433,8 +442,8 @@ QVariant QGIGamePiece::itemChange(QGraphicsItem::GraphicsItemChange change, cons
 		if( !impl->block && m_pc )
 		{
 			impl->block = true;
-			// this causes WAY too many events to fire:
-			//m_pc->setPieceProperty("pos",value);
+			// this causes WAY too many events to fire in common cases,
+			// e.g. dragging several selected pieces.
 			m_pc->setProperty("pos",value);
 			impl->block = false;
 			// ^^^ We have to be careful here to avoid that we 
