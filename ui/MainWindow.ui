@@ -298,7 +298,7 @@
     <string>Zoom &amp;100%</string>
    </property>
    <property name="shortcut" >
-    <string comment="Reset board zoom level" >Alt+R</string>
+    <string comment="Reset board zoom level" >Ctrl+Z</string>
    </property>
   </action>
   <action name="actionRefreshFileList" >
