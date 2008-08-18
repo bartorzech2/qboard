@@ -2,10 +2,9 @@
 #labels Featured,Docs-User
 = HOWTO: getting started with QBoard =
 
-This guide gives a brief overview of how to get started with QBoard.
+This guide gives a brief overview of how to get started with QBoard and how to use its more significant features.
 
-== QBoard Home Directory ==
-
+== First: QBoard Home Directory ==
 
 To allow us to save relative paths in our data files, we need a common root directory which is portable across platforms. To that end, we request that you store all QBoard-related data files under the QBoard home directory (`~/.QBoard`). QBoard tries its best to make sure you stay inside the home directory. For example, when loading graphics files for pieces and boards, it uses a path relative to the home, if possible, as this makes the saved data portable to other machines (or if the QBoard home dir changes). 
 
@@ -32,18 +31,26 @@ QBoard-specific application data.
 
   * To save a game, click the Save button or File->Save menu item. That will save the entire game state.
   * It is in principal possible to save any in-game object individually (e.g. individual pieces or JUST the board, without the pieces), but there is currently no UI for doing so.
+  * Use the Quicksave and Quickload features to quickly save and load.
 
-== Tips and Tricks ==
+== Minimaps ==
 
-=== Piece style templates ==
+QBoard has a main board view and any number of "minimaps", which are simply copies of the board view which start out at a smaller scale. The minimaps can be zoomed in/out to any degree the main map supports by using Ctrl-ScrollWheel while hovering over the view.
+
+However - having any scaled board view active _drastically_ cuts performance of on-board drag operations, especially once a few items are selected. As in "unusably slow". There are two known workarounds:
+
+  * Use the right-click menues to enable OpenGL mode in the mini view and disable it in the main view, and keep the main view _unscaled_. In my experience, this solves the "drag slowdowns" problem (but can cause other graphics glitches in the minimap, at least on my platform).
+  * Open a minimap only when you need it, and close it when you're done. :/
+
+In any case, try to avoid zooming the main view unless you need it temporarily. There's a hotkey to zoom back to 100% - look in the Board menu of QBoard for the key combination.
+
+== Piece style templates ==
 
 The colorful squares in the bottom/left of the main window are piece style templates. If you click one of those, newly-added pieces will take on that style. Use the right-click menu to edit them. You can also paste items copied from the board into this area, so you can customize your templates any way you like.
 
 The templates area is saved automatically when QBoard exits. If you have hosed your templates beyond repair and want to start with a new set, close QBoard, delete the file `~/.QBoard/QBoard/persistance/MainWindow/default-templates`, then start QBoard. Deleting or replacing the file while QBoard is open will have no effect and the file will be replaced or overwritten when QBoard exits.
 
 
-=== The clipboard ===
+== The clipboard ==
 
 Most in-play objects can be copied, cut, and pasted within the board. When objects are copied or cut, their data is available as text in the Qt clipboard, which means you can paste it into another application (e.g. a text editor). From there, you can edit it, copy it, and paste it back into QBoard.
-
-Unfortunately, QBoard currently has no keyboard shortcuts for Copy/Paste. This has to do with some objects not having enough access to other objects in the context of the events. Maybe it'll be fixed some day.
