@@ -138,10 +138,14 @@ namespace qboard
     */
     void showHelpResource( QString const & title, QString const & res );
 
+    /**
+       Works like clipboardGraphicsItems(), but takes a reference
+       point (origin) to store in the serialized data. That point is
+       used by paste operations to calculate the new position of
+       pasted items, so as to keep their relative positions intact.
+    */
     bool clipboardScene( QGraphicsScene * gsc, bool copy, QPoint const & origin );
     /**
-       NO LONGER TRUE:
-
        If origin is not currently selected, then if it is-a
        Serializable it is copied to the system clipboard.  If origin
        is selected, all selected Serializables are copies. If the copy
@@ -184,6 +188,17 @@ namespace qboard
        Transforms qgi to be rotated around its centerpoint.
     */
     void rotateCentered( QGraphicsItem * qgi, qreal angle );
+
+
+    /**
+       Calculates the middle point of one or more QGraphicsItems.
+
+       If qgi is selected, then this function calculates the middle
+       point of the largest bounding rectangle of all selected
+       items. If qgi is not selected then the coordinates of its
+       center point are returned.
+    */
+    QPoint calculateCenter( QGraphicsItem * qgi );
 
 }
 
