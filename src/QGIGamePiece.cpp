@@ -171,14 +171,35 @@ void QGIGamePiece::setPiece( GamePiece * pc )
 bool QGIGamePiece::event( QEvent * e )
 {
 #if 0
-	if( e->type() == QEvent::DynamicPropertyChange )
+    typedef QMap<QString,bool> PropMarkMap;
+    static PropMarkMap map;
+    if( map.isEmpty() )
+    {
+	map["pos"] = 1;
+    }
+    while( e->type() == QEvent::DynamicPropertyChange )
+    {
+	QDynamicPropertyChangeEvent *chev = dynamic_cast<QDynamicPropertyChangeEvent *>(e);
+	if( ! chev ) break; 
+	QByteArray bakey( chev->propertyName() );
+	const QString key( bakey );
+	if(0) qDebug() << "QGIGamePiece::event(): DynamicPropertyChange: propery key ="<<key;
+	if( ! map.contains(key) ) break;
+	char const * ckey = bakey.constData();
+	QVariant val( this->property(ckey) );
+	if( QString("pos") == key )
 	{
-		e->accept();
-		this->update();
-		return true;
+	    this->setPos( val.toPoint() );
 	}
+	else
+	{
+	    break;
+	}
+	e->accept();
+	return true;
+    }
 #endif
-	return QObject::event(e);
+    return QObject::event(e);
 }
 
 void QGIGamePiece::piecePropertySet( char const *pname )
@@ -436,28 +457,30 @@ QRectF QGIGamePiece::boundingRect() const
 
 QVariant QGIGamePiece::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
-#if 0
-	if( change == ItemPositionHasChanged )
+#if 1
+    if( change == ItemPositionHasChanged )
+    { // i hate this, but it's the only way to guaranty that
+	// GamePiece["pos"] and this->pos() stay in sync during moves via
+	// e.g. dragging of multiple selected items.
+	if( !impl->block && m_pc )
 	{
-		if( !impl->block && m_pc )
-		{
-			impl->block = true;
-			// this causes WAY too many events to fire in common cases,
-			// e.g. dragging several selected pieces.
-			m_pc->setProperty("pos",value);
-			impl->block = false;
-			// ^^^ We have to be careful here to avoid that we 
-			// end up moving this object again during this handler, which the Qt docs say
-			// not to do.
-			// For the basic use case, setProperty() is fine, but if there are other objects
-			// watching m_pc (e.g. an editor widget) then the pos property change won't be
-			// visible, so we need setPieceProperty(). Thus the impl->block kludge to avoid
-			// a potential event loop.
-		}
+	    impl->block = true;
+	    // this causes WAY too many events to fire in common cases,
+	    // e.g. dragging several selected pieces.
+	    m_pc->setPieceProperty("pos",value);
+	    impl->block = false;
+	    // ^^^ We have to be careful here to avoid that we end up
+	    // moving this object again during this handler, which the
+	    // Qt docs say not to do.
+	    // For the basic use case, setProperty() is fine, but if there are other objects
+	    // watching m_pc (e.g. an editor widget) then the pos property change won't be
+	    // visible, so we need setPieceProperty(). Thus the impl->block kludge to avoid
+	    // a potential event loop.
 	}
-	return value;
+    }
+    return value;
 #else
-	return QGraphicsPixmapItem::itemChange(change,value);
+    return QGraphicsPixmapItem::itemChange(change,value);
 #endif
 }
 void QGIGamePiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget )

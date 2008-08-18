@@ -189,16 +189,19 @@ namespace qboard
     */
     void rotateCentered( QGraphicsItem * qgi, qreal angle );
 
+    /**
+       Calculates the bounding rectangle of one or more QGraphicsItems.
+
+       If qgi is selected, then this function calculates the bounds
+       point of the largest bounding rectangle of all selected
+       items. If qgi is not selected then the bounds of qgi returned.
+    */
+    QRectF calculateBounds( QGraphicsItem * qgi );
 
     /**
-       Calculates the middle point of one or more QGraphicsItems.
-
-       If qgi is selected, then this function calculates the middle
-       point of the largest bounding rectangle of all selected
-       items. If qgi is not selected then the coordinates of its
-       center point are returned.
+       Calculates the middle point of calculateBounds(qgi).
     */
-    QPoint calculateCenter( QGraphicsItem * qgi );
+    QPointF calculateCenter( QGraphicsItem * qgi );
 
 }
 

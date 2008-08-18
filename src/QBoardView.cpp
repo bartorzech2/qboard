@@ -244,7 +244,7 @@ void QBoardView::wheelEvent(QWheelEvent *event)
     //horizontalScrollBar()->setRange(0, vsz.width() - mysz.width());
 #endif
 }
-static const double BoardZoomScaleFactor = 0.25;
+static const double BoardZoomScaleFactor = 0.50;
 void QBoardView::zoomIn()
 {
     this->zoom( impl->scale + BoardZoomScaleFactor );
