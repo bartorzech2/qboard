@@ -83,6 +83,23 @@ void MenuHandlerPiece::showHelp()
     qboard::showHelpResource("Game Pieces", ":/QBoard/help/classes/GamePiece.html");
 }
 
+bool MenuHandlerPiece::copyPiece()
+{
+    GamePiece * pc = impl->pview ? impl->pview->piece() : 0;
+    return pc
+	? S11nClipboard::instance().serialize( *pc )
+	: false;
+}
+
+bool MenuHandlerPiece::cutPiece()
+{
+    if( this->copyPiece() )
+    {
+	impl->pview->piece()->deleteLater();
+    }
+    return false;
+}
+
 void MenuHandlerPiece::doMenu( QGIGamePiece * pv, QGraphicsSceneContextMenuEvent * ev )
 {
     if( ! pv ) return;
@@ -132,13 +149,22 @@ void MenuHandlerPiece::doMenu( QGIGamePiece * pv, QGraphicsSceneContextMenuEvent
 #if 1
 	m->addSeparator();
 	MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( pv, m );
-	m->addAction(QIcon(":/QBoard/icon/editcopy.png"),"Copy",clipper,SLOT(clipboardCopy()) );
-	if( pc && pv->isSelected() )
+	if( pc )
 	{
-	    QMenu * mcopy = m->addMenu("Copy...");
-	    mcopy->addAction(QIcon(":/QBoard/icon/editcopy.png"),"Pieces as GamePieceList",this,SLOT(copyPieceList()) );
+	    if( pv->isSelected() )
+	    {
+		m->addAction(QIcon(":/QBoard/icon/editcopy.png"),tr("Copy selected"),clipper,SLOT(clipboardCopy()) );
+		m->addAction(QIcon(":/QBoard/icon/editcut.png"),"Cut selected",clipper,SLOT(clipboardCut()) );
+		QMenu * mcopy = m->addMenu(tr("Copy..."));
+		mcopy->addAction(QIcon(":/QBoard/icon/editcopy.png"),"Pieces as GamePieceList",this,SLOT(copyPieceList()) );
+	    }
+	    else
+	    {
+		m->addAction(QIcon(":/QBoard/icon/editcopy.png"),tr("Copy"),this,SLOT(copyPiece()) );
+		m->addAction(QIcon(":/QBoard/icon/editcut.png"),"Cut",this,SLOT(cutPiece()) );
+	    }
 	}
-	m->addAction(QIcon(":/QBoard/icon/editcut.png"),"Cut",clipper,SLOT(clipboardCut()) );
+
 	m->addSeparator();
 #endif
 	m->addSeparator();

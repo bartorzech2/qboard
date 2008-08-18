@@ -13,21 +13,22 @@
 
 #include "MainWindowImpl.h"
 //#include <QtScript>
-#include <QGridLayout>
-#include <QSplitter>
-#include <QDockWidget>
+#include <QCursor>
 #include <QDebug>
-#include <QFileDialog>
-#include <QScrollArea>
-#include <QRegExp>
-#include <QGraphicsView>
-#include <QGraphicsScene>
-#include <QMessageBox>
-#include <QScrollBar>
-#include <QPrinter>
-#include <QPrintDialog>
 #include <QDialog>
+#include <QDockWidget>
+#include <QFileDialog>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QGridLayout>
 #include <QMessageBox>
+#include <QMessageBox>
+#include <QPrintDialog>
+#include <QPrinter>
+#include <QRegExp>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QSplitter>
 
 #include <cmath>
 #include <s11n.net/s11n/s11nlite.hpp>
@@ -443,7 +444,7 @@ bool MainWindowImpl::loadGame()
 
 void MainWindowImpl::launchNewBoardView()
 {
-    const qreal zm(0.20);
+    const qreal zm(0.25);
     QBoardView * v = new QBoardView( this->impl->gstate );
     v->zoom(zm);
 	QDockWidget * win = new QDockWidget( "QBoard View", this );
@@ -659,41 +660,72 @@ static QGraphicsItem * firstSelectedQGI( QGraphicsScene * sc )
 }
 
 
-void MainWindowImpl::slotCopy()
+static void clipboardQGI( QStatusBar * sb, QGraphicsScene * sc, bool copy )
 {
-    //qboard::clipboardGraphicsItems( impl->gv, true );
-    QGraphicsItem * qgi = firstSelectedQGI( impl->gstate.scene() );
+    QGraphicsItem * qgi = firstSelectedQGI( sc );
     if( qgi )
     {
-	qboard::clipboardScene( qgi->scene(), true, QPoint() );
-	//qboard::clipboardScene( qgi->scene(), true, qgi->pos().toPoint() );
-	//qboard::clipboardScene( qgi->scene(), true, calculateCenter(qgi) );
-	this->statusBar()->showMessage( tr("Selected items were copied to the clipboard.") );
+	QPoint pos;
+#if 1
+	QRectF r( qboard::calculateBounds( qgi ) );
+	qDebug() << "clipboardQGI() rect ="<<r;
+	pos = r.topLeft().toPoint();
+#else
+	//pos = qgi->pos().toPoint();
+	//pos = qboard::calculateCenter(qgi).toPoint();
+	//pos = impl->gv->placementPos();
+#endif
+	qboard::clipboardScene( qgi->scene(), copy, pos );
+
+	sb->showMessage( QString("Selected items were %1 to the clipboard.").arg(copy?"copied":"cut") );
     }
     else
     {
-	this->statusBar()->showMessage( tr("Copy: no on-board items selected") );
+	sb->showMessage( QString("%1: no on-board items selected").arg(copy?"copy":"cut") );
     }
+
+}
+
+void MainWindowImpl::slotCopy()
+{
+    clipboardQGI( this->statusBar(), impl->gstate.scene(), true  );
+//     else
+//     {
+// 	this->statusBar()->showMessage( tr("Copy: no on-board items selected") );
+//     }
 }
 
 void MainWindowImpl::slotCut()
 {
-    QGraphicsItem * qgi = firstSelectedQGI( impl->gstate.scene() );
-    if( qgi )
+    clipboardQGI( this->statusBar(), impl->gstate.scene(), false  );
+//     else
+//     {
+// 	this->statusBar()->showMessage( tr("Cut: no on-board items selected") );
+//     }
+}
+
+static QPoint findBoardPastePoint( QGraphicsView * board )
+{
+    QPoint ret;
+    QWidget * vp = board->viewport();
+    qDebug() << "findBoardPastePoint("<<board<<") viewport ="<<vp
+	     << "viewport parent ="<<vp->parent();
+    QPoint glpos( QCursor::pos() );
+    QWidget * wa = QApplication::widgetAt( glpos );
+    qDebug() << "findBoardPastePoint("<<board<<") widgetAt("<<glpos<<") ="<<wa;
+    if( wa == vp )
     {
-	qboard::clipboardScene( qgi->scene(), false, QPoint() );
-	//qboard::clipboardScene( qgi->scene(), false, qgi->pos().toPoint() );
-	//qboard::clipboardScene( qgi->scene(), false, calculateCenter(qgi) );
-	this->statusBar()->showMessage( tr("Selected items were cut to the clipboard.") );
+	ret = board->mapFromGlobal( glpos );
+	qDebug() << "findBoardPastePoint("<<board<<") mapFromGlobal("<<glpos<<") ="<<ret;
     }
-    else
-    {
-	this->statusBar()->showMessage( tr("Cut: no on-board items selected") );
-    }
+    return ret;
 }
 
 void MainWindowImpl::slotPaste()
 {
     //bool pasteGraphicsItems( impl->gstate, QPoint() );
-    impl->gstate.pasteClipboard( QPoint() );
+    //impl->gstate.pasteClipboard( QPoint() );
+    impl->gstate.pasteClipboard( findBoardPastePoint(impl->gv) );
+    //impl->gstate.pasteClipboard( impl->gv->placementPos() ); // too randomish
+
 }

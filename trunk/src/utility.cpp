@@ -414,8 +414,10 @@ namespace qboard {
 	return clipboardScene( gvi->scene(), copy, gvi->pos().toPoint() );
     }
 
-    QPoint calculateCenter( QGraphicsItem * qgi )
+
+    QRectF calculateBounds( QGraphicsItem * qgi )
     {
+	if( ! qgi ) return QRectF();
 	typedef QList<QGraphicsItem*> QGIL;
 	QGIL li;
 	if( qgi->isSelected() )
@@ -426,26 +428,51 @@ namespace qboard {
 	{
 	    li.push_back(qgi);
 	}
-	QPoint ret;
-	// find a middle point.
-	int left = 0;
-	int right = 0;
-	int top = 0;
-	int bottom = 0;
+#if 1
+	QRectF un;
+	for( QGIL::iterator it = li.begin();
+	     li.end() != it; ++it )
+	{
+	    QGraphicsItem * gi = *it;
+	    un = un.unite( QRectF( gi->pos(), gi->boundingRect().size() ) );
+	}
+	return un;
+#else
+	qreal left = 0;
+	qreal right = 0;
+	qreal top = 0;
+	qreal bottom = 0;
+	int count = 0;
 	for( QGIL::iterator it = li.begin();
 	     li.end() != it; ++it )
 	{
 	    QGraphicsItem * gvi = *it;
-	    QPoint ip( gvi->pos().toPoint() );
-	    QRect ir( gvi->boundingRect().toRect() );
-	    int tmp = ip.x() + (ir.width() - ir.x());
+	    QPointF ip( gvi->pos() );
+	    QRectF ir( gvi->boundingRect() );
+	    qreal tmp = ip.x() + (ir.width() - ir.x());
+	    if( 1 == ++count )
+	    {
+		left = ip.x();
+		top = ip.y();
+		right = left + ir.width();
+		bottom = top + ir.height();
+	    }
 	    if( tmp > right ) right = tmp;
 	    else if( tmp < left ) left = tmp;
 	    tmp = ip.y() + (ir.height() - ir.y());
 	    if( tmp < top ) top = tmp;
 	    else if( tmp > bottom ) bottom = tmp;
 	}
-	return QPoint( (left + right) / 2, (top + bottom) / 2);
+	return QRectF( left, top, right-left, bottom-top );
+#endif
+    }
+
+    QPointF calculateCenter( QGraphicsItem * qgi )
+    {
+	QRectF r( calculateBounds(qgi) );
+	qDebug() << "qboard::calculateCenter("<<qgi<<"):"<<r;
+	return QPointF( r.left() + (r.width() / 2),
+			r.top() + (r.height() / 2) );
     }
 
 

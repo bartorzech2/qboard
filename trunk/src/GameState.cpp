@@ -160,11 +160,15 @@ bool GameState::serialize( S11nNode & dest ) const
 	GamePiece * pc = v->piece();
 	if( ! pc ) continue;
 	QVariant ppos( pc->property("pos") );
-	if( ! ppos.isValid() )
-	{
-	    pc->setProperty("pos",v->pos().toPoint() );
-	    // ^^^^ Note that we do not use setPieceProperty() to avoid triggering a piecePropertySet() signal.
-	    qDebug() << "WARNING: GameState::serialize() kludge: setting 'pos' property for piece.";
+	if( 1 )
+	{ // Kludge to enforce proper piece
+	    QPoint vpos( v->pos().toPoint() );
+	    if( ppos.toPoint() != vpos )
+	    {
+		pc->setProperty( "pos", vpos );
+		// ^^^^ Note that we do not use setPieceProperty() to avoid triggering a piecePropertySet() signal.
+		qDebug() << "WARNING: GameState::serialize() kludge: setting 'pos' property for piece.";
+	    }
 	}
     }
     return s11n::serialize_subnode( dest, "board", this->impl->board )
@@ -348,10 +352,10 @@ bool GameState::pasteClipboard( QPoint const & target )
 	node = 0;
     }
     QPoint pD;
-    if( ! origin.isNull() ) // && !target.isNull()
-    {
-	pD = origin - target;
-    }
+//     if( ! origin.isNull() ) // && !target.isNull()
+//     {
+// 	pD = origin - target;
+//     }
     node = s11n::find_child_by_name(*root, "pieces");
     QGIL newSelected;
     if( node )
@@ -381,18 +385,7 @@ bool GameState::pasteClipboard( QPoint const & target )
 	    if( ! gotOrigin )
 	    {
 		gotOrigin = true;
-		if( ! origin.isNull() )
-		{
-		    if( target.isNull() )
-		    {
-			pD = QPoint();
-		    }
-		    else
-		    {
-			pD = origin - target;
-		    }
-		}
-		else
+		if( origin.isNull() )
 		{
 		    if( target.isNull() )
 		    {
@@ -408,6 +401,17 @@ bool GameState::pasteClipboard( QPoint const & target )
 // 			  ? pcpos
 // 			  : target)
 // 			- target;
+		}
+		else
+		{
+		    if( target.isNull() )
+		    {
+			pD = QPoint();
+		    }
+		    else
+		    {
+			pD = origin - target;
+		    }
 		}
 	    }
 	    pcpos -= pD;

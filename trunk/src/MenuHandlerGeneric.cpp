@@ -60,6 +60,7 @@ void MenuHandlerCopyCut::clipboard( QGraphicsItem * gvi, bool copy )
 	}
     }
 }
+
 void MenuHandlerCopyCut::clipboardCopy()
 {
     this->clipboard( m_gi, true );
@@ -101,7 +102,7 @@ void SceneSelectionDestroyer::destroyItem()
 }
 QMenu * MenuHandlerCommon::createMenu( QGraphicsItem *gi ) //, QGraphicsSceneContextMenuEvent *ev )
 {
-    QString label = gi->isSelected() ? tr("Item...") : tr("Selected items...");
+    QString label = gi->isSelected() ? tr("Selected items...") : tr("Item...");
 #if 0
     QVariant vp( QVariant::fromValue( gi ) );
     QGraphicsItem * gpt = vp.value<QGraphicsItem*>(); 
