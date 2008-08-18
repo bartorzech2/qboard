@@ -325,13 +325,20 @@ namespace qboard {
 	    if( (*it)->parentItem() ) continue;
 	    //qDebug() <<"qboard::clipboardGraphicsItems() marking " << *it;
 	    if( !copy ) toCut.push_back(*it); // FIXME? only cut serializables?
+	    Serializable * ser = dynamic_cast<Serializable*>(*it);
+	    if( ! ser )
+	    {
+		if(1) qDebug() << (copy?"copy":"cut")<<"handler cannot handle non-Serializables."
+			       << "Skipping object "<<*it;
+	    }
 	    if( (*it)->type() == QGITypes::GamePiece )
 	    { // FIXME: i frigging hate this special handling of QGIGamePiece! Remove it once we have a Better Way!
 		QGIGamePiece * pcv = dynamic_cast<QGIGamePiece*>(*it);
 		GamePiece * pc = pcv ? pcv->piece() : 0;
 		if( pc )
 		{
-		    pc->setProperty("pos",pcv->pos().toPoint()); // FIXME! This is a kludge!
+		    //ser = pc;
+		    pc->setPieceProperty("pos",pcv->pos().toPoint()); // This is a huge kludge to ensure proper pos!
 		    pieces.addPiece(pc);
 		    if(0) qDebug() <<"qboard::clipboardGraphicsItems() copy/cut object is GamePiece:" << pc;
 		}
@@ -342,17 +349,8 @@ namespace qboard {
 		}
 		continue;
 	    }
-	    Serializable * ser = dynamic_cast<Serializable*>(*it);
-	    if( ser )
-	    {
-		//if(0) qDebug() <<"qboard::clipboardGraphicsItems() marking for CUT " << *it;
-		seritems.push_back(ser);
-	    }
-	    else
-	    {
-		if(0) qDebug() << (copy?"copy":"cut")<<"handler cannot handle non-Serializables."
-			       << "Skipping object "<<*it;
-	    }
+	    //if(0) qDebug() <<"qboard::clipboardGraphicsItems() marking for "<<(copy?"COPY":"CUT") << *it;
+	    seritems.push_back(ser);
 	}
 	S11nNode * parent = S11nNodeTraits::create(GameState::KeyClipboard);
 	try
@@ -388,7 +386,7 @@ namespace qboard {
 	}
 	seritems.clear();
 	if(0) qDebug() <<"qboard::clipboardGraphicsItems() serialized data.";
-	cb.slotCut(parent);
+	cb.slotCut(parent); parent = 0;
 	if( copy )
 	{
 	    if(0) qDebug() << "qboard::clipboardGraphicsItems() copied data.";
@@ -414,6 +412,40 @@ namespace qboard {
 	if(0) qDebug() <<"qboard::clipboardGraphicsItems("<<gvi<<","<<copy<<")";
 	if( ! gvi ) return false;
 	return clipboardScene( gvi->scene(), copy, gvi->pos().toPoint() );
+    }
+
+    QPoint calculateCenter( QGraphicsItem * qgi )
+    {
+	typedef QList<QGraphicsItem*> QGIL;
+	QGIL li;
+	if( qgi->isSelected() )
+	{
+	    li = qgi->scene()->selectedItems();
+	}
+	else
+	{
+	    li.push_back(qgi);
+	}
+	QPoint ret;
+	// find a middle point.
+	int left = 0;
+	int right = 0;
+	int top = 0;
+	int bottom = 0;
+	for( QGIL::iterator it = li.begin();
+	     li.end() != it; ++it )
+	{
+	    QGraphicsItem * gvi = *it;
+	    QPoint ip( gvi->pos().toPoint() );
+	    QRect ir( gvi->boundingRect().toRect() );
+	    int tmp = ip.x() + (ir.width() - ir.x());
+	    if( tmp > right ) right = tmp;
+	    else if( tmp < left ) left = tmp;
+	    tmp = ip.y() + (ir.height() - ir.y());
+	    if( tmp < top ) top = tmp;
+	    else if( tmp > bottom ) bottom = tmp;
+	}
+	return QPoint( (left + right) / 2, (top + bottom) / 2);
     }
 
 

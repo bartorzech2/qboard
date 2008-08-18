@@ -658,40 +658,6 @@ static QGraphicsItem * firstSelectedQGI( QGraphicsScene * sc )
     return qgi;
 }
 
-//! Don't use this!
-static QPoint calculateCenter( QGraphicsItem * qgi )
-{
-    typedef QList<QGraphicsItem*> QGIL;
-    QGIL li;
-    if( qgi->isSelected() )
-    {
-	li = qgi->scene()->selectedItems();
-    }
-    else
-    {
-	li.push_back(qgi);
-    }
-    QPoint ret;
-    // find a middle point.
-    int left = 0;
-    int right = 0;
-    int top = 0;
-    int bottom = 0;
-    for( QGIL::iterator it = li.begin();
-	 li.end() != it; ++it )
-    {
-	QGraphicsItem * gvi = *it;
-	QPoint ip( gvi->pos().toPoint() );
-	QRect ir( gvi->boundingRect().toRect() );
-	int tmp = ip.x() + (ir.width() - ir.x());
-	if( tmp > right ) right = tmp;
-	else if( tmp < left ) left = tmp;
-	tmp = ip.y() + (ir.height() - ir.y());
-	if( tmp < top ) top = tmp;
-	else if( tmp > bottom ) bottom = tmp;
-    }
-    return QPoint( (left + right) / 2, (top + bottom) / 2);
-}
 
 void MainWindowImpl::slotCopy()
 {
@@ -699,9 +665,9 @@ void MainWindowImpl::slotCopy()
     QGraphicsItem * qgi = firstSelectedQGI( impl->gstate.scene() );
     if( qgi )
     {
-	//qboard::clipboardScene( qgi->scene(), true, QPoint() );
+	qboard::clipboardScene( qgi->scene(), true, QPoint() );
 	//qboard::clipboardScene( qgi->scene(), true, qgi->pos().toPoint() );
-	qboard::clipboardScene( qgi->scene(), true, calculateCenter(qgi) );
+	//qboard::clipboardScene( qgi->scene(), true, calculateCenter(qgi) );
 	this->statusBar()->showMessage( tr("Selected items were copied to the clipboard.") );
     }
     else
@@ -717,7 +683,7 @@ void MainWindowImpl::slotCut()
     {
 	qboard::clipboardScene( qgi->scene(), false, QPoint() );
 	//qboard::clipboardScene( qgi->scene(), false, qgi->pos().toPoint() );
-	qboard::clipboardScene( qgi->scene(), false, calculateCenter(qgi) );
+	//qboard::clipboardScene( qgi->scene(), false, calculateCenter(qgi) );
 	this->statusBar()->showMessage( tr("Selected items were cut to the clipboard.") );
     }
     else
