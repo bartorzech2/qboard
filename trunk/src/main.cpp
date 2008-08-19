@@ -18,13 +18,14 @@
 #include "SetupQBoard.h"
 #include <s11n.net/s11n/s11nlite.hpp>
 
-#define TEST_QS11N 0
+#define TEST_QS11N 1
 #if TEST_QS11N
 #include "GamePiece.h"
 #include <iostream>
 #include "Serializable.h"
 #include "S11nQt.h"
 #include "S11nQtList.h"
+#include "S11nQtStream.h"
 #include <s11n.net/s11n/proxy/pod/int.hpp>
 #endif
 
@@ -181,8 +182,31 @@ void try_s11n()
 		QPixmap p2;
 		s11nlite::deserialize( node, p2 );
 		NT::clear(node);
-		s11nlite::save( p2, std::cout );
-		//p2.save("000.png","PNG");
+		QString fname("foo.s11n");
+		{
+		    QFile ofile(fname);
+		    ofile.remove();
+		    StdToQtOBuf sentry( std::cout, ofile );
+		    s11nlite::save( p2, std::cout );
+		    qDebug() << "Take a look for file "<<fname;
+		}
+		{
+		    QFile ifile(fname);
+		    //ifile.remove();
+		    // ifile.open(QIODevice::WriteOnly); // test exception tossing
+		    StdToQtIBuf sentry( std::cin, ifile );
+		    S11nNode * cp = s11nlite::load_node( std::cin );
+		    if( ! cp )
+		    {
+			CERR << "ERROR loading node from QIODevice!\n";
+		    }
+		    else
+		    {
+			COUT << "Read from QIODevice:\n";
+			s11nlite::save( *cp, std::cout );
+			delete cp;
+		    }
+		}
 	    }
 	}
 #endif // TEST_QS11N
