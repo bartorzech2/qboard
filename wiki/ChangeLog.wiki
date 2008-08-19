@@ -8,6 +8,16 @@ are at the top.
 ----
 *2008 August 17:*
 
+- Significant improvements in copy/paste, including:
+
+  * Ctrl-C/Ctrl-X/Ctrl-V do the conventional things. Copy/cut requires that the board have at least one selected item.
+  * Pasting with the mouse over the board will paste to that board position, otherwise it will try to restore the original position where the data was copied/cut from.
+
+- Added underlying support to allow libs11n to (indirectly) use QIODevices as input/output source/targets. That means we can't serialize directly to, e.g. QFile or QBuffer.
+
+
+*2008 August 17:*
+
 - QGIHtml (the on-board text widgets) can now be rotated.
 
 - Improved pasting a bit. e.g.
@@ -17,7 +27,7 @@ are at the top.
 - Clipboard is now better synchronized with the global Qt/X11 clipboard.
 
 
-*2008 August 16:*
+=== *2008 August 16:* ===
 
 - Added s11n support for QMap, plus QByteArray and QPixmap with compression.
 
@@ -36,7 +46,6 @@ one no longer has to scroll the board to get the new image to show up.
 - Added "Help" context menu item to some in-game objects.
 
 - Copy/cut/paste is basically working. On-board lines don't paste in the proper location, but that's part of a bigger problem. Unfortunately, we can't currently bind keyboard shortcuts to copy/cut/paste because where those are caught we don't have access to the necessary widgets to initiate the copy/paste.
-
 
 *2008 August 13:*
 
