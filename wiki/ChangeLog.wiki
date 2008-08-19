@@ -6,7 +6,7 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top.
 
 ----
-*2008 August 17:*
+*2008 August 19:*
 
 - Significant improvements in copy/paste, including:
 
