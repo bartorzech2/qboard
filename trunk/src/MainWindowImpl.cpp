@@ -666,15 +666,19 @@ static void clipboardQGI( QStatusBar * sb, QGraphicsScene * sc, bool copy )
     if( qgi )
     {
 	QPoint pos;
-#if 1
+#if 0
+	// Works!
 	QRectF r( qboard::calculateBounds( qgi ) );
 	qDebug() << "clipboardQGI() rect ="<<r;
 	pos = r.topLeft().toPoint();
 #else
+	pos = qboard::calculateCenter( qgi ).toPoint();
+	qDebug() << "clipboardQGI() center ="<<pos;
 	//pos = qgi->pos().toPoint();
 	//pos = qboard::calculateCenter(qgi).toPoint();
-	//pos = impl->gv->placementPos();
+	//pos = impl->gv->placementPos();// works, but barely
 #endif
+	qDebug() << "clipboardQGI() pos ="<<pos;
 	qboard::clipboardScene( qgi->scene(), copy, pos );
 
 	sb->showMessage( QString("Selected items were %1 to the clipboard.").arg(copy?"copied":"cut") );
