@@ -18,7 +18,7 @@
 #include "SetupQBoard.h"
 #include <s11n.net/s11n/s11nlite.hpp>
 
-#define TEST_QS11N 1
+#define TEST_QS11N 0
 #if TEST_QS11N
 #include "GamePiece.h"
 #include <iostream>
