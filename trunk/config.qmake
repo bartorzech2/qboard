@@ -155,6 +155,7 @@ QBOARD_HEADERS_LIB = \
  $$SRC_DIR/S11nQtListReg.h \
  $$SRC_DIR/S11nQtMap.h \
  $$SRC_DIR/S11nQtMapReg.h \
+ $$SRC_DIR/S11nQtStream.h \
  $$SRC_DIR/Serializable.h \
  $$SRC_DIR/SetupQBoard.h \
  $$SRC_DIR/reg_qt_s11n.h \
@@ -178,6 +179,7 @@ QBOARD_SOURCES_LIB = \
  $$SRC_DIR/QGIPiecePlacemarker.cpp \
  $$SRC_DIR/S11nClipboard.cpp \
  $$SRC_DIR/S11nQt.cpp \
+ $$SRC_DIR/S11nQtStream.cpp \
  $$SRC_DIR/Serializable.cpp \
  $$SRC_DIR/SetupQBoard.cpp \
  $$SRC_DIR/utility.cpp
