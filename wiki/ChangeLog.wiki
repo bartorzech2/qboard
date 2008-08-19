@@ -13,7 +13,7 @@ are at the top.
   * Ctrl-C/Ctrl-X/Ctrl-V do the conventional things. Copy/cut requires that the board have at least one selected item.
   * Pasting with the mouse over the board will paste to that board position, otherwise it will try to restore the original position where the data was copied/cut from.
 
-- Added underlying support to allow libs11n to (indirectly) use QIODevices as input/output source/targets. That means we can't serialize directly to, e.g. QFile or QBuffer.
+- Added underlying support to allow libs11n to (indirectly) use QIODevices as input/output source/targets. That means we can serialize directly to or from, e.g. QFile or QBuffer.
 
 
 *2008 August 17:*
