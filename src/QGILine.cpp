@@ -135,7 +135,10 @@ bool QGILineBinder::serialize( S11nNode & dest ) const
 {
 	if( ! this->Serializable::serialize( dest ) ) return false;
 	if( ! impl->ends.first || ! impl->ends.second ) return false;
-	typedef S11nNodeTraits NT;
+	// We must ensure that the "pos" property is synced, but we have
+	// to violate constness to do it :/
+	QGILineBinder * ncthis = const_cast<QGILineBinder*>( this );
+	ncthis->setProperty( "pos", this->pos() );
 	if( this->metaObject()->propertyCount() )
 	{
 		S11nNode & pr( s11n::create_child( dest, "properties" ) );
