@@ -48,7 +48,7 @@ struct QBoardView::Impl
 	  scale(1.0),
 	  glmode(false),
 	  placer(0),
-	  placeAt(20,20)
+	  placeAt(50,50)
     {
     }
     ~Impl()
