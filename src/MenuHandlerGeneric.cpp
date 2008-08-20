@@ -103,24 +103,29 @@ void SceneSelectionDestroyer::destroyItem()
 QMenu * MenuHandlerCommon::createMenu( QGraphicsItem *gi ) //, QGraphicsSceneContextMenuEvent *ev )
 {
     QString label = gi->isSelected() ? tr("Selected items...") : tr("Item...");
-#if 0
-    QVariant vp( QVariant::fromValue( gi ) );
-    QGraphicsItem * gpt = vp.value<QGraphicsItem*>(); 
-    qDebug() << "vp=="<<vp<<"ptr="<<gpt;
-#endif
     QMenu * menu = new QMenu(label);
     menu->addAction(label)->setEnabled(false);
     SceneSelectionDestroyer * destroyer = new SceneSelectionDestroyer( menu, gi );
     menu->addAction(QIcon(":/QBoard/icon/button_cancel.png"),"Destroy",destroyer,SLOT(destroyItem()) );
     menu->addSeparator();
-#if 0
-    MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( gi, menu );
-    menu->addAction(QIcon(":/QBoard/icon/editcopy.png"),"Copy",clipper,SLOT(clipboardCopy()) );
-    menu->addAction(QIcon(":/QBoard/icon/editcut.png"),"Cut",clipper,SLOT(clipboardCut()) );
-#endif
     return menu;
 }
 
+struct QObjectPropertyAction::Impl
+{
+    typedef QList<QObject *> ListType;
+    ListType list;
+    QString key;
+    QVariant val;
+    Impl() :
+	list(),
+	key(),
+	val()
+    {
+    }
+    ~Impl()
+    {}
+};
 
 QObjectPropertyAction::QObjectPropertyAction(
 					     QObject * obj,
@@ -128,16 +133,8 @@ QObjectPropertyAction::QObjectPropertyAction(
 					     QVariant const & val,
 					     QObject * parent )
     : QAction(val.toString(),parent),
-      m_o(obj),
-      m_key(propName),
-      m_val(val)
+      impl(new Impl)
 {
-    if( val.type() == QVariant::Color )
-    {
-	QPixmap px(16,16);
-	px.fill(val.value<QColor>());
-	this->setIcon(QIcon(px));
-    }
 #if 1
     if( val == obj->property(propName.toAscii()) )
     {
@@ -145,39 +142,107 @@ QObjectPropertyAction::QObjectPropertyAction(
 	this->setChecked(true);
     }
 #endif
-    connect( m_o, SIGNAL(destroyed()), this, SLOT(dtorDisconnect()) );
-    connect( this, SIGNAL(triggered()), this, SLOT(setProperty()) );
+    impl->list.push_back(obj);
+    impl->key = propName;
+    impl->val = val;
+    this->setup();
+}
+QObjectPropertyAction::QObjectPropertyAction(
+					     QList<QObject *> objs,
+					     QString const & propName,
+					     QVariant const & val,
+					     QObject * parent )
+    : QAction(val.toString(),parent),
+      impl(new Impl)
+{
+    impl->list = objs;
+    impl->key = propName;
+    impl->val = val;
+    this->setup();
 }
 QObjectPropertyAction::~QObjectPropertyAction()
 {
 	
 }
 
-void QObjectPropertyAction::dtorDisconnect()
+void QObjectPropertyAction::setup()
 {
-    this->m_o = 0;
+    if( impl->val.type() == QVariant::Color )
+    {
+	QPixmap px(16,16);
+	px.fill(impl->val.value<QColor>());
+	this->setIcon(QIcon(px));
+    }
+#if 0
+    // For our current use cases, this is overkill...
+    for( Impl::ListType::iterator it = impl->list.begin();
+	 impl->list.end() != it; ++it )
+    {
+	connect( *it, SIGNAL(destroyed(QObject*)), this, SLOT(dtorDisconnect(QObject*)) );
+    }
+#endif
+    connect( this, SIGNAL(triggered()), this, SLOT(setProperty()) );
+}
+
+
+void QObjectPropertyAction::dtorDisconnect(QObject * obj)
+{
+    impl->list.removeOne(obj);
 }
 
 
 void QObjectPropertyAction::setProperty()
 {
-    if( ! m_o ) return;
-    m_o->setProperty(m_key.toAscii(), m_val);
+    for( Impl::ListType::iterator it = impl->list.begin();
+	 impl->list.end() != it; ++it )
+    {
+	(*it)->setProperty( impl->key.toAscii(), impl->val );
+    }
 }
 
+
+
+struct QObjectPropertyMenu::Impl
+{
+    typedef QList<QObject *> ListType;
+    ListType list;
+    QString key;
+    Impl() :
+	list(),
+	key()
+    {
+    }
+    ~Impl()
+    {}
+};
 QObjectPropertyMenu::QObjectPropertyMenu( const QString & title,
 					  QObject * obj,
 					  QString const & propName,
 					  QWidget * parent ) :
-    QMenu(title,parent),
-    m_o(obj),
-    m_key(propName)
+    QMenu(title, parent),
+    impl(new Impl)
 {
+    impl->list.push_back(obj);
+    impl->key = propName;
+}
+QObjectPropertyMenu::QObjectPropertyMenu( const QString & title,
+					  QList<QObject *> list,
+					  QString const & propName,
+					  QWidget * parent ) :
+    QMenu(title, parent),
+    impl(new Impl)
+{
+    impl->list = list;
+    impl->key = propName;
+}
+QObjectPropertyMenu::~QObjectPropertyMenu()
+{
+    delete impl;
 }
 
 QAction * QObjectPropertyMenu::addItem( QVariant const & val, QString const & lbl)
 {
-    QObjectPropertyAction * ac = new QObjectPropertyAction( m_o, m_key, val, this );
+    QObjectPropertyAction * ac = new QObjectPropertyAction( impl->list, impl->key, val, this );
     if( ! lbl.isEmpty() )
     {
 	ac->setText(lbl);
@@ -186,14 +251,12 @@ QAction * QObjectPropertyMenu::addItem( QVariant const & val, QString const & lb
     return ac;
 }
 
-QObjectPropertyMenu::~QObjectPropertyMenu()
-{
-}
 
-
-QObjectPropertyMenu * QObjectPropertyMenu::makePenStyleMenu( QObject * pv, char const * propertyName )
+QObjectPropertyMenu * QObjectPropertyMenu::makePenStyleMenu(
+			   QList<QObject *> objs,
+			   char const * propertyName )
 {
-    QObjectPropertyMenu * pm = new QObjectPropertyMenu("Style", pv, propertyName, 0 );
+    QObjectPropertyMenu * pm = new QObjectPropertyMenu("Style", objs, propertyName, 0 );
     for( int i = Qt::NoPen; i < Qt::CustomDashLine; ++i )
     {
 	pm->addItem( QVariant(i), qboard::penStyleToString(i) );
@@ -201,15 +264,22 @@ QObjectPropertyMenu * QObjectPropertyMenu::makePenStyleMenu( QObject * pv, char 
     return pm;
 }
 
-QObjectPropertyMenu * QObjectPropertyMenu::makeIntListMenu(
-							   char const * lbl, 
-							   QObject * pv,
-							   char const * propertyName,
-							   int from,
-							   int to,
-							   int step )
+QObjectPropertyMenu * QObjectPropertyMenu::makePenStyleMenu( QObject * pv, char const * propertyName )
 {
-    QObjectPropertyMenu * pm = new QObjectPropertyMenu(lbl, pv, propertyName, 0 );
+    QList<QObject*> li;
+    li.push_back( pv );
+    return makePenStyleMenu( li, propertyName );
+}
+
+QObjectPropertyMenu * QObjectPropertyMenu::makeIntListMenu(
+				      char const * lbl, 
+				      QList<QObject *> objs,
+				      char const * propertyName,
+				      int from,
+				      int to,
+				      int step )
+{
+    QObjectPropertyMenu * pm = new QObjectPropertyMenu(lbl, objs, propertyName, 0 );
     for( int i = from; i < to; i += step )
     {
 	pm->addItem( QVariant(i) );
@@ -217,14 +287,25 @@ QObjectPropertyMenu * QObjectPropertyMenu::makeIntListMenu(
     return pm;
 }
 
-QObjectPropertyMenu *
-QObjectPropertyMenu::makeAlphaMenu(
-				   QObject * obj,
+QObjectPropertyMenu * QObjectPropertyMenu::makeIntListMenu(
+				   char const * lbl, 
+				   QObject * pv,
 				   char const * propertyName,
-				   QColor const & hint )
+				   int from,
+				   int to,
+				   int step )
 {
+    QList<QObject*> foo;
+    foo.push_back(pv);
+    return makeIntListMenu(lbl,foo,propertyName,from,to,step);
+}
 
-    QObjectPropertyMenu * pm = new QObjectPropertyMenu("Transparency", obj, propertyName, 0 );
+QObjectPropertyMenu * QObjectPropertyMenu::makeAlphaMenu(
+				QList<QObject *> objs,
+				char const * propertyName,
+				QColor const & hint )
+{
+    QObjectPropertyMenu * pm = new QObjectPropertyMenu("Transparency", objs, propertyName, 0 );
     const short opaque = 255;
     const qreal step = opaque/10.0;
     int pct = 0;
@@ -257,17 +338,30 @@ QObjectPropertyMenu::makeAlphaMenu(
     return pm;
 }
 
-QObjectPropertyMenu * QObjectPropertyMenu::makeColorMenu(
-							 QObject * pv,
-							 char const * propertyName,
-							 char const * alphaName )
+QObjectPropertyMenu *
+QObjectPropertyMenu::makeAlphaMenu(
+				   QObject * obj,
+				   char const * propertyName,
+				   QColor const & hint )
 {
-    QObjectPropertyMenu * mc = new QObjectPropertyMenu("Color",pv,propertyName,0);
+    QList<QObject*> li;
+    li.push_back(obj);
+    return makeAlphaMenu( li, propertyName, hint );
+}
+
+QObjectPropertyMenu * QObjectPropertyMenu::makeColorMenu(
+					 QList<QObject*> list,
+					 char const * propertyName,
+					 char const * alphaName )
+{
+    if( list.isEmpty() ) return 0;
+    QObjectPropertyMenu * mc = new QObjectPropertyMenu("Color",list,propertyName,0);
     mc->setIcon(QIcon(":/QBoard/icon/colorize.png"));
     if( alphaName )
     {
+	QObject * pv = *(list.begin());
 	QColor hint( pv->property(propertyName).value<QColor>() );
-	mc->addMenu( QObjectPropertyMenu::makeAlphaMenu(pv,alphaName, hint) );
+	mc->addMenu( QObjectPropertyMenu::makeAlphaMenu(list,alphaName, hint) );
     }
     typedef QList<QColor> QL; 
     QL colors( qboard::colorList() ); 
@@ -281,3 +375,12 @@ QObjectPropertyMenu * QObjectPropertyMenu::makeColorMenu(
     return mc;
 }
 
+QObjectPropertyMenu * QObjectPropertyMenu::makeColorMenu(
+					 QObject * pv,
+					 char const * propertyName,
+					 char const * alphaName )
+{
+    QList<QObject*> li;
+    li.push_back(pv);
+    return makeColorMenu(li, propertyName, alphaName);
+}

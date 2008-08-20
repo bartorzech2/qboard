@@ -257,9 +257,11 @@ void MenuHandlerQGIHtml::doMenu( QGIHtml * pv, QGraphicsSceneContextMenuEvent * 
 	ev->accept();
 	MenuHandlerCommon proxy;
 	QMenu * m = proxy.createMenu( pv );
+	QList<QObject*> list;
+	list.push_back(pv);
 	if(1)
 	{
-	    QObjectPropertyMenu * pm = QObjectPropertyMenu::makeIntListMenu("Rotate",pv,"angle",0,360,15);
+	    QObjectPropertyMenu * pm = QObjectPropertyMenu::makeIntListMenu("Rotate",list,"angle",0,360,15);
 	    pm->setIcon(QIcon(":/QBoard/icon/rotate_cw.png"));
 	    m->addMenu(pm);
 	}
