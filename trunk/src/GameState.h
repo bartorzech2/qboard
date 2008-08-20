@@ -75,6 +75,12 @@ public:
     */
     QGraphicsItem * addPiece( GamePiece * pc );
 
+    /**
+       Transfers ownership of the item to this object's
+       QGraphicsScene.
+    */
+    void addItem( QGraphicsItem * item );
+
 //     /**
 //        Returns the current placement position. See addPiece() for
 //        details.

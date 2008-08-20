@@ -19,13 +19,13 @@
 #include <QGraphicsView>
 #include "S11nQt.h"
 #include "QBoardView.h"
-#include "QGIGamePiece.h"
+#include "QGIPiece.h"
 
 struct PieceAppearanceWidget::Impl
 {
     GameState gs;
     QGraphicsView * gv;
-    GamePiece * pc;
+    QGIPiece * pc;
     Impl() : gs(), gv(0),pc(0)
     {
     }
@@ -64,17 +64,15 @@ void PieceAppearanceWidget::setupDefaultTemplates()
     int count = cl.size();
     int pos = 0;
     int rows = 3;
-    QGraphicsItem * qgi = 0;
     for( QCL::iterator it = cl.begin();
 	 cl.end() != it; ++it )
     {
-	GamePiece * pc = new GamePiece;
+	QGIPiece * pc = new QGIPiece;
 	if( ! this->impl->pc ) this->impl->pc = pc;
-	qgi = this->impl->gs.addPiece( pc );
-	pc->setPieceProperty("size",QSize(step,step));
-	pc->setPieceProperty("pos",QPoint(x,y));
-	pc->setPieceProperty("dragDisabled",int(1));
-	//x += step + space;
+	this->impl->gs.addItem( pc );
+	pc->setProperty("size",QSize(step,step));
+	pc->setProperty("pos",QPoint(x,y));
+	pc->setProperty("dragDisabled",int(1));
 	x += step + space;
 	if( ++pos >= (count/rows) )
 	{
@@ -82,9 +80,9 @@ void PieceAppearanceWidget::setupDefaultTemplates()
 	    pos = 0;
 	    x = space;
 	}
-	pc->setPieceProperty("color",*it);
-	pc->setPieceProperty("borderSize",1);
-	pc->setPieceProperty("borderColor",QColor(0,0,0));
+	pc->setProperty("color",*it);
+	pc->setProperty("borderSize",1);
+	pc->setProperty("borderColor",QColor(0,0,0));
     }
 
 }
@@ -104,7 +102,7 @@ void PieceAppearanceWidget::setupUI()
     //v->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
     v->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
     v->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
-    //v->setDragMode(QGraphicsView::ScrollHandDrag);
+    v->setDragMode(QGraphicsView::NoDrag);
     v->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     v->setBackgroundBrush(QColor("#abb8fb"));
     v->viewport()->setObjectName( "PieceAppearanceWidget");
@@ -174,12 +172,11 @@ void PieceAppearanceWidget::clear()
     this->impl->gs.clear();
 }
 
-void PieceAppearanceWidget::applyCurrentTemplate( GamePiece * tgt )
+void PieceAppearanceWidget::applyCurrentTemplate( QObject * tgt )
 {
     if( !tgt ) return;
     typedef QList<QGraphicsItem*> QIL;
     QIL li( impl->gv->scene()->selectedItems() );
-    QGIGamePiece * pvi = 0;
     impl->pc = 0;
     // If there are multiple items selected, simply pick the first
     // selected item which has an associated piece (the order has no
@@ -188,24 +185,42 @@ void PieceAppearanceWidget::applyCurrentTemplate( GamePiece * tgt )
 	 li.end() != it;
 	 ++it )
     {
-	pvi = dynamic_cast<QGIGamePiece*>(*it);
+	QGIPiece * pvi = dynamic_cast<QGIPiece*>(*it);
 	if( pvi )
 	{
-	    impl->pc = pvi->piece();
-	    if( impl->pc ) break;
+	    impl->pc = pvi;
 	}
     }
     if( ! impl->pc ) return;
 
+    /**
+       We want to keep certain properties intact:
+    
+       pixmap: b/c the game client normally sets this
+
+       pos: we don't want to use the template's pos
+
+       dragDisabled: that property was developed to support
+       this class. The client will almost always expect
+       his pieces to be draggable.
+    */
     QVariant pix( tgt->property("pixmap") );
     QVariant pos( tgt->property("pos") );
     QVariant dragDisabled( tgt->property("dragDisabled") );
     {
-	S11nNode n;
-	impl->pc->serialize( n );
-	tgt->deserialize( n );
+	QObject * src = impl->pc;
+	typedef QList<QByteArray> QL;
+	QL ql( src->dynamicPropertyNames() );
+	QL::const_iterator it( ql.begin() );
+	QL::const_iterator et( ql.end() );
+	for( ; et != it; ++it )
+	{
+	    char const * key = it->constData();
+	    if( !key || (*key == '_') ) continue; // Qt reserves the "_q_" prefix, so we'll elaborate on that.
+	    tgt->setProperty( key, src->property(key) );
+	}
     }
-    tgt->setPieceProperty("pos", pos );
-    tgt->setPieceProperty("pixmap", pix );
-    tgt->setPieceProperty("dragDisabled", dragDisabled );
+    tgt->setProperty("pos", pos );
+    tgt->setProperty("pixmap", pix );
+    tgt->setProperty("dragDisabled", dragDisabled );
 }

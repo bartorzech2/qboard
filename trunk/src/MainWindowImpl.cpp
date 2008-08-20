@@ -36,6 +36,7 @@
 #include "GamePiece.h"
 #include "QBoardView.h"
 #include "QGIGamePiece.h"
+#include "QGIPiece.h"
 #include "QGIHtml.h"
 #include "GameState.h"
 #include "FileBrowser.h"
@@ -392,7 +393,7 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 bool MainWindowImpl::loadPiece( QFileInfo const & fi )
 {
 	QString fn( fi.filePath() ); // absoluteFilePath() );
-	GamePiece * pc = new GamePiece;
+	QGIPiece * pc = new QGIPiece;
 	if( pc->fileNameMatches( fn ) )
 	{
 	    if( ! pc->load( fn ) )
@@ -401,21 +402,16 @@ bool MainWindowImpl::loadPiece( QFileInfo const & fi )
 		QMessageBox::warning( this, "Load failed!",
 				      QString("Failed: MainWindowImpl::loadPiece(%1)").arg(fn),
 				      QMessageBox::Ok, QMessageBox::Ok );
-
 		return false;
 	    }
 	}
 	else
 	{
-		qDebug() << "loadPiece("<<fn<<")";
-		impl->paw->applyCurrentTemplate( pc );
-		pc->setProperty( "pixmap", fn );
+	    impl->paw->applyCurrentTemplate( pc );
+	    pc->setProperty( "pixmap", fn );
 	}
-	//impl->gv->addPiece(pc);
-	//impl->gstate.addPiece(pc,true);
-	//impl->gstate.setPlacementPos(impl->gv->placementPos());
-	pc->setPieceProperty("pos",impl->gv->placementPos());
-	impl->gstate.addPiece(pc);
+	pc->setProperty( "pos", impl->gv->placementPos() );
+	impl->gstate.addItem(pc);
 	return true;
 }
 
