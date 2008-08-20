@@ -118,14 +118,19 @@ public:
 			QString const & propName,
 			QVariant const & val,
 			QObject * parent = 0);
+
+	QObjectPropertyAction( QList<QObject *> objs,
+			QString const & propName,
+			QVariant const & val,
+			QObject * parent = 0);
 	virtual ~QObjectPropertyAction();
 private Q_SLOTS:
 	void setProperty();
-	void dtorDisconnect();
+	void dtorDisconnect(QObject*);
 private:
-	QObject * m_o;
-	QString m_key;
-	QVariant m_val;
+    void setup();
+    struct Impl;
+    Impl * impl;
 };
 
 /**
@@ -145,6 +150,10 @@ public:
 	*/
 	QObjectPropertyMenu( const QString & title,
 		QObject * obj,
+		QString const & propName,
+		QWidget * parent = 0 );
+	QObjectPropertyMenu( const QString & title,
+		QList<QObject *> objs,
 		QString const & propName,
 		QWidget * parent = 0 );
 	virtual ~QObjectPropertyMenu();
@@ -169,6 +178,8 @@ public:
 	*/
 	static QObjectPropertyMenu * makeAlphaMenu( QObject * obj, char const * propertyName, QColor const & hint = QColor() );
 
+	static QObjectPropertyMenu * makeAlphaMenu( QList<QObject *> objs, char const * propertyName, QColor const & hint = QColor() );
+
 	/**
 		Creates a menu of common colors. When triggered,
 		obj->setProperty(propertyName,selectedValue) is called.
@@ -179,6 +190,8 @@ public:
 	*/
 	static QObjectPropertyMenu * makeColorMenu( QObject * obj, char const * propertyName, char const * alphaName = 0 );
 
+	static QObjectPropertyMenu * makeColorMenu( QList<QObject *> objs, char const * propertyName, char const * alphaName = 0 );
+
 	/**
 		Creates a menu of Qt::PenStyle entries. When triggered,
 		obj->PieceProperty(propertyName,selectedValue) is called.
@@ -186,6 +199,7 @@ public:
 		The caller owns the returned menu.
 	*/
 	static QObjectPropertyMenu * makePenStyleMenu( QObject * obj, char const * propertyName );
+	static QObjectPropertyMenu * makePenStyleMenu( QList<QObject *> objs, char const * propertyName );
 
 	/**
 		Creates a menu of integer valures, in the range (from,to), in intervales
@@ -200,9 +214,11 @@ public:
 	*/
 	static QObjectPropertyMenu * makeIntListMenu( char const * lbl, QObject * obj, char const * propertyName, int from, int to, int step = 1 );
 
+	static QObjectPropertyMenu * makeIntListMenu( char const * lbl, QList<QObject *> objs, char const * propertyName, int from, int to, int step = 1 );
+
 private:
-	QObject * m_o;
-	QString m_key;
+    struct Impl;
+    Impl * impl;
 };
 
 #endif // __MENUHANDLERGENERIC_H__

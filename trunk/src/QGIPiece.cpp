@@ -432,25 +432,35 @@ void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent 
     if( ! pv ) return;
     impl->piece = pv;
     impl->scene = pv->scene();
+    typedef QList<QObject *> OL;
+    OL selected;
+    if(  pv->isSelected() )
+    {
+	selected = qboard::selectedItemsCast<QObject>( impl->scene );
+    }
+    else
+    {
+	selected.push_back( dynamic_cast<QObject*>(pv) );
+    }
     MenuHandlerCommon proxy;
     ev->accept();
     QMenu * m = proxy.createMenu( pv );
-    QObjectPropertyMenu * mColor = QObjectPropertyMenu::makeColorMenu(pv, "color", "colorAlpha" );
+    QObjectPropertyMenu * mColor = QObjectPropertyMenu::makeColorMenu(selected, "color", "colorAlpha" );
     mColor->setIcon(QIcon(":/QBoard/icon/color_fill.png"));
     m->addMenu(mColor);
     if(1)
     {
-	QObjectPropertyMenu * pm = QObjectPropertyMenu::makeIntListMenu("Rotate",pv,"angle",0,360,15);
+	QObjectPropertyMenu * pm = QObjectPropertyMenu::makeIntListMenu("Rotate",selected,"angle",0,360,15);
 	pm->setIcon(QIcon(":/QBoard/icon/rotate_cw.png"));
 	m->addMenu(pm);
     }
 
     QMenu * mBrd = m->addMenu("Border");
-    mBrd->addMenu( QObjectPropertyMenu::makeColorMenu(pv,"borderColor","borderAlpha") );
-    mBrd->addMenu( QObjectPropertyMenu::makePenStyleMenu(pv,"borderStyle") );
+    mBrd->addMenu( QObjectPropertyMenu::makeColorMenu(selected,"borderColor","borderAlpha") );
+    mBrd->addMenu( QObjectPropertyMenu::makePenStyleMenu(selected,"borderStyle") );
     if(1)
     {
-	mBrd->addMenu( QObjectPropertyMenu::makeIntListMenu("Size",pv,"borderSize",0,8) );
+	mBrd->addMenu( QObjectPropertyMenu::makeIntListMenu("Size",selected,"borderSize",0,8) );
     }
 
     if(1)
@@ -461,7 +471,7 @@ void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent 
 	    ? (lock.toInt() ? true : false)
 	    : false;
 	QVariant newVal = locked ? QVariant(int(0)) : QVariant(int(1));
-	QObjectPropertyAction * act = new QObjectPropertyAction(pv,"dragDisabled",newVal);
+	QObjectPropertyAction * act = new QObjectPropertyAction(selected,"dragDisabled",newVal);
 	act->setIcon(QIcon(":/QBoard/icon/unlock.png"));
 	act->setCheckable( true );
 	act->blockSignals(true);

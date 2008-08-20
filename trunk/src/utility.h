@@ -19,11 +19,10 @@
 #include <QColor>
 #include <QDebug>
 #include <QtGlobal>
-
+#include <QGraphicsScene>
 class QPoint;
 class QGraphicsItem;
 class GameState;
-class QGraphicsScene;
 
 #define QBOARD_VERBOSE_DTOR if(1) qDebug()
 
@@ -202,6 +201,32 @@ namespace qboard
        Calculates the middle point of calculateBounds(qgi).
     */
     QPointF calculateCenter( QGraphicsItem * qgi );
+
+
+    /**
+       For each selected item in sc, an attempt is made to cast it to
+       a (T*). On success, the (T*) is added to the which is returned
+       by this function. This does not change ownership of sc nor the
+       (T*) contained in the returned list.
+
+       T must be a non-cv-qualified type.
+    */
+    template <typename T>
+    static QList<T*> selectedItemsCast( QGraphicsScene * sc )
+    {
+	typedef QList<QGraphicsItem*> QGIL;
+	QGIL sel = sc ? sc->selectedItems() : QGIL();
+	typedef QList<T *> OL;
+	OL ol;
+	for( QGIL::iterator it = sel.begin();
+	     sel.end() != it; ++it )
+	{
+	    T * obj = dynamic_cast<T*>( *it );
+	    if( obj ) ol.push_back(obj);
+	}
+	return ol;
+    }
+
 
 }
 
