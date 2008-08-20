@@ -12,9 +12,10 @@ are at the top.
 rotate all selected objects which support that property, instead of all
 objects of the same type as the selected object.
 
-- Started replacing removing the split-brain GamePiece/QGIGamePiece combination
+- Started removing the split-brain GamePiece/QGIGamePiece combination
 with a single object, QGIPiece. This allows me to remove several ugly workarounds
-in places which shouldn't have them.
+in places which shouldn't have them. Older saved files will (should) still load,
+but new save files will have a slightly different structure.
 
 - More cleanups in the positioning of pasted data.
 
