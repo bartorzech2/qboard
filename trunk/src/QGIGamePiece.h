@@ -79,7 +79,7 @@ public:
 	virtual bool event( QEvent * e );
 
     /**
-       Serializes this object (AND piece()) to dest.
+       Serializes this object to dest.
     */
     virtual bool serialize( S11nNode & dest ) const;
     /**
