@@ -3,10 +3,10 @@
 = QBoard ChangeLog =
 
 This is the informal ChangeLog for the QBoard project. Newest items
-are at the top.
+are at the top. Dates written extra large are release dates.
 
 ----
-*2008 August 20:*
+=== *2008 August 20:* ===
 
 - The popup menus have been more unified. e.g. using Rotate will now
 rotate all selected objects which support that property, instead of all
@@ -77,7 +77,7 @@ to use those resources as pixmap sources for in-play pieces. So the basics
 seem to work, anyway.
 
 
-*2008 August 11:*
+=== *2008 August 11:* ===
 
 - Added "piece templates" to the main UI. The appearance of the
 currently-selected template is used as the basis when loading piece
@@ -95,7 +95,7 @@ persistant across QBoard sessions.
 
 - Corrected several compile warnings caught by gcc 4.2.3.
 
-*2008 June 15:*
+=== *2008 June 15:* ===
 
 - Fixed a major bug under Qt 4.3 which caused non-piece gameboard items
 to be not removed. The end effect was duplicate or extra items at
@@ -121,6 +121,6 @@ what a bitch it was to get the event handling right in conjunction with
 overlapping pieces and the board.
 
 
-*2008 June 13:*
+=== *2008 June 13:* ===
 
 - Initial release via Google Code.
