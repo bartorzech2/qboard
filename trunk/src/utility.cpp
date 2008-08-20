@@ -20,11 +20,9 @@
 #include <sstream>
 
 #include "utility.h"
-#include "QGIGamePiece.h" // a horrible, horrible dependency!
 #include "S11nClipboard.h" // another horrible dep!
 #include "S11nQt.h"
 #include "S11nQtList.h"
-#include "GamePiece.h"
 #include "GameState.h"
 
 /************************************************************************
@@ -319,11 +317,10 @@ namespace qboard {
 	QGIL selected( gsc->selectedItems() );
 	typedef QList<Serializable *> SerL;
 	SerL seritems;
-	GamePieceList pieces;
 	for( QGIL::iterator it = selected.begin(); selected.end() != it; ++it )
 	{
 	    if( (*it)->parentItem() ) continue;
-	    qDebug() <<"qboard::clipboardGraphicsItems() marking " << *it;
+	    //if(0) qDebug() <<"qboard::clipboardScene() marking " << *it;
 	    if( !copy ) toCut.push_back(*it); // FIXME? only cut serializables?
 	    Serializable * ser = dynamic_cast<Serializable*>(*it);
 	    if( ! ser )
@@ -331,25 +328,7 @@ namespace qboard {
 		if(1) qDebug() << (copy?"copy":"cut")<<"handler cannot handle non-Serializables."
 			       << "Skipping object "<<*it;
 	    }
-	    if( (*it)->type() == QGITypes::GamePiece )
-	    { // FIXME: i frigging hate this special handling of QGIGamePiece! Remove it once we have a Better Way!
-		QGIGamePiece * pcv = dynamic_cast<QGIGamePiece*>(*it);
-		GamePiece * pc = pcv ? pcv->piece() : 0;
-		if( pc )
-		{
-		    //ser = pc;
-		    pc->setPieceProperty("pos",pcv->pos().toPoint()); // This is a huge kludge to ensure proper pos!
-		    pieces.addPiece(pc);
-		    if(0) qDebug() <<"qboard::clipboardGraphicsItems() copy/cut object is GamePiece:" << pc;
-		}
-		else
-		{
-		    if(0) qDebug() << (copy?"copy":"cut")<<"handler found QGIGamePiece with no associated GamePiece!"
-				   << "Skipping object "<<*it;
-		}
-		continue;
-	    }
-	    //if(0) qDebug() <<"qboard::clipboardGraphicsItems() marking for "<<(copy?"COPY":"CUT") << *it;
+	    //if(0) qDebug() <<"qboard::clipboardScene() marking for "<<(copy?"COPY":"CUT") << *it;
 	    seritems.push_back(ser);
 	}
 	S11nNode * parent = S11nNodeTraits::create(GameState::KeyClipboard);
@@ -361,27 +340,19 @@ namespace qboard {
 	    {
 		ret = s11n::serialize_subnode( meta, "originPoint", origin );
 	    }
-	    if( ret && ! pieces.empty() )
-	    {
-		ret = s11n::serialize_subnode( *parent, "pieces", pieces );
-		pieces.clearPieces(false);
-	    }
 	    if( ret && ! seritems.isEmpty() )
 	    {
 		ret = s11n::serialize_subnode( *parent, "graphicsitems", seritems );
 	    }
 	    if( ! ret )
 	    {
-		throw s11n::s11n_exception("qboard::clipboardGraphicsItems(): serialization of one or more entries failed!");
-		// 		delete parent;
-		// 		return false;
+		throw s11n::s11n_exception("qboard::clipboardScene(): serialization of one or more entries failed!");
 	    }
 	}
 	catch(std::exception const & ex)
 	{
-	    pieces.clearPieces(false);
 	    delete parent;
-	    qDebug() << "qboard::clipboardGraphicsItems(): serialization threw:"<<ex.what();
+	    qDebug() << "qboard::clipboardScene(): serialization threw:"<<ex.what();
 	    return false;
 	}
 	seritems.clear();
@@ -389,17 +360,17 @@ namespace qboard {
 	parent = 0;
 	if( copy )
 	{
-	    if(0) qDebug() << "qboard::clipboardGraphicsItems() copied data.";
+	    if(0) qDebug() << "qboard::clipboardScene() copied data.";
 	}
 	else
 	{
-	    if(0) qDebug() << "qboard::clipboardGraphicsItems() cut data.";
+	    if(0) qDebug() << "qboard::clipboardScene() cut data.";
 	    qboard::destroy( toCut );
 	}
 	S11nClipboard::S11nNode * cont = cb.contents();
 	if( cont )
 	{
-	    if(1)
+	    if(0)
 	    {
 		qDebug() <<"Clipboard contents:";
 		s11nlite::save( *cont, std::cout );
@@ -411,7 +382,13 @@ namespace qboard {
     {
 	if(0) qDebug() <<"qboard::clipboardGraphicsItems("<<gvi<<","<<copy<<")";
 	if( ! gvi ) return false;
+#if 0
+	// reference point at top/left:
 	return clipboardScene( gvi->scene(), copy, gvi->pos().toPoint() );
+#else
+	// reference point centered around gvi's bounds:
+	return clipboardScene( gvi->scene(), copy, calculateCenter(gvi).toPoint() );
+#endif
     }
 
 
@@ -475,5 +452,20 @@ namespace qboard {
 			r.top() + (r.height() / 2) );
     }
 
+    int copyProperties( QObject const * src, QObject * dest )
+    {
+	typedef QList<QByteArray> QL;
+	QL ql( src->dynamicPropertyNames() );
+	QL::const_iterator it( ql.begin() );
+	QL::const_iterator et( ql.end() );
+	int count = 0;
+	for( ; et != it; ++it, ++count )
+	{
+	    char const * key = it->constData();
+	    if( key && (*key == '_') ) continue; // Qt reserves the "_q_" prefix, so we'll elaborate on that.
+	    dest->setProperty( key, src->property(key) );
+	}
+	return count;
+    }
 
 } // namespace
