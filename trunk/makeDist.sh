@@ -10,10 +10,13 @@ echo "Creating $DEST ..."
 
 test -d ${DEST} && rm -fr ${DEST}
 mkdir ${DEST}
-
+test -d ${DEST} || {
+    echo "Destination dir [${DEST}] could not be created!"
+    exit 1
+}
 find . -name '*~' | xargs rm -f
 
-sdirs="apps counters resources src s11n ui"
+sdirs="apps counters resources src s11n ui plugins"
 
 echo "Copying files..."
 for d in $sdirs; do
@@ -24,8 +27,9 @@ for d in $sdirs; do
 	-o -name '*.pro' \
 	-o -name '*.ui' \
 	-o -name '*.qrc' \
-	-o -name '*.png') \
-	$DEST || {
+	-o -name '*.png' \
+	-o -name '*.html' \
+	) $DEST || {
 	err=$?
 	echo "Copy failed!"
 	exit $err
