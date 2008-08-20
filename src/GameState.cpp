@@ -78,6 +78,11 @@ QGraphicsScene * GameState::scene()
     return impl->scene;
 }
 
+void GameState::addItem( QGraphicsItem * it )
+{
+    impl->scene->addItem( it );
+}
+
 QGraphicsItem * GameState::addPiece( GamePiece * pc )
 {
     if( ! pc ) return 0;
@@ -211,7 +216,7 @@ bool GameState::deserialize(  S11nNode const & src )
 		    s11n::cleanup_serializable( li );
 		    return false;
 		}
-		impl->scene->addItem( gi );
+		this->addItem( gi );
 	    }
 	    li.clear();
 	}
@@ -305,6 +310,47 @@ bool GameState::pasteTryHarder( S11nNode const & root,
 	delete gli;
 	gli = 0;
     }
+    typedef QList<Serializable*> SerList;
+    SerList serToClean;
+    SerList pli;
+    try {
+	if( s11nlite::deserialize(root, pli) )
+	{
+	    QPoint xpos( pos );
+	    QPoint step(10,10);
+	    //qDebug() << "GameState::pasteTryHarder(): pasting GamePieceList @"<<pos;
+	    impl->scene->clearSelection();
+	    for( SerList::iterator it = pli.begin();
+		 it != pli.end(); ++it )
+	    {
+		QGraphicsItem * gi = dynamic_cast<QGraphicsItem*>(*it);
+		if( ! gi )
+		{
+		    serToClean.push_back(*it);
+		    continue;
+		}
+		
+		gi->setPos( xpos );
+		if( QObject * obj = dynamic_cast<QObject*>(*it) )
+		{
+		    obj->setProperty( "pos", xpos );
+		}
+		gi->setSelected(true);
+		this->addItem( gi );
+		xpos += step;
+		// FIXME: wrap at the edge of the board, or negate step direction.
+	    }
+	    pli.clear();
+	    return true;
+	}
+    }
+    catch(...) {
+	s11n::cleanup_serializable( pli );
+	s11n::cleanup_serializable( serToClean );
+	return false;
+    }
+    s11n::cleanup_serializable( serToClean );
+
     try {
 	Serializable * ser = s11nlite::deserialize<Serializable>(root);
 	if( ser )
@@ -319,7 +365,7 @@ bool GameState::pasteTryHarder( S11nNode const & root,
 		    obj->setProperty( "pos", pos );
 		}
 		qDebug() << "GameState::pasteTryHarder(): pasting Serializable QGI";
-		this->scene()->addItem( qgi );
+		this->addItem( qgi );
 		return true;
 	    }
 	    s11n::cleanup_serializable<Serializable>( ser );
@@ -356,8 +402,78 @@ bool GameState::pasteClipboard( QPoint const & target )
 //     {
 // 	pD = origin - target;
 //     }
-    node = s11n::find_child_by_name(*root, "pieces");
+
+    node = s11n::find_child_by_name(*root, "graphicsitems");
     QGIL newSelected;
+    if( node )
+    {
+	bool gotOrigin = false;
+	if(0) qDebug() << "qboard::pasteGraphicsItems() pasting items";
+	SerL list;
+	if( ! s11nlite::deserialize( *node, list ) )
+	{
+	    if(1) qDebug() << "qboard::pasteGraphicsItems() pasting deserialization of graphicsitems failed!";
+	    return false;
+	}
+	for( SerL::iterator it = list.begin();
+	     it != list.end(); ++it )
+	{
+	    QGraphicsItem * qgi = dynamic_cast<QGraphicsItem*>( *it );
+	    if( ! qgi )
+	    {
+		if(1) qDebug() << "qboard::pasteGraphicsItems() warning: skipping non-piece, non-QGI Serializable in input.";
+		delete( *it );
+		continue;
+	    }
+	    QPoint newpos = qgi->pos().toPoint();
+	    if( ! gotOrigin )
+	    {
+		gotOrigin = true;
+		if( origin.isNull() )
+		{
+		    if( target.isNull() )
+		    {
+			pD = QPoint();
+			origin = newpos;
+		    }
+		    else
+		    {
+			origin = newpos;
+			pD = newpos - target;
+		    }
+		}
+		else
+		{
+		    if( target.isNull() )
+		    {
+			pD = QPoint();
+		    }
+		    else
+		    {
+			pD = origin - target;
+		    }
+		}
+	    }
+	    newpos -= pD;
+	    
+	    if( QObject * qobj = dynamic_cast<QObject*>(*it) )
+	    {
+		qobj->setProperty( "pos", newpos );
+	    }
+	    else
+	    {
+		qgi->setPos( newpos );
+	    }
+	    if(0) qDebug() << "qboard::pasteGraphicsItems() adding Serializable QGI to scene:"
+			   << "newpos ="<<newpos
+			   << qgi;
+	    newSelected.push_back(qgi);
+	    this->addItem(qgi);
+		continue;
+	}
+    }
+
+    node = s11n::find_child_by_name(*root, "pieces");
     if( node )
     {
 	GamePieceList list;
@@ -366,7 +482,6 @@ bool GameState::pasteClipboard( QPoint const & target )
 	    return false;
 	}
 	GamePiece * pc = 0;
-	bool gotOrigin = false;
 	for( GamePieceList::iterator it = list.begin();
 	     list.end() != it;
 	     ++it )
@@ -382,41 +497,9 @@ bool GameState::pasteClipboard( QPoint const & target )
  	    {
  		pcpos = vpos.toPoint();
  	    }
-	    if( ! gotOrigin )
-	    {
-		gotOrigin = true;
-		if( origin.isNull() )
-		{
-		    if( target.isNull() )
-		    {
-			pD = QPoint();
-			origin = pcpos;
-		    }
-		    else
-		    {
-			origin = pcpos;
-			pD = pcpos - target;
-		    }
-// 		    pD = (target.isNull()
-// 			  ? pcpos
-// 			  : target)
-// 			- target;
-		}
-		else
-		{
-		    if( target.isNull() )
-		    {
-			pD = QPoint();
-		    }
-		    else
-		    {
-			pD = origin - target;
-		    }
-		}
-	    }
 	    pcpos -= pD;
 	    pc->setPieceProperty("pos",pcpos);
-	    newSelected.push_back( this->addPiece( pc ) );
+	    this->addPiece( pc );
 	    if(0) qDebug() << "qboard::pasteGraphicsItems() pasting piece:"<<pc
 			   << "\norigin ="<<origin<<", target ="<<target<<", pcpos ="<<pcpos<<"delta ="<<pD;
 	}
@@ -429,35 +512,6 @@ bool GameState::pasteClipboard( QPoint const & target )
 	if( ! s11nlite::deserialize( *node, impl->board ) )
 	{
 	    if(1) qDebug() << "qboard::pasteGraphicsItems() pasting deserialization of board failed!";
-	}
-    }
-    node = s11n::find_child_by_name(*root, "graphicsitems");
-    if( node )
-    {
-	if(0) qDebug() << "qboard::pasteGraphicsItems() pasting items";
-	SerL list;
-	if( ! s11nlite::deserialize( *node, list ) )
-	{
-	    if(1) qDebug() << "qboard::pasteGraphicsItems() pasting deserialization of graphicsitems failed!";
-	    return false;
-	}
-	for( SerL::iterator it = list.begin();
-	     it != list.end(); ++it )
-	{
-	    QGraphicsItem * qgi = dynamic_cast<QGraphicsItem*>( *it );
-	    if( qgi )
-	    {
-		QPoint newpos( qgi->pos().toPoint() - pD );
-		qgi->setPos( newpos );
-		if(0) qDebug() << "qboard::pasteGraphicsItems() adding Serializable QGI to scene:"
-			       << "newpos ="<<newpos
-			       << qgi;
-		newSelected.push_back(qgi);
-		this->scene()->addItem(qgi);
-		continue;
-	    }
-	    if(0) qDebug() << "qboard::pasteGraphicsItems() warning: skipping non-piece, non-QGI Serializable in input.";
-	    delete( *it );
 	}
     }
 

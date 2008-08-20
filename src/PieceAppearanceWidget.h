@@ -19,7 +19,7 @@ public:
     GameState & state();
     GameState const & state() const;
     QGraphicsView * view();
-    void applyCurrentTemplate( GamePiece * target );
+    void applyCurrentTemplate( QObject * target );
     void setupDefaultTemplates();
 public Q_SLOTS:
     /**
