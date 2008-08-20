@@ -26,15 +26,6 @@ class GameState : public QObject, public Serializable
 public:
     GameState();
     virtual ~GameState();
-    /**
-       This holds all GamePieces. When a piece
-       is added to this list, it is automatically
-       added to this object with a new View object
-       for the piece. When a piece is removed, it's
-       view is only automatically removed if the
-       piece is destroyed.
-     */
-    GamePieceList & pieces();
 
 
     /**
@@ -44,8 +35,6 @@ public:
     /** Serializes this object to.
 	
     The following data are serialized:
-		
-    - All objects in this->pieces().
 		
     - this->board().
 		
@@ -110,6 +99,16 @@ private Q_SLOTS:
     void pieceRemoved( GamePiece * pc );
 
 private:
+    /**
+       This holds all GamePieces. When a piece
+       is added to this list, it is automatically
+       added to this object with a new View object
+       for the piece. When a piece is removed, it's
+       view is only automatically removed if the
+       piece is destroyed.
+     */
+    GamePieceList & pieces();
+
     bool pasteTryHarder( S11nNode const & root,
 			 QPoint const & pos );
     struct Impl;

@@ -52,7 +52,7 @@ void QGIHtml::setup()
 }
 QGIHtml::~QGIHtml()
 {
-	qDebug() << "~QGIHtml()";
+	QBOARD_VERBOSE_DTOR << "~QGIHtml()";
 	delete impl;
 }
 

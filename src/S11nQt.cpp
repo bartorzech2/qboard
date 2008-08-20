@@ -862,7 +862,8 @@ bool QVariant_s11n::operator()( S11nNode const & src, QVariant & dest ) const
 }
 
 
-void QObjectProperties_s11n::clearProperties( QObject & obj )
+#if 1
+static void QObjectProperties_s11n_clearProperties( QObject & obj )
 {
     typedef QList<QByteArray> QL;
     QL ql( obj.dynamicPropertyNames() );
@@ -875,6 +876,7 @@ void QObjectProperties_s11n::clearProperties( QObject & obj )
 	obj.setProperty( key, QVariant() );
     }
 }
+#endif
 
 bool QObjectProperties_s11n::operator()( S11nNode & dest, QObject const & src ) const
 {
@@ -894,21 +896,25 @@ bool QObjectProperties_s11n::operator()( S11nNode & dest, QObject const & src ) 
 	}
 	return true;
 }
+
 bool QObjectProperties_s11n::operator()( S11nNode const & src, QObject & dest ) const
 {
-    clearProperties( dest );
+    QObjectProperties_s11n_clearProperties( dest );
     typedef S11nNodeTraits::child_list_type CLT;
     CLT::const_iterator it = S11nNodeTraits::children(src).begin();
     CLT::const_iterator et = S11nNodeTraits::children(src).end();
-    QString key;
     S11nNode const * node = 0;
     std::string nname;
     for( ; et != it; ++it )
     {
 	node = *it;
-	QVariant vari;
-	if( ! s11n::deserialize( *node, vari ) ) return false;
 	nname = S11nNodeTraits::name(*node);
+	QVariant vari;
+	if( ! s11n::deserialize( *node, vari ) )
+	{
+	    qDebug() << "QObjectProperties_s11n::deserialize failed for key:" <<nname.c_str();
+	    return false;
+	}
 	dest.setProperty( nname.c_str(), vari ); 
     }
     return true;

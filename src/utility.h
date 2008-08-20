@@ -24,7 +24,7 @@ class QPoint;
 class QGraphicsItem;
 class GameState;
 
-#define QBOARD_VERBOSE_DTOR if(1) qDebug()
+#define QBOARD_VERBOSE_DTOR if(0) qDebug()
 
 namespace qboard
 {
@@ -230,9 +230,15 @@ namespace qboard
     
     /**
        Copies all "dynamic" properties from src to dest.
+       Returns the number of properties copied.
     */
     int copyProperties( QObject const * src, QObject * dest );
 
+    /**
+       Unsets Copies all "dynamic" properties from obj.
+       Returns the number of properties cleared.
+    */
+    int clearProperties( QObject * obj );
 }
 
 #endif // QBOARD_UTILITY_H_INCLUDED

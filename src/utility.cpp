@@ -155,7 +155,7 @@ namespace qboard {
 #if 1 // i don't like this, but it avoids some crashes!
 	    if( QObject * obj = dynamic_cast<QObject*>(*it) )
 	    { // kludge to help avoid stepping on self during Destroy/Delete actions
-		qDebug() << "qboard::destroy(QList) using obj->deleteLater():" <<obj;
+		if(0) qDebug() << "qboard::destroy(QList) using obj->deleteLater():" <<obj;
 		obj->deleteLater(); // huh? not destroying QGILineBinder???
 	    }
 	    else
@@ -163,14 +163,14 @@ namespace qboard {
 		sc = (*it)->scene();
 		if( sc )
 		{
-		    qDebug() << "qboard::destroy(QList) asking Scene to remove *it:"<<*it;
+		    if(0) qDebug() << "qboard::destroy(QList) asking Scene to remove *it:"<<*it;
 		    sc->removeItem(*it);
 		}
-		qDebug() << "qboard::destroy(QList) delete *it:" <<*it;
+		if(0) qDebug() << "qboard::destroy(QList) delete *it:" <<*it;
 		delete *it;
 	    }
 #else
-	    qDebug() << "qboard::destroy(QList) delete *it:"<<*it;
+	    if(0) qDebug() << "qboard::destroy(QList) delete *it:"<<*it;
 	    delete *it;
 #endif
 
@@ -454,16 +454,32 @@ namespace qboard {
 
     int copyProperties( QObject const * src, QObject * dest )
     {
+	if( src == dest ) return 0;
 	typedef QList<QByteArray> QL;
 	QL ql( src->dynamicPropertyNames() );
-	QL::const_iterator it( ql.begin() );
-	QL::const_iterator et( ql.end() );
 	int count = 0;
-	for( ; et != it; ++it, ++count )
+	for( QL::const_iterator it( ql.begin() );
+	     ql.end() != it; ++it, ++count )
 	{
 	    char const * key = it->constData();
 	    if( key && (*key == '_') ) continue; // Qt reserves the "_q_" prefix, so we'll elaborate on that.
 	    dest->setProperty( key, src->property(key) );
+	}
+	return count;
+    }
+
+    int clearProperties( QObject * obj )
+    {
+	if( ! obj ) return 0;
+	typedef QList<QByteArray> QL;
+	QL ql( obj->dynamicPropertyNames() );
+	int count = 0;
+	for( QL::const_iterator it( ql.begin() );
+	     ql.end() != it; ++it, ++count )
+	{
+	    char const * key = it->constData();
+	    if( key && (*key == '_') ) continue; // Qt reserves the "_q_" prefix, so we'll elaborate on that.
+	    obj->setProperty( key, QVariant() );
 	}
 	return count;
     }

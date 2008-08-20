@@ -197,7 +197,7 @@ void MainWindowImpl::clearClipboard()
 
 void MainWindowImpl::clipboardUpdated()
 {
-    QString msg(tr("Clipboard updated: "));
+    QString msg;
     S11nClipboard & cb( S11nClipboard::instance() );
     if( ! cb.contents() )
     {
@@ -210,6 +210,10 @@ void MainWindowImpl::clipboardUpdated()
 	msg += cb.contentLabel();
 	this->actionClearClipboard->setEnabled( true );
 	this->actionPaste->setEnabled( true );
+#if 0
+	qDebug() << "MainWindowImpl::clipboardUpdated(): content:";
+	s11nlite::save( *cb.contents(), std::cout );
+#endif
     }
     this->statusBar()->showMessage( msg );
 }

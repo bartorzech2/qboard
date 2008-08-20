@@ -99,7 +99,7 @@ QGILineBinder::QGILineBinder( QGILineNode * l, QGILineNode * r ) :
 QGILineBinder::~QGILineBinder()
 {
 	delete impl;
-	qDebug() << "~QGILineBinder()";
+	if(0) qDebug() << "~QGILineBinder()";
 }
 
 void QGILineBinder::toggleArrows()
@@ -366,7 +366,7 @@ QGILineNode::QGILineNode() :
 
 QGILineNode::~QGILineNode()
 {
-	qDebug() << "~QGILineNode()";
+    if(0) qDebug() << "~QGILineNode()";
 }
 
 QGILineBinder * QGILineNode::edge()
