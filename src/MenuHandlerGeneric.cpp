@@ -194,7 +194,7 @@ void QObjectPropertyAction::setup()
 
 void QObjectPropertyAction::dtorDisconnect(QObject * obj)
 {
-    impl->list.removeOne(obj);
+    impl->list.removeAll(obj);
 }
 
 
