@@ -122,12 +122,28 @@ contains(QT,opengl){
   #DEFINES += QBOARD_USE_OPENGL=0
   message(Disabling OpenGL support.)
 }
+########################################################################
+# S11nQt stuff...
+S11NQT_HEADERS = \
+ $$SRC_DIR/S11n.h \
+ $$SRC_DIR/S11nClipboard.h \
+ $$SRC_DIR/S11nQt.h \
+ $$SRC_DIR/S11nQtList.h \
+ $$SRC_DIR/S11nQtListReg.h \
+ $$SRC_DIR/S11nQtMap.h \
+ $$SRC_DIR/S11nQtMapReg.h \
+ $$SRC_DIR/S11nQtStream.h
 
+S11NQT_SOURCES = \
+ $$SRC_DIR/S11nClipboard.cpp \
+ $$SRC_DIR/S11nQt.cpp \
+ $$SRC_DIR/S11nQtStream.cpp
 
 ########################################################################
 # If/when we ever refactor QBoard into lib+app, these headers belong
 # in the lib:
 QBOARD_HEADERS_LIB = \
+ $$S11NQT_HEADERS \
  $$SRC_DIR/GamePiece.h \
  $$SRC_DIR/GameState.h \
  $$SRC_DIR/GL.h \
@@ -139,6 +155,7 @@ QBOARD_HEADERS_LIB = \
  $$SRC_DIR/parsepp_typelist_10.hpp \
  $$SRC_DIR/parsepp_typelist.hpp \
  $$SRC_DIR/PieceAppearanceWidget.h \
+ $$SRC_DIR/PropObj.h \
  $$SRC_DIR/QBBatch.h \
  $$SRC_DIR/QBoard.h \
  $$SRC_DIR/QBoardPlugin.h \
@@ -147,28 +164,22 @@ QBOARD_HEADERS_LIB = \
  $$SRC_DIR/QGIGamePiece.h \
  $$SRC_DIR/QGIHtml.h \
  $$SRC_DIR/QGILine.h \
+ $$SRC_DIR/QGIPiece.h \
  $$SRC_DIR/QGIPiecePlacemarker.h \
- $$SRC_DIR/S11n.h \
- $$SRC_DIR/S11nClipboard.h \
- $$SRC_DIR/S11nQt.h \
- $$SRC_DIR/S11nQtList.h \
- $$SRC_DIR/S11nQtListReg.h \
- $$SRC_DIR/S11nQtMap.h \
- $$SRC_DIR/S11nQtMapReg.h \
- $$SRC_DIR/S11nQtStream.h \
  $$SRC_DIR/Serializable.h \
  $$SRC_DIR/SetupQBoard.h \
  $$SRC_DIR/reg_qt_s11n.h \
  $$SRC_DIR/utility.h
 
-
 QBOARD_SOURCES_LIB = \
+ $$S11NQT_SOURCES \
  $$SRC_DIR/GamePiece.cpp \
  $$SRC_DIR/GameState.cpp \
  $$SRC_DIR/MenuHandlerBoard.cpp \
  $$SRC_DIR/MenuHandlerGeneric.cpp \
  $$SRC_DIR/MenuHandlerPiece.cpp \
  $$SRC_DIR/PieceAppearanceWidget.cpp \
+ $$SRC_DIR/PropObj.cpp \
  $$SRC_DIR/QBBatch.cpp \
  $$SRC_DIR/QBoard.cpp \
  $$SRC_DIR/QBoardPlugin.cpp \
@@ -176,16 +187,15 @@ QBOARD_SOURCES_LIB = \
  $$SRC_DIR/QGIGamePiece.cpp \
  $$SRC_DIR/QGIHtml.cpp \
  $$SRC_DIR/QGILine.cpp \
+ $$SRC_DIR/QGIPiece.cpp \
  $$SRC_DIR/QGIPiecePlacemarker.cpp \
- $$SRC_DIR/S11nClipboard.cpp \
- $$SRC_DIR/S11nQt.cpp \
- $$SRC_DIR/S11nQtStream.cpp \
  $$SRC_DIR/Serializable.cpp \
  $$SRC_DIR/SetupQBoard.cpp \
  $$SRC_DIR/utility.cpp
 
-QBOARD_SOURCES_GAMESETS = 
-QBOARD_HEADERS_GAMESETS = 
+
+#QBOARD_SOURCES_GAMESETS = 
+#QBOARD_HEADERS_GAMESETS = 
 
 ########################################################################
 # Sources related to the main GUI.
