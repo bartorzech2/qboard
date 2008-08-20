@@ -13,13 +13,95 @@
  *
  */
 
+/************************************************************************
+This file declares some bindings for Qt and libs11n, providing
+serialization support for many common Qt types.
+************************************************************************/
 
 #include "S11n.h"
+#include "S11nQtStream.h"
+#include <sstream>
+#include <memory>
+namespace s11n { namespace qt {
+
+    /**
+       Serializes src to dest using libs11n.
+       SerializableT must be a non-cv-qualified
+       Serializable type.
+    */
+    template <typename SerializableT>
+    bool serialize( QIODevice & dest, SerializableT const & src )
+    {
+	std::ostringstream dummy;
+	StdToQtOBuf sentry( dummy, dest );
+	return s11nlite::save( src, dummy );
+    }
+
+    /**
+       Tries to deserialize a new SerializableT
+       object from src using libs11n.
+       SerializableT must be a non-cv-qualified
+       Serializable type and src must contain data
+       for that type. On error it returns a 0 pointer
+       or propogates an exception. On success it returns
+       a new object, which the caller owns.
+    */
+    template <typename SerializableT>
+    SerializableT * deserialize( QIODevice & src )
+    {
+	std::istringstream dummy;
+	StdToQtIBuf sentry( dummy, src );
+	return s11nlite::load_serializable<SerializableT>( dummy );
+    }
+
+    /**
+       Deserializes dest from src using libs11n.
+       SerializableT must be a non-cv-qualified
+       Serializable type. Note that deserializing
+       this way cannot support polymorphic deserialization
+       of SerializableT. If that is important to you,
+       use the deserialize(QIODevice&), as it can support
+       polymorphic SerializableT.
+    */
+    template <typename SerializableT>
+    bool deserialize( QIODevice & src, SerializableT & dest )
+    {
+	std::istringstream dummy;
+	StdToQtIBuf sentry( dummy, src );
+	typedef std::auto_ptr<S11nNode> AP;
+	AP n( s11nlite::load_node( dummy ) );
+	return n.get()
+	    ? s11nlite::deserialize( *n, dest )
+	    : false;
+    }
+}} // namespaces
+/************************************************************************
+At this point in the file, one might ask why "some" of the code is
+in the s11n::qt namespace and "some" is not. The answers are:
+
+a) i vaguely remember having problems with Qt and namespaces some
+years ago, so i don't normally use namespaces in Qt-based code.
+
+b) Historical reasons. i would ideally like to see all of it in a
+namespace, but it's a lot of repetative editing to fix it, so it ain't
+gonna get fixed yet.
+
+c) right now i'd rather write silly code comments then go and do the morally
+right thing and move all the code into namespaces.
+
+ ************************************************************************/
+
 
 #include <QByteArray>
 /**
    An s11n proxy for QByteArrays. See the compressionThreshold member
    for important notes.
+
+   Note that since you can read/write directly from/to QByteArrays
+   using the QIODevice interface, it is in principal possible to save
+   arbitrary binary data using libs11n this way. Not necessarily an
+   efficient way to save binary data, but maybe useful for some
+   cases (e.g. saving QPixmaps as inlined data).
 */
 struct QByteArray_s11n
 {
@@ -27,7 +109,8 @@ struct QByteArray_s11n
        Serializes src to dest, saving the data in a bin64-encoded
        string. If src.size() is greater than
        QByteArray_s11n::compressionThreshold then the serialized
-       copy is compressed using qCompress().
+       copy is compressed using qCompress() before bin64 encoding
+       is applied.
 
        See the compressionThreshold for more info.
     */
@@ -149,7 +232,10 @@ namespace s11n {
 }
 
 #include <QPixmap>
-/* s11n proxy for QPixmap. */
+/*
+s11n proxy for QPixmap. It actually uses QByteArray_s11n
+to store the data.
+*/
 #define S11N_TYPE QPixmap
 #define S11N_TYPE_NAME "QPixmap"
 #define S11N_SERIALIZE_FUNCTOR QPixmap_s11n
@@ -236,7 +322,8 @@ struct QString_s11n
 #include <QVariant>
 /* s11n proxy for QVariant.
 
-It supports the following QVariant types:
+It supports the following QVariant types (as defined in the
+QVariant::Type enum):
 
 - String, StringList
 - Color (only ARGB format)
@@ -266,8 +353,8 @@ struct QVariant_s11n
 	before this function was called. */
 	bool operator()( S11nNode const & src, QVariant & dest ) const;
 	/**
-		Returns true only if this type can de/serialize QVariants
-		of the given type.
+	   Returns true only if this type can de/serialize QVariants
+	   of the given type.
 	*/
 	static bool canHandle( QVariant::Type t );
 };
