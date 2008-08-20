@@ -19,11 +19,11 @@
 /**
    StdToQtOBuf is a helper to divert output intended for a
    std::ostream to a QIODevice instead. The intention is to allow Qt
-   applications to interact more naturally with libraries making heavy
-   use of the STL streams (originally libs11n). Another use is to get
-   the use of Unicode file names (supported by Qt) with STL-based
-   stream APIs by opening a QFile to open the file and then use the
-   STL-based stream API to read/write from/to it.
+   applications which make heavy use of the STL interact more
+   naturally with Qt. Another use is to get the use of Unicode file
+   names (supported by Qt) with STL-based stream APIs by opening a
+   QFile to open the file and then use the STL-based stream API to
+   read/write from/to it.
 
    This object is intended to be used as a proxy, like:
 
@@ -37,7 +37,6 @@
     // For example:
     s11nlite::save( dummy, myS11nableObject );
     ...
-
   }
 \endcode
 
@@ -82,6 +81,12 @@ public:
        false. traits_type::eof().
     */
     virtual int overflow(int c);
+private:
+    //! Copying not allowed.
+    StdToQtOBuf( const StdToQtOBuf & );
+    //! Copying not allowed.
+    StdToQtOBuf & operator=( const StdToQtOBuf & );
+
 };
 
 /**
@@ -150,5 +155,7 @@ private:
     //! Copying not allowed.
     StdToQtIBuf & operator=( const StdToQtIBuf & );
 };
+
+
 
 #endif // QBOARD_S11nQtStream_H_INCLUDED

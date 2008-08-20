@@ -15,6 +15,7 @@
 #include <stdexcept>
 struct StdToQtOBuf::Impl
 {
+    // FIXME? add a buffer?
     std::ostream & in;
     QIODevice & out;
     std::streambuf * oldBuf;
@@ -79,12 +80,13 @@ struct StdToQtIBuf::Impl
     std::istream & sstr;
     QIODevice & qstr;
     std::streambuf * oldBuf;
-    char cbuf;
+    QByteArray bufa;
+    static const int bufsize = 1024;
     Impl(std::istream & i, QIODevice & o ) :
 	sstr(i),
 	qstr(o),
 	oldBuf(i.rdbuf()),
-	cbuf(0)
+	bufa(bufsize,0)
     {
 	if( ! o.isOpen() )
 	{
@@ -122,11 +124,12 @@ StdToQtIBuf::~StdToQtIBuf()
 
 int StdToQtIBuf::underflow()
 {
-    if( ! impl->qstr.getChar( &impl->cbuf ) )
+    char * dest = impl->bufa.data();
+    qint64 rd = impl->qstr.read( dest, Impl::bufsize );
+    if( rd < 1 )
     {
 	return traits_type::eof();
     }
-    char * x = &impl->cbuf;
-    this->setg(x,x,x+1);
-    return traits_type::not_eof(*x);
+    this->setg(dest,dest,dest+rd);
+    return traits_type::not_eof(*dest);
 }

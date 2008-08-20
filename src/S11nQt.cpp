@@ -22,9 +22,9 @@
 #include "S11nQtList.h"
 #include "S11nQtMap.h"
 
-typedef unsigned long long hashval_t;
-const hashval_t hashval_t_err = static_cast<hashval_t>(-1);
-hashval_t hash_cstring_djb2( void const * vstr)
+typedef unsigned long long hashval_t; // FIXME: some platforms don't have long long
+static const hashval_t hashval_t_err = static_cast<hashval_t>(-1);
+static hashval_t hash_cstring_djb2( void const * vstr)
 { /* "djb2" algo code taken from: http://www.cse.yorku.ca/~oz/hash.html */
     if( ! vstr ) return hashval_t_err;
     hashval_t hash = 5381;
@@ -52,7 +52,7 @@ bool QByteArray_s11n::operator()( S11nNode & dest, QByteArray const & src ) cons
 				: src ).toBase64() );
     b64.append('\0');
     NT::set( dest, "djb2", hash_cstring_djb2( b64.constData() ) );
-    NT::set( dest, "bin64", std::string( b64.constData(), b64.count()-1 ) );
+    NT::set( dest, "bin64", std::string( b64.constData(), b64.size()-1 ) );
     return true;
 }
 bool QByteArray_s11n::operator()( S11nNode const & src, QByteArray & dest ) const
