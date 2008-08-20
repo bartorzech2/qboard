@@ -66,6 +66,9 @@ public:
     */
     QGraphicsScene * scene();
 
+//     QList<QObject*> selectedObjects();
+//     QList<Serializable*> selectedSerializables();
+
     /**
        This is functionally identical to calling
        pieces().addPiece(pc), but this returns
