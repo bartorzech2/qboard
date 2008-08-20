@@ -6,6 +6,19 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top.
 
 ----
+*2008 August 20:*
+
+- The popup menus have been more unified. e.g. using Rotate will now
+rotate all selected objects which support that property, instead of all
+objects of the same type as the selected object.
+
+- Started replacing removing the split-brain GamePiece/QGIGamePiece combination
+with a single object, QGIPiece.
+
+- In theory older versions of QBoard can still load the newer saved data, but
+there's no guaranty.
+
+
 *2008 August 19:*
 
 - Significant improvements in copy/paste, including:
