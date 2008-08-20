@@ -21,17 +21,14 @@
 #include <QIcon>
 
 //#include "MenuHandlerGeneric.h"
-#include "GamePiece.h"
-#include "QGIGamePiece.h"
 #include "GameState.h"
 #include "utility.h"
-#include "S11nQt.h"
-#include "S11nQtList.h"
 #include "S11nClipboard.h"
 #include <stdexcept>
 #include "QBoard.h"
 #include "QBoardView.h"
 #include "GL.h"
+#include "MenuHandlerGeneric.h"
 
 struct MenuHandlerBoard::Impl
 {
@@ -89,6 +86,16 @@ void MenuHandlerBoard::doMenu( GameState & gs, QBoardView * pv, QContextMenuEven
     m.addAction("Board")->setEnabled(false);
     m.addSeparator();
     m.addAction(QIcon(":/QBoard/icon/editcopy.png"),"Copy board (not pieces)",this,SLOT(doCopy()) );
+
+    QList<QGraphicsItem*> selected( pv->scene()->selectedItems() );
+    if( ! selected.isEmpty() )
+    {
+	QGraphicsItem * pv = *(selected.begin());
+	MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( pv, &m );
+	m.addAction(QIcon(":/QBoard/icon/editcopy.png"),tr("Copy selected items"),clipper,SLOT(clipboardCopy()) );
+	m.addAction(QIcon(":/QBoard/icon/editcut.png"),"Cut selected items",clipper,SLOT(clipboardCut()) );
+    }
+
     QAction * act = m.addAction(QIcon(":/QBoard/icon/editpaste.png"),
 				QString("Paste (%1)").arg( S11nClipboard::instance().contentLabel() ),
 				this,SLOT(doPaste()) );
