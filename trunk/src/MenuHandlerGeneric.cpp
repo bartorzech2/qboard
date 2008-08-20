@@ -38,7 +38,9 @@ void MenuHandlerCopyCut::clipboard( QGraphicsItem * gvi, bool copy )
     if( ! gvi ) return;
     if( gvi->isSelected() )
     {
-	qboard::clipboardGraphicsItems( gvi, copy );
+	qboard::clipboardScene( gvi->scene(), copy,
+				qboard::calculateCenter(gvi).toPoint() );
+	return;
     }
     else
     {
@@ -135,13 +137,6 @@ QObjectPropertyAction::QObjectPropertyAction(
     : QAction(val.toString(),parent),
       impl(new Impl)
 {
-#if 1
-    if( val == obj->property(propName.toAscii()) )
-    {
-	this->setCheckable(true);
-	this->setChecked(true);
-    }
-#endif
     impl->list.push_back(obj);
     impl->key = propName;
     impl->val = val;
@@ -167,6 +162,18 @@ QObjectPropertyAction::~QObjectPropertyAction()
 
 void QObjectPropertyAction::setup()
 {
+#if 1
+    if( 1 == impl->list.count() )
+    {
+	QObject * obj = *(impl->list.begin());
+	if( impl->val == obj->property(impl->key.toAscii()) )
+	{
+	    this->setCheckable(true);
+	    this->setChecked(true);
+	}
+    }
+#endif
+
     if( impl->val.type() == QVariant::Color )
     {
 	QPixmap px(16,16);

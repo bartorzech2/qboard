@@ -17,9 +17,8 @@
 #include <QApplication>
 S11nClipboard::S11nClipboard() : m_node(0)
 {
-    connect(QApplication::clipboard(),SIGNAL(dataChanged()),
-	    this,SLOT(syncFromQt()));
     this->syncFromQt();
+    connect(QApplication::clipboard(),SIGNAL(dataChanged()),this,SLOT(syncFromQt()));
 }
 S11nClipboard::~S11nClipboard()
 {
@@ -37,6 +36,7 @@ S11nClipboard::S11nNode * S11nClipboard::contents()
 
 void S11nClipboard::syncToQt()
 {
+    disconnect(QApplication::clipboard(),SIGNAL(dataChanged()),this,SLOT(syncFromQt()));
     QClipboard * cb = QApplication::clipboard();
     // cb->clear(); doh! Ends up nuking m_node via signal to syncFromQt()!
     if( this->m_node )
@@ -52,6 +52,7 @@ void S11nClipboard::syncToQt()
 	cb->clear();
     }
     emit signalUpdated();
+    connect(QApplication::clipboard(),SIGNAL(dataChanged()),this,SLOT(syncFromQt()));
 }
 
 void S11nClipboard::syncFromQt()

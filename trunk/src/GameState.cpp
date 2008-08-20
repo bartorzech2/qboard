@@ -195,27 +195,18 @@ bool GameState::deserialize(  S11nNode const & src )
 	    throw;
 	}
     }
+#if 1 // for backwards compatibility only
     ch = s11n::find_child_by_name(src, "pieces");
     if( ch )
     {
-#if 1
 	if( ! s11n::deserialize( *ch, this->impl->pieces ) ) return false;
-#else
-	typedef QList<GamePiece*> PL;
-	PL list;
-	if( ! s11n::deserialize( *ch, list ) ) return false;
-	for( PL::iterator it = list.begin();
-	     list.end() != it; ++it )
-	{
-	    impl->pieces.addPiece( *it );
-	}
-#endif
     }
+#endif // backwards compat
     return true;
 }
 
 
-
+#if 0
 static void adjustPos( QObject * obj, QPoint const & pos )
 {
     if( ! obj ) return;
@@ -226,33 +217,41 @@ static void adjustPos( QObject * obj, QPoint const & pos )
     {
 	pD = cpos - pos;
     }
-#if 1
     QPoint newpos = cpos.isNull() ?  pos : cpos;
-    qDebug() << "adjustPos("<<obj<<","<<pos<<"): delta="<<pD<<"cpos="<<cpos<<"newpos="<<newpos;
+    if(0) qDebug() << "adjustPos("<<obj<<","<<pos<<"): delta="<<pD<<"cpos="<<cpos<<"newpos="<<newpos;
     newpos -= pD;
-    qDebug() << "adjustPos("<<obj<<","<<pos<<"): delta="<<pD<<"cpos="<<cpos<<"newpos="<<newpos;
+    if(0) qDebug() << "adjustPos("<<obj<<","<<pos<<"): delta="<<pD<<"cpos="<<cpos<<"newpos="<<newpos;
     if( newpos != cpos )
     {
 	obj->setProperty("pos", newpos);
     }
-#else
-    QPoint newpos = cpos.isNull() ? pos : cpos;
-    if( ! pD.isNull() )
-    {
-	newpos -= pD;
-	qDebug() << "adjustPos("<<obj<<","<<pos<<"): delta="<<pD<<"cpos="<<cpos<<"newpos="<<newpos;
-	if( newpos != cpos )
-	{
-	    obj->setProperty("pos", newpos);
-	}
-    }
-#endif
+}
+#endif // adjustPos(QObject...)
 
+static void adjustPos( QGraphicsItem * obj, QPoint const & pos )
+{
+    if( ! obj ) return;
+    QVariant vpos( obj->pos() );
+    QPoint cpos = vpos.isValid() ? vpos.toPoint() : QPoint();
+    QPoint pD;
+    if( ! pos.isNull() && ! cpos.isNull() )
+    {
+	pD = cpos - pos;
+    }
+    QPoint newpos = cpos.isNull() ?  pos : cpos;
+    if(0) qDebug() << "adjustPos("<<obj<<","<<pos<<"): delta="<<pD<<"cpos="<<cpos<<"newpos="<<newpos;
+    newpos -= pD;
+    if(0) qDebug() << "adjustPos("<<obj<<","<<pos<<"): delta="<<pD<<"cpos="<<cpos<<"newpos="<<newpos;
+    if( newpos != cpos )
+    {
+	obj->setPos( newpos );
+    }
 }
 
 bool GameState::pasteTryHarder( S11nNode const & root,
 				QPoint const & pos )
 {
+    if(1) qDebug() << "GameState::pasteTryHarder(node,"<<pos<<")";
     try {
 	if( impl->board.deserialize(root) )
 	{
@@ -260,13 +259,35 @@ bool GameState::pasteTryHarder( S11nNode const & root,
 	}
     }
     catch(...) {}
+
+
+    try {
+	Serializable * ser = s11nlite::deserialize<Serializable>(root);
+	if( ser )
+	{
+	    if(1) qDebug() << "GameState::pasteTryHarder(node,"<<pos<<") <Serializable>";
+	    QGraphicsItem * qgi = dynamic_cast<QGraphicsItem*>(ser);
+	    if( qgi )
+	    {
+		if(1) qDebug() << "GameState::pasteTryHarder(node,"<<pos<<") Serializable QGI";
+		adjustPos( qgi, pos );
+		this->addItem( qgi );
+		return true;
+	    }
+	    if(1) qDebug() << "GameState::pasteTryHarder(node,"<<pos<<") non-QGI Serializable";
+	    s11n::cleanup_serializable<Serializable>( ser );
+	}
+    }
+    catch(...) {}
+
     typedef QList<Serializable*> SerList;
     SerList serToClean;
     SerList pli;
     try {
 	if( s11nlite::deserialize(root, pli) )
 	{
-	    QPoint xpos( pos );
+	    if(1) qDebug() << "GameState::pasteTryHarder(node,"<<pos<<") QList<Serializable*>";
+    	    QPoint xpos( pos );
 	    QPoint step(10,10);
 	    //qDebug() << "GameState::pasteTryHarder(): pasting GamePieceList @"<<pos;
 	    impl->scene->clearSelection();
@@ -277,20 +298,25 @@ bool GameState::pasteTryHarder( S11nNode const & root,
 		if( ! gi )
 		{
 		    serToClean.push_back(*it);
+		    if(1) qDebug() << "GameState::pasteTryHarder(node,"<<pos<<") skipping non-QGraphicsItem Serializable:"<<(*it)->s11nClass();
 		    continue;
 		}
-		
+		if(1) qDebug() << "GameState::pasteTryHarder(node,"<<pos<<") got QGraphicsItem:"<<gi;
 		gi->setPos( xpos );
+#if 0
+		// i don't like this, but it might be necessary for keeping cut/paste/s11n pos prop in sync?
 		if( QObject * obj = dynamic_cast<QObject*>(*it) )
 		{
 		    obj->setProperty( "pos", xpos );
 		}
+#endif
 		gi->setSelected(true);
 		this->addItem( gi );
 		xpos += step;
 		// FIXME: wrap at the edge of the board, or negate step direction.
 	    }
 	    pli.clear();
+	    s11n::cleanup_serializable( serToClean );
 	    return true;
 	}
     }
@@ -299,29 +325,7 @@ bool GameState::pasteTryHarder( S11nNode const & root,
 	s11n::cleanup_serializable( serToClean );
 	return false;
     }
-    s11n::cleanup_serializable( serToClean );
-
-    try {
-	Serializable * ser = s11nlite::deserialize<Serializable>(root);
-	if( ser )
-	{
-	    QGraphicsItem * qgi = dynamic_cast<QGraphicsItem*>(ser);
-	    if( qgi )
-	    {
-		QObject * obj = dynamic_cast<QObject*>(ser);
-		if( obj )
-		{
-		    adjustPos( obj, pos );
-		    obj->setProperty( "pos", pos );
-		}
-		qDebug() << "GameState::pasteTryHarder(): pasting Serializable QGI";
-		this->addItem( qgi );
-		return true;
-	    }
-	    s11n::cleanup_serializable<Serializable>( ser );
-	}
-    }
-    catch(...) {}
+    if(1) qDebug() << "GameState::pasteTryHarder(node,"<<pos<<") could not find a match!";
 
     return false;
 }
@@ -414,7 +418,7 @@ bool GameState::pasteClipboard( QPoint const & target )
 			   << qgi;
 	    newSelected.push_back(qgi);
 	    this->addItem(qgi);
-		continue;
+	    continue;
 	}
     }
 

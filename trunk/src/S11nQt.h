@@ -371,17 +371,21 @@ struct QVariant_s11n
 */
 struct QObjectProperties_s11n
 {
-	/** Serializes all "dynamic" Properties from the src object to dest.
-	Each propery is saved in a separate subnode, named after the property.
-	Properties which begin with an underscore are skipped.
-	*/
-	bool operator()( S11nNode & dest, QObject const & src ) const;
-	/** Deserializes subnodes of src and inserts them as properties
-	of dest from src. If this routine returns false, dest may be partially
-	deserialized - its state is effectively undefined. */
-	bool operator()( S11nNode const & src, QObject & dest ) const;
+    /**
+       Serializes all "dynamic" Properties from the src object to dest.
+       Each propery is saved in a separate subnode, named after the property.
+       Properties which begin with an underscore are skipped.
+    */
+    bool operator()( S11nNode & dest, QObject const & src ) const;
+    /**
+       Deserializes subnodes of src and inserts them as properties
+       of dest from src. If this routine returns false, dest may be partially
+       deserialized - its state is effectively undefined.
 
-    static void clearProperties( QObject & obj );
+       As per s11n convention, this routine clears out any existing
+       properties of dest before populating it.
+    */
+    bool operator()( S11nNode const & src, QObject & dest ) const;
 
 };
 

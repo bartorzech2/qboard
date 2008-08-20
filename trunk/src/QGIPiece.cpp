@@ -23,6 +23,7 @@
 #include "S11nQtList.h"
 #include "S11nClipboard.h"
 #include "MenuHandlerGeneric.h"
+#include "PropObj.h"
 
 struct QGIPiece::Impl
 {
@@ -90,7 +91,7 @@ bool QGIPiece::event( QEvent * e )
 void QGIPiece::propertySet( char const *pname, QVariant const & var )
 {
     // FIXME: treat QVariant::Invalid appropriately for each property
-    //qDebug() << "QGIPiece::piecePropertySet("<<pname<<")[block="<<impl->block<<"] val="<<var;
+    if(0) qDebug() << "QGIPiece::propertySet("<<pname<<")[block="<<impl->block<<"] val="<<var;
     if( impl->block ) return;
     std::string key( pname );
     if( "zLevel" == key )
@@ -101,7 +102,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     }
     if( "pos" == key )
     {
-	this->setPos( var.toPoint() );
+	this->setPos( var.value<QPointF>() );
 	this->update();
 	return;
     }
@@ -282,11 +283,19 @@ void QGIPiece::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
     event->accept();
     QGIPieceMenuHandler mh;
     mh.doMenu( this, event );
-    //this->QGraphicsPixmapItem::contextMenuEvent(event);
 }
 QRectF QGIPiece::boundingRect() const
 {
-    return impl->pixmap.rect();
+    QRectF r( impl->pixmap.rect() );
+    if( impl->borderSize > 0 )
+    { // QGraphicsItem::boundingRect() docs say we need this:
+	qreal pw( impl->borderSize / 1.8 ); // 2.0 doesn't quite work for me - still get graphics artefacts
+	r.setLeft( r.left() - pw );
+	r.setRight( r.right() + pw );
+	r.setTop( r.top() - pw );
+	r.setBottom( r.bottom() + pw );
+    }
+    return r;
 }
 
 QVariant QGIPiece::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
@@ -342,19 +351,29 @@ void QGIPiece::dragMoveEvent( QGraphicsSceneDragDropEvent * event )
 
 bool QGIPiece::serialize( S11nNode & dest ) const
 {
-    qDebug() << "QGIPiece::serialize()"<<this;
     if( ! this->Serializable::serialize( dest ) ) return false;
     // EVIL KLUDGE: we must ensure that our 'pos' property
     // is set properly. We must violate constness to do so.
-    QGIPiece * c = const_cast<QGIPiece*>( this );
-    c->setProperty( "pos", this->pos().toPoint() );
-    return QObjectProperties_s11n()( dest, *this );
+    PropObj props;
+    qboard::copyProperties( this, &props );
+    props.setProperty("pos", this->pos() );
+    return s11n::serialize_subnode( dest,"props", props );
 }
 
 bool QGIPiece::deserialize( S11nNode const & src )
 {
-    return this->Serializable::deserialize( src )
-	&& QObjectProperties_s11n()( src, *this );
+    if( ! this->Serializable::deserialize( src ) ) return false;
+    qboard::clearProperties(this);
+    // Reminder: don't clear our properties here. Normally
+    // we would do a full clean up, but in this case that's problematic.
+    PropObj props;
+    if( ! s11n::deserialize_subnode( src, "props", props ) )
+    {
+	qDebug() << "QGIPiece::deserialize() deser of props node failed!";
+	return false;
+    }
+    qboard::copyProperties( &props, this );
+    return true;
 }
 
 
@@ -483,9 +502,9 @@ void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent 
 
 #if 1
     m->addSeparator();
-    MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( pv, m );
     if( pv->isSelected() )
     {
+	MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( pv, m );
 	m->addAction(QIcon(":/QBoard/icon/editcopy.png"),tr("Copy selected"),clipper,SLOT(clipboardCopy()) );
 	m->addAction(QIcon(":/QBoard/icon/editcut.png"),"Cut selected",clipper,SLOT(clipboardCut()) );
 	QMenu * mcopy = m->addMenu(tr("Copy..."));

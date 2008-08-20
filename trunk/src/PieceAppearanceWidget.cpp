@@ -58,7 +58,7 @@ void PieceAppearanceWidget::setupDefaultTemplates()
 
 	;
     int step = 24;
-    int space = 2;
+    int space = 4;
     int x = space;
     int y = space;
     int count = cl.size();
@@ -73,18 +73,22 @@ void PieceAppearanceWidget::setupDefaultTemplates()
 	pc->setProperty("size",QSize(step,step));
 	pc->setProperty("pos",QPoint(x,y));
 	pc->setProperty("dragDisabled",int(1));
-	x += step + space;
+	const QRectF bounds( pc->boundingRect() );
 	if( ++pos >= (count/rows) )
 	{
-	    y += step + space;
+	    y += int(bounds.height())  + space;
 	    pos = 0;
 	    x = space;
+	}
+	else
+	{
+	    x += int(bounds.width()) + space;
 	}
 	pc->setProperty("color",*it);
 	pc->setProperty("borderSize",1);
 	pc->setProperty("borderColor",QColor(0,0,0));
     }
-
+    //impl->gs.scene()->setSceneRect( QRectF() );
 }
 void PieceAppearanceWidget::setupUI()
 {

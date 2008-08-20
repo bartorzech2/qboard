@@ -106,7 +106,8 @@ void MenuHandlerBoard::doMenu( GameState & gs, QBoardView * pv, QContextMenuEven
     }
 #if QBOARD_USE_OPENGL
     {
-	QAction * ac = m.addAction("Toggle OpenGL Mode",pv, SLOT(setGLMode(bool)) );
+	m.addSeparator();
+	QAction * ac = m.addAction(tr("Toggle OpenGL Mode"),pv, SLOT(setGLMode(bool)) );
 	ac->setCheckable( true );
 	ac->setChecked( pv->isGLMode() );
     }
