@@ -13,7 +13,10 @@ rotate all selected objects which support that property, instead of all
 objects of the same type as the selected object.
 
 - Started replacing removing the split-brain GamePiece/QGIGamePiece combination
-with a single object, QGIPiece.
+with a single object, QGIPiece. This allows me to remove several ugly workarounds
+in places which shouldn't have them.
+
+- More cleanups in the positioning of pasted data.
 
 - In theory older versions of QBoard can still load the newer saved data, but
 there's no guaranty.
