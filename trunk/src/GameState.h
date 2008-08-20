@@ -70,15 +70,6 @@ public:
 //     QList<Serializable*> selectedSerializables();
 
     /**
-       This is functionally identical to calling
-       pieces().addPiece(pc), but this returns
-       the new QGraphicsItem associated with the
-       piece, which is owned by its QGraphicsScene
-       parent.
-    */
-    QGraphicsItem * addPiece( GamePiece * pc );
-
-    /**
        Transfers ownership of the item to this object's
        QGraphicsScene.
     */
