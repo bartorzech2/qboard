@@ -227,6 +227,11 @@ namespace qboard
 	return ol;
     }
 
+    
+    /**
+       Copies all "dynamic" properties from src to dest.
+    */
+    int copyProperties( QObject const * src, QObject * dest );
 
 }
 
