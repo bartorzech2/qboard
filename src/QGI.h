@@ -21,6 +21,7 @@ struct QGITypes
 	enum Types {
 	_TypesStart = QGraphicsItem::UserType + 100,
 	GamePiece,
+	GamePiece2,
 	Html,
 	LineNode,
 	LineNodeBinder,
