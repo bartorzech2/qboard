@@ -3,5 +3,6 @@
     <file>help/classes/GamePiece.html</file>
     <file>help/classes/QGIHtml.html</file>
     <file>help/classes/QGILine.html</file>
+    <file>help/classes/QGIPiece.html</file>
   </qresource>
 </RCC>
