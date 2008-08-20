@@ -198,7 +198,7 @@ void try_s11n()
 		    S11nNode * cp = s11nlite::load_node( std::cin );
 		    if( ! cp )
 		    {
-			CERR << "ERROR loading node from QIODevice!\n";
+			throw std::runtime_error("ERROR loading S11nNode from QIODevice!");
 		    }
 		    else
 		    {
