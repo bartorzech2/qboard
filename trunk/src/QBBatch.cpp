@@ -15,8 +15,7 @@
 
 #include "S11nQt.h"
 #include "QBoard.h"
-#include "GamePiece.h"
-#include "QGIGamePiece.h"
+#include "QGIPiece.h"
 #include <sstream>
 #include <memory>
 #include <algorithm>
@@ -63,7 +62,7 @@ namespace QBBatch {
     struct State
     {
 	GameState * gstate;
-	GamePiece * piece;
+	QGIPiece * piece;
 	QObject * current; // current item: either piece or board
 	std::string key; // current property key
 	std::string toeocmd; // collected by r_toeocmd
@@ -168,7 +167,7 @@ namespace QBBatch {
     };
 
     /**
-       Sets current item to the most recently created GamePiece.
+       Sets current item to the most recently created game piece.
     */
     struct a_piece;
 
@@ -410,8 +409,9 @@ namespace QBBatch {
 	    if( "piece" == m )
 	    {
 		QBB_VERBOSE << "Creating new piece.\n";
-		st.current = st.piece = new GamePiece;
-		st.gstate->pieces().addPiece( st.piece );
+		st.current = st.piece = new QGIPiece;
+		st.gstate->addItem( st.piece );
+		//st.gstate->pieces().addPiece( st.piece );
 		//COUT << "Created new game piece.\n";
 	    }
 	    else if( "game" == m )

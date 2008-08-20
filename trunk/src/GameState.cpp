@@ -17,7 +17,7 @@
 #include <QList>
 #include "S11nQt.h"
 #include "S11nQtList.h"
-#include "QGIGamePiece.h"
+#include "QGIPiece.h"
 #include "utility.h"
 #include "QBoard.h"
 #include "S11nClipboard.h"
@@ -93,7 +93,23 @@ QGraphicsItem * GameState::addPiece( GamePiece * pc )
 }
 QGraphicsItem * GameState::pieceAdded( GamePiece * pc )
 {
+#if 0
     return (impl->lameKludge = new QGIGamePiece(pc,impl->scene));
+#else
+    QGIPiece * gvi = new QGIPiece;
+    typedef QList<QByteArray> QL;
+    QL ql( pc->dynamicPropertyNames() );
+    QL::const_iterator it( ql.begin() );
+    QL::const_iterator et( ql.end() );
+    for( ; et != it; ++it )
+    {
+	char const * key = it->constData();
+	if( key && (*key == '_') ) continue; // Qt reserves the "_q_" prefix, so we'll elaborate on that.
+	gvi->setProperty( key, pc->property(key) );
+    }
+    impl->scene->addItem( gvi );
+    return gvi;
+#endif
     //qDebug() << "GameState::pieceAdded() added QGIGamePiece" << static_cast<QObject*>(pv);
 }
 void GameState::pieceRemoved( GamePiece * )
@@ -126,17 +142,7 @@ bool GameState::serialize( S11nNode & dest ) const
 {
     if( ! this->Serializable::serialize( dest ) ) return false;
     typedef S11nNodeTraits NT;
-    /**
-       FIXME:
-
-       This code is largely here to accomodate different types of
-       Views for GamePiece- vs non-GamePiece objects. We need to
-       come up with a way to eliminate this special-case crap.
-    */
-    QList<Serializable*> nonPiece;
-    // We need to make sure that the pieces have a 'pos' property set, so we will
-    // look at all QGIGamePieces and sync their position properties. So lame.
-    // This is why members of this type are mutable.
+    QList<Serializable*> serItems;
     typedef QList<QGraphicsItem *> QL;
     QL ql( this->impl->scene->items() );
     QL::iterator it = ql.begin();
@@ -149,36 +155,17 @@ bool GameState::serialize( S11nNode & dest ) const
 	     relationships from here. */
 	    continue;
 	}
-	QGIGamePiece * v = dynamic_cast<QGIGamePiece *>( *it );
-	// ^^^^ this cast is so Java/C#-ish that it makes me ill.
-	if( ! v )
+	Serializable * ser = dynamic_cast<Serializable*>( *it );
+	if( ! ser )
 	{
-	    Serializable * ser = dynamic_cast<Serializable*>( *it );
-	    if( ! ser )
-	    {
-		qDebug() << "WARNING: GameState::serialize(): skipping non-Serializable QGraphicsItem:"<<*it;
-		continue;
-	    }
-	    nonPiece.push_back(ser);
+	    qDebug() << "WARNING: GameState::serialize(): skipping non-Serializable QGraphicsItem:"<<*it;
 	    continue;
 	}
-	GamePiece * pc = v->piece();
-	if( ! pc ) continue;
-	QVariant ppos( pc->property("pos") );
-	if( 1 )
-	{ // Kludge to enforce proper piece
-	    QPoint vpos( v->pos().toPoint() );
-	    if( ppos.toPoint() != vpos )
-	    {
-		pc->setProperty( "pos", vpos );
-		// ^^^^ Note that we do not use setPieceProperty() to avoid triggering a piecePropertySet() signal.
-		qDebug() << "WARNING: GameState::serialize() kludge: setting 'pos' property for piece.";
-	    }
-	}
+	serItems.push_back(ser);
     }
     return s11n::serialize_subnode( dest, "board", this->impl->board )
 	&& s11n::serialize_subnode( dest, "pieces", this->impl->pieces )
-	&& (nonPiece.isEmpty() ? true : s11nlite::serialize_subnode( dest, "graphicsitems", nonPiece ) )
+	&& (serItems.isEmpty() ? true : s11nlite::serialize_subnode( dest, "graphicsitems", serItems ) )
 	;
 }
 
@@ -229,6 +216,8 @@ bool GameState::deserialize(  S11nNode const & src )
     }
     return true;
 }
+
+
 
 static void adjustPos( QObject * obj, QPoint const & pos )
 {
@@ -527,3 +516,4 @@ bool GameState::pasteClipboard( QPoint const & target )
     }
     return true;
 }
+
