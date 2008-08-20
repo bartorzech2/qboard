@@ -56,11 +56,11 @@ public Q_SLOTS:
     */
     void enablePlacemarker( bool );
     /**
-       Adds the given piece to the game state (transfering ownership).
-       The piece's position is set to that of the placemarker if the
+       Adds the given item to the game state (transfering ownership).
+       The item's position is set to that of the placemarker if the
        placemarker is enabled, otherwise it is not changed.
     */
-    void addPiece( GamePiece * );
+    void addItem( QGraphicsItem * );
     void selectAll();
     /** Sets or unsets OpenGL mode, which is faster for many operations
 	but often misses important screen updates.

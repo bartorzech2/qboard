@@ -376,7 +376,7 @@ void QBoardView::contextMenuEvent( QContextMenuEvent * event )
     }
 }
 
-void QBoardView::addPiece( GamePiece * pc )
+void QBoardView::addItem( QGraphicsItem * vi )
 {
     QPoint pos;
     if( impl->placer )
@@ -385,7 +385,7 @@ void QBoardView::addPiece( GamePiece * pc )
 	// If the size is set, use it. Since pc is
 	// very unlikely to have a view so far, its
 	// size is not likely to be set.
-	QVariant var( pc->property("size") );
+	QVariant var( vi->boundingRect().size() );
 	if( var.isValid() )
 	{
 	    QSize sz(var.toSize() );
@@ -399,15 +399,16 @@ void QBoardView::addPiece( GamePiece * pc )
     else
     {
 	pos = impl->placeAt;
-// 	QScrollBar * sb = this->verticalScrollBar();
-// 	pos.setY( sb->sliderPosition() );
-// 	sb = this->horizontalScrollBar();
-// 	pos.setX( sb->sliderPosition() );
-// 	// ^^^ this isn't valid when we're scaled!
     }
-    qDebug() << "QBoardView::addPiece() pos ="<<pos;
-    pc->setPieceProperty("pos", pos );
-    impl->gs.addPiece(pc);
+    vi->setPos( pos );
+    impl->gs.addItem(vi);
+#if 0
+    QObject * pc = dynamic_cast<QObject*>(vi);
+    if( vi )
+    {
+	pc->setProperty("pos", pos );
+    }
+#endif
 }
 void QBoardView::enablePlacemarker( bool en )
 {
