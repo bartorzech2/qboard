@@ -33,9 +33,7 @@
 #include <cmath>
 #include <s11n.net/s11n/s11nlite.hpp>
 
-#include "GamePiece.h"
 #include "QBoardView.h"
-#include "QGIGamePiece.h"
 #include "QGIPiece.h"
 #include "QGIHtml.h"
 #include "GameState.h"
@@ -288,21 +286,7 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 	// FIXME: this dispatch needs to be generalized.
 	QString fn( fi.filePath() ); // fi.absoluteFilePath() );
 	bool worked = false;
-	GamePiece pc;
-	GamePieceList gpl;
-	if( pc.fileNameMatches(fn) )
-	{
-		worked = this->loadPiece(fi);
-	}
-	if( gpl.fileNameMatches(fn) )
-	{
-		worked = gpl.load(fn);
-		if( worked )
-		{
-		    impl->gstate.pieces().takePieces(gpl);
-		}
-	}
-	else if( impl->gstate.board().fileNameMatches(fn) )
+	if( impl->gstate.board().fileNameMatches(fn) )
 	{
 		worked = impl->gstate.board().load(fn);
 	}
@@ -396,13 +380,21 @@ bool MainWindowImpl::loadPiece( QFileInfo const & fi )
 	QGIPiece * pc = new QGIPiece;
 	if( pc->fileNameMatches( fn ) )
 	{
-	    if( ! pc->load( fn ) )
+	    try
+	    {
+		if( ! pc->load( fn ) )
+		{
+		    delete pc;
+		    QMessageBox::warning( this, "Load failed!",
+					  QString("Failed: MainWindowImpl::loadPiece(%1)").arg(fn),
+					  QMessageBox::Ok, QMessageBox::Ok );
+		    return false;
+		}
+	    }
+	    catch(...)
 	    {
 		delete pc;
-		QMessageBox::warning( this, "Load failed!",
-				      QString("Failed: MainWindowImpl::loadPiece(%1)").arg(fn),
-				      QMessageBox::Ok, QMessageBox::Ok );
-		return false;
+		throw;
 	    }
 	}
 	else
@@ -410,7 +402,11 @@ bool MainWindowImpl::loadPiece( QFileInfo const & fi )
 	    impl->paw->applyCurrentTemplate( pc );
 	    pc->setProperty( "pixmap", fn );
 	}
-	pc->setProperty( "pos", impl->gv->placementPos() );
+	QPoint pos( impl->gv->placementPos() );
+	QRect bounds( pc->boundingRect().toRect() );
+	pos.setX( pos.x() - (bounds.width()/2) );
+	pos.setY( pos.y() - (bounds.height()/2) );
+	pc->setProperty( "pos", pos );
 	impl->gstate.addItem(pc);
 	return true;
 }
@@ -708,16 +704,14 @@ static QPoint findBoardPastePoint( QGraphicsView * board )
 {
     QPoint ret;
     QWidget * vp = board->viewport();
-    qDebug() << "findBoardPastePoint("<<board<<") viewport ="<<vp
-	     << "viewport parent ="<<vp->parent();
+    if(1) qDebug() << "findBoardPastePoint("<<board<<") viewport ="<<vp
+		   << "viewport parent ="<<vp->parent();
     QPoint glpos( QCursor::pos() );
     QWidget * wa = QApplication::widgetAt( glpos );
-    qDebug() << "findBoardPastePoint("<<board<<") widgetAt("<<glpos<<") ="<<wa;
-    if( wa == vp )
-    {
-	ret = board->mapFromGlobal( glpos );
-	qDebug() << "findBoardPastePoint("<<board<<") mapFromGlobal("<<glpos<<") ="<<ret;
-    }
+    if(0) qDebug() << "findBoardPastePoint("<<board<<") widgetAt("<<glpos<<") ="<<wa;
+    if( wa != vp ) return ret;
+    ret = board->mapToScene( board->mapFromGlobal(glpos) ).toPoint();
+    if(0) qDebug() << "findBoardPastePoint("<<board<<") ret ="<<ret;
     return ret;
 }
 
