@@ -1,6 +1,8 @@
 #summary Exceedingly brief overview of the QBoard code and architecture
 #labels Phase-Implementation
 
+*This stuff is not current, as of 2008 Aug 20. i'll get around to it someday, maybe.*
+
 = Introduction =
 
 QBoard _could_ have been implemented as a library and a thin wrapper client app around it, but it's not. Maybe someday it will be restructured to be so, but today it's not. This page provides an overview of the app parts and major classes.
