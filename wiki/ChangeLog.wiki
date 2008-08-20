@@ -1,4 +1,5 @@
 #summary Informal summary of differences between versions.
+#labels Featured
 
 = QBoard ChangeLog =
 
