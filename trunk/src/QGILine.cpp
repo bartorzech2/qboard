@@ -571,7 +571,7 @@ void MenuHandlerLineNode::doMenu( QGILineNode *gvi, QGraphicsSceneContextMenuEve
 	QMenu * menuLine = menu->addMenu("Line");
 	menuLine->addMenu( QObjectPropertyMenu::makeColorMenu(line, "color", "alpha" ) );
 	menuLine->addMenu( QObjectPropertyMenu::makePenStyleMenu(line, "style" ) );
-	menuLine->addMenu( QObjectPropertyMenu::makeIntListMenu("Width", line, "width",1,10,1) );
+	menuLine->addMenu( QObjectPropertyMenu::makeNumberListMenu("Width", line, "width",1,10,1) );
 
 	QMenu * mdot = QObjectPropertyMenu::makeColorMenu( gvi,  "color" );
 	mdot->setTitle("Dot");
@@ -586,7 +586,7 @@ void MenuHandlerLineNode::doMenu( QGILineNode *gvi, QGraphicsSceneContextMenuEve
 		act->setCheckable(true);
 		act->setChecked(true);
 	}
-	menuArrows->addMenu( QObjectPropertyMenu::makeIntListMenu("Size", line, "arrowSize",8,24,2) );
+	menuArrows->addMenu( QObjectPropertyMenu::makeNumberListMenu("Size", line, "arrowSize",8,24,2) );
 
 	menu->addSeparator();
 	menu->addAction(QIcon(":/QBoard/icon/help.png"),"Help...", this, SLOT(showHelp()) );
