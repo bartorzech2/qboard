@@ -86,7 +86,7 @@ b) Historical reasons. i would ideally like to see all of it in a
 namespace, but it's a lot of repetative editing to fix it, so it ain't
 gonna get fixed yet.
 
-c) right now i'd rather write silly code comments then go and do the morally
+c) right now i'd rather write silly code comments than go and do the morally
 right thing and move all the code into namespaces.
 
  ************************************************************************/
