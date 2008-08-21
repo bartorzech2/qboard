@@ -167,7 +167,7 @@ public:
 
 		The caller owns the returned menu.
 	*/
-	static PiecePropertyMenu * makeIntListMenu( char const * lbl, QGIGamePiece * pv, char const * propertyName, int from, int to, int step = 1 );
+	static PiecePropertyMenu * makeNumberListMenu( char const * lbl, QGIGamePiece * pv, char const * propertyName, int from, int to, int step = 1 );
 private:
 	QGIGamePiece * m_view;
 	QString m_key;
