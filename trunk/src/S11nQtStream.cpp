@@ -30,7 +30,7 @@ struct StdToQtOBuf::Impl
 	}
 	if( o.openMode() != QIODevice::WriteOnly )
 	{
-	    throw std::runtime_error("StdToQtOBuf::StdToQtOBuf() requires that the QIODevice be open WriteOnly");
+	    throw std::runtime_error("StdToQtOBuf::StdToQtOBuf() requires that the QIODevice be open (or openable) in WriteOnly mode.");
 	}
     }
     ~Impl()
@@ -94,7 +94,7 @@ struct StdToQtIBuf::Impl
 	}
 	if( o.openMode() != QIODevice::ReadOnly )
 	{
-	    throw std::runtime_error("StdToQtIBuf::StdToQtIBuf() requires that the QIODevice be open ReadOnly");
+	    throw std::runtime_error("StdToQtIBuf::StdToQtIBuf() requires that the QIODevice be open (or openable) in ReadOnly mode.");
 	}
     }
     ~Impl()
@@ -132,4 +132,22 @@ int StdToQtIBuf::underflow()
     }
     this->setg(dest,dest,dest+rd);
     return traits_type::not_eof(*dest);
+}
+
+
+
+QtStdOStream::QtStdOStream( QIODevice & proxy )
+    : m_buf( *this, proxy )
+{
+}
+QtStdOStream::~QtStdOStream()
+{
+}
+
+QtStdIStream::QtStdIStream( QIODevice & proxy )
+    : m_buf( *this, proxy )
+{
+}
+QtStdIStream::~QtStdIStream()
+{
 }
