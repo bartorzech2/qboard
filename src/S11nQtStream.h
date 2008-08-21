@@ -157,5 +157,73 @@ private:
 };
 
 
+/**
+   A proxy class to allow passing a QIODevice (indirectly) to a
+   routine requiring a std::ostream. All output to this object will end
+   up going to the QIODevice.
+
+   Example usage:
+
+\code
+QFile file("my.file");
+QtStdOStream str(file);
+some_routine_taking_std_stream( str );
+\endcode
+
+*/
+class QtStdOStream : public std::ostream
+{
+public:
+    /**
+       Sets up all output to go to proxy.
+
+       If proxy is not open in QIODevice::WriteOnly mode, and cannot
+       be opened in that mode, then an exception is thrown.
+    */
+    QtStdOStream( QIODevice & proxy );
+    /**
+       Detaches this object from the constructor-specified proxy.
+    */
+    virtual ~QtStdOStream();
+private:
+    //! Copying not allowed.
+    QtStdOStream( QtStdOStream const & );
+    //! Copying not allowed.
+    QtStdOStream & operator=( QtStdOStream const & );
+    StdToQtOBuf m_buf;
+};
+
+/**
+   A proxy class to allow passing a QIODevice (indirectly) to a
+   routine requiring a std::istream. All input to this object will end
+   up going to the QIODevice.
+
+   Example usage:
+
+\code
+QFile file("my.file");
+QtStdIStream str(file);
+some_routine_taking_std_stream( str );
+\endcode
+*/
+class QtStdIStream : public std::istream
+{
+public:
+    /**
+       Sets up all output input to go to proxy.
+
+       If proxy is not open in QIODevice::ReadOnly mode, and cannot be
+       opened in that mode, then an exception is thrown.
+    */
+    QtStdIStream( QIODevice & proxy );
+    virtual ~QtStdIStream();
+private:
+    //! Copying not allowed.
+    QtStdIStream( QtStdIStream const & );
+    //! Copying not allowed.
+    QtStdIStream & operator=( QtStdIStream const & );
+    StdToQtIBuf m_buf;
+};
+
 
 #endif // QBOARD_S11nQtStream_H_INCLUDED
