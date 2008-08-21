@@ -239,6 +239,28 @@ namespace qboard
        Returns the number of properties cleared.
     */
     int clearProperties( QObject * obj );
+
+
+    /**
+       Creates a new QTransform scaled and rotated to the
+       given angle. If scaleY is 0 then it is set to the same
+       as scaleX. The transformation is centered with the given
+       bounds.
+     */
+    QTransform rotateAndScale( QRectF const & bounds, qreal angle, qreal scaleX, qreal scaleY = 0 );
+
+    /**
+       Rotates and scales obj around its centerpoint, using the given
+       rotation and scale values. If scaleY is zero then it is treated
+       as if it were scaleX.
+    */
+    void rotateAndScale( QGraphicsItem * obj, qreal angle, qreal scaleX, qreal scaleY = 0 );
+
+    /**
+       Identical to rotateAndScale(QGraphicsItem*,...) except that it
+       functions on a QGraphicsView.
+    */
+    void rotateAndScale( QGraphicsView * obj, qreal angle, qreal scaleX, qreal scaleY = 0 );
 }
 
 #endif // QBOARD_UTILITY_H_INCLUDED
