@@ -11,6 +11,9 @@ are at the top. Dates written extra large are release dates.
 
 - Pieces and HTML widgets can now be scaled independently of the board.
 
+- Fixed a very significant memory leak in the menu handlers. One of them
+was leaking like a sieve before.
+
 
 === *2008 August 20:* ===
 
