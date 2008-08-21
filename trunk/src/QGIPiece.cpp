@@ -47,6 +47,10 @@ struct QGIPiece::Impl
 	block = false;
 	alpha = borderAlpha = 255;
     }
+
+
+    
+
 };
 
 #include <QGraphicsScene>
@@ -72,6 +76,30 @@ QGIPiece::~QGIPiece()
     delete this->impl;
 }
 
+void QGIPiece::refreshTransformation()
+{
+    this->resetTransform(); // unfortunate
+    QTransform trans( this->transform() );
+    QRectF rec(this->boundingRect());
+    qreal x = rec.width()/2;
+    qreal y = rec.height()/2;
+    trans.translate(x,y);
+    qreal dval( this->property("angle").toDouble() );
+    if( 0.0 != dval )
+    {
+	//qboard::rotateCentered( this, dval );
+	trans.rotate(dval);
+    }
+    dval = this->property("scale").toDouble();
+    if( dval > 0.05 ) // arbitrary limit
+    {
+	//this->scale( dval, dval );
+	trans.scale( dval, dval );
+    }
+    trans.translate(-x, -y);
+    this->setTransform( trans );
+}
+
 bool QGIPiece::event( QEvent * e )
 {
 #if 1
@@ -91,6 +119,10 @@ bool QGIPiece::event( QEvent * e )
 void QGIPiece::propertySet( char const *pname, QVariant const & var )
 {
     // FIXME: treat QVariant::Invalid appropriately for each property
+
+    // FIXME: instead of doing string comparisons on pname, use a
+    // lookup map with Impl member funcs as implementations. Make Impl
+    // a friend class.
     if(0) qDebug() << "QGIPiece::propertySet("<<pname<<")[block="<<impl->block<<"] val="<<var;
     if( impl->block ) return;
     std::string key( pname );
@@ -137,7 +169,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     if( "borderSize" == key )
     {
 	int bs = var.toInt();;
-	impl->borderSize = (bs >= 0) ? bs : 1;
+	impl->borderSize = (bs >= 0) ? bs : 0;
 	this->update();
 	return;
     }
@@ -163,9 +195,16 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	    this->update();
 	    return;
 	}
-	QString val = var.toString();
-	impl->borderLineStyle = qboard::stringToPenStyle(val);
-	this->update();
+	else
+	{
+	    impl->borderLineStyle = qboard::stringToPenStyle(var.toString());
+	    this->update();
+	    return;
+	}
+    }
+    if( "scale" == key )
+    {
+	this->refreshTransformation();
 	return;
     }
     if( "size" == key )
@@ -177,13 +216,12 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	    impl->pixmap = bogus;
 	    // Kludge to ensure bounding rect is kept intact
 	    this->setPixmap(bogus);
-
 	}
 	return;
     }
     if( "angle" == key )
     {
-	qboard::rotateCentered( this, var.toDouble() );
+	this->refreshTransformation();
 	return;
     }
     if( "dragDisabled" == key )
@@ -238,6 +276,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	return;
     } // pixmap property
 }
+
 void QGIPiece::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 {
     if( ev->buttons() & Qt::RightButton )
@@ -469,7 +508,7 @@ void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent 
     m->addMenu(mColor);
     if(1)
     {
-	QObjectPropertyMenu * pm = QObjectPropertyMenu::makeIntListMenu("Rotate",selected,"angle",0,360,15);
+	QObjectPropertyMenu * pm = QObjectPropertyMenu::makeNumberListMenu("Rotate",selected,"angle",0,360,15);
 	pm->setIcon(QIcon(":/QBoard/icon/rotate_cw.png"));
 	m->addMenu(pm);
     }
@@ -479,7 +518,7 @@ void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent 
     mBrd->addMenu( QObjectPropertyMenu::makePenStyleMenu(selected,"borderStyle") );
     if(1)
     {
-	mBrd->addMenu( QObjectPropertyMenu::makeIntListMenu("Size",selected,"borderSize",0,8) );
+	mBrd->addMenu( QObjectPropertyMenu::makeNumberListMenu("Size",selected,"borderSize",0,8) );
     }
 
     if(1)
@@ -498,6 +537,16 @@ void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent 
 	act->blockSignals(false);
 	act->setText(locked ? "Unlock position" : "Lock position");
 	mMisc->addAction(act);
+
+	if(1)
+	{
+	    QObjectPropertyMenu * pm =
+		QObjectPropertyMenu::makeNumberListMenu("Scale",
+							selected, "scale",
+							0.25, 3.0, 0.25);
+	    pm->setIcon(QIcon(":/QBoard/icon/viewmag.png"));
+	    mMisc->addMenu(pm);
+	}
     }
 
 #if 1

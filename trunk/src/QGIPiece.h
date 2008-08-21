@@ -58,6 +58,11 @@ private:
     QGIPiece( QGIPiece const & ); // not implemented
     QGIPiece & operator=(QGIPiece const &); // not implemented
     void setup();
+    /**
+       Unfortunate kludge to ensure that scaling and rotation
+       don't hose each other.
+    */
+    void refreshTransformation();
 public:
     /**
        Creates an empty object.
@@ -127,8 +132,9 @@ private Q_SLOTS:
     bool copyPiece();
     bool cutPiece();
 private:
-	struct Impl;
-	Impl * impl;
+    struct Impl;
+    friend class Impl;
+    Impl * impl;
 };
 
 
