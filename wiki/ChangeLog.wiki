@@ -9,7 +9,7 @@ are at the top. Dates written extra large are release dates.
 ----
 *2008 August 21:*
 
-- Pieces can now be scaled independently of the board.
+- Pieces and HTML widgets can now be scaled independently of the board.
 
 
 === *2008 August 20:* ===
