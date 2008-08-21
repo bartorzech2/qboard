@@ -22,33 +22,33 @@
 class QGraphicsSceneContextMenuEvent;
 class QEvent;
 /**
-	QGIHtml implements a serializale QGraphicsTextItem which acts
-	as an on-board text/html widget.
+   QGIHtml implements a serializale QGraphicsTextItem which acts
+   as an on-board text/html widget.
 */
 class QGIHtml : public QGraphicsTextItem, public Serializable
 {
 Q_OBJECT
 public:
-	QGIHtml();
-	virtual ~QGIHtml();
-	/** Serializes this object to dest. The following properties are saved:
-		position, text (as HTML), QObject "dynamic" properties.
-	*/
-	virtual bool serialize( S11nNode & dest ) const;
-	/** Deserializes src to this object. */
-	virtual bool deserialize( S11nNode const & src );
-	virtual int type() const { return QGITypes::Html; }
+    QGIHtml();
+    virtual ~QGIHtml();
+    /** Serializes this object to dest. The following properties are saved:
+	position, text (as HTML), QObject "dynamic" properties.
+    */
+    virtual bool serialize( S11nNode & dest ) const;
+    /** Deserializes src to this object. */
+    virtual bool deserialize( S11nNode const & src );
+    virtual int type() const { return QGITypes::Html; }
 protected:
-	virtual void mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event );
-	virtual void focusOutEvent( QFocusEvent * event );
-	virtual void mousePressEvent ( QGraphicsSceneMouseEvent * event );
-	virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent * event );
+    virtual void mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event );
+    virtual void focusOutEvent( QFocusEvent * event );
+    virtual void mousePressEvent ( QGraphicsSceneMouseEvent * event );
+    virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent * event );
     virtual bool event( QEvent * e );
-
 private:
-	void setup();
-	struct Impl;
-	Impl * impl;
+    void refreshTransformation();
+    void setup();
+    struct Impl;
+    Impl * impl;
 };
 
 // Register QGIHtml with s11n:
@@ -67,29 +67,29 @@ class QGIHtmlEditor : public QDialog, public Ui::QGIHtmlEditor
 {
 Q_OBJECT
 public:
-	QGIHtmlEditor( QGIHtml * item, QWidget * parent = 0 );
+    QGIHtmlEditor( QGIHtml * item, QWidget * parent = 0 );
 public Q_SLOTS:
-	virtual void accept();
-	virtual void reject();
+    virtual void accept();
+    virtual void reject();
 private Q_SLOTS:
-	void textBold(bool);
+    void textBold(bool);
 private:
-	QGIHtml * m_item;
+    QGIHtml * m_item;
 };
 
 /*
-	Context menu handler for QGIHtml object.
+  Context menu handler for QGIHtml object.
 */
 class QGraphicsSceneContextMenuEvent;
 class MenuHandlerQGIHtml : public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 public:
-	MenuHandlerQGIHtml();
-	virtual ~MenuHandlerQGIHtml();
+    MenuHandlerQGIHtml();
+    virtual ~MenuHandlerQGIHtml();
 public Q_SLOTS:
-	void doMenu( QGIHtml *, QGraphicsSceneContextMenuEvent * );
-	void showHelp();
+    void doMenu( QGIHtml *, QGraphicsSceneContextMenuEvent * );
+    void showHelp();
 };
 
 #endif

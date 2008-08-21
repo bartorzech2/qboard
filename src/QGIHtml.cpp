@@ -56,6 +56,12 @@ QGIHtml::~QGIHtml()
 	delete impl;
 }
 
+void QGIHtml::refreshTransformation()
+{
+    qboard::rotateAndScale( this,
+			    this->property("angle").toDouble(),
+			    this->property("scale").toDouble() );
+}
 
 bool QGIHtml::event( QEvent * e )
 {
@@ -67,6 +73,7 @@ bool QGIHtml::event( QEvent * e )
 	map["pos"] = 1;
 	map["html"] = 1;
 	map["angle"] = 1;
+	map["scale"] = 1;
     }
     while( e->type() == QEvent::DynamicPropertyChange )
     {
@@ -86,9 +93,10 @@ bool QGIHtml::event( QEvent * e )
 	{
 	    this->setHtml( val.toString() );
 	}
-	else if( QString("angle") == key )
+	else if( (QString("angle") == key)
+		 || (QString("scale") == key) )
 	{
-	    qboard::rotateCentered( this, val.toDouble() );
+	    this->refreshTransformation();
 	}
 	else
 	{
@@ -268,8 +276,21 @@ void MenuHandlerQGIHtml::doMenu( QGIHtml * pv, QGraphicsSceneContextMenuEvent * 
 	}
 	if(1)
 	{
-	    QObjectPropertyMenu * pm = QObjectPropertyMenu::makeNumberListMenu("Rotate",list,"angle",0,360,15);
+	    QObjectPropertyMenu * pm =
+		QObjectPropertyMenu::makeNumberListMenu("Rotate",
+							list,
+							"angle",
+							0,360,15);
 	    pm->setIcon(QIcon(":/QBoard/icon/rotate_cw.png"));
+	    m->addMenu(pm);
+	}
+	if(1)
+	{
+	    QObjectPropertyMenu * pm =
+		QObjectPropertyMenu::makeNumberListMenu("Scale",
+							list, "scale",
+							0.25, 3.0, 0.25);
+	    pm->setIcon(QIcon(":/QBoard/icon/viewmag.png"));
 	    m->addMenu(pm);
 	}
 #if 1
