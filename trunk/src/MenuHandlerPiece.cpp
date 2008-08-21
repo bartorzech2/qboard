@@ -114,7 +114,7 @@ void MenuHandlerPiece::doMenu( QGIGamePiece * pv, QGraphicsSceneContextMenuEvent
 	if(1)
 	{
 		
-		PiecePropertyMenu * pm = PiecePropertyMenu::makeIntListMenu("Rotate",pv,"angle",0,360,15);
+		PiecePropertyMenu * pm = PiecePropertyMenu::makeNumberListMenu("Rotate",pv,"angle",0,360,15);
 		pm->setIcon(QIcon(":/QBoard/icon/rotate_cw.png"));
 		m->addMenu(pm);
 	}
@@ -124,7 +124,7 @@ void MenuHandlerPiece::doMenu( QGIGamePiece * pv, QGraphicsSceneContextMenuEvent
 	mBrd->addMenu( PiecePropertyMenu::makePenStyleMenu(pv,"borderStyle") );
 	if(1)
 	{
-		mBrd->addMenu( PiecePropertyMenu::makeIntListMenu("Size",pv,"borderSize",0,8) );
+		mBrd->addMenu( PiecePropertyMenu::makeNumberListMenu("Size",pv,"borderSize",0,8) );
 	}
 
 	GamePiece * pc = pv->piece();
@@ -279,7 +279,7 @@ PiecePropertyMenu * PiecePropertyMenu::makePenStyleMenu( QGIGamePiece * pv, char
 	return pm;
 }
 
-PiecePropertyMenu * PiecePropertyMenu::makeIntListMenu(
+PiecePropertyMenu * PiecePropertyMenu::makeNumberListMenu(
 	char const * lbl, 
 	QGIGamePiece * pv,
 	char const * propertyName,
