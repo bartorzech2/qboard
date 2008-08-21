@@ -212,9 +212,9 @@ public:
 
 		The caller owns the returned menu.
 	*/
-	static QObjectPropertyMenu * makeIntListMenu( char const * lbl, QObject * obj, char const * propertyName, int from, int to, int step = 1 );
+	static QObjectPropertyMenu * makeNumberListMenu( char const * lbl, QObject * obj, char const * propertyName, qreal from, qreal to, qreal step = 1 );
 
-	static QObjectPropertyMenu * makeIntListMenu( char const * lbl, QList<QObject *> objs, char const * propertyName, int from, int to, int step = 1 );
+	static QObjectPropertyMenu * makeNumberListMenu( char const * lbl, QList<QObject *> objs, char const * propertyName, qreal from, qreal to, qreal step = 1 );
 
 private:
     struct Impl;

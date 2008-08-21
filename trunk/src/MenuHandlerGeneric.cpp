@@ -278,33 +278,33 @@ QObjectPropertyMenu * QObjectPropertyMenu::makePenStyleMenu( QObject * pv, char 
     return makePenStyleMenu( li, propertyName );
 }
 
-QObjectPropertyMenu * QObjectPropertyMenu::makeIntListMenu(
+QObjectPropertyMenu * QObjectPropertyMenu::makeNumberListMenu(
 				      char const * lbl, 
 				      QList<QObject *> objs,
 				      char const * propertyName,
-				      int from,
-				      int to,
-				      int step )
+				      qreal from,
+				      qreal to,
+				      qreal step )
 {
     QObjectPropertyMenu * pm = new QObjectPropertyMenu(lbl, objs, propertyName, 0 );
-    for( int i = from; i < to; i += step )
+    for( qreal i = from; i < to; i += step )
     {
 	pm->addItem( QVariant(i) );
     }
     return pm;
 }
 
-QObjectPropertyMenu * QObjectPropertyMenu::makeIntListMenu(
+QObjectPropertyMenu * QObjectPropertyMenu::makeNumberListMenu(
 				   char const * lbl, 
 				   QObject * pv,
 				   char const * propertyName,
-				   int from,
-				   int to,
-				   int step )
+				   qreal from,
+				   qreal to,
+				   qreal step )
 {
     QList<QObject*> foo;
     foo.push_back(pv);
-    return makeIntListMenu(lbl,foo,propertyName,from,to,step);
+    return makeNumberListMenu(lbl,foo,propertyName,from,to,step);
 }
 
 QObjectPropertyMenu * QObjectPropertyMenu::makeAlphaMenu(
