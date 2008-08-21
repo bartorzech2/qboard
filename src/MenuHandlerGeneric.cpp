@@ -157,7 +157,7 @@ QObjectPropertyAction::QObjectPropertyAction(
 }
 QObjectPropertyAction::~QObjectPropertyAction()
 {
-	
+    delete this->impl;
 }
 
 void QObjectPropertyAction::setup()
