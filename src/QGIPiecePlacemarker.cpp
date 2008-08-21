@@ -64,7 +64,7 @@ QGIPiecePlacemarker::QGIPiecePlacemarker() :
 
 QGIPiecePlacemarker::~QGIPiecePlacemarker()
 {
-	qDebug() << "~QGIPiecePlacemarker()";
+	QBOARD_VERBOSE_DTOR << "~QGIPiecePlacemarker()";
 	delete impl;
 }
 
