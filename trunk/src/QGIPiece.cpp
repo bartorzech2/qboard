@@ -78,26 +78,9 @@ QGIPiece::~QGIPiece()
 
 void QGIPiece::refreshTransformation()
 {
-    this->resetTransform(); // unfortunate
-    QTransform trans( this->transform() );
-    QRectF rec(this->boundingRect());
-    qreal x = rec.width()/2;
-    qreal y = rec.height()/2;
-    trans.translate(x,y);
-    qreal dval( this->property("angle").toDouble() );
-    if( 0.0 != dval )
-    {
-	//qboard::rotateCentered( this, dval );
-	trans.rotate(dval);
-    }
-    dval = this->property("scale").toDouble();
-    if( dval > 0.05 ) // arbitrary limit
-    {
-	//this->scale( dval, dval );
-	trans.scale( dval, dval );
-    }
-    trans.translate(-x, -y);
-    this->setTransform( trans );
+    qboard::rotateAndScale( this,
+			    this->property("angle").toDouble(),
+			    this->property("scale").toDouble() );
 }
 
 bool QGIPiece::event( QEvent * e )
