@@ -233,11 +233,11 @@ namespace s11n { namespace qt {
 	}
     private:
 	QSharedDataPointer<SharedS11nNode> proxy;
-
     };
+
 }} // namespaces
-using s11n::qt::VariantS11n;
-Q_DECLARE_METATYPE(VariantS11n); // an experiment!
+using s11n::qt::VariantS11n; // we don't want the namespace part stored by QMetaType
+Q_DECLARE_METATYPE(VariantS11n);
 
 /************************************************************************
 At this point in the file, one might ask why "some" of the code is
