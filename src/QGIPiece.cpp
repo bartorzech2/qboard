@@ -18,7 +18,6 @@
 #include <QFont>
 #include <QGraphicsItem>
 #include "MenuHandlerPiece.h"
-#include "utility.h"
 #include "S11nQt.h"
 #include "S11nQtList.h"
 #include "S11nClipboard.h"
@@ -74,9 +73,16 @@ QGIPiece::~QGIPiece()
 
 void QGIPiece::refreshTransformation()
 {
-    qboard::rotateAndScale( this,
-			    this->property("angle").toDouble(),
-			    this->property("scale").toDouble() );
+    QVariant v( this->property("angle") );
+    qreal angle = v.canConvert<qreal>() ? v.value<qreal>() : 0.0;
+    v = this->property("scale");
+    qreal scale = v.canConvert<qreal>() ? v.value<qreal>() : 1.0;
+    if( 0 == scale ) scale = 1.0;
+    QTransform tr( qboard::rotateAndScale( this->boundingRect(), angle, scale, scale, true ) );
+    // TODO:
+    // horizontal/vertical flip
+    // shearing
+    this->setTransform( tr );
 }
 
 bool QGIPiece::event( QEvent * e )
@@ -215,7 +221,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	QPixmap pix;
 	if( var.canConvert<QPixmap>() )
 	{
-	    impl->pixmap = var.value<QPixmap>();
+	    pix = var.value<QPixmap>();
 	}
 	else if( var.canConvert<QString>() )
 	{
@@ -365,8 +371,19 @@ void QGIPiece::dragMoveEvent( QGraphicsSceneDragDropEvent * event )
 bool QGIPiece::serialize( S11nNode & dest ) const
 {
     if( ! this->Serializable::serialize( dest ) ) return false;
-    // EVIL KLUDGE: we must ensure that our 'pos' property
-    // is set properly. We must violate constness to do so.
+    S11nNodeTraits::set( dest, "QGIFlags", int(this->flags()) );
+    QList<QGraphicsItem *> chgi( this->childItems() );
+    if( ! chgi.isEmpty() )
+    {
+	if( ! s11n::qt::serializeQGIList<Serializable>( s11n::create_child(dest,"children"),
+							chgi, false ) )
+	{
+	    return false;
+	}
+    }
+    // EVIL KLUDGE: we must ensure that our 'pos' property is set
+    // properly. We must violate constness to do so or use a proxy
+    // object :/
     PropObj props;
     qboard::copyProperties( this, &props );
     props.setProperty("pos", this->pos() );
@@ -376,16 +393,32 @@ bool QGIPiece::serialize( S11nNode & dest ) const
 bool QGIPiece::deserialize( S11nNode const & src )
 {
     if( ! this->Serializable::deserialize( src ) ) return false;
-    qboard::clearProperties(this);
-    // Reminder: don't clear our properties here. Normally
-    // we would do a full clean up, but in this case that's problematic.
-    PropObj props;
-    if( ! s11n::deserialize_subnode( src, "props", props ) )
     {
-	qDebug() << "QGIPiece::deserialize() deser of props node failed!";
-	return false;
+	qboard::clearProperties(this);
+	PropObj props;
+	if( ! s11n::deserialize_subnode( src, "props", props ) )
+	{
+	    qDebug() << "QGIPiece::deserialize() deser of props node failed!";
+	    return false;
+	}
+	qboard::copyProperties( &props, this );
     }
-    qboard::copyProperties( &props, this );
+
+    {
+	S11nNode const * ch = s11n::find_child_by_name(src, "children");
+	if( ch )
+	{
+	    typedef QList<QGraphicsItem *> QGIL;
+	    QGIL childs;
+	    if( -1 == s11n::qt::deserializeQGIList<Serializable>( *ch,
+				  childs,
+				  this,
+				  QGraphicsItem::ItemIsMovable ) )
+	    {
+		return false;
+	    }
+	}
+    }
     return true;
 }
 
@@ -517,7 +550,7 @@ void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent 
 	    QObjectPropertyMenu * pm =
 		QObjectPropertyMenu::makeNumberListMenu("Scale",
 							selected, "scale",
-							0.25, 3.0, 0.25);
+							0.25, 3.01, 0.25);
 	    pm->setIcon(QIcon(":/QBoard/icon/viewmag.png"));
 	    mMisc->addMenu(pm);
 	}
@@ -529,6 +562,7 @@ void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent 
     {
 	MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( pv, m );
 	m->addAction(QIcon(":/QBoard/icon/editcopy.png"),tr("Copy selected"),clipper,SLOT(clipboardCopy()) );
+
 	m->addAction(QIcon(":/QBoard/icon/editcut.png"),"Cut selected",clipper,SLOT(clipboardCut()) );
 	QMenu * mcopy = m->addMenu(tr("Copy..."));
 	mcopy->addAction(QIcon(":/QBoard/icon/editcopy.png"),"Selected as QList<Serializable*>",this,SLOT(copyQGIList()) );
