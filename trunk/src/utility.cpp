@@ -486,12 +486,14 @@ namespace qboard {
 
     QTransform rotateAndScale( QRectF const & bounds, qreal angle, qreal scaleX, qreal scaleY, bool center )
     {
+	if( 0 == scaleX ) scaleX = 1.0;
+	if( 0 == scaleY ) scaleY = scaleX;
 	QTransform trans;
 	qreal x = bounds.width()/2;
 	qreal y = bounds.height()/2;
 	if( center ) trans.translate(x,y);
 	trans.rotate( angle );
-	trans.scale( scaleX, scaleY ? scaleY : scaleX );
+	trans.scale( scaleX, scaleY );
 	if( center ) trans.translate(-x, -y);
 	return trans;
     }
