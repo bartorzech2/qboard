@@ -242,23 +242,24 @@ namespace qboard
 
 
     /**
-       Creates a new QTransform scaled and rotated to the
-       given angle. If scaleY is 0 then it is set to the same
-       as scaleX. The transformation is centered with the given
-       bounds.
+       Creates a new QTransform scaled and rotated to the given
+       angle. If scaleY is 0 then it is set to the same as scaleX. If
+       center is true (the default) then the transformation is
+       centered with the given bounds.
      */
-    QTransform rotateAndScale( QRectF const & bounds, qreal angle, qreal scaleX, qreal scaleY = 0 );
+    QTransform rotateAndScale( QRectF const & bounds, qreal angle, qreal scaleX, qreal scaleY = 0, bool center = true );
 
     /**
-       Rotates and scales obj around its centerpoint, using the given
-       rotation and scale values. If scaleY is zero then it is treated
-       as if it were scaleX.
+       Like rotateAndScale(QRectF,...), where the rect is
+       obj->boundingRect(), and the transformation is applied to obj
+       using obj->setTransform().
     */
-    void rotateAndScale( QGraphicsItem * obj, qreal angle, qreal scaleX, qreal scaleY = 0 );
+    void rotateAndScale( QGraphicsItem * obj, qreal angle, qreal scaleX, qreal scaleY = 0, bool center = true );
 
     /**
        Identical to rotateAndScale(QGraphicsItem*,...) except that it
-       functions on a QGraphicsView.
+       functions on a QGraphicsView and does not rotate around the center
+       (which screws up the view's scrollbars).
     */
     void rotateAndScale( QGraphicsView * obj, qreal angle, qreal scaleX, qreal scaleY = 0 );
 }
