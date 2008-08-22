@@ -80,9 +80,7 @@ public:
     virtual bool serialize( S11nNode & dest ) const;
 
     /**
-       Deserializes this object. If this object is already connected
-       to a piece, THAT piece will be used as the target of deserialization,
-       otherwise a new piece is created.
+       Deserializes this object from src.
     */
     virtual bool deserialize( S11nNode const & src );
 
@@ -128,10 +126,13 @@ public Q_SLOTS:
         void showHelp();
 	void doMenu( QGIPiece *, QGraphicsSceneContextMenuEvent * );
 private Q_SLOTS:
-    void copyQGIList();
+    void copyList();
+    void cutList();
     bool copyPiece();
     bool cutPiece();
+    void addChild();
 private:
+    static void clipList( QGIPiece * src, bool copy );
     struct Impl;
     friend class Impl;
     Impl * impl;

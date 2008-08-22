@@ -16,6 +16,8 @@
 #include "S11nQtList.h"
 #include "utility.h"
 #include "MenuHandlerGeneric.h"
+#include "S11nClipboard.h"
+
 #include <QGraphicsSceneMouseEvent>
 #include <QFocusEvent>
 #include <QDebug>
@@ -23,6 +25,7 @@
 #include <QAction>
 #include <QKeySequence>
 #include <QFont>
+
 struct QGIHtml::Impl
 {
 	Impl()
@@ -250,6 +253,7 @@ void QGIHtml::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
 
 
 
+
 QGIHtmlEditor::QGIHtmlEditor(QGIHtml * item, QWidget * parent) 
 	: QDialog(parent),
 	Ui::QGIHtmlEditor(),
@@ -278,6 +282,7 @@ void QGIHtmlEditor::reject()
 }
 
 MenuHandlerQGIHtml::MenuHandlerQGIHtml()
+    : m_gi(0)
 {
 	
 }
@@ -292,9 +297,39 @@ void MenuHandlerQGIHtml::showHelp()
 {
     qboard::showHelpResource("QGIHtml widget", ":/QBoard/help/classes/QGIHtml.html");
 }
+
+void MenuHandlerQGIHtml::clipList( QGIHtml * src, bool copy )
+{
+    if( !src || ! src->scene() ) return;
+    typedef QList<QGIHtml*> QSL;
+    QSL sel( qboard::selectedItemsCast<QGIHtml>( src->scene() ) );
+    try
+    {
+	S11nClipboard::instance().serialize( sel );
+    }
+    catch(...)
+    {
+    }
+    if( ! copy )
+    {
+	s11n::cleanup_serializable( sel );
+    }
+}
+
+void MenuHandlerQGIHtml::copyList()
+{
+    clipList( m_gi, true );
+}
+
+void MenuHandlerQGIHtml::cutList()
+{
+    clipList( m_gi, false );
+}
+
 void MenuHandlerQGIHtml::doMenu( QGIHtml * pv, QGraphicsSceneContextMenuEvent * ev )
 {
 	ev->accept();
+	m_gi = pv;
 	MenuHandlerCommon proxy;
 	QMenu * m = proxy.createMenu( pv );
 	QList<QObject*> list;
@@ -327,8 +362,13 @@ void MenuHandlerQGIHtml::doMenu( QGIHtml * pv, QGraphicsSceneContextMenuEvent * 
 	}
 	m->addSeparator();
 	MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( pv, m );
-	m->addAction(QIcon(":/QBoard/icon/editcopy.png"),"Copy",clipper,SLOT(clipboardCopy()) );
-	m->addAction(QIcon(":/QBoard/icon/editcut.png"),"Cut",clipper,SLOT(clipboardCut()) );
+	QMenu * copySub = clipper->addDefaultEntries(m, true, pv->isSelected() );
+	if( copySub )
+	{
+	    copySub->addAction(QIcon(":/QBoard/icon/editcopy.png"),"Copy selected as QList<QGIHtml*>",this,SLOT(copyList()) );
+	    copySub->addAction(QIcon(":/QBoard/icon/editcut.png"),"Cut selected as QList<QGIHtml*>",this,SLOT(cutList()) );
+	}
+
 	m->addSeparator();
 	m->addAction(QIcon(":/QBoard/icon/help.png"),"Help...", this, SLOT(showHelp()) );
 	m->exec( ev->screenPos() );

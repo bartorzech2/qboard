@@ -81,11 +81,18 @@ Q_OBJECT
 public:
 	explicit MenuHandlerCopyCut(QGraphicsItem * gi,QObject * parent=0);
 	virtual ~MenuHandlerCopyCut();
+    QMenu * addDefaultEntries( QMenu *, bool copy = true, bool cut = true );
 public Q_SLOTS:
 	void clipboardCopy();
 	void clipboardCut();
+    void copyList();
+    void cutList();
+    void copyOne();
+    void cutOne();
 private:
-	void clipboard( QGraphicsItem *, bool copy );
+    static void clipOne( QGraphicsItem *, bool copy );
+    static void clipList( QGraphicsItem *, bool copy );
+    static void clipboard( QGraphicsItem *, bool copy );
 	QGraphicsItem * m_gi;
 };
 

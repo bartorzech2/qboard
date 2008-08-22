@@ -12,6 +12,7 @@
  */
 #include "MenuHandlerGeneric.h"
 #include "S11nClipboard.h"
+#include <s11n.net/s11n/serialize.hpp>
 #include <QDebug>
 //#include <Q>
 #include <QGraphicsScene>
@@ -70,6 +71,102 @@ void MenuHandlerCopyCut::clipboardCopy()
 void MenuHandlerCopyCut::clipboardCut()
 {
     this->clipboard( m_gi, false );
+}
+
+void MenuHandlerCopyCut::clipOne( QGraphicsItem * gi, bool copy )
+{
+    Serializable * ser = dynamic_cast<Serializable*>(gi);
+    if( ! ser ) return;
+    try
+    {
+	S11nClipboard::instance().serialize( *ser );
+    }
+    catch(...)
+    {
+    }
+    if( ! copy )
+    {
+	QObject * o = dynamic_cast<QObject*>(gi);
+	if( o )
+	{
+	    o->deleteLater();
+	}
+	else
+	{
+	    delete gi;
+	}
+    }
+}
+
+void MenuHandlerCopyCut::copyOne()
+{
+    return clipOne( m_gi, true );
+}
+void MenuHandlerCopyCut::cutOne()
+{
+    return clipOne( m_gi, false );
+}
+
+void MenuHandlerCopyCut::clipList( QGraphicsItem * gi, bool copy )
+{
+    if( ! gi ) return;
+    typedef QList<Serializable*> QSL;
+    QSL sel( qboard::selectedItemsCast<Serializable>( gi->scene() ) );
+    try
+    {
+	S11nClipboard::instance().serialize( sel );
+    }
+    catch(...)
+    {
+    }
+    if( ! copy )
+    {
+	s11n::cleanup_serializable( sel );
+    }
+}
+
+void MenuHandlerCopyCut::copyList()
+{
+    clipList( m_gi, true );
+}
+
+void MenuHandlerCopyCut::cutList()
+{
+    clipList( m_gi, false );
+}
+
+QMenu * MenuHandlerCopyCut::addDefaultEntries( QMenu * m, bool cut, bool list )
+{
+    if( ! m_gi ) return 0;
+    QString const icoCopy(":/QBoard/icon/editcopy.png");
+    QString const icoCut(":/QBoard/icon/editcut.png");
+    if( list && m_gi->isSelected() )
+    {
+	m->addAction(QIcon(icoCopy),
+		     "Copy selected",this,SLOT(clipboardCopy()) );
+	if( cut ) m->addAction(QIcon(icoCut),
+			       "Cut selected",this,SLOT(clipboardCut()) );
+
+    }
+    else
+    {
+	m->addAction(QIcon(icoCopy),
+		     "Copy",this,SLOT(copyOne()) );
+	if( cut ) m->addAction(QIcon(icoCut),
+			       "Cut",this,SLOT(cutOne()) );
+    }
+    QMenu * mextra = 0;
+    if( list && m_gi->isSelected() )
+    {
+	mextra = m->addMenu(tr("Clipboard..."));
+	mextra->addAction(QIcon(icoCopy),
+			  "Copy selected as QList<Serializable*>",
+			  this,SLOT(copyList()) );
+	if( cut ) mextra->addAction(QIcon(icoCut),
+				    "Cut selected as QList<Serializable*>",
+				    this,SLOT(cutList()) );
+    }
+    return mextra;
 }
 
 SceneSelectionDestroyer::SceneSelectionDestroyer( QObject * parent, QGraphicsItem * gi ) :
