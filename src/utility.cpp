@@ -20,6 +20,7 @@
 #include <QGraphicsView>
 
 #include "utility.h"
+#include "Serializable.h"
 #include "S11nClipboard.h" // another horrible dep!
 #include "S11nQt.h"
 #include "S11nQtList.h"
@@ -310,7 +311,7 @@ namespace qboard {
 
     bool clipboardScene( QGraphicsScene * gsc, bool copy, QPoint const & origin )
     {
-	if(1) qDebug() <<"qboard::clipboardScene("<<gsc<<","<<copy<<","<<origin<<")";
+	if(0) qDebug() <<"qboard::clipboardScene("<<gsc<<","<<copy<<","<<origin<<")";
 	typedef QList<QGraphicsItem *> QGIL;
 	QGIL toCut;
 	S11nClipboard & cb( S11nClipboard::instance() );
@@ -392,7 +393,7 @@ namespace qboard {
     }
 
 
-    QRectF calculateBounds( QGraphicsItem * qgi )
+    QRectF calculateBounds( QGraphicsItem * qgi, bool skipParented )
     {
 	if( ! qgi ) return QRectF();
 	typedef QList<QGraphicsItem*> QGIL;
@@ -403,50 +404,33 @@ namespace qboard {
 	}
 	else
 	{
-	    li.push_back(qgi);
+	    return QRectF( qgi->pos(), qgi->boundingRect().size() );
 	}
-#if 1
 	QRectF un;
 	for( QGIL::iterator it = li.begin();
 	     li.end() != it; ++it )
 	{
 	    QGraphicsItem * gi = *it;
 	    un = un.unite( QRectF( gi->pos(), gi->boundingRect().size() ) );
+	    if( gi->parentItem() )
+	    {
+		if( skipParented ) continue;
+		QRectF r(gi->boundingRect());
+		QPointF p(gi->mapToParent(r.topLeft()));
+		un = un.unite( QRectF( p, r.size() ) );
+		continue;
+	    }
+	    else
+	    {
+		un = un.unite( QRectF( gi->pos(), gi->boundingRect().size() ) );
+	    }
 	}
 	return un;
-#else
-	qreal left = 0;
-	qreal right = 0;
-	qreal top = 0;
-	qreal bottom = 0;
-	int count = 0;
-	for( QGIL::iterator it = li.begin();
-	     li.end() != it; ++it )
-	{
-	    QGraphicsItem * gvi = *it;
-	    QPointF ip( gvi->pos() );
-	    QRectF ir( gvi->boundingRect() );
-	    qreal tmp = ip.x() + (ir.width() - ir.x());
-	    if( 1 == ++count )
-	    {
-		left = ip.x();
-		top = ip.y();
-		right = left + ir.width();
-		bottom = top + ir.height();
-	    }
-	    if( tmp > right ) right = tmp;
-	    else if( tmp < left ) left = tmp;
-	    tmp = ip.y() + (ir.height() - ir.y());
-	    if( tmp < top ) top = tmp;
-	    else if( tmp > bottom ) bottom = tmp;
-	}
-	return QRectF( left, top, right-left, bottom-top );
-#endif
     }
 
-    QPointF calculateCenter( QGraphicsItem * qgi )
+    QPointF calculateCenter( QGraphicsItem * qgi, bool skipParented )
     {
-	QRectF r( calculateBounds(qgi) );
+	QRectF r( calculateBounds(qgi,skipParented) );
 	//qDebug() << "qboard::calculateCenter("<<qgi<<"):"<<r;
 	return QPointF( r.left() + (r.width() / 2),
 			r.top() + (r.height() / 2) );
@@ -511,6 +495,44 @@ namespace qboard {
 	if( scaleY == 0.0 ) scaleY = scaleX;
 	obj->setTransform( rotateAndScale( obj->sceneRect(), angle, scaleX, scaleY, false ) );
     }
+
+
+    QTransform & transformFlip( QTransform & trans,
+				QSizeF const & bounds,
+				bool horiz )
+    {
+	if( horiz )
+	{
+	    trans.translate( -bounds.width(), 0 ).scale(-1,1);
+	}
+	else
+	{
+	    trans.translate( 0, -bounds.height() ).scale(1,-1);
+	}
+	return trans;
+    }
+
+    QTransform & transformFlip( QTransform & trans,
+				QRectF const & bounds,
+				bool horiz )
+    {
+	return transformFlip( trans, bounds.size(), horiz );
+    }
+
+    void transformFlip( QGraphicsItem * gi, bool horiz )
+    {
+	QTransform t( gi->transform() );
+	transformFlip( t, gi->boundingRect().size(), horiz );
+	gi->setTransform( t );
+    }
+
+    void transformFlip( QGraphicsView * gi, bool horiz )
+    {
+	QTransform t( gi->transform() );
+	transformFlip( t, gi->sceneRect().size(), horiz );
+	gi->setTransform( t );
+    }
+
 
 
 } // namespace
