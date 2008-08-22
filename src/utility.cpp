@@ -484,30 +484,30 @@ namespace qboard {
 	return count;
     }
 
-    QTransform rotateAndScale( QRectF const & bounds, qreal angle, qreal scaleX, qreal scaleY )
+    QTransform rotateAndScale( QRectF const & bounds, qreal angle, qreal scaleX, qreal scaleY, bool center )
     {
 	QTransform trans;
 	qreal x = bounds.width()/2;
 	qreal y = bounds.height()/2;
-	trans.translate(x,y);
+	if( center ) trans.translate(x,y);
 	trans.rotate( angle );
 	trans.scale( scaleX, scaleY ? scaleY : scaleX );
-	trans.translate(-x, -y);
+	if( center ) trans.translate(-x, -y);
 	return trans;
     }
 
-    void rotateAndScale( QGraphicsItem * obj, qreal angle, qreal scaleX, qreal scaleY )
+    void rotateAndScale( QGraphicsItem * obj, qreal angle, qreal scaleX, qreal scaleY, bool center )
     {
 	if( ! obj ) return;
 	if( scaleY == 0.0 ) scaleY = scaleX;
-	obj->setTransform( rotateAndScale( obj->boundingRect(), angle, scaleX, scaleY ) );
+	obj->setTransform( rotateAndScale( obj->boundingRect(), angle, scaleX, scaleY, center ) );
     }
 
     void rotateAndScale( QGraphicsView * obj, qreal angle, qreal scaleX, qreal scaleY )
     {
 	if( ! obj ) return;
 	if( scaleY == 0.0 ) scaleY = scaleX;
-	obj->setTransform( rotateAndScale( obj->sceneRect(), angle, scaleX, scaleY ) );
+	obj->setTransform( rotateAndScale( obj->sceneRect(), angle, scaleX, scaleY, false ) );
     }
 
 
