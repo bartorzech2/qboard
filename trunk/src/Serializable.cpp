@@ -18,7 +18,7 @@
 #include <s11n.net/s11n/s11nlite.hpp>
 #include <s11n.net/s11n/functional.hpp>
 #include <QRegExp>
- 
+
 struct Serializable::Impl
 {
     char const * cname;
@@ -53,11 +53,12 @@ Serializable::~Serializable()
 
 Serializable & Serializable::operator=( Serializable const &rhs )
 {
-    return this->copy( rhs );
+    //return this->copy( rhs );
+    return *this;
 }
 Serializable::Serializable( Serializable const & rhs )
 {
-    this->copy(rhs);
+    //this->copy(rhs);
 }
 
 
@@ -181,3 +182,4 @@ bool Serializable_s11n::operator()( S11nNode const & src, Serializable & dest ) 
 {
     return dest.deserialize( src );
 }
+

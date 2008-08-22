@@ -16,6 +16,7 @@
 
 #include "S11n.h"
 #include <QString>
+
 #include <string>
 #include <iostream>
 /**
@@ -108,21 +109,24 @@ public:
        Creates a polymorphic clone of this object via serialization.
     */
     Serializable * clone() const;
+
+
 protected:
-    /**
-       Implemented using this->copy(rhs).
-    */
-    Serializable & operator=( Serializable const & rhs );
-    /**
-       Implemented using this->copy(rhs).
-    */
-    Serializable( Serializable const & );
     /**
        Uses de/serialize() to create a polymorphic copy of rhs.
        On error (e.g. an attempt to copy between two different
        polymorphic types) it throws.
     */
     Serializable & copy( Serializable const & rhs );
+    /**
+       Does nothing.
+    */
+    Serializable & operator=( Serializable const & rhs );
+    /**
+       Does nothing.
+    */
+    Serializable( Serializable const & );
+
     /** This sets s11nClass(cn) and sets s11nFileExtension()
 	to cn prefixed by a '.'. e.g. if cn=="MyType" then
 	s11nFileExtension(".MyType") is set. See s11nClass()
@@ -149,6 +153,7 @@ protected:
        s11nFileExtension(".foo") instead of s11nFileExtension("foo").
     */
     void s11nFileExtension( char const * );
+
 private:
     struct Impl;
     Impl * impl;
@@ -189,5 +194,6 @@ namespace s11n {
 #define S11N_FACREG_INTERFACE_TYPE Serializable
 #define S11N_FACREG_TYPE_IS_ABSTRACT 1
 #include <s11n.net/s11n/factory_reg.hpp>
+
 
 #endif // __QBOARD_SERIALIZABLE_H_INCLUDED__
