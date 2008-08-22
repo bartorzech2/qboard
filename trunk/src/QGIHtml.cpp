@@ -215,8 +215,15 @@ bool QGIHtml::deserialize(  S11nNode const & src )
 
 void QGIHtml::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
 {
+    if( this->hasFocus() )
+    {
+	QGraphicsTextItem::contextMenuEvent(event);
+    }
+    else
+    {
 	MenuHandlerQGIHtml mh;
 	mh.doMenu( this, event );
+    }
 }
 
 
