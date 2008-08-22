@@ -104,10 +104,43 @@ void MenuHandlerBoard::doMenu( GameState & gs, QBoardView * pv, QContextMenuEven
     {
 	act->setEnabled(false);
     }
+
+    if(1)
+    {
+	QObjectPropertyMenu * pm =
+	    new QObjectPropertyMenu( "Scale", pv, "scale", 0 );
+#define ADDIT(Val) pm->addItem(QVariant(Val))->setText(QString("%1%").arg(int(Val*100)));
+	ADDIT(0.25);
+	ADDIT(0.50);
+	ADDIT(1.0);
+	ADDIT(2.0);
+	ADDIT(4.0);
+	ADDIT(8.0);
+#undef ADDIT
+	pm->setIcon(QIcon(":/QBoard/icon/viewmag.png"));
+	m.addMenu(pm);
+
+    }
+    if(1)
+    {
+	QObjectPropertyMenu * pm =
+	    QObjectPropertyMenu::makeNumberListMenu("Rotate",
+						    pv, "angle",
+						    0, 360, 45);
+	pm->setIcon(QIcon(":/QBoard/icon/rotate_cw.png"));
+	m.addMenu(pm);
+    }
+
+
 #if QBOARD_USE_OPENGL
     {
 	m.addSeparator();
-	QAction * ac = m.addAction(tr("Toggle OpenGL Mode"),pv, SLOT(setGLMode(bool)) );
+	QObjectPropertyAction * ac =
+	    new QObjectPropertyAction( pv,
+				       "openglMode",
+				       QVariant( pv->isGLMode() ? 0 : 1 ) );
+	m.addAction( ac );
+	ac->setText( tr("Toggle OpenGL Mode") );
 	ac->setCheckable( true );
 	ac->setChecked( pv->isGLMode() );
     }
