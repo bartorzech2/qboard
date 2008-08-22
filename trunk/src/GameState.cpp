@@ -22,6 +22,8 @@
 #include "QBoard.h"
 #include "S11nClipboard.h"
 
+#include <s11n.net/s11n/s11n_debuggering_macros.hpp>
+
 struct GameState::Impl
 {
     mutable GamePieceList pieces;
@@ -252,6 +254,13 @@ bool GameState::pasteTryHarder( S11nNode const & root,
 				QPoint const & pos )
 {
     if(1) qDebug() << "GameState::pasteTryHarder(node,"<<pos<<")";
+    /**
+       We will be randomly attempting deserializations which are likely
+       to fail. This may cause warning messages from s11n, via its
+       debugging facility, so we turn those off for the life of this
+       function.
+    */
+    s11n::debug::trace_mask_changer sentry( s11n::debug::TRACE_NEVER );
     try {
 	if( impl->board.deserialize(root) )
 	{
