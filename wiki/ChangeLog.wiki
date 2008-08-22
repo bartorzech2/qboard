@@ -9,12 +9,11 @@ are at the top. Dates written extra large are release dates.
 ----
 *2008 August 21:*
 
-- *Fixed a very significant memory leak* in the menu handlers. One of them
+- _*Fixed a very significant memory leak*_ in the menu handlers. One of them
 was leaking like a sieve before.
 
 - Pieces and HTML widgets can now be scaled independently of the board.
-Now we can use larger piece graphics on game boards with small hexes :).
-(Well, i've had that problem, anyway.)
+Now we can scale down larger piece graphics for use with game boards which have small hexes :). (Well, i've had that problem, anyway.)
 
 - We can now copy ANY s11n-serializable type to a QVariant :), via a simple
 proxy type.
