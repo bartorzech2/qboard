@@ -18,8 +18,13 @@ This file declares some bindings for Qt and libs11n, providing
 serialization support for many common Qt types.
 ************************************************************************/
 
+#include <QSharedData>
+#include <QSharedDataPointer>
+#include <QMetaType>
+
 #include "S11n.h"
 #include "S11nQtStream.h"
+
 #include <sstream>
 #include <memory>
 namespace s11n { namespace qt {
@@ -74,7 +79,166 @@ namespace s11n { namespace qt {
 	    ? s11nlite::deserialize( *n, dest )
 	    : false;
     }
+
+    /**
+       SharedS11nNode is a QSharedData type implementing
+       a reference-counted S11nNode.
+    */
+    struct SharedS11nNode : public QSharedData
+    {
+    public:
+	S11nNode node;
+	SharedS11nNode() : QSharedData(), node()
+	{}
+	SharedS11nNode( const SharedS11nNode & rhs )
+	    : QSharedData(rhs), node( rhs.node )
+	{
+	}
+#if 0
+	SharedS11nNode & operator=( SharedS11nNode const & rhs )
+	{
+	    if( this != rhs )
+	    {
+		this->node = rhs.node;
+	    }
+	    return *this;
+	}
+#endif
+    };
+
+    /**
+       VariantS11n is type to allow QVariant to hold a *copy* of any
+       Serializable.
+    */
+    class VariantS11n
+    {
+    public:
+	/**
+	   Returns the preferred type name for use with QVariant.
+	*/
+	static char const * variantTypeName()
+	{
+	    return "VariantS11n";
+	}
+	/**
+	   Returns the id for VariantS11n which is registered via
+	   qRegisterMetaType<VariantS11n>().
+	*/
+	static int variantType()
+	{
+	    static int bob = qRegisterMetaType<VariantS11n>(variantTypeName());
+	    return bob;
+	}
+
+	VariantS11n()
+	    : proxy( new SharedS11nNode )
+	{
+	}
+	/**
+	   Makes a deep copy of n.
+	 */
+	VariantS11n( S11nNode const & n)
+	    : proxy( new SharedS11nNode )
+	{
+	    proxy->node = n;
+	}
+	/**
+	   Makes a ref-counted copy of src.
+	*/
+	VariantS11n & operator=( VariantS11n const & src )
+	{
+	    this->proxy = src.proxy;
+	    return *this;
+	}
+	/**
+	   Makes a ref-counted copy of src.
+	*/
+	VariantS11n( VariantS11n const & src )
+	    : proxy(src.proxy)
+	{
+	}
+	/**
+	   Calls this->serialize(src). If serialization fails an exception
+	   is thrown.
+	*/
+	template <typename SerT>
+	VariantS11n( SerT const & src )
+	    : proxy(new SharedS11nNode)
+	{
+	    if( ! this->serialize( src ) )
+	    {
+		QString msg = QString("VariantS11n(<Serializable[%1]> const &): serialization failed").
+		    arg(s11n::s11n_traits<SerT>::class_name( &src ).c_str());
+		throw std::runtime_error( msg.toAscii().constData() );
+	    }
+	}
+	~VariantS11n()
+	{}
+
+	/**
+	   Returns true if this object contains no serialized data.
+	*/
+	bool empty() const
+	{
+	    return S11nNodeTraits::empty(proxy->node);
+	}
+
+	/**
+	   Equivalent to s11n::serialize(this->node(), src).
+	*/
+	template <typename SerT>
+	bool serialize( SerT const & src )
+	{
+	    S11nNodeTraits::clear(proxy->node);
+	    return s11n::serialize(proxy->node, src );
+	}
+
+	/**
+	   Equivalent to s11n::deserialize(this->node(), dest).
+	*/
+	template <typename SerT>
+	bool deserialize( SerT & dest ) const
+	{
+	    return s11n::deserialize( proxy->node, dest );
+	}
+
+	/**
+	   Equivalent to s11n::deserialize<SerT>(this->node()). The
+	   caller owns the returned pointer, which may be 0 on error.
+	*/
+	template <typename SerT>
+	SerT * deserialize() const
+	{
+	    return s11n::deserialize<SerT>( proxy->node );
+	}
+
+	/**
+	   Non-const accesor for this object's S11nNode.  Calling this
+	   will force a deep copy if other VariantS11n objects are sharing
+	   the underlying node.
+	*/
+	S11nNode & node() { return this->proxy->node; }
+	/**
+	   Const accesor for this object's S11nNode.
+	*/
+	S11nNode const & node() const { return this->proxy->node; }
+
+	/**
+	   Clears the memory used by serialized data, making
+	   this->node() usable again as a target for serialization.
+	*/
+	void clear()
+	{
+	    S11nNodeTraits::clear( proxy->node );
+	}
+    private:
+	QSharedDataPointer<SharedS11nNode> proxy;
+
+    };
 }} // namespaces
+using s11n::qt::VariantS11n;
+Q_DECLARE_METATYPE(VariantS11n); // an experiment!
+
 /************************************************************************
 At this point in the file, one might ask why "some" of the code is
 in the s11n::qt namespace and "some" is not. The answers are:
@@ -337,6 +501,9 @@ QVariant::Type enum):
 - Time, Date, DateTime
 - ByteArray
 - Pixmap
+- And now ...
+    * ANY Serializable Type (as defined by libs11n), via the 
+    s11n::qt::VariantS11n proxy type.
 
 If an attempt is made to serialize a different type, serialization
 will fail. If, upon deserialization, the integer values defined by
@@ -356,7 +523,7 @@ struct QVariant_s11n
 	   Returns true only if this type can de/serialize QVariants
 	   of the given type.
 	*/
-	static bool canHandle( QVariant::Type t );
+	static bool canHandle( int t );
 };
 #define S11N_TYPE QVariant
 #define S11N_TYPE_NAME "QVariant"
@@ -388,5 +555,7 @@ struct QObjectProperties_s11n
     bool operator()( S11nNode const & src, QObject & dest ) const;
 
 };
+
+
 
 #endif

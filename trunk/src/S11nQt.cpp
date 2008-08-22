@@ -577,45 +577,46 @@ bool QTime_s11n::operator()( S11nNode const & src, QTime & dest ) const
 }
 
 
-bool QVariant_s11n::canHandle( QVariant::Type t )
+bool QVariant_s11n::canHandle( int t )
 {
 	return 
 	    (t == QVariant::ByteArray)
-		|| (t == QVariant::Color)
-		|| (t == QVariant::Date)
-		|| (t == QVariant::DateTime)
-		|| (t == QVariant::Double)
-		|| (t == QVariant::Int)
-		|| (t == QVariant::Line)
-		|| (t == QVariant::LineF)
-		|| (t == QVariant::List)
-		|| (t == QVariant::LongLong)
-		|| (t == QVariant::Map)
-		|| (t == QVariant::Rect)
-		|| (t == QVariant::RectF)
-		|| (t == QVariant::Pixmap)
-		|| (t == QVariant::Point)
-		|| (t == QVariant::PointF)
-		|| (t == QVariant::Size)
-		|| (t == QVariant::SizeF)
-		|| (t == QVariant::String)
-		|| (t == QVariant::StringList)
-		|| (t == QVariant::Time)
-		|| (t == QVariant::ULongLong)
-		|| (t == QVariant::UInt)
-		;
+	    || (t == QVariant::Color)
+	    || (t == QVariant::Date)
+	    || (t == QVariant::DateTime)
+	    || (t == QVariant::Double)
+	    || (t == QVariant::Int)
+	    || (t == QVariant::Line)
+	    || (t == QVariant::LineF)
+	    || (t == QVariant::List)
+	    || (t == QVariant::LongLong)
+	    || (t == QVariant::Map)
+	    || (t == QVariant::Rect)
+	    || (t == QVariant::RectF)
+	    || (t == QVariant::Pixmap)
+	    || (t == QVariant::Point)
+	    || (t == QVariant::PointF)
+	    || (t == QVariant::Size)
+	    || (t == QVariant::SizeF)
+	    || (t == QVariant::String)
+	    || (t == QVariant::StringList)
+	    || (t == QVariant::Time)
+	    || (t == QVariant::ULongLong)
+	    || (t == QVariant::UInt)
+	    // || (t == QVariant::UserType) // Only certain ones
+	    || (t == s11n::qt::VariantS11n::variantType())
+	    ;
 }
 
-typedef QMap<int,QString> VariantTypeIDNameMap;
-typedef QMap<QString,int> VariantNameTypeIDMap;
 
+typedef QMap<QString,int> VariantNameTypeIDMap;
 static VariantNameTypeIDMap & vNTMap()
 {
     static VariantNameTypeIDMap bob;
     if( bob.isEmpty() )
     {
 #define MAP(VT) \
-	bob[# VT] = QVariant::VT; \
+	bob[# VT] = QVariant::VT;		\
 	bob[QString("%1").arg(QVariant::VT)] = QVariant::VT;
 
 	MAP(BitArray);
@@ -666,12 +667,20 @@ static VariantNameTypeIDMap & vNTMap()
 	MAP(Url);
 	MAP(UserType);
 #undef MAP
+	bob[s11n::qt::VariantS11n::variantTypeName()] = s11n::qt::VariantS11n::variantType();
+	bob[QString("%1").arg(s11n::qt::VariantS11n::variantType())] = s11n::qt::VariantS11n::variantType();
+
 // 	COUT << "vNTMap()==\n";
 // 	s11nlite::save(bob,std::cout);
     }
     return bob;
 }
 
+int variantTypeID( QString const & vt )
+{
+    return vNTMap().value( vt, QVariant::Invalid );
+}
+typedef QMap<int,QString> VariantTypeIDNameMap;
 static VariantTypeIDNameMap & vTNMap()
 {
     static VariantTypeIDNameMap bob;
@@ -727,6 +736,7 @@ static VariantTypeIDNameMap & vTNMap()
 	MAP(ULongLong);
 	MAP(Url);
 	MAP(UserType);
+	bob[s11n::qt::VariantS11n::variantType()] = s11n::qt::VariantS11n::variantTypeName();
 #undef MAP
     }
     return bob;
@@ -737,37 +747,29 @@ QString variantTypeName( int vt )
     return vTNMap().value( vt, "Invalid" );
 }
 
-int variantTypeID( QString const & vt )
-{
-    return vNTMap().value( vt, QVariant::Invalid );
-}
-
-
 #include "S11nQtList.h"
 bool QVariant_s11n::operator()( S11nNode & dest, QVariant const & src ) const
 {
-	const QVariant::Type vt = src.type();
-	typedef S11nNodeTraits NT;
+	const int vt = src.userType();
 	if( ! QVariant_s11n::canHandle(vt) )
 	{
 		//throw s11n::s11n_exception( "QVariant_s11n cannot serialize QVariants type() %d", vt );
 		return false;
 	}
+	typedef S11nNodeTraits NT;
 #if 0
 	NT::set( dest, "type", vt );
 #else
 	NT::set( dest, "type", variantTypeName(vt).toAscii().constData() );
 #endif
-	bool ret = false;
 
 #define CASE_PROP(T,Setter) \
 	case QVariant::T: \
-	ret = true; NT::set(dest, "val", src.Setter); \
-	break;
+	NT::set(dest, "val", src.Setter); \
+	return true;
 #define CASE_OBJ(T,X) \
 	case QVariant::T: \
-	    ret = s11n::serialize_subnode( dest, "val", X ); \
-	break;
+	return s11n::serialize_subnode( dest, "val", X ); \
 
 	switch( vt )
 	{
@@ -799,35 +801,42 @@ bool QVariant_s11n::operator()( S11nNode & dest, QVariant const & src ) const
 	};
 #undef CASE_PROP
 #undef CASE_OBJ
-	return ret;
+	if( src.canConvert<VariantS11n>() )
+	{
+	    VariantS11n vsn( src.value<VariantS11n>() );
+	    S11nNode & ch( s11n::create_child( dest, "val" ) );
+	    S11nNodeTraits::swap( vsn.node(), ch );
+	    return true;
+	}
+	return false;
 }
+
 #include <QDebug>
 bool QVariant_s11n::operator()( S11nNode const & src, QVariant & dest ) const
 {
 	typedef S11nNodeTraits NT;
-	int vt = QVariant::Invalid;
+	std::string vtstr( NT::get( src, "type", std::string("0") ) );
+	int vt = variantTypeID( vtstr.c_str() );
+	if( ! canHandle( vt ) )
 	{
-	    QString vtstr( NT::get( src, "type", std::string("0") ).c_str() );
-	    vt = variantTypeID(vtstr);
+	    qDebug() << "QVariant_s11n::deserialize: cannot handle type id "
+		     << vt << "/" << vtstr.c_str();
+	    return false;
 	}
-	if( ! QVariant_s11n::canHandle( QVariant::Type(vt) ) )
-	{
-	    throw s11n::s11n_exception("QVariant_s11n::deserialize: cannot handle QVariant::Type #%d",vt); 
-	    //return false;
-	}
-	bool ret = false;
 #define CASE_OBJ(VT,Type) \
 	case QVariant::VT: { \
 	    Type tmp;							\
-	    if( (ret = s11n::deserialize_subnode( src, "val", tmp ) ) ) \
-	    {dest = QVariant(tmp);}					\
+	    if( s11n::deserialize_subnode( src, "val", tmp ) ) \
+	    {dest = QVariant(tmp); return true;}	       \
 	} break;
 #define CASE_PROP(VT,Type,DefaultVal)		\
 	case QVariant::VT: \
 	{ Type i = NT::get( src, "val", DefaultVal ); \
-	    dest = QVariant( i );  ret = true; \
+	    dest = QVariant( i ); return true; \
 	} break;
 
+	using namespace s11n::qt;
+	static const int S11nVariantID = VariantS11n::variantType();
 	switch( vt )
 	{
 	    CASE_OBJ(ByteArray,QByteArray);
@@ -856,9 +865,22 @@ bool QVariant_s11n::operator()( S11nNode const & src, QVariant & dest ) const
 	  default:
 	      break;
 	};
+	if( vt == S11nVariantID )
+	{
+	      S11nNode const * ch = s11n::find_child_by_name( src, "val" );
+	      if( ch )
+	      {
+		  dest.setValue( VariantS11n(*ch) );
+		  return true;
+	      }
+	      else
+	      {
+		  return false;
+	      }
+	}
 #undef CASE_OBJ
 #undef CASE_PROP
-	return ret;
+	return false;
 }
 
 
