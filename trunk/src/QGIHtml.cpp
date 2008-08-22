@@ -13,6 +13,7 @@
 
 #include "QGIHtml.h"
 #include "S11nQt.h"
+#include "S11nQtList.h"
 #include "utility.h"
 #include "MenuHandlerGeneric.h"
 #include <QGraphicsSceneMouseEvent>
@@ -164,20 +165,29 @@ bool QGIHtml::serialize( S11nNode & dest ) const
 		if( ! QObjectProperties_s11n()( pr, *this ) ) return false;
 	}
 #endif
+	{
+	    QList<QGraphicsItem *> chgi( this->childItems() );
+	    if( ! chgi.isEmpty() )
+	    {
+		if( ! s11n::qt::serializeQGIList<Serializable>( s11n::create_child(dest,"children"),
+								chgi, false ) )
+		{
+		    return false;
+		}
+	    }
+	}
 	const QString html( this->toHtml() );
 	const long thresh = 128;
-	bool ret = true;
 	if( html.size() > thresh )
 	{
-	    ret = s11n::serialize_subnode( dest, "html", html.toUtf8() );
+	    if( ! s11n::serialize_subnode( dest, "html", html.toUtf8() ) ) return false;
 	}
 	else
 	{
-	    ret = s11n::serialize_subnode( dest, "html", html );
+	    if( ! s11n::serialize_subnode( dest, "html", html ) ) return false;
 	}
 	
-	return ret
-	    && s11n::serialize_subnode( dest, "pos", this->pos().toPoint() );
+	return s11n::serialize_subnode( dest, "pos", this->pos().toPoint() );
 }
 
 bool QGIHtml::deserialize(  S11nNode const & src )
@@ -198,11 +208,23 @@ bool QGIHtml::deserialize(  S11nNode const & src )
 	{
 	    this->setProperty("angle", NT::get( src, "angle", qreal(0.0) ) );
 	    double dbl = NT::get( src, "scale", qreal(1.0) );
-	    if( dbl <= 0.0 )
+	    if( dbl == 0.0 )
 	    {
 		dbl = 1.0;
 	    }
 	    this->setProperty("scale", QVariant(dbl));
+	}
+	{
+	    S11nNode const * ch = s11n::find_child_by_name(src, "children");
+	    if( ch )
+	    {
+		typedef QList<QGraphicsItem *> QGIL;
+		QGIL childs;
+		if( -1 == s11n::qt::deserializeQGIList<Serializable>( *ch, childs, this ) )
+		{
+		    return false;
+		}
+	    }
 	}
 #if 0
 	S11nNode const * ch = s11n::find_child_by_name(src, "properties");
@@ -299,16 +321,14 @@ void MenuHandlerQGIHtml::doMenu( QGIHtml * pv, QGraphicsSceneContextMenuEvent * 
 	    QObjectPropertyMenu * pm =
 		QObjectPropertyMenu::makeNumberListMenu("Scale",
 							list, "scale",
-							0.25, 3.0, 0.25);
+							0.25, 3.01, 0.25);
 	    pm->setIcon(QIcon(":/QBoard/icon/viewmag.png"));
 	    m->addMenu(pm);
 	}
-#if 1
 	m->addSeparator();
 	MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( pv, m );
 	m->addAction(QIcon(":/QBoard/icon/editcopy.png"),"Copy",clipper,SLOT(clipboardCopy()) );
 	m->addAction(QIcon(":/QBoard/icon/editcut.png"),"Cut",clipper,SLOT(clipboardCut()) );
-#endif
 	m->addSeparator();
 	m->addAction(QIcon(":/QBoard/icon/help.png"),"Help...", this, SLOT(showHelp()) );
 	m->exec( ev->screenPos() );
