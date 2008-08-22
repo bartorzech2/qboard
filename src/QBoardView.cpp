@@ -61,6 +61,8 @@ QBoardView::QBoardView( GameState & gs ) :
     QGraphicsView(gs.scene()),
     impl( new Impl(gs) )
 {
+    this->setProperty("scale", 1.0);
+    this->setProperty("angle", 0.0);
     //this->setCacheMode(QGraphicsView::CacheBackground);
     connect( &impl->board, SIGNAL(loaded()), this, SLOT(updateBoardPixmap()) );
     this->setAlignment(Qt::AlignLeft | Qt::AlignTop);
@@ -96,6 +98,71 @@ QBoardView::~QBoardView()
     }
     delete impl;
 }
+
+void QBoardView::refreshTransformation()
+{
+    qboard::rotateAndScale( this,
+			    this->property("angle").toDouble(),
+			    this->property("scale").toDouble() );
+    this->updateGeometry(); // ensure scrollbars get synced
+}
+
+void QBoardView::propertySet( char const *pname, QVariant const & var )
+{
+    // FIXME: treat QVariant::Invalid appropriately for each property
+    // FIXME: instead of doing string comparisons on pname, use a
+    // lookup map with Impl member funcs as implementations. Make Impl
+    // a friend class.
+    if(0) qDebug() << "QBoardView::propertySet("<<pname<<","<<var<<")"<<var;
+    QString key( pname );
+    if( "color" == key )
+    {
+	// TODO
+	return;
+    }
+    if( "scale" == key )
+    {
+	impl->scale = var.toDouble();
+	this->refreshTransformation();
+	return;
+    }
+    if( "angle" == key )
+    {
+	this->refreshTransformation();
+	return;
+    }
+    if( "pixmap" == key )
+    {
+	impl->board.setProperty( "pixmap", var );
+	return;
+    } // pixmap property
+    // we could arguably handle "openglMode", but i don't want that serialized.
+    if( "openglMode" == key )
+    {
+	if( var.isValid() )
+	{
+	    this->setGLMode( var.toInt() != 0 );
+	}
+	return;
+    } // pixmap property
+}
+
+
+
+bool QBoardView::event( QEvent * e )
+{
+    while( e->type() == QEvent::DynamicPropertyChange )
+    {
+	QDynamicPropertyChangeEvent *chev = dynamic_cast<QDynamicPropertyChangeEvent *>(e);
+	if( ! chev ) break;
+	char const * key = chev->propertyName().constData();
+	this->propertySet( key, this->property(key) );
+	e->accept();
+	break;
+    }
+    return this->QGraphicsView::event(e);
+}
+
 
 void QBoardView::setHandDragMode(bool handMode )
 {
@@ -181,6 +248,7 @@ void QBoardView::updateBoardPixmap()
     impl->scale -= 0.01;
     this->zoom( impl->scale + 0.01 );
     this->viewport()->update(); // without this, viewport won't update until the board is manipulated
+    this->updateGeometry();
 }
 
 void QBoardView::drawBackground( QPainter *p, const QRectF & rect )
@@ -258,14 +326,18 @@ void QBoardView::zoomOut()
 
 void QBoardView::zoom( qreal z )
 {
-    if( (z < 0.10) || (z>5.01) ) return; // arbitrary! 
+    if( (z < 0.10) || (z>5.01) ) return; // arbitrary!
     if( z == impl->scale ) return;
+#if 1
+    this->setProperty("scale", z);
+#else
     impl->scale = z;
     //qDebug() << "QBoardView::zoom()"<<impl->scale;
     //resetTransform() undoes rotation, which is annoying. But we need it to get the behaviour i want. :/
     this->resetTransform();
     this->scale( impl->scale, impl->scale );
     this->updateGeometry(); // without this, scrollbars get out of sync.
+#endif
 }
 
 void QBoardView::zoomReset()

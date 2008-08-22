@@ -75,11 +75,15 @@ protected:
 	virtual void mousePressEvent ( QMouseEvent * event );
     virtual void dragMoveEvent( QDragMoveEvent * event );
     virtual void contextMenuEvent( QContextMenuEvent * event );
+    virtual bool event( QEvent * e );
 
 private Q_SLOTS:
     void placemarkerDestroyed();
 
 private:
+    /** Handles property changes. */
+    void propertySet( char const * key, QVariant const & val );
+    void refreshTransformation();
     struct Impl;
     Impl * impl;
 };
