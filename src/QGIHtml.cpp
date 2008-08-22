@@ -156,6 +156,7 @@ bool QGIHtml::serialize( S11nNode & dest ) const
 	if( ! this->Serializable::serialize( dest ) ) return false;
 	typedef S11nNodeTraits NT;
 	NT::set( dest, "angle", this->property("angle").toInt() );
+	NT::set( dest, "scale", this->property("scale").toDouble() );
 #if 0
 	if( this->metaObject()->propertyCount() )
 	{
@@ -195,11 +196,13 @@ bool QGIHtml::deserialize(  S11nNode const & src )
 	    this->setHtml(html);
 	}
 	{
-	    int angle = NT::get( src, "angle", int(0) );
-	    if( angle != 0.0 )
+	    this->setProperty("angle", NT::get( src, "angle", qreal(0.0) ) );
+	    double dbl = NT::get( src, "scale", qreal(1.0) );
+	    if( dbl <= 0.0 )
 	    {
-		this->setProperty("angle", QVariant(angle));
+		dbl = 1.0;
 	    }
+	    this->setProperty("scale", QVariant(dbl));
 	}
 #if 0
 	S11nNode const * ch = s11n::find_child_by_name(src, "properties");
