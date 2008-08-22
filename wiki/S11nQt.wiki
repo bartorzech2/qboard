@@ -12,7 +12,7 @@ The distribution contains code for de/serializing the following Qt types:
   * QString, both ASCII and Unicode strings (though it internally uses different formats for each).
   * Most of the commonly-used utility classes, including: QPoint, QColor, QRect, QSize, QLine, QPolygon, QPair, QFont, QDate/Time/DateTime.
   * QByteArray and QPixmap, with compression
-  * Many (but not all) forms of QVariant.
+  * Many forms of QVariant. Custom QVariant registrations are in place to allow QVariant to hold ANY SerializableType object.
   * QList, QStringList, QVector, QMap
   * QObject properties. They are internally stored as QVariants, which implies that only property values of QVariant types supported by this code will work for purposes of serialization.
 
