@@ -217,17 +217,30 @@ void try_s11n()
 	     << " vcp.type() == "<<vcp.type()<<'\n';
 	COUT << "vcp.typeName() == "
 	     << vcp.typeName() <<'\n';
+	COUT << "vcp.userType() == "
+	     << vcp.userType() <<'\n';
 	COUT << "typeToName("<<VariantS11n::variantType()<<") == "
 	     << QVariant::typeToName(QVariant::Type(VariantS11n::variantType()))<<"\n";
+	COUT << "QVariant::typeToName(vcp.type()=="<<vcp.type()<<") == "
+	     << QVariant::typeToName(vcp.type())<<"\n";
 	COUT << "QVariant::nameToType("<<vcp.typeName()<<") == "
 	     << QVariant::nameToType(vcp.typeName()) << '\n';
+	COUT << "save(qv):\n";
+	s11nlite::save( qv, std::cout );
 	VariantS11n vsn( vcp.value<VariantS11n>() );
+	COUT << "save(vsn.node()):\n";
 	s11nlite::save( vsn.node(), std::cout );
 	QString deser;
 	if( ! vsn.deserialize(deser) )
 	{
 	    throw s11n::s11n_exception("VariantS11n deserialization of QString failed!");
 	}
+	QSize bogus;
+	if( vsn.deserialize(bogus) )
+	{
+	    throw s11n::s11n_exception("VariantS11n deserialization of non-QString should not have worked!");
+	}
+	COUT << "save(deser):\n";
 	s11nlite::save( deser, std::cout );
     }
 
