@@ -501,9 +501,8 @@ QVariant::Type enum):
 - Time, Date, DateTime
 - ByteArray
 - Pixmap
-- And now ...
-    * ANY Serializable Type (as defined by libs11n), via the 
-    s11n::qt::VariantS11n proxy type.
+- Any Serializable Type (as defined by libs11n), via the 
+s11n::qt::VariantS11n proxy type.
 
 If an attempt is made to serialize a different type, serialization
 will fail. If, upon deserialization, the integer values defined by
