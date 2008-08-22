@@ -44,7 +44,7 @@ void MenuHandlerCopyCut::clipboard( QGraphicsItem * gvi, bool copy )
     }
     else
     {
-	if( gvi->parentItem() ) return;
+	//if( gvi->parentItem() ) return;
 	Serializable * ser = dynamic_cast<Serializable*>( gvi );
 	if( ! ser ) return;
 	S11nClipboard::instance().serialize( *ser );
