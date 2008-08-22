@@ -89,7 +89,13 @@ public:
     virtual ~MenuHandlerQGIHtml();
 public Q_SLOTS:
     void doMenu( QGIHtml *, QGraphicsSceneContextMenuEvent * );
+private Q_SLOTS:
+    void copyList();
+    void cutList();
     void showHelp();
+private:
+    static void clipList( QGIHtml * src, bool copy );
+    QGIHtml * m_gi;
 };
 
 #endif

@@ -24,12 +24,18 @@
 #include "MenuHandlerGeneric.h"
 #include "PropObj.h"
 
+#define QGIPiece_USE_PIXCACHE 0
+// i would like to cache the paint jobs, but i get weird graphics artefacts when i do
+
 struct QGIPiece::Impl
 {
     QColor backgroundColor;
     QColor borderColor;
     int borderSize;
     QPixmap pixmap;
+#if QGIPiece_USE_PIXCACHE
+    QPixmap pixcache;
+#endif
     int borderLineStyle;
     int alpha;
     int borderAlpha;
@@ -45,6 +51,12 @@ struct QGIPiece::Impl
 	borderLineStyle = Qt::SolidLine;
 	block = false;
 	alpha = borderAlpha = 255;
+    }
+    void clearPix()
+    {
+#if QGIPiece_USE_PIXCACHE
+	pixcache = QPixmap();
+#endif
     }
 };
 
@@ -127,6 +139,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     {
 	impl->backgroundColor = var.value<QColor>();
 	impl->backgroundColor.setAlpha(impl->alpha);
+	impl->clearPix();
 	this->update();
 	return;
     }
@@ -134,6 +147,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     {
 	impl->borderColor = var.value<QColor>();
 	impl->borderColor.setAlpha(impl->alpha);
+	impl->clearPix();
 	this->update();
 	return;
     }
@@ -141,13 +155,15 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     {
 	impl->alpha = var.toInt();
 	impl->backgroundColor.setAlpha(impl->alpha);
-	this->update();
+	impl->clearPix();
+    	this->update();
 	return;
     }
     if( "borderAlpha" == key )
     {
 	impl->borderAlpha = var.toInt();
 	impl->borderColor.setAlpha(impl->borderAlpha);
+	impl->clearPix();
 	this->update();
 	return;
     }
@@ -155,11 +171,13 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     {
 	int bs = var.toInt();;
 	impl->borderSize = (bs >= 0) ? bs : 0;
+	impl->clearPix();
 	this->update();
 	return;
     }
     if( "borderStyle" == key )
     {
+	impl->clearPix();
 	if( var.type() == QVariant::Int )
 	{
 	    const int i = var.toInt();
@@ -194,6 +212,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     }
     if( "size" == key )
     {
+	impl->clearPix();
 	if( impl->pixmap.isNull() )
 	{
 	    QPixmap bogus( var.toSize() );
@@ -218,6 +237,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     }
     if( "pixmap" == key )
     {
+	impl->clearPix();
 	QPixmap pix;
 	if( var.canConvert<QPixmap>() )
 	{
@@ -303,9 +323,34 @@ void QGIPiece::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
     QGIPieceMenuHandler mh;
     mh.doMenu( this, event );
 }
+
+QRectF boundsOfChildren( QGraphicsItem const * qgi )
+{
+    typedef QList<QGraphicsItem*> QGIL;
+    QGIL ch( qgi->childItems() );
+    QRectF r;
+    for( QGIL::const_iterator it = ch.begin();
+	 ch.end() != it; ++it )
+    {
+	QGraphicsItem const * x = *it;
+	QRectF r2( x->mapToParent(x->pos()), x->boundingRect().size() );
+	r = r.unite( r2 );
+    }
+    if(1  && ! r.isNull() ) qDebug() << "bounds of children ="<<r;
+    return r;
+}
+
 QRectF QGIPiece::boundingRect() const
 {
     QRectF r( impl->pixmap.rect() );
+    if( r.isNull() )
+    {
+	QVariant sz( this->property("size") );
+	if( sz.canConvert<QSize>() )
+	{
+	    r.setSize(sz.value<QSize>());
+	}
+    }
     if( impl->borderSize > 0 )
     { // QGraphicsItem::boundingRect() docs say we need this:
 	qreal pw( impl->borderSize / 1.8 ); // 2.0 doesn't quite work for me - still get graphics artefacts
@@ -314,6 +359,12 @@ QRectF QGIPiece::boundingRect() const
 	r.setTop( r.top() - pw );
 	r.setBottom( r.bottom() + pw );
     }
+#if 0
+    if(0  && ! r.isNull() ) qDebug() << "bounds self ="<<r;
+    QRectF r2( boundsOfChildren( this ) ); //this->mapToParent(  ).boundingRect() );
+    //r2 = QRectF( this->mapToParent(r2.topLeft()), r2.size() );
+    r = r.unite( r2 );
+#endif
     return r;
 }
 
@@ -321,40 +372,107 @@ QVariant QGIPiece::itemChange(QGraphicsItem::GraphicsItemChange change, const QV
 {
     return QGraphicsPixmapItem::itemChange(change,value);
 }
+
+
+static void paintLinesToChildren( QGraphicsItem * qgi,
+				  QPainter * painter,
+				  QPen const & pen )
+{
+    typedef QList<QGraphicsItem*> QGIL;
+    QGIL ch( qgi->childItems() );
+    if( ch.isEmpty() ) return;
+    QRectF prect( qgi->boundingRect() );
+    QPointF mid( prect.left() + (prect.width() / 2),
+		 prect.top() + (prect.height() / 2) );
+    painter->save();
+    for( QGIL::iterator it = ch.begin();
+	 ch.end() != it; ++it )
+    {
+	QGraphicsItem * x = *it;
+	QRectF xr( x->boundingRect() );
+	QPointF xmid( xr.left() + (xr.width() / 2),
+		      xr.top() + (xr.height() / 2) );
+	//xmid = x->mapToParent( xmid );
+	xmid = qgi->mapFromItem( x, xmid );
+	painter->setPen( pen );
+	painter->drawLine( QLineF( mid, xmid ) );
+    }
+    painter->restore();
+
+}
 void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget )
 {
 #if 0
     this->QGraphicsPixmapItem::paint(painter,option,widget);
     return;
 #endif
+    if(0)
+    { // for me this only works in GL mode
+	QPen linePen(Qt::red, 4, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin);
+	paintLinesToChildren( this, painter, linePen );
+    }
     QRect rect( this->boundingRect().toRect() );
-    if( 1 ) // Background color
+    if( 
+#if QGIPiece_USE_PIXCACHE
+       impl->pixcache.isNull()
+#else
+       1
+#endif
+       )
     {
-	if( impl->backgroundColor.isValid() )
+	QPainter * cp = 0;
+#if QGIPiece_USE_PIXCACHE
+	QPixmap captcha( rect.size() );
+	QPainter _cp( &captcha );
+	cp = &_cp;
+#else
+	cp = painter;
+#endif
+	if( 1 ) // Background color
 	{
-	    painter->fillRect( rect, impl->backgroundColor );
+	    if( impl->backgroundColor.isValid() )
+	    {
+		cp->fillRect( rect, impl->backgroundColor );
+	    }
 	}
-    }
-    QPixmap const & pix( impl->pixmap );
-    if( ! pix.isNull() )
-    {
-	//this->QGraphicsPixmapItem::paint(painter,option,widget);
-	painter->drawPixmap(rect,pix,rect);
-    }
-
-    if( 1 ) // Border
-    {
-	if( impl->borderSize && impl->borderColor.isValid() )
+	if( ! impl->pixmap.isNull() )
 	{
-	    //qDebug() << "borderColor: bounding rect: "<<rect<<"borderSize="<<impl->borderSize<<"color: " << impl->borderColor;
-	    painter->save();
-	    painter->setPen( QPen(impl->borderColor,
-				  qreal( impl->borderSize ),
-				  Qt::PenStyle( impl->borderLineStyle ) ) );
-	    painter->drawRect( rect );
-	    painter->restore();
+	    QRectF pmr( impl->pixmap.rect() );
+#if 0
+	    qreal xl = double(impl->borderSize) / 2.0;
+	    pmr.translate( xl, xl );
+	    cp->drawPixmap(pmr, impl->pixmap, pmr);
+	    pmr.translate( -xl, -xl );
+#else
+	    cp->drawPixmap(pmr, impl->pixmap, pmr);
+#endif
+	    //cp->drawPixmap( pix.rect(), pix, pix.rect() );
 	}
+	
+	if( 1 ) // Border
+	{
+	    if( impl->borderSize && impl->borderColor.isValid() )
+	    {
+		//qDebug() << "borderColor: bounding rect: "<<rect<<"borderSize="<<impl->borderSize<<"color: " << impl->borderColor;
+		cp->save();
+		cp->setPen( QPen(impl->borderColor,
+				 qreal( impl->borderSize ),
+				 Qt::PenStyle( impl->borderLineStyle ) ) );
+		cp->drawRect( rect );
+		cp->restore();
+	    }
+	}
+#if QGIPiece_USE_PIXCACHE
+	impl->pixcache = captcha;
+#endif
     }
+    else
+    {
+	if(0) qDebug() << "QGIPiece::paint() using cached image.";
+    }
+#if QGIPiece_USE_PIXCACHE
+    painter->drawPixmap( rect, impl->pixcache, rect );
+#endif
     // Let parent draw selection borders and such:
     this->QGraphicsPixmapItem::paint(painter,option,widget);
 }
@@ -450,25 +568,32 @@ QGIPieceMenuHandler::~QGIPieceMenuHandler()
 }
 
 
-void QGIPieceMenuHandler::copyQGIList()
+void QGIPieceMenuHandler::clipList( QGIPiece * src, bool copy )
 {
-    if( ! impl->scene ) return;
-    typedef QList<QGraphicsItem*> QGIL;
-    QGIL sel( impl->scene->selectedItems() );
-    QList<QGIPiece*> sli;
-    for( QGIL::iterator it = sel.begin(); sel.end() != it; ++it )
-    {
-	QGIPiece * pcv = dynamic_cast<QGIPiece*>( *it );
-	if( ! pcv ) continue;
-	sli.push_back(pcv);
-    }
+    if( !src || ! src->scene() ) return;
+    typedef QList<QGIPiece*> QSL;
+    QSL sel( qboard::selectedItemsCast<QGIPiece>( src->scene() ) );
     try
     {
-	S11nClipboard::instance().serialize( sli );
+	S11nClipboard::instance().serialize( sel );
     }
     catch(...)
     {
     }
+    if( ! copy )
+    {
+	s11n::cleanup_serializable( sel );
+    }
+}
+
+void QGIPieceMenuHandler::copyList()
+{
+    clipList( impl->piece, true );
+}
+
+void QGIPieceMenuHandler::cutList()
+{
+    clipList( impl->piece, false );
 }
 
 void QGIPieceMenuHandler::showHelp()
@@ -490,6 +615,35 @@ bool QGIPieceMenuHandler::cutPiece()
 	impl->piece->deleteLater();
     }
     return false;
+}
+
+
+void QGIPieceMenuHandler::addChild()
+{
+    QObject * o = this->sender();
+    QString name;
+    if( o )
+    {
+	QAction * ac = qobject_cast<QAction*>(o);
+	if( ac ) name = ac->text();
+    }
+    if(1) qDebug() << "QGIPieceMenuHandler::addChild() class ="<<name;
+    if( name.isEmpty() ) return;
+    Serializable * s = s11n::cl::classload<Serializable>( name.toAscii().constData() );
+    if( s )
+    {
+	QGraphicsItem * gi = dynamic_cast<QGraphicsItem*>(s);
+	if( gi )
+	{
+	    gi->setParentItem( impl->piece );
+	    gi->setFlag( QGraphicsItem::ItemIsSelectable, false );
+	    gi->setFlag( QGraphicsItem::ItemIsMovable, true );
+	}
+	else
+	{
+	    s11n::cleanup_serializable( s );
+	}
+    }
 }
 
 void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent * ev )
@@ -531,19 +685,6 @@ void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent 
     if(1)
     {
 	QMenu * mMisc = m->addMenu("Misc.");
-	QVariant lock = pv->property("dragDisabled");
-	bool locked = lock.isValid()
-	    ? (lock.toInt() ? true : false)
-	    : false;
-	QVariant newVal = locked ? QVariant(int(0)) : QVariant(int(1));
-	QObjectPropertyAction * act = new QObjectPropertyAction(selected,"dragDisabled",newVal);
-	act->setIcon(QIcon(":/QBoard/icon/unlock.png"));
-	act->setCheckable( true );
-	act->blockSignals(true);
-	act->setChecked( locked );
-	act->blockSignals(false);
-	act->setText(locked ? "Unlock position" : "Lock position");
-	mMisc->addAction(act);
 
 	if(1)
 	{
@@ -554,23 +695,41 @@ void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent 
 	    pm->setIcon(QIcon(":/QBoard/icon/viewmag.png"));
 	    mMisc->addMenu(pm);
 	}
+
+	if(1)
+	{
+	    QMenu * mAdd = mMisc->addMenu("Create child...");
+	    mAdd->addAction( "QGIHtml", this, SLOT(addChild()) );
+	}
+
+	if(1)
+	{
+	    QVariant lock = pv->property("dragDisabled");
+	    bool locked = lock.isValid()
+		? (lock.toInt() ? true : false)
+		: false;
+	    QVariant newVal = locked ? QVariant(int(0)) : QVariant(int(1));
+	    QObjectPropertyAction * act = new QObjectPropertyAction(selected,"dragDisabled",newVal);
+	    act->setIcon(QIcon(":/QBoard/icon/unlock.png"));
+	    act->setCheckable( true );
+	    act->blockSignals(true);
+	    act->setChecked( locked );
+	    act->blockSignals(false);
+	    act->setText(locked ? "Unlock position" : "Lock position");
+	    mMisc->addAction(act);
+	}
     }
 
 #if 1
     m->addSeparator();
-    if( pv->isSelected() )
+    MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( pv, m );
+    QMenu * copySub = clipper->addDefaultEntries( m, true, pv->isSelected() );
+    if( copySub )
     {
-	MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( pv, m );
-	m->addAction(QIcon(":/QBoard/icon/editcopy.png"),tr("Copy selected"),clipper,SLOT(clipboardCopy()) );
-
-	m->addAction(QIcon(":/QBoard/icon/editcut.png"),"Cut selected",clipper,SLOT(clipboardCut()) );
-	QMenu * mcopy = m->addMenu(tr("Copy..."));
-	mcopy->addAction(QIcon(":/QBoard/icon/editcopy.png"),"Selected as QList<Serializable*>",this,SLOT(copyQGIList()) );
-    }
-    else
-    {
-	m->addAction(QIcon(":/QBoard/icon/editcopy.png"),tr("Copy"),this,SLOT(copyPiece()) );
-	m->addAction(QIcon(":/QBoard/icon/editcut.png"),"Cut",this,SLOT(cutPiece()) );
+	copySub->addAction(QIcon(":/QBoard/icon/editcopy.png"),"Copy selected as QList<QGIPiece*>",
+			   this,SLOT(copyList()) );
+	copySub->addAction(QIcon(":/QBoard/icon/editcut.png"),"Cut selected as QList<QGIPiece*>",
+			   this,SLOT(cutList()) );
     }
     m->addSeparator();
 #endif
