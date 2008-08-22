@@ -120,6 +120,7 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	connect( this->actionClearBoard, SIGNAL(triggered(bool)), this, SLOT(clearBoard()) );
 	connect( this->actionQuickSave, SIGNAL(triggered(bool)), this, SLOT(quickSave()) );
 	connect( this->actionQuickLoad, SIGNAL(triggered(bool)), this, SLOT(quickLoad()) );
+
 	connect( this->actionCopy, SIGNAL(triggered(bool)), this, SLOT(slotCopy()) );
 	connect( this->actionCut, SIGNAL(triggered(bool)), this, SLOT(slotCut()) );
 	connect( this->actionPaste, SIGNAL(triggered(bool)), this, SLOT(slotPaste()) );
@@ -162,11 +163,19 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 		impl->gv, SLOT(setHandDragMode(bool)) );
 	this->actionToggleBoardDragMode->setChecked(false);
 	connect( this->actionSelectAll, SIGNAL(triggered(bool)), impl->gv, SLOT(selectAll()) );
-
 	connect( this->actionZoomIn, SIGNAL(triggered(bool)), impl->gv, SLOT(zoomIn()) );
 	connect( this->actionZoomOut, SIGNAL(triggered(bool)), impl->gv, SLOT(zoomOut()) );	
 	connect( this->actionZoomReset, SIGNAL(triggered(bool)), impl->gv, SLOT(zoomReset()) );
 
+#define BOGO(A)
+	// this->action ## A->setParent(impl->gv);
+	BOGO(Copy);
+	BOGO(Cut);
+	BOGO(Paste);
+	BOGO(ZoomIn);
+	BOGO(ZoomOut);
+	BOGO(ZoomReset);
+#undef BOGO
 
 	splitter->addWidget( impl->gv );
 
@@ -499,14 +508,65 @@ void MainWindowImpl::addLine()
 
 #include "QBoardPlugin.h"
 #include <QPluginLoader>
+#include <QGraphicsSimpleTextItem>
 void MainWindowImpl::doSomethingExperimental()
 {
 	qDebug() << "MainWindowImpl::doSomethingExperimental()";
 	//new QGraphicsLineItem( 0,0, 200, 200 )
 	//impl->gstate.scene()->addItem(  );
 	//impl->gstate.scene()->addWidget( new QFrame );
-#if 1
+
 	if(1)
+	{
+	    QGIPiece * pc = new QGIPiece;
+	    pc->setProperty("color",QColor("#ffff00") );
+	    pc->setProperty("borderColor",QColor("#ff0000") );
+	    pc->setProperty("borderSize", 1);
+	    pc->setProperty("pos",QPoint(20,20) );
+	    pc->setProperty("size",QSize(50,50) );
+	    impl->gstate.scene()->addItem(pc);
+
+	    QGIHtml * i = 
+		new QGIHtml;
+	    i->setPlainText("Hi, world");
+	    i->setFlag(QGraphicsItem::ItemIsMovable, true);
+	    i->setFlag(QGraphicsItem::ItemIsSelectable, false);
+	    i->setPos( QPointF(20, 20) );
+	    i->setParentItem(pc);
+#if 0
+	    QGraphicsSimpleTextItem * ch = 
+		new QGraphicsSimpleTextItem;
+	    ch->setFlag(QGraphicsItem::ItemIsMovable, true);
+	    ch->setFlag(QGraphicsItem::ItemIsSelectable, false);
+	    ch->setParentItem( i );
+	    ch->setPos( 4, 8 );
+	    ch->setText("I'm a child item");
+#endif
+	}
+
+	if(0)
+	{
+	    QGraphicsTextItem * ti = new QGraphicsTextItem("Hi, world.");
+	    impl->gstate.scene()->addItem( ti );
+	    ti->setFlag(QGraphicsItem::ItemIsMovable, true);
+	    ti->setFlag(QGraphicsItem::ItemIsSelectable, true);
+	}
+	if(0)
+	{
+	    qboard::transformFlip( impl->gv, true );
+#if 0
+	    // Flip board view...
+	    QGraphicsView * v = impl->gv;
+	    QTransform t( v->transform() );
+	    QRectF r(v->sceneRect());
+	    //t.translate( -r.width(), 0 ).scale(-1,1);
+	    t.translate( 0, -r.height() ).scale(1,-1);
+	    v->setTransform( t );
+#endif
+	}
+
+#if 1
+	if(0)
 	{
 	    QBoardPlugin * plug = 0;
 	    QDir pluginsDir(qApp->applicationDirPath());
