@@ -38,6 +38,11 @@ bool QBoard::event( QEvent * e )
 	    if( QString("pixmap") == key )
 	    {
 		QVariant var( this->property("pixmap") );
+		if( var.canConvert<QPixmap>() )
+		{
+		    this->m_file.clear();
+		    this->m_px = var.value<QPixmap>();
+		}
 		if( var.isValid() )
 		{
 		    this->load( var.toString() );
