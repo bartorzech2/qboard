@@ -194,13 +194,20 @@ namespace qboard
        If qgi is selected, then this function calculates the bounds
        point of the largest bounding rectangle of all selected
        items. If qgi is not selected then the bounds of qgi returned.
+
+       If skipParented is true then this function skips over any QGI
+       with a parent, because not skipping them would hose our current
+       use-case. As a special case, if (!qgi->isSelected()) then
+       the skipParented flag is ignored. In that case, the bounds of
+       the qgi are calculated in its parent's coord space, not the
+       scene coord space.
     */
-    QRectF calculateBounds( QGraphicsItem * qgi );
+    QRectF calculateBounds( QGraphicsItem * qgi, bool skipParented = true );
 
     /**
        Calculates the middle point of calculateBounds(qgi).
     */
-    QPointF calculateCenter( QGraphicsItem * qgi );
+    QPointF calculateCenter( QGraphicsItem * qgi, bool skipParented = true );
 
 
     /**
@@ -262,6 +269,36 @@ namespace qboard
        (which screws up the view's scrollbars).
     */
     void rotateAndScale( QGraphicsView * obj, qreal angle, qreal scaleX, qreal scaleY = 0 );
+
+
+    /**
+       Flips trans in either a horizontal (if horiz is true) or
+       vertical (if horiz is false) direction. Returns trans.
+
+       Note that trans must be translated either -bounds.width() (if
+       horiz) or -bounds.height() (if !horiz), to ensure that the
+       relative view position is kept intact.
+    */
+    QTransform & transformFlip( QTransform & trans,
+				QSizeF const & bounds,
+				bool horiz );
+
+    /**
+       Equivalent to transformFlip( trans, bounds.size(), horiz ).
+    */
+    QTransform & transformFlip( QTransform & trans,
+				QRectF const & bounds,
+				bool horiz );
+    /**
+       Transforms gi, as described for transformFlip(QTransform&,...).
+    */
+    void transformFlip( QGraphicsItem * gi, bool horiz );
+
+    /**
+       Transforms gi as described for transformFlip(QTransform&,...).
+    */
+    void transformFlip( QGraphicsView * gi, bool horiz );
+
 }
 
 #endif // QBOARD_UTILITY_H_INCLUDED
