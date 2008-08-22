@@ -47,10 +47,6 @@ struct QGIPiece::Impl
 	block = false;
 	alpha = borderAlpha = 255;
     }
-
-
-    
-
 };
 
 #include <QGraphicsScene>
@@ -93,7 +89,7 @@ bool QGIPiece::event( QEvent * e )
 	char const * key = chev->propertyName().constData();
 	this->propertySet( key, this->property(key) );
 	e->accept();
-	return true;
+	break;
     }
 #endif
     return QObject::event(e);
@@ -185,7 +181,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	    return;
 	}
     }
-    if( "scale" == key )
+    if( ("scale" == key) || ("angle" == key) )
     {
 	this->refreshTransformation();
 	return;
@@ -200,11 +196,6 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	    // Kludge to ensure bounding rect is kept intact
 	    this->setPixmap(bogus);
 	}
-	return;
-    }
-    if( "angle" == key )
-    {
-	this->refreshTransformation();
 	return;
     }
     if( "dragDisabled" == key )
