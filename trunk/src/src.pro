@@ -18,7 +18,6 @@ FORMS = \
  $$UI_SRCDIR/AboutQBoard.ui \
  $$UI_SRCDIR/MainWindow.ui \
  $$UI_SRCDIR/QGIHtmlEditor.ui \
- $$UI_SRCDIR/ScriptWindow.ui \
  $$UI_SRCDIR/SetupQBoard.ui \
  $$QBOARD_FORMS_QT44
 
