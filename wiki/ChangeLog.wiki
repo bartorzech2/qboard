@@ -7,6 +7,15 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top. Dates written extra large are release dates.
 
 ----
+*2008 August 22:*
+
+- i can't seem to get QGIHtml to intercept Ctrl-C/X/V/Z properly, but i've changed it to show the text editor's popup menu when in editor mode, so it's still possible to copy/cut/paste from there.
+
+- Pieces can now have child objects. When a parent is moved, the children move relative to it. A child may also be dragged around independently. This can current be used to attach QGIHtml objects to pieces, such that the QGIHtml will follow the piece around. There will be other uses at some point.
+
+- A few minor touch-ups.
+
+
 *2008 August 21:*
 
 - _*Fixed a very significant memory leak*_ in the menu handlers. One of them
