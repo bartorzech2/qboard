@@ -43,7 +43,7 @@ bool QBoard::event( QEvent * e )
 		    this->m_file.clear();
 		    this->m_px = var.value<QPixmap>();
 		}
-		if( var.isValid() )
+		else if( var.isValid() )
 		{
 		    this->load( var.toString() );
 		}
@@ -51,8 +51,8 @@ bool QBoard::event( QEvent * e )
 		{
 		    this->m_file = QString();
 		    this->m_px = QPixmap();
-		    emit loaded();
 		}
+		emit loaded();
 	    }
 	    return true;
 	}
