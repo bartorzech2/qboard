@@ -47,7 +47,14 @@ public Q_SLOTS:
     /** Returns true if this object has the given dynamic property, else false. */
     bool hasProperty( char const * );
 
+    /**
+       Copies all properties of this object to dest.
+    */
     void copyPropertiesTo( QObject * dest ) const;
+
+    /**
+       Copies all properties of src to this object.
+    */
     void copyPropertiesFrom( QObject const * src );
 
 Q_SIGNALS:
