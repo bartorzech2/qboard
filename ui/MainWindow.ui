@@ -153,7 +153,7 @@
     <string>Ctrl+S</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionLoad" >
@@ -168,7 +168,7 @@
     <string>Ctrl+O</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionQuit" >
@@ -186,7 +186,7 @@
     <string>Ctrl+Q</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionCopy" >
@@ -204,7 +204,7 @@
     <string>Ctrl+C</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionCut" >
@@ -222,7 +222,7 @@
     <string>Ctrl+X</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionPaste" >
@@ -243,7 +243,7 @@
     <string>Ctrl+V</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionClearClipboard" >
@@ -258,7 +258,7 @@
     <string>Clear clipboard</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionZoomIn" >
@@ -270,7 +270,7 @@
     <string>Zoom &amp;in</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionZoomOut" >
@@ -282,7 +282,7 @@
     <string>Zoom &amp;out</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionZoomReset" >
@@ -297,7 +297,7 @@
     <string comment="Reset board zoom level" >Ctrl+Z</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionRefreshFileList" >
@@ -321,7 +321,7 @@
     <string>F5</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionToggleBrowserView" >
@@ -342,7 +342,7 @@
     <string>Ctrl+B</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionNewBoardView" >
@@ -357,7 +357,7 @@
     <string>Ctrl+N</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionExperiment" >
@@ -372,7 +372,7 @@
     <string>Alt+X</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionHome" >
@@ -387,7 +387,7 @@
     <string>Alt+Home</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionAboutQt" >
@@ -399,7 +399,7 @@
     <string>About &amp;Qt</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionAboutQBoard" >
@@ -411,7 +411,7 @@
     <string>&amp;About QBoard</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionPrint" >
@@ -426,7 +426,7 @@
     <string>Ctrl+P</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionHelp" >
@@ -441,7 +441,7 @@
     <string>F1</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionClearBoard" >
@@ -453,7 +453,7 @@
     <string>&amp;Clear board</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionNewWindow" >
@@ -465,7 +465,7 @@
     <string>&amp;New Window</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionToggleBoardDragMode" >
@@ -486,7 +486,7 @@
     <string>Ctrl+G</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionRotate90" >
@@ -501,7 +501,7 @@
     <string>Ctrl+R</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionAddQGIHtml" >
@@ -516,7 +516,7 @@
     <string>Ctrl+T</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionAddLine" >
@@ -528,7 +528,7 @@
     <string>Add &amp;Line item</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionSelectAll" >
@@ -542,7 +542,7 @@
     <string>Ctrl+A</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionQuickSave" >
@@ -557,7 +557,7 @@
     <string>Alt+S</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionQuickLoad" >
@@ -572,7 +572,7 @@
     <string>Alt+L</string>
    </property>
    <property name="shortcutContext" >
-    <enum>Qt::WidgetShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
  </widget>
