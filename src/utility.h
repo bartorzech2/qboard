@@ -299,6 +299,14 @@ namespace qboard
     */
     void transformFlip( QGraphicsView * gi, bool horiz );
 
+
+    /**
+       Qt 4.3 and 4.4 have different names for QGraphicsItem::children()
+       resp. childItems(). This function uses whichever is appropriate
+       for your Qt version and returns that list.
+    */
+    QList<QGraphicsItem*> childItems( QGraphicsItem const * );
+
 }
 
 #endif // QBOARD_UTILITY_H_INCLUDED
