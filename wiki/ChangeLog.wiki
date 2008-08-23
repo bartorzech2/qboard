@@ -9,7 +9,8 @@ are at the top. Dates written extra large are release dates.
 ----
 *2008 August 23:*
 
-Release
+- Added new item type, QGIDot - a simple dot to place around the board.
+
 
 *2008 August 22:*
 
