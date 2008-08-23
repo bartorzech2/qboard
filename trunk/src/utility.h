@@ -80,10 +80,10 @@ namespace qboard
 	/**
 		Destroys the given item using the QBoard-kludgy approach.
 		If alsoSelected is true, all selected items are destroyed.
-		See destroy(QList) for details about what is NOT destroyed
+		See destroyToplevelItems(QList) for details about what is NOT destroyed
 		and special-case conditions.
 	*/
-	void destroy( QGraphicsItem *, bool alsoSelected );
+	void destroyToplevelItems( QGraphicsItem *, bool alsoSelected );
 	
 	/**
 		Destroys the given list of items using a QBoard-kludgy approach.
@@ -98,7 +98,7 @@ namespace qboard
 		(this is unfortunate, however): the QGIGamePiece and its associated
 		GamePiece are both destroyed. 
 	*/
-	void destroy( QList<QGraphicsItem *>& );
+	void destroyToplevelItems( QList<QGraphicsItem *>& );
 	
 	/**
 		Given one of the following strings, it returns the appropriate Qt::PenStyle

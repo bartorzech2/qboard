@@ -142,7 +142,7 @@ namespace qboard {
 	return "NoPen";
     }
 
-    void destroy( QList<QGraphicsItem *> & tops )
+    void destroyToplevelItems( QList<QGraphicsItem *> & tops )
     {
 	typedef QList<QGraphicsItem *> QL;
 	QGraphicsScene * sc = 0;
@@ -150,13 +150,13 @@ namespace qboard {
 	{
 	    if( (*it)->parentItem() )
 	    {
-		//qDebug() << "qboard::destroy(QList) skipping parented item.";
+		//qDebug() << "qboard::destroyToplevelItems(QList) skipping parented item.";
 		continue;
 	    }
 #if 1 // i don't like this, but it avoids some crashes!
 	    if( QObject * obj = dynamic_cast<QObject*>(*it) )
 	    { // kludge to help avoid stepping on self during Destroy/Delete actions
-		if(0) qDebug() << "qboard::destroy(QList) using obj->deleteLater():" <<obj;
+		if(0) qDebug() << "qboard::destroyToplevelItems(QList) using obj->deleteLater():" <<obj;
 		obj->deleteLater(); // huh? not destroying QGILineBinder???
 	    }
 	    else
@@ -164,21 +164,21 @@ namespace qboard {
 		sc = (*it)->scene();
 		if( sc )
 		{
-		    if(0) qDebug() << "qboard::destroy(QList) asking Scene to remove *it:"<<*it;
+		    if(0) qDebug() << "qboard::destroyToplevelItems(QList) asking Scene to remove *it:"<<*it;
 		    sc->removeItem(*it);
 		}
-		if(0) qDebug() << "qboard::destroy(QList) delete *it:" <<*it;
+		if(0) qDebug() << "qboard::destroyToplevelItems(QList) delete *it:" <<*it;
 		delete *it;
 	    }
 #else
-	    if(0) qDebug() << "qboard::destroy(QList) delete *it:"<<*it;
+	    if(0) qDebug() << "qboard::destroyToplevelItems(QList) delete *it:"<<*it;
 	    delete *it;
 #endif
 
 	}
 	tops.clear();
     }
-    void destroy( QGraphicsItem * gi, bool alsoSelected )
+    void destroyToplevelItems( QGraphicsItem * gi, bool alsoSelected )
     {
 	if( ! gi ) return;
 	typedef QList<QGraphicsItem *> QL;
@@ -191,7 +191,7 @@ namespace qboard {
 	{
 	    tops.push_back(gi);
 	}
-	destroy( tops );
+	destroyToplevelItems( tops );
     }
 	
 	
@@ -366,7 +366,7 @@ namespace qboard {
 	else
 	{
 	    if(0) qDebug() << "qboard::clipboardScene() cut data.";
-	    qboard::destroy( toCut );
+	    qboard::destroyToplevelItems( toCut );
 	}
 	S11nClipboard::S11nNode * cont = cb.contents();
 	if( cont )
