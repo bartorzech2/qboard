@@ -11,10 +11,11 @@ are at the top. Dates written extra large are release dates.
 
 - i can't seem to get QGIHtml to intercept Ctrl-C/X/V/Z properly, but i've changed it to show the text editor's popup menu when in editor mode, so it's still possible to copy/cut/paste from there.
 
-- Pieces can now have child objects. When a parent is moved, the children move relative to it. A child may also be dragged around independently. This can current be used to attach QGIHtml objects to pieces, such that the QGIHtml will follow the piece around. There will be other uses at some point.
+- Pieces can now have child objects. When a parent is moved, the children move relative to it. A child may also be dragged around independently. This can currently be used to attach QGIHtml objects to pieces, such that the QGIHtml will follow the piece around. There will be other uses at some point. TODO: draw lines between parent and children (i tried it, the lines only show up in GL mode).
 
 - A few minor touch-ups.
 
+- QGIPiece now uses a cache for its rendering options, which saves tons of redrawing (but also introduced 5+ hours of debugging the finer details of getting the borders to draw properly in the face of tiny rounding errors).
 
 *2008 August 21:*
 
