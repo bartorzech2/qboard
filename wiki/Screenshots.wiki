@@ -3,29 +3,5 @@
 
 = The obligatory screenshots... =
 
-Here is a small collection of QBoard screenshots. You can find the complete collection over at: http://wanderinghorse.net/gaming/QBoard/
-
-The first screenshot ever taken of QBoard:
-
-[http://wanderinghorse.net/gaming/QBoard/qboard-20080604.jpg http://wanderinghorse.net/gaming/QBoard/thumbs/qboard-20080604.jpg]
-
-This screenshot demonstrates multiple board views, each with independent scaling levels:
-
-[http://wanderinghorse.net/gaming/QBoard/qboard-20080608-lines.jpg http://wanderinghorse.net/gaming/QBoard/thumbs/qboard-20080608-lines.jpg]
-
-
-Here's a demo of translucent playing pieces:
-
-[http://wanderinghorse.net/gaming/QBoard/qboard-20080609-alpha.jpg http://wanderinghorse.net/gaming/QBoard/thumbs/qboard-20080609-alpha.jpg]
-
-Here we see how to set color and transparency levels:
-
-[http://wanderinghorse.net/gaming/QBoard/qboard-20080610-menus.jpg http://wanderinghorse.net/gaming/QBoard/thumbs/qboard-20080610-menus.jpg]
-
-Get a really close-up look at your game...
-
-[http://wanderinghorse.net/gaming/QBoard/QBoard-20080811-up-close.jpg http://wanderinghorse.net/gaming/QBoard/thumbs/QBoard-20080811-up-close.jpg]
-
-Breathe new life into old classics:
-
-[http://wanderinghorse.net/gaming/QBoard/QBoard-20080820-olympica.jpg http://wanderinghorse.net/gaming/QBoard/thumbs/QBoard-20080820-olympica.jpg]
+Googlecode unfortunately doesn't let us upload images for use in the project wiki. But they do host an image management service, so you can find the screenshots over
+at [http://picasaweb.google.com/sgbeal/ScreenshotsQBoard?authkey=P9f-I2pkz1w Google Picasa].
