@@ -2,7 +2,7 @@
 
 = Introduction =
 
-QBoard uses [http://s11n.net libs11n] for its serialization (save/load) support, and therefor has very flexible serialization features. The most obvious use of serialization, from a user's perspective, is saving and loading a game. A less obvious use is the clipboard. When we copy or cut objects, we don't actually put those objects in the clipboard (that can easily lead to dangling pointers). Instead, we serialize them and stuff that data (plain text) into the clipboard.
+QBoard uses [http://s11n.net libs11n] for its serialization (save/load) support, and therefor has very flexible serialization features. The most obvious use of serialization, from a user's perspective, is saving and loading a game. A less obvious use is the clipboard. When we copy or cut objects, we don't actually put those objects in the clipboard (that can easily lead to dangling pointers). Instead, we serialize them and stuff that data (plain text) into the clipboard. There are even other, less obvious, uses, but we won't bore you with those details right now.
 
 = What file format(s) is(are) used? =
 
@@ -48,17 +48,17 @@ And here's that same data in another format:
 
 The point is, the format doesn't interest us. QBoard only cares about the structure of the data, and uses that structure to determine whether it can or cannot handle a given set of data. The structure represents various objects, and whether or not QBoard can do anything with those objects is context dependent.
 
-= What exactly can QBoard save? =
+= What exactly can QBoard save and load? =
 
 The GUI currently provides only features for saving/loading the game as a whole, via the File->Save/Load menus and the Quicksave/Quickload features.
 
 That said...
 
-All QBoard objects which inherit the Serializable base class have the built-in ability to save themselves to a file. At point point, item-specific menus will be added for saving/loading that object's data (independent of other game state).
+All QBoard objects which inherit the Serializable base class have the built-in ability to save and load themselves. At some point, item-specific menus will be added for saving/loading each object's data (independent of other game state).
 
-Pasting from the clipboard is, in fact, the same process as loading (just a different data source). So whatever applies to loading also applies to pasting.
+Pasting from the clipboard is, in fact, the exact same process as loading (just a different data source). So whatever applies to loading also applies to pasting.
 
-The global game state supports pasting of various types of data:
+The global game state currently supports pasting of various types of data:
 
   * Individual QGraphicsItems _if_ they inherit Serializable.
   * `QList<Serializable*>` _if_ the contained items are also QGraphicsItems.
