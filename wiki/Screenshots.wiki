@@ -4,4 +4,4 @@
 = The obligatory screenshots... =
 
 Googlecode unfortunately doesn't let us upload images for use in the project wiki. But they do host an image management service, so you can find the screenshots over
-at [http://picasaweb.google.com/sgbeal/ScreenshotsQBoard?authkey=P9f-I2pkz1w Google Picasa].
+at [http://picasaweb.google.com/sgbeal/ScreenshotsQBoard Google Picasa].
