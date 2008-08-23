@@ -119,7 +119,7 @@ void GameState::clear()
     this->pieces().clearPieces();
     QList<QGraphicsItem *> ql(impl->scene->items()); 
     //qDebug() <<"GameState::clear() trying to clear"<<ql.size()<<" QGI items";
-    qboard::destroy( ql );
+    qboard::destroyToplevelItems( ql );
 }
 
 GamePieceList & GameState::pieces()
