@@ -17,6 +17,8 @@ are at the top. Dates written extra large are release dates.
 
 - QGIPiece now uses a cache for its rendering options, which saves tons of redrawing (but also introduced 5+ hours of debugging the finer details of getting the borders to draw properly in the face of tiny rounding errors).
 
+- Seem to have gotten rid of the "paint streaks" that happened when dragging pieces with larger border sizes.
+
 *2008 August 21:*
 
 - _*Fixed a very significant memory leak*_ in the menu handlers. One of them
