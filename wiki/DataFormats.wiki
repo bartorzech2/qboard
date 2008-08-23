@@ -67,3 +67,8 @@ The global game state supports pasting of various types of data:
   * A serialized QBoard object (e.g. to swap out the board graphic without intefering with the in-play pieces), which you can incidentally get by using the "Copy board" item in the board's menu.
 
 Any clipboarded data can be pasted into a text editor, saved to a file, and re-used later. _However_, we make absolutely no guarantees that the format of copy/cut data will be the same in future versions, so don't use this feature for long-term storage. (It is very useful for testing QBoard, though.)
+
+= See also... =
+
+  * the s11n home page: http://s11n.net
+  * [S11nQt], generic libs11n bindings for Qt
