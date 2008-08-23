@@ -27,8 +27,7 @@
 #include "MenuHandlerGeneric.h"
 #include "PropObj.h"
 
-#define QGIPiece_USE_PIXCACHE 0
-// i would like to cache the paint jobs, but i get weird graphics artefacts when i do
+#define QGIPiece_USE_PIXCACHE 1
 
 struct QGIPiece::Impl
 {
@@ -378,15 +377,16 @@ QRectF QGIPiece::boundingRect() const
 	r.setBottom( r.bottom() + pw );
     }
 #else
-    if( 1 && (impl->borderSize > 0) )
+    if( 0 && (impl->borderSize > 0) )
     { // QGraphicsItem::boundingRect() docs say we need this:
 	qreal bs = impl->borderSize;
 	r.adjust( 0, 0, bs * 2, bs * 2 );
 	//r.adjust( -bs, -bs, bs * 2, bs * 2 );
     }
-#if 1
-     r = QRectF( std::ceil(r.left()), std::ceil(r.top()),
-		 std::ceil(r.width()), std::ceil(r.height()) );
+#if 0
+    r = r.normalized();
+    r = QRectF( 0, 0,
+		std::ceil(r.width()), std::ceil(r.height()) );
 #endif
 #endif
     return r; // r.normalized();
@@ -428,6 +428,7 @@ void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * optio
 	paintLinesToChildren( this, painter, linePen );
     }
     QRectF bounds( this->boundingRect().normalized() );
+#define AMSG qDebug() << "QGIPixmap::paint():"
     if( 
 #if QGIPiece_USE_PIXCACHE
        impl->pixcache.isNull()
@@ -442,7 +443,7 @@ void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * optio
 // 	QSizeF csize( std::ceil(bounds.width()),
 // 		      std::ceil(bounds.height()) );
 	QPixmap captcha( bounds.size().toSize() );
-	qDebug() << "QGIPixmap::paint(): bounds="<<bounds<<", pixcache.size ="<<captcha.size();
+	AMSG << "bounds="<<bounds<<", pixcache.size ="<<captcha.size();
 	captcha.fill( Qt::transparent );
 	QPainter _cp( &captcha );
 	cp = &_cp;
@@ -458,25 +459,34 @@ void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * optio
 	}
 	const qreal bs = impl->borderSize;
 	qreal xl = bs / 2.0;
+	//if( 0 == (int(xl*10) % 5) ) xl -= 0.0001; // kludge
 	if( ! impl->pixmap.isNull() )
 	{
-	    QRectF pmr( impl->pixmap.rect() );
-	    pmr.adjust( xl, xl, bs, bs );
+	    // Weird: if i use impl->pixmap.rect() i get (0.5,0.5,W,H)
+	    QRectF pmr( QPointF(0,0), impl->pixmap.size() );
+	    //QRectF pmr( impl->pixmap.rect() );
+	    AMSG << "drawPixmap("<<pmr<<"...)";
 	    cp->drawPixmap(pmr, impl->pixmap, impl->pixmap.rect() );
 	}
 
 	if( bs && impl->borderColor.isValid() )
 	{
-	    QRectF br( QPointF(xl, xl),
-		       QSize( bounds.width() -bs,
-			      bounds.height()  -bs )
-		       );
+	    QRectF br( bounds );
+	    br.adjust( xl, xl, -xl, -xl );
+#if QGIPiece_USE_PIXCACHE
+ 	    if( (int(bs+0.49) % 2) == 1 )
+ 	    { // kludge to avoid some off-by-one unsightlyness
+		qreal fudge = 0.5;
+ 		br.adjust( -fudge, -fudge, -fudge, -fudge );
+ 	    }
+#endif
 	    cp->save();
 	    cp->setPen( QPen(impl->borderColor,
 			     bs,
 			     Qt::PenStyle( impl->borderLineStyle ),
 			     Qt::FlatCap,
 			     Qt::MiterJoin ) );
+	    AMSG << "drawRect("<<br<<"...) bs ="<<bs<<", xl ="<<xl;;
 	    cp->drawRect( br );
 	    cp->restore();
 	}
@@ -487,13 +497,14 @@ void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * optio
     else
     {
 	++impl->countPaintCache;
-	if(0) qDebug() << "QGIPiece::paint() using cached image.";
+	if(0) AMSG << "using cached image.";
     }
 #if QGIPiece_USE_PIXCACHE
     painter->drawPixmap( bounds, impl->pixcache, bounds );
 #endif
     // Let parent draw selection borders and such:
     this->QGraphicsPixmapItem::paint(painter,option,widget);
+#undef AMSG
 }
 
 #include <QGraphicsSceneDragDropEvent>
