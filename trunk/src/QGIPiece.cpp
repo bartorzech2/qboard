@@ -31,7 +31,7 @@ struct QGIPiece::Impl
 {
     QColor backgroundColor;
     QColor borderColor;
-    int borderSize;
+    qreal borderSize;
     QPixmap pixmap;
 #if QGIPiece_USE_PIXCACHE
     QPixmap pixcache;
@@ -169,7 +169,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     }
     if( "borderSize" == key )
     {
-	int bs = var.toInt();;
+	double bs = var.toDouble();;
 	impl->borderSize = (bs >= 0) ? bs : 0;
 	impl->clearPix();
 	this->update();
@@ -340,6 +340,11 @@ QRectF boundsOfChildren( QGraphicsItem const * qgi )
     return r;
 }
 
+
+QVariant QGIPiece::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+{
+    return QGraphicsPixmapItem::itemChange(change,value);
+}
 QRectF QGIPiece::boundingRect() const
 {
     QRectF r( impl->pixmap.rect() );
@@ -351,27 +356,25 @@ QRectF QGIPiece::boundingRect() const
 	    r.setSize(sz.value<QSize>());
 	}
     }
-    if( impl->borderSize > 0 )
+#if 0
+    // seems to mostly do what i want...
+    if( 1 && (impl->borderSize > 0) )
     { // QGraphicsItem::boundingRect() docs say we need this:
-	qreal pw( impl->borderSize / 1.8 ); // 2.0 doesn't quite work for me - still get graphics artefacts
+	qreal pw( impl->borderSize / 2.0 ); // size/2.0 doesn't quite work for me - still get graphics artefacts
 	r.setLeft( r.left() - pw );
 	r.setRight( r.right() + pw );
 	r.setTop( r.top() - pw );
 	r.setBottom( r.bottom() + pw );
     }
-#if 0
-    if(0  && ! r.isNull() ) qDebug() << "bounds self ="<<r;
-    QRectF r2( boundsOfChildren( this ) ); //this->mapToParent(  ).boundingRect() );
-    //r2 = QRectF( this->mapToParent(r2.topLeft()), r2.size() );
-    r = r.unite( r2 );
+#else
+    if( 1 && (impl->borderSize > 0) )
+    { // QGraphicsItem::boundingRect() docs say we need this:
+	r.adjust( 0, 0, impl->borderSize * 2, impl->borderSize * 2 );
+    }
 #endif
-    return r;
+    return r.normalized();
 }
 
-QVariant QGIPiece::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
-{
-    return QGraphicsPixmapItem::itemChange(change,value);
-}
 
 
 static void paintLinesToChildren( QGraphicsItem * qgi,
@@ -408,10 +411,10 @@ void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * optio
 #endif
     if(0)
     { // for me this only works in GL mode
-	QPen linePen(Qt::red, 4, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin);
+	QPen linePen(Qt::red, 4, Qt::DotLine, Qt::FlatCap, Qt::MiterJoin);
 	paintLinesToChildren( this, painter, linePen );
     }
-    QRect rect( this->boundingRect().toRect() );
+    QRect bounds( this->boundingRect().toRect() );
     if( 
 #if QGIPiece_USE_PIXCACHE
        impl->pixcache.isNull()
@@ -422,7 +425,8 @@ void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * optio
     {
 	QPainter * cp = 0;
 #if QGIPiece_USE_PIXCACHE
-	QPixmap captcha( rect.size() );
+	QPixmap captcha( bounds.size() );
+	captcha.fill( Qt::transparent );
 	QPainter _cp( &captcha );
 	cp = &_cp;
 #else
@@ -432,35 +436,32 @@ void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * optio
 	{
 	    if( impl->backgroundColor.isValid() )
 	    {
-		cp->fillRect( rect, impl->backgroundColor );
+		cp->fillRect( bounds, impl->backgroundColor );
 	    }
 	}
+	const qreal bs = impl->borderSize;
+	qreal xl = bs / 2.0;
 	if( ! impl->pixmap.isNull() )
 	{
 	    QRectF pmr( impl->pixmap.rect() );
-#if 0
-	    qreal xl = double(impl->borderSize) / 2.0;
-	    pmr.translate( xl, xl );
-	    cp->drawPixmap(pmr, impl->pixmap, pmr);
-	    pmr.translate( -xl, -xl );
-#else
-	    cp->drawPixmap(pmr, impl->pixmap, pmr);
-#endif
-	    //cp->drawPixmap( pix.rect(), pix, pix.rect() );
+	    pmr.adjust( bs, bs, 2*bs, 2*bs );
+	    cp->drawPixmap(pmr, impl->pixmap, impl->pixmap.rect() );
 	}
-	
-	if( 1 ) // Border
+
+	if( bs && impl->borderColor.isValid() )
 	{
-	    if( impl->borderSize && impl->borderColor.isValid() )
-	    {
-		//qDebug() << "borderColor: bounding rect: "<<rect<<"borderSize="<<impl->borderSize<<"color: " << impl->borderColor;
-		cp->save();
-		cp->setPen( QPen(impl->borderColor,
-				 qreal( impl->borderSize ),
-				 Qt::PenStyle( impl->borderLineStyle ) ) );
-		cp->drawRect( rect );
-		cp->restore();
-	    }
+	    QRectF br( QPointF(xl, xl),
+		       QSize( bounds.width() -bs,
+			      bounds.height()  -bs )
+		       );
+	    cp->save();
+	    cp->setPen( QPen(impl->borderColor,
+			     bs,
+			     Qt::PenStyle( impl->borderLineStyle ),
+			     Qt::FlatCap,
+			     Qt::MiterJoin ) );
+	    cp->drawRect( br );
+	    cp->restore();
 	}
 #if QGIPiece_USE_PIXCACHE
 	impl->pixcache = captcha;
@@ -471,7 +472,7 @@ void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * optio
 	if(0) qDebug() << "QGIPiece::paint() using cached image.";
     }
 #if QGIPiece_USE_PIXCACHE
-    painter->drawPixmap( rect, impl->pixcache, rect );
+    painter->drawPixmap( bounds, impl->pixcache, bounds );
 #endif
     // Let parent draw selection borders and such:
     this->QGraphicsPixmapItem::paint(painter,option,widget);
