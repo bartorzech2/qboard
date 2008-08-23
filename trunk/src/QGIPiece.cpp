@@ -11,12 +11,15 @@
  *
  */
 
-#include "QGIPiece.h"
-#include "GamePiece.h"
-#include "utility.h"
 #include <QDebug>
 #include <QFont>
 #include <QGraphicsItem>
+
+#include <cmath>
+
+#include "QGIPiece.h"
+#include "GamePiece.h"
+#include "utility.h"
 #include "MenuHandlerPiece.h"
 #include "S11nQt.h"
 #include "S11nQtList.h"
@@ -45,12 +48,20 @@ struct QGIPiece::Impl
        position.
     */
     bool block;
+    size_t countPaintCache;
+    size_t countRepaint;
     Impl()
     {
 	borderSize = 1;
 	borderLineStyle = Qt::SolidLine;
 	block = false;
 	alpha = borderAlpha = 255;
+	countPaintCache = countRepaint = 0;
+    }
+    ~Impl()
+    {
+	qDebug() << "QGIPiece: repaint count ="<<countRepaint
+		 << "cached paint count ="<<countPaintCache;
     }
     void clearPix()
     {
@@ -369,10 +380,16 @@ QRectF QGIPiece::boundingRect() const
 #else
     if( 1 && (impl->borderSize > 0) )
     { // QGraphicsItem::boundingRect() docs say we need this:
-	r.adjust( 0, 0, impl->borderSize * 2, impl->borderSize * 2 );
+	qreal bs = impl->borderSize;
+	r.adjust( 0, 0, bs * 2, bs * 2 );
+	//r.adjust( -bs, -bs, bs * 2, bs * 2 );
     }
+#if 1
+     r = QRectF( std::ceil(r.left()), std::ceil(r.top()),
+		 std::ceil(r.width()), std::ceil(r.height()) );
 #endif
-    return r.normalized();
+#endif
+    return r; // r.normalized();
 }
 
 
@@ -405,16 +422,12 @@ static void paintLinesToChildren( QGraphicsItem * qgi,
 }
 void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget )
 {
-#if 0
-    this->QGraphicsPixmapItem::paint(painter,option,widget);
-    return;
-#endif
     if(0)
     { // for me this only works in GL mode
 	QPen linePen(Qt::red, 4, Qt::DotLine, Qt::FlatCap, Qt::MiterJoin);
 	paintLinesToChildren( this, painter, linePen );
     }
-    QRect bounds( this->boundingRect().toRect() );
+    QRectF bounds( this->boundingRect().normalized() );
     if( 
 #if QGIPiece_USE_PIXCACHE
        impl->pixcache.isNull()
@@ -423,9 +436,13 @@ void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * optio
 #endif
        )
     {
+	++impl->countRepaint;
 	QPainter * cp = 0;
 #if QGIPiece_USE_PIXCACHE
-	QPixmap captcha( bounds.size() );
+// 	QSizeF csize( std::ceil(bounds.width()),
+// 		      std::ceil(bounds.height()) );
+	QPixmap captcha( bounds.size().toSize() );
+	qDebug() << "QGIPixmap::paint(): bounds="<<bounds<<", pixcache.size ="<<captcha.size();
 	captcha.fill( Qt::transparent );
 	QPainter _cp( &captcha );
 	cp = &_cp;
@@ -444,7 +461,7 @@ void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * optio
 	if( ! impl->pixmap.isNull() )
 	{
 	    QRectF pmr( impl->pixmap.rect() );
-	    pmr.adjust( bs, bs, 2*bs, 2*bs );
+	    pmr.adjust( xl, xl, bs, bs );
 	    cp->drawPixmap(pmr, impl->pixmap, impl->pixmap.rect() );
 	}
 
@@ -469,6 +486,7 @@ void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * optio
     }
     else
     {
+	++impl->countPaintCache;
 	if(0) qDebug() << "QGIPiece::paint() using cached image.";
     }
 #if QGIPiece_USE_PIXCACHE
