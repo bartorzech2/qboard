@@ -51,12 +51,12 @@ Serializable::~Serializable()
     // handler.
 }
 
-Serializable & Serializable::operator=( Serializable const &rhs )
+Serializable & Serializable::operator=( Serializable const & )
 {
     //return this->copy( rhs );
     return *this;
 }
-Serializable::Serializable( Serializable const & rhs )
+Serializable::Serializable( Serializable const & )
 {
     //this->copy(rhs);
 }
