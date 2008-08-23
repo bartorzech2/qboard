@@ -71,7 +71,7 @@ public:
     virtual ~QGIPiece();
     virtual void paint ( QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0 );
     virtual QRectF boundingRect () const;
-    virtual int type() const { return QGITypes::GamePiece2; }
+    virtual int type() const { return QGITypes::QGIPiece; }
     virtual bool event( QEvent * e );
 
     /**

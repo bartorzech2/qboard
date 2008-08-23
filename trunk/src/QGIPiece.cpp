@@ -20,7 +20,6 @@
 #include "QGIPiece.h"
 #include "GamePiece.h"
 #include "utility.h"
-#include "MenuHandlerPiece.h"
 #include "S11nQt.h"
 #include "S11nQtList.h"
 #include "S11nClipboard.h"
@@ -675,6 +674,10 @@ void QGIPieceMenuHandler::addChild()
 	    s11n::cleanup_serializable( s );
 	}
     }
+    else
+    {
+	if(1) qDebug() << "QGIPieceMenuHandler::addChild() could not load object of type "<<name;
+    }
 }
 
 void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent * ev )
@@ -731,6 +734,7 @@ void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent 
 	{
 	    QMenu * mAdd = mMisc->addMenu("Create child...");
 	    mAdd->addAction( "QGIHtml", this, SLOT(addChild()) );
+	    mAdd->addAction( "QGIDot", this, SLOT(addChild()) );
 	}
 
 	if(1)
