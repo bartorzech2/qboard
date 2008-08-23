@@ -180,12 +180,21 @@ SceneSelectionDestroyer::~SceneSelectionDestroyer()
 void SceneSelectionDestroyer::destroySelectedItems()
 {
     if( ! this->gitem ) return;
-    qboard::destroy( this->gitem, true );
+    qboard::destroyToplevelItems( this->gitem, true );
 }
 void SceneSelectionDestroyer::destroyItem(QGraphicsItem * item)
 {
     if( item == this->gitem ) gitem = 0;
-    qboard::destroy( item, false );
+    if( ! item->parentItem() )
+    {
+	qboard::destroyToplevelItems( item, false );
+    }
+    else
+    {
+	QObject * o = dynamic_cast<QObject*>(item);
+	if( o ) o->deleteLater();
+	else delete o;
+    }
 }
 void SceneSelectionDestroyer::destroyItem()
 {
