@@ -1,0 +1,23 @@
+#summary How to compile QBoard
+
+= Compiling QBoard =
+
+QBoard uses Qt's qmake tool for its build process, the goal being to have a single build process which can, in theory, run on any system supported by Qt.
+
+QBoard needs Qt version 4.3.x or 4.4.x, and you will need to have Qt's development files (headers/libs) in a suitable place on your system (where your compiler and linker can find them).
+
+= Unix systems =
+
+To build QBoard, simply:
+
+{{{
+~> qmake
+~> make
+}}}
+
+The application will compile to `bin/QT_VERSION/QBoard`. To install it, simply copy it to your favourite binaries directory (e.g. `~/bin` is good).
+
+
+= Non-Unix systems =
+
+Instructions for building it on non-Unix environments would be appreciated, if anyone gets it working.
