@@ -13,6 +13,12 @@
  *
  */
 
+#include <QGraphicsItem>
+
+/**
+   QGITypes holds the custom QGraphicsItem::type() values used
+   by QBoard-related QGraphicsItem types.
+*/
 struct QGITypes
 {
 	/**
@@ -20,12 +26,13 @@ struct QGITypes
 	*/
 	enum Types {
 	_TypesStart = QGraphicsItem::UserType + 100,
-	GamePiece,
-	GamePiece2,
-	Html,
+	GamePiece, // obsolete
 	LineNode,
 	LineNodeBinder,
-	PiecePlacemarker
+	QGIDot,
+	QGIHtml,
+	QGIPiece,
+	QGIPiecePlacemarker
 	};
 };
 #endif // __QGI_H__
