@@ -534,5 +534,15 @@ namespace qboard {
     }
 
 
+    QList<QGraphicsItem*> childItems( QGraphicsItem const * gi )
+    {
+	return gi ?
+#if QT_VERSION >= 0x040400
+	    gi->childItems()
+#else // Assume Qt 4.3...
+	    gi->QGraphicsItem::children()
+#endif
+	    : QList<QGraphicsItem*>();
 
+    }
 } // namespace
