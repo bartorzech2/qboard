@@ -55,7 +55,7 @@ public:
 
 //     void setGameState( GameState & gs );
 
-    virtual int type() const { return QGITypes::PiecePlacemarker; }
+    virtual int type() const { return QGITypes::QGIPiecePlacemarker; }
 
 protected:
 	//virtual void mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event );
