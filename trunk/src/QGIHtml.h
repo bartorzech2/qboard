@@ -37,7 +37,7 @@ public:
     virtual bool serialize( S11nNode & dest ) const;
     /** Deserializes src to this object. */
     virtual bool deserialize( S11nNode const & src );
-    virtual int type() const { return QGITypes::Html; }
+    virtual int type() const { return QGITypes::QGIHtml; }
 protected:
     virtual void mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event );
     virtual void focusOutEvent( QFocusEvent * event );
