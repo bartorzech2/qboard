@@ -4,6 +4,8 @@
 
 This guide gives a brief overview of how to get started with QBoard and how to use its more significant features.
 
+For instructions on compiling QBoard, see the [CompilingQBoard] page.
+
 == First: QBoard Home Directory ==
 
 To allow us to save relative paths in our data files, we need a common root directory which is portable across platforms. To that end, we request that you store all QBoard-related data files under the QBoard home directory (`~/.QBoard`). QBoard tries its best to make sure you stay inside the home directory. For example, when loading graphics files for pieces and boards, it uses a path relative to the home, if possible, as this makes the saved data portable to other machines (or if the QBoard home dir changes). 
