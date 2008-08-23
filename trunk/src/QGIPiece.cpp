@@ -337,7 +337,7 @@ void QGIPiece::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
 QRectF boundsOfChildren( QGraphicsItem const * qgi )
 {
     typedef QList<QGraphicsItem*> QGIL;
-    QGIL ch( qgi->childItems() );
+    QGIL ch( qboard::childItems(qgi) );
     QRectF r;
     for( QGIL::const_iterator it = ch.begin();
 	 ch.end() != it; ++it )
@@ -399,7 +399,8 @@ static void paintLinesToChildren( QGraphicsItem * qgi,
 				  QPen const & pen )
 {
     typedef QList<QGraphicsItem*> QGIL;
-    QGIL ch( qgi->childItems() );
+    QGIL ch( qboard::childItems(qgi) );
+
     if( ch.isEmpty() ) return;
     QRectF prect( qgi->boundingRect() );
     QPointF mid( prect.left() + (prect.width() / 2),
@@ -418,8 +419,8 @@ static void paintLinesToChildren( QGraphicsItem * qgi,
 	painter->drawLine( QLineF( mid, xmid ) );
     }
     painter->restore();
-
 }
+
 void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget )
 {
     if(0)
@@ -428,7 +429,7 @@ void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * optio
 	paintLinesToChildren( this, painter, linePen );
     }
     QRectF bounds( this->boundingRect().normalized() );
-#define AMSG qDebug() << "QGIPixmap::paint():"
+#define AMSG if(0) qDebug() << "QGIPixmap::paint():"
     if( 
 #if QGIPiece_USE_PIXCACHE
        impl->pixcache.isNull()
@@ -520,7 +521,7 @@ bool QGIPiece::serialize( S11nNode & dest ) const
 {
     if( ! this->Serializable::serialize( dest ) ) return false;
     S11nNodeTraits::set( dest, "QGIFlags", int(this->flags()) );
-    QList<QGraphicsItem *> chgi( this->childItems() );
+    QList<QGraphicsItem *> chgi( qboard::childItems(this) );
     if( ! chgi.isEmpty() )
     {
 	if( ! s11n::qt::serializeQGIList<Serializable>( s11n::create_child(dest,"children"),

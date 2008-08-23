@@ -161,15 +161,8 @@ bool QGIHtml::serialize( S11nNode & dest ) const
 	typedef S11nNodeTraits NT;
 	NT::set( dest, "angle", this->property("angle").toInt() );
 	NT::set( dest, "scale", this->property("scale").toDouble() );
-#if 0
-	if( this->metaObject()->propertyCount() )
 	{
-		S11nNode & pr( s11n::create_child( dest, "properties" ) );
-		if( ! QObjectProperties_s11n()( pr, *this ) ) return false;
-	}
-#endif
-	{
-	    QList<QGraphicsItem *> chgi( this->childItems() );
+	    QList<QGraphicsItem *> chgi( qboard::childItems(this) );
 	    if( ! chgi.isEmpty() )
 	    {
 		if( ! s11n::qt::serializeQGIList<Serializable>( s11n::create_child(dest,"children"),
