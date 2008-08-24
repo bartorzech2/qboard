@@ -13,7 +13,7 @@ are at the top. Dates written extra large are release dates.
 
 - Pieces can now be "covered." When covered, their images are not shown.
 
-- Fixed: in Qt 4.3 the HTML widgets would become immobile after editing them via double-clicking them.
+- ~~Fixed: in Qt 4.3 the HTML widgets would become immobile after editing them via double-clicking them.~~
 
 
 === *2008 August 23:* ===
