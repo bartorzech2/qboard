@@ -24,6 +24,8 @@ public:
     virtual ~QBoardHomeView();
     QFileIconProvider * iconProvider();
 
+public Q_SLOTS:
+    void refresh();
 Q_SIGNALS:
     void itemActivated( QFileInfo const & );
 protected:
