@@ -421,8 +421,8 @@ QObjectPropertyMenu * QObjectPropertyMenu::makeAlphaMenu(
     QObjectPropertyMenu * pm = new QObjectPropertyMenu("Transparency", objs, propertyName, 0 );
     const short opaque = 255;
     const qreal step = opaque/10.0;
-    int pct = 0;
-    for( qreal i = 0.0; i <= opaque; i += step, pct += 10)
+    int pct = 100;
+    for( qreal i = opaque; i >= 0; i -= step, pct -= 10)
     {
 	QString lbl;
 	if( i == 0 )
