@@ -52,12 +52,10 @@
 
 #define QBOARD_MAINWINDOW_PERSISTENCE_CLASS "MainWindow"
 
-class FileBrowser;
 struct MainWindowImpl::Impl
 {
     GameState gstate;
     QBoardView * gv;
-    FileBrowser * fb;
     QBoardHomeView * tree;
     PieceAppearanceWidget *paw;
     QWidget * sidebar;
@@ -65,7 +63,6 @@ struct MainWindowImpl::Impl
     static char const * persistanceClass;
     Impl() : gstate(),
 	     gv(0),
-	     fb(0),
 	     tree(0),
 	     paw(new PieceAppearanceWidget),
 	     sidebar(0)
@@ -98,7 +95,6 @@ struct MainWindowImpl::Impl
 	    them from here. Call me old fashioned. */
 	delete paw;
 	delete gv;
-	//delete fb;
 	delete sidebar;
     }
 };
@@ -152,13 +148,10 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	splitter->addWidget( vsplit );
 	vsplit->setHandleWidth(4);
 
-	//FileBrowser * fb = this->impl->fb = new FileBrowser( "*", 0 );
 	impl->tree = new QBoardHomeView();
 	vsplit->addWidget(impl->tree);
 	connect( this->actionRefreshFileList, SIGNAL(triggered(bool)), impl->tree, SLOT(refresh()) );
 	connect( impl->tree, SIGNAL(itemActivated(QFileInfo const &)), this, SLOT(loadFile(QFileInfo const &)) );
-	//connect( fb, SIGNAL(pickedDir(QDir const &)), this, SLOT(chdir(QDir const &)) );
-	//connect( this->actionToggleBrowserView, SIGNAL(toggled(bool)), fb, SLOT(setVisible(bool)) );
 	connect( this->actionToggleBrowserView, SIGNAL(toggled(bool)), this, SLOT(toggleSidebarVisible(bool)) );
 	impl->gv = new QBoardView( impl->gstate );
 	impl->gv->enablePlacemarker(true);
@@ -367,7 +360,8 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 #else
 		// WTF won't this work right?
 		QBBatch::process_scripts( &(impl->gstate), li );
-		impl->fb->reloadDir();// in case script generated anything.
+		//impl->fb->reloadDir();// in case script generated anything.
+		impl->tree->refresh();
 		worked = true;
 #endif
 	    }
