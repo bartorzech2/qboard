@@ -13,10 +13,11 @@
 
 #include "QBoard.h"
 
-#include <s11n.net/s11n/s11nlite.hpp>
-#include <QDebug>
-
 #include "S11nQt.h"
+
+#include <QDebug>
+#include <QVariant>
+
 QBoard::QBoard() 
     : QObject(), Serializable("QBoard")
 {
