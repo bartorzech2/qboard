@@ -21,7 +21,7 @@ sdirs="apps counters resources src s11n ui plugins"
 echo "Copying files..."
 for d in $sdirs; do
     echo -e "\t... $d"
-    cp --parents $(find $d \
+    find $d \
 	-name '*.h' \
 	-o -name '*.?pp' \
 	-o -name '*.pro' \
@@ -29,11 +29,17 @@ for d in $sdirs; do
 	-o -name '*.qrc' \
 	-o -name '*.png' \
 	-o -name '*.html' \
-	) $DEST || {
+	| sed -e '/\/bak/d' \
+	-e '/\/nono/d' \
+	-e '/\/debug/d' \
+	-e '/\.#/d' \
+	> filelist
+    cp --parents $(cat filelist) $DEST || {
 	err=$?
 	echo "Copy failed!"
 	exit $err
     }
+    rm filelist
 
     #echo cp --parents $(set -x; find $d $nameargs)
 done
