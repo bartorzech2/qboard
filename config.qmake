@@ -164,6 +164,7 @@ QBOARD_HEADERS_LIB = \
  $$SRC_DIR/QBBatch.h \
  $$SRC_DIR/QBoard.h \
  $$SRC_DIR/QBoardPlugin.h \
+ $$SRC_DIR/QBoardHomeView.h \
  $$SRC_DIR/QBoardView.h \
  $$SRC_DIR/QGI.h \
  $$SRC_DIR/QGIDot.h \
@@ -189,6 +190,7 @@ QBOARD_SOURCES_LIB = \
  $$SRC_DIR/QBBatch.cpp \
  $$SRC_DIR/QBoard.cpp \
  $$SRC_DIR/QBoardPlugin.cpp \
+ $$SRC_DIR/QBoardHomeView.cpp \
  $$SRC_DIR/QBoardView.cpp \
  $$SRC_DIR/QGIDot.cpp \
  $$SRC_DIR/QGIGamePiece.cpp \
