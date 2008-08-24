@@ -19,20 +19,20 @@
 #define COUT std::cout << __FILE__ << ":" << std::dec << __LINE__ << " : "
 #endif
 
-#include "GamePiece.h"
-#include "Serializable.h"
 #include "S11nQt.h"
 #include "S11nQtList.h"
 #include "S11nQtStream.h"
 #include <s11n.net/s11n/proxy/pod/int.hpp>
 
+#include <QTransform>
+#include <QTime>
 void try_s11n()
 {
     // test out our s11n-qt routines...
     QString qs("Hello, world.");
     S11nNode node;
     typedef s11nlite::node_traits NT;
-
+#define THROW(MSG) throw std::runtime_error(MSG);
     if(1)
     {
 	s11nlite::serialize( node, qs );
@@ -56,27 +56,6 @@ void try_s11n()
 	s11nlite::save( qr, std::cout );
     }
 
-    NT::clear(node);	
-    GamePiece gp;
-    if(1)
-    {
-	gp.setProperty("geom", QRect(0,0,40,45) );
-	gp.setProperty("bgcolor", QColor(127,0,20,13) );
-	gp.setProperty("phrase", QString("Hi, world") );
-	gp.setProperty("size", QSize(100,200) );
-	gp.setProperty("point", QPointF(10,20) );
-	QPixmap pm(35,40);
-	pm.fill(QColor(255,255,0));
-	gp.setProperty( "inlinePixmap", QVariant(pm) );
-	NT::clear(node);
-	bool worked = s11n::serialize( node, gp );
-	COUT << "serialize gp worked ? == "<<worked<<'\n';
-	s11nlite::save( node, std::cout );
-	GamePiece gpde;
-	worked = s11n::deserialize( node, gpde );
-	COUT << "deserialize gp worked ? == "<<worked<<'\n';
-	s11nlite::save( gpde, std::cout );
-    }
 	
     NT::clear(node);
     if(1)
@@ -115,16 +94,6 @@ void try_s11n()
 	QPolygon poly;
 	for( int i =0 ; i < 5; ++i ) poly.push_back( QPoint(i,1) );
 	s11nlite::save( poly, std::cout );
-    }
-
-    NT::clear(node);
-    if(1)
-    {
-	GamePiece gp2;
-	gp2.setProperty("pos",QPoint(1,2));
-	gp2.setProperty("size",QSize(10,10));
-	qDebug() << "gp.geom() == "<<gp2.geom();
-	s11nlite::save( gp2, std::cout );
     }
 
     NT::clear(node);
@@ -244,6 +213,41 @@ void try_s11n()
 	s11nlite::save( deser, std::cout );
     }
 
+    if(1)
+    {
+	QTransform tr(11,12,13,21,22,23,31,32,33);
+	COUT << "QTransform:\n";
+	S11nNode n;
+	s11nlite::serialize( n, tr );
+	s11nlite::save( n, std::cout );
+	QTransform tr2;
+	s11nlite::deserialize( n, tr2 );
+	s11nlite::save( tr2, std::cout );
+    }
+
+    if(1)
+    {
+	QMatrix tr(11,12,21,22,3,4);
+	COUT << "QMatrix:\n";
+	S11nNode n;
+	s11nlite::serialize( n, tr );
+	s11nlite::save( n, std::cout );
+	QMatrix tr2;
+	s11nlite::deserialize( n, tr2 );
+	s11nlite::save( tr2, std::cout );
+    }
+
+    if(1)
+    {
+	QDateTime tr = QDateTime::currentDateTime();
+	COUT << "QDateTime:\n";
+	S11nNode n;
+	s11nlite::serialize( n, tr );
+	s11nlite::save( n, std::cout );
+	QDateTime tr2;
+	s11nlite::deserialize( n, tr2 );
+	s11nlite::save( tr2, std::cout );
+    }
 }
 
 int main(int argc, char ** argv)
