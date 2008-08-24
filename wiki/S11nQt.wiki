@@ -10,9 +10,9 @@ The code is available via the QBoard source tree (look for `src/*11n*.*`) or as 
 The distribution contains code for de/serializing the following Qt types:
 
   * QString, both ASCII and Unicode strings (though it internally uses different formats for each).
-  * Most of the commonly-used utility classes, including: QPoint, QColor, QRect, QSize, QLine, QPolygon, QPair, QFont, QDate/Time/DateTime.
+  * Most of the commonly-used utility classes, including: QPoint, QColor, QRect, QSize, QLine, QPolygon, QPair, QFont, QDate/Time/DateTime, QTransform, QMatrix, QRegExp.
   * QByteArray and QPixmap, with compression
-  * Many forms of QVariant. Custom QVariant registrations are in place to allow QVariant to hold ANY SerializableType object.
+  * Many forms of QVariant, including storing any SerializableType object.
   * QList, QStringList, QVector, QMap
   * QObject properties. They are internally stored as QVariants, which implies that only property values of QVariant types supported by this code will work for purposes of serialization.
 
@@ -23,3 +23,25 @@ The code gets pretty heavy use in QBoard and is believed to work quite well.
 Suggestions, fixes, etc., are of course always welcome.
 
 Happy hacking!
+
+= QVariant and Serializables =
+
+Probably the most interesting part of the QVariant/S11n support is the ability to store arbitrary Serializable types (as defined by libs11n) in QVariants, and then pass them around. To store a Serializable in a QVariant we need to use a proxy type. That looks like this:
+
+{{{
+#include "S11nQt.h"
+using namespace s11n::qt;
+...
+QVariant var( VariantS11n(mySerializable) );
+}}}
+
+To deserialize it, we do:
+
+{{{
+if( var.canConvert<VariantS11n>() )
+{
+  VariantS11n sv( myVariant.value<VariantS11n>() );
+  MySerializable * my = sv.deserialize<MySerializable>();
+  ...
+}
+}}}
