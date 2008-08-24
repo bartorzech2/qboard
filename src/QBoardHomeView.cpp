@@ -90,7 +90,8 @@ struct QBoardHomeView::Impl
 	    iconer = new QBoardFileIconProvider;
 	}
 	model->setIconProvider( iconer );
-
+	model->setSorting( QDir::DirsFirst | QDir::IgnoreCase );
+	model->setReadOnly( false );
     }
     ~Impl()
     {
@@ -118,13 +119,14 @@ QBoardHomeView::QBoardHomeView( QWidget * parent ) :
     {
 	this->setColumnHidden(i, true);
     }
-    this->setRootIndex( impl->model->index(qboard::home().absolutePath()) );
     this->setUniformRowHeights(true);
 #if QT_VERSION >= 0x040400
     this->QTreeView::setHeaderHidden(true);
 #endif
     connect( impl->sel, SIGNAL(currentChanged( const QModelIndex &, const QModelIndex & )),
 	     this, SLOT(currentChanged( const QModelIndex &, const QModelIndex & )));
+    //this->setSortingEnabled(true);
+    this->setRootIndex( impl->model->index(qboard::home().absolutePath()) );
 }
 
 QBoardHomeView::~QBoardHomeView()
@@ -134,7 +136,9 @@ QBoardHomeView::~QBoardHomeView()
 
 void QBoardHomeView::mouseDoubleClickEvent( QMouseEvent * event )
 {
+    impl->model->setReadOnly( true );
     this->QTreeView::mouseDoubleClickEvent(event);
+    impl->model->setReadOnly( false );
     qDebug() << "QBoardHomeView::mouseDoubleClickEvent(): "
 	     << impl->model->filePath(impl->current);
     QFileInfo fi(impl->model->filePath(impl->current));
@@ -143,6 +147,13 @@ void QBoardHomeView::mouseDoubleClickEvent( QMouseEvent * event )
 	emit itemActivated( fi );
     }
 }
+
+void QBoardHomeView::refresh()
+{
+    impl->model->refresh(); // causes a segfault when called during ctor
+    this->setRootIndex( impl->model->index(qboard::home().absolutePath()) );
+}
+
 void QBoardHomeView::currentChanged( const QModelIndex & current,
 				     const QModelIndex & /* previous */ )
 {
