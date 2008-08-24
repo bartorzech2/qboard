@@ -20,6 +20,7 @@
 #include "QGIPiece.h"
 #include "utility.h"
 #include "QBoard.h"
+#include "QBoardScene.h"
 #include "S11nClipboard.h"
 
 #include <s11n.net/s11n/s11n_debuggering_macros.hpp>
@@ -35,10 +36,10 @@ struct GameState::Impl
     Impl() :
 	pieces(),
 	board(),
-// 	placeAt(0,0),
-	scene( new QGraphicsScene( QRectF(0,0,200,200) ) ),
+	scene( new QBoardScene() ),
 	lameKludge(0)
     {
+	scene->setSceneRect( QRectF(0,0,200,200) );
     }
     ~Impl()
     {
