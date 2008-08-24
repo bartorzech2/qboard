@@ -85,7 +85,7 @@ QBoardView::QBoardView( GameState & gs ) :
 	updating the display.
      */
 
-    this->setCacheMode(QGraphicsView::CacheBackground);
+    //this->setCacheMode(QGraphicsView::CacheBackground);
     this->setOptimizationFlags( QGraphicsView::DontClipPainter );
 
     this->updateBoardPixmap();
