@@ -36,6 +36,9 @@
 # working once and qdevelop hosed the quoting when it re-saved the
 # .pro file.
 QBOARD_VERSION = 0
+!$$QBOARD_VERSION {
+#  QMAKE_CXX = colorgcc
+}
 QBOARD_CONF = config.qmake # THIS file
 TOP_SRCDIR=$$PWD
 !exists($$TOP_SRCDIR/$$QBOARD_CONF) {
@@ -139,6 +142,7 @@ S11NQT_SOURCES = \
  $$SRC_DIR/S11nQt.cpp \
  $$SRC_DIR/S11nQtStream.cpp
 
+
 ########################################################################
 # If/when we ever refactor QBoard into lib+app, these headers belong
 # in the lib:
@@ -156,17 +160,18 @@ QBOARD_HEADERS_LIB = \
  $$SRC_DIR/parsepp_typelist.hpp \
  $$SRC_DIR/PieceAppearanceWidget.h \
  $$SRC_DIR/PropObj.h \
+ $$SRC_DIR/Serializable.h \
  $$SRC_DIR/QBBatch.h \
  $$SRC_DIR/QBoard.h \
  $$SRC_DIR/QBoardPlugin.h \
  $$SRC_DIR/QBoardView.h \
  $$SRC_DIR/QGI.h \
+ $$SRC_DIR/QGIDot.h \
  $$SRC_DIR/QGIGamePiece.h \
  $$SRC_DIR/QGIHtml.h \
  $$SRC_DIR/QGILine.h \
  $$SRC_DIR/QGIPiece.h \
  $$SRC_DIR/QGIPiecePlacemarker.h \
- $$SRC_DIR/Serializable.h \
  $$SRC_DIR/SetupQBoard.h \
  $$SRC_DIR/reg_qt_s11n.h \
  $$SRC_DIR/utility.h
@@ -180,16 +185,17 @@ QBOARD_SOURCES_LIB = \
  $$SRC_DIR/MenuHandlerPiece.cpp \
  $$SRC_DIR/PieceAppearanceWidget.cpp \
  $$SRC_DIR/PropObj.cpp \
+ $$SRC_DIR/Serializable.cpp \
  $$SRC_DIR/QBBatch.cpp \
  $$SRC_DIR/QBoard.cpp \
  $$SRC_DIR/QBoardPlugin.cpp \
  $$SRC_DIR/QBoardView.cpp \
+ $$SRC_DIR/QGIDot.cpp \
  $$SRC_DIR/QGIGamePiece.cpp \
  $$SRC_DIR/QGIHtml.cpp \
  $$SRC_DIR/QGILine.cpp \
  $$SRC_DIR/QGIPiece.cpp \
  $$SRC_DIR/QGIPiecePlacemarker.cpp \
- $$SRC_DIR/Serializable.cpp \
  $$SRC_DIR/SetupQBoard.cpp \
  $$SRC_DIR/utility.cpp
 
