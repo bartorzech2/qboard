@@ -97,7 +97,6 @@ struct QBoardHomeView::Impl
     {
 	delete sel;
 	delete model;
-	delete iconer;
 	if( 0 == --instCount )
 	{
 	    delete iconer;
@@ -136,11 +135,16 @@ QBoardHomeView::~QBoardHomeView()
 
 void QBoardHomeView::mouseDoubleClickEvent( QMouseEvent * event )
 {
+    /**
+       This readOnly flag kludge is to keep a double-click from
+       causing the view to go into item-rename mode, but still allow
+       renaming via the standard hotkey F2.
+    */
     impl->model->setReadOnly( true );
     this->QTreeView::mouseDoubleClickEvent(event);
     impl->model->setReadOnly( false );
-    qDebug() << "QBoardHomeView::mouseDoubleClickEvent(): "
-	     << impl->model->filePath(impl->current);
+    if(0) qDebug() << "QBoardHomeView::mouseDoubleClickEvent(): "
+		   << impl->model->filePath(impl->current);
     QFileInfo fi(impl->model->filePath(impl->current));
     if( fi.isFile() )
     {
