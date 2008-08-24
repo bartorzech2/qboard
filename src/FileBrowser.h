@@ -45,6 +45,7 @@ public Q_SLOTS:
 		Re-reads whatever directory was set last via setDir().
 	*/
 	void reloadDir();
+    QFileIconProvider * iconProvider();
 Q_SIGNALS:
 	/**
 		Triggered when a file is selected.
@@ -58,9 +59,7 @@ Q_SIGNALS:
   private Q_SLOTS:
 	void somethingSelected(QListWidgetItem*);
 private:
-	QString nameFilter;
-	QString basePath;
-	QFileIconProvider * iconer;
-	bool showHidden;
+    struct Impl;
+    Impl * impl;
 };
 #endif // __FILEBROWSER_H__
