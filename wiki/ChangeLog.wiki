@@ -9,7 +9,11 @@ are at the top. Dates written extra large are release dates.
 ----
 *2008 August 24:*
 
-- Replaced the file browser with a tree-based view - much more useful.
+- Replaced the file browser with a tree-based view - much more useful than before.
+
+- Pieces can now be "covered." When covered, their images are not shown.
+
+- Fixed: in Qt 4.3 the HTML widgets would become immobile after editing them via double-clicking them.
 
 
 === *2008 August 23:* ===
