@@ -116,7 +116,7 @@ bool GamePiece::hasProperty( char const * key )
 
 bool GamePiece::setPieceProperty( char const * name, QVariant const & v)
 {
-    if( v.isValid() && ! QVariant_s11n::canHandle( v.type() ) )
+    if( v.isValid() && ! s11n::qt::QVariant_s11n::canHandle( v.type() ) )
     {
 	qDebug() << "GamePiece::setPieceProperty(["<<name<<"],["<<v<<"]) rejecting unknown QVariant type.";
 	return false;
@@ -158,14 +158,14 @@ bool GamePiece_s11n::operator()( S11nNode & dest, GamePiece const & src ) const
 {
 	S11nNode & ch( s11n::create_child(dest, "properties"));
 	S11nNodeTraits::class_name(ch,"list");
-	return QObjectProperties_s11n()( ch, src ); 
+	return s11n::qt::QObjectProperties_s11n()( ch, src ); 
 }
 
 bool GamePiece_s11n::operator()( S11nNode const & src, GamePiece & dest )
 {
 	S11nNode const * ch = s11n::find_child_by_name(src, "properties");
 	if( ! ch ) return false;
-	return QObjectProperties_s11n()( *ch, dest );
+	return s11n::qt::QObjectProperties_s11n()( *ch, dest );
 }
 
 bool GamePiece::serialize( S11nNode & dest ) const

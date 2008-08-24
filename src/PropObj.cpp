@@ -75,11 +75,11 @@ void PropObj::copyPropertiesFrom( QObject const * src )
 bool PropObj::serialize( S11nNode & dest ) const
 {
     if( ! this->Serializable::serialize( dest ) ) return false;
-    return QObjectProperties_s11n()( dest , *this );
+    return s11n::qt::QObjectProperties_s11n()( dest , *this );
 }
 
 bool PropObj::deserialize( S11nNode const & src )
 {
     if( ! this->Serializable::deserialize( src ) ) return false;
-    return QObjectProperties_s11n()( src, *this );
+    return s11n::qt::QObjectProperties_s11n()( src, *this );
 }
