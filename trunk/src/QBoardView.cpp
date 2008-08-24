@@ -63,7 +63,6 @@ QBoardView::QBoardView( GameState & gs ) :
 {
     this->setProperty("scale", 1.0);
     this->setProperty("angle", 0.0);
-    //this->setCacheMode(QGraphicsView::CacheBackground);
     connect( &impl->board, SIGNAL(loaded()), this, SLOT(updateBoardPixmap()) );
     this->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     this->setInteractive(true);
@@ -85,6 +84,10 @@ QBoardView::QBoardView( GameState & gs ) :
 	causing some pieces to become invisible until manually
 	updating the display.
      */
+
+    this->setCacheMode(QGraphicsView::CacheBackground);
+    this->setOptimizationFlags( QGraphicsView::DontClipPainter );
+
     this->updateBoardPixmap();
 
 }
@@ -259,9 +262,12 @@ void QBoardView::drawBackground( QPainter *p, const QRectF & rect )
     }
     else
     {
-#if 0
-	// todo: only fillRect for pixmaps with alpha
-	p->fillRect( rect, this->backgroundBrush() );
+#if 0 // do we want this?
+	if( impl->board.pixmap().hasAlpha() )
+	{
+	    this->QGraphicsView::drawBackground(p,rect);
+	    //p->fillRect( rect, this->backgroundBrush() );
+	}
 #endif
 	QRect bogo = impl->board.pixmap().rect();
 	p->drawPixmap(bogo, impl->board.pixmap(), bogo );
