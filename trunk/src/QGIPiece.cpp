@@ -270,6 +270,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     }
     if( "pixmap" == key )
     {
+	this->prepareGeometryChange();
 	impl->clearPix();
 	QPixmap pix;
 	if( var.canConvert<QPixmap>() )
@@ -434,8 +435,7 @@ static void paintLinesToChildren( QGraphicsItem * qgi,
     {
 	QGraphicsItem * x = *it;
 	QRectF xr( x->boundingRect() );
-	QPointF xmid( xr.left() + (xr.width() / 2),
-		      xr.top() + (xr.height() / 2) );
+	QPointF xmid( xr.center() );
 	//xmid = x->mapToParent( xmid );
 	xmid = qgi->mapFromItem( x, xmid );
 	painter->setPen( pen );
