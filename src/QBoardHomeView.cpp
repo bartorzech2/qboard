@@ -162,6 +162,6 @@ void QBoardHomeView::currentChanged( const QModelIndex & current,
 				     const QModelIndex & /* previous */ )
 {
     impl->current = current;
-    qDebug() << "QBoardHomeView::currentChanged(): "
-	     << impl->model->filePath(current);
+    if(0) qDebug() << "QBoardHomeView::currentChanged(): "
+		   << impl->model->filePath(current);
 }
