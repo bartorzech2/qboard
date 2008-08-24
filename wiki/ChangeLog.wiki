@@ -7,7 +7,12 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top. Dates written extra large are release dates.
 
 ----
-*2008 August 23:*
+*2008 August 24:*
+
+- Replaced the file browser with a tree-based view - much more useful.
+
+
+=== *2008 August 23:* ===
 
 - Added new item type, QGIDot - a simple dot to place around the board or as a child of another piece.
 
