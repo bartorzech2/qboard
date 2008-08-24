@@ -28,14 +28,16 @@
 
 struct QGIHtml::Impl
 {
-	Impl()
-	{
-		
-	}
-	~Impl()
-	{
-		
-	}
+    GraphicsItemFlags giflags;
+    bool blocked;
+    Impl() : blocked(false)
+    {
+	
+    }
+    ~Impl()
+    {
+	
+    }
 };
 QGIHtml::QGIHtml() :
 	QGraphicsTextItem(),
@@ -69,7 +71,6 @@ void QGIHtml::refreshTransformation()
 
 bool QGIHtml::event( QEvent * e )
 {
-#if 1
     typedef QMap<QString,bool> PropMarkMap;
     static PropMarkMap map;
     if( map.isEmpty() )
@@ -110,8 +111,9 @@ bool QGIHtml::event( QEvent * e )
 	this->update();
 	return true;
     }
-#endif
-    return QObject::event(e);
+    return impl->blocked
+	? true
+	: this->QObject::event(e);
 }
 
 
@@ -119,25 +121,49 @@ void QGIHtml::mouseDoubleClickEvent( QGraphicsSceneMouseEvent * ev )
 {
 	if( ev->buttons() & Qt::LeftButton )
 	{
-		ev->accept();
-		this->setTextInteractionFlags( Qt::TextEditorInteraction );
+	    impl->giflags = this->flags();
+	    ev->accept();
+	    this->setTextInteractionFlags( Qt::TextEditorInteraction );
+	    this->setFocus();
+	    // ^^^ setFocus() is necessary for correct Qt4.3 interaction.
 	}
 	else
 	{
-		this->QGraphicsTextItem::mouseDoubleClickEvent(ev);
+	    this->QGraphicsTextItem::mouseDoubleClickEvent(ev);
 	}
 }
 
 
+void QGIHtml::focusInEvent( QFocusEvent * event )
+{
+    if(0) qDebug() << "QGIHtml::focusInEvent()";
+    //impl->giflags = this->flags();
+    //this->setTextInteractionFlags( Qt::TextEditorInteraction );
+    this->QGraphicsTextItem::focusInEvent(event);
+}
 void QGIHtml::focusOutEvent( QFocusEvent * event )
 {
-    // This fl stuff is to work around a problem in Qt 4.3
-    // where this object becomes imobile after leaving
-    // edit mode.
-    GraphicsItemFlags fl = this->flags();
-    this->setTextInteractionFlags( Qt::NoTextInteraction );
+    if(0) qDebug() << "QGIHtml::focusOutEvent() blocked ="<<impl->blocked;
+    if( impl->blocked )
+    {
+	event->accept();
+	return;
+    }
+    /**
+       Try to work around a problem in Qt 4.3 where this object
+       becomes imobile after leaving edit mode.
+    */
+#if QT_VERSION < 0x040400
+    impl->blocked = true;
+    this->setTextInteractionFlags( Qt::NoTextInteraction ); // can cause endless recursion!
+    //this->QGraphicsTextItem::focusOutEvent(event);
+    this->setFlags(impl->giflags);
+    event->accept();
+    impl->blocked = false;
+#else
+    this->setTextInteractionFlags( Qt::NoTextInteraction ); // can cause endless recursion!
     this->QGraphicsTextItem::focusOutEvent(event);
-    this->setFlags(fl);
+#endif
 }
 
 void QGIHtml::mousePressEvent(QGraphicsSceneMouseEvent *ev)
