@@ -37,7 +37,7 @@
 #include "QGIPiece.h"
 #include "QGIHtml.h"
 #include "GameState.h"
-#include "FileBrowser.h"
+#include "QBoardHomeView.h"
 #include "QGILine.h"
 #include "utility.h"
 #include "S11nClipboard.h"
@@ -52,11 +52,13 @@
 
 #define QBOARD_MAINWINDOW_PERSISTENCE_CLASS "MainWindow"
 
+class FileBrowser;
 struct MainWindowImpl::Impl
 {
     GameState gstate;
     QBoardView * gv;
     FileBrowser * fb;
+    QBoardHomeView * tree;
     PieceAppearanceWidget *paw;
     QWidget * sidebar;
     static char const * fileName;
@@ -64,6 +66,7 @@ struct MainWindowImpl::Impl
     Impl() : gstate(),
 	     gv(0),
 	     fb(0),
+	     tree(0),
 	     paw(new PieceAppearanceWidget),
 	     sidebar(0)
     {
@@ -95,7 +98,7 @@ struct MainWindowImpl::Impl
 	    them from here. Call me old fashioned. */
 	delete paw;
 	delete gv;
-	delete fb;
+	//delete fb;
 	delete sidebar;
     }
 };
@@ -112,7 +115,6 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	connect( this->actionSave, SIGNAL(triggered(bool)), this, SLOT(saveGame()) );
 	connect( this->actionLoad, SIGNAL(triggered(bool)), this, SLOT(loadGame()) );
 	connect( this->actionNewBoardView, SIGNAL(triggered(bool)), this, SLOT(launchNewBoardView()) );
-	connect( this->actionHome, SIGNAL(triggered(bool)), this, SLOT(goHome()) );
 	connect( this->actionAboutQt, SIGNAL(triggered(bool)), qApp, SLOT(aboutQt()) );
 	connect( this->actionAboutQBoard, SIGNAL(triggered(bool)), this, SLOT(aboutQBoard()) );
 	connect( this->actionPrint, SIGNAL(triggered(bool)), this, SLOT(printGame()) );
@@ -150,10 +152,11 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	splitter->addWidget( vsplit );
 	vsplit->setHandleWidth(4);
 
-	FileBrowser * fb = this->impl->fb = new FileBrowser( "*", 0 );
-	vsplit->addWidget(fb);
-	connect( this->actionRefreshFileList, SIGNAL(triggered(bool)), fb, SLOT(reloadDir()) );
-	connect( fb, SIGNAL(pickedFile(QFileInfo const &)), this, SLOT(loadFile(QFileInfo const &)) );
+	//FileBrowser * fb = this->impl->fb = new FileBrowser( "*", 0 );
+	impl->tree = new QBoardHomeView();
+	vsplit->addWidget(impl->tree);
+	connect( this->actionRefreshFileList, SIGNAL(triggered(bool)), impl->tree, SLOT(refresh()) );
+	connect( impl->tree, SIGNAL(itemActivated(QFileInfo const &)), this, SLOT(loadFile(QFileInfo const &)) );
 	//connect( fb, SIGNAL(pickedDir(QDir const &)), this, SLOT(chdir(QDir const &)) );
 	//connect( this->actionToggleBrowserView, SIGNAL(toggled(bool)), fb, SLOT(setVisible(bool)) );
 	connect( this->actionToggleBrowserView, SIGNAL(toggled(bool)), this, SLOT(toggleSidebarVisible(bool)) );
@@ -231,7 +234,7 @@ void MainWindowImpl::clipboardUpdated()
 void MainWindowImpl::goHome()
 {
 	this->chdir( qboard::home() );
-	impl->fb->setDir(".");
+	//impl->fb->setDir(".");
 }
 void MainWindowImpl::aboutQBoard()
 {
@@ -296,6 +299,7 @@ bool MainWindowImpl::saveGame()
 
 bool MainWindowImpl::loadFile( QFileInfo const & fi )
 {
+    if( ! fi.isFile() ) return false;
 	// FIXME: this dispatch needs to be generalized.
 	QString fn( fi.filePath() ); // fi.absoluteFilePath() );
 	bool worked = false;
@@ -353,7 +357,8 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 		*/
 		GameState bogo;
 		QBBatch::process_scripts( &bogo, li );
-		impl->fb->reloadDir();// in case script generated anything.
+		//impl->fb->reloadDir();// in case script generated anything.
+		impl->tree->refresh();
 		S11nNode node;
 		if( bogo.serialize(node) && impl->gstate.deserialize(node) )
 		{
@@ -512,6 +517,7 @@ void MainWindowImpl::addLine()
 #include <QGraphicsLineItem>
 #include <QGraphicsSimpleTextItem>
 #include <QLineF>
+
 void MainWindowImpl::doSomethingExperimental()
 {
 	qDebug() << "MainWindowImpl::doSomethingExperimental()";
@@ -520,6 +526,38 @@ void MainWindowImpl::doSomethingExperimental()
 	//impl->gstate.scene()->addWidget( new QFrame );
 
 	if(1)
+	{
+	    QBoardHomeView * v = new QBoardHomeView(0);
+	    v->show();
+	    connect( v, SIGNAL(itemActivated(QFileInfo const &)),
+		     this, SLOT(loadFile(QFileInfo const &)) );
+
+#if 0
+	    QDirModel *model = new QDirModel;
+	    model->setIconProvider( impl->fb->iconProvider() );
+	    QTreeView *tree = new QTreeView(0);
+	    tree->setModel(model);
+	    for( int i = 1; i < 4; ++i )
+	    {
+		tree->setColumnHidden(i, true);
+	    }
+	    tree->setRootIndex(model->index(QDir::currentPath()));
+	    tree->show();
+	    QString fn("QBoard/manual/index.html");
+	    QModelIndex sel;
+#define FP sel = model->index(fn); \
+	    qDebug() << fn << "sel.isValid() =="<<sel.isValid() \
+		     << "filePath =="<<model->filePath(sel);
+	    FP;
+	    fn = QString("%1/QBoard/manual/index.html").arg(qboard::home().absolutePath());
+	    FP;
+	    fn = "/foo";
+	    FP;
+#undef FP
+#endif
+	}
+
+	if(0)
 	{
 	    QGraphicsLineItem * li =
 		new QGraphicsLineItem;
