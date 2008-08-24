@@ -131,8 +131,13 @@ void QGIHtml::mouseDoubleClickEvent( QGraphicsSceneMouseEvent * ev )
 
 void QGIHtml::focusOutEvent( QFocusEvent * event )
 {
-	event->accept();
-	this->setTextInteractionFlags( Qt::NoTextInteraction );
+    // This fl stuff is to work around a problem in Qt 4.3
+    // where this object becomes imobile after leaving
+    // edit mode.
+    GraphicsItemFlags fl = this->flags();
+    this->setTextInteractionFlags( Qt::NoTextInteraction );
+    this->QGraphicsTextItem::focusOutEvent(event);
+    this->setFlags(fl);
 }
 
 void QGIHtml::mousePressEvent(QGraphicsSceneMouseEvent *ev)
