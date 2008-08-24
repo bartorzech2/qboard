@@ -41,6 +41,7 @@ public:
 protected:
     virtual void mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event );
     virtual void focusOutEvent( QFocusEvent * event );
+    virtual void focusInEvent( QFocusEvent * event );
     virtual void mousePressEvent ( QGraphicsSceneMouseEvent * event );
     virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent * event );
     virtual bool event( QEvent * e );
