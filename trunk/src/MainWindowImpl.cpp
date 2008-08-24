@@ -507,8 +507,11 @@ void MainWindowImpl::addLine()
 }
 
 #include "QBoardPlugin.h"
+#include "QGIDot.h"
 #include <QPluginLoader>
+#include <QGraphicsLineItem>
 #include <QGraphicsSimpleTextItem>
+#include <QLineF>
 void MainWindowImpl::doSomethingExperimental()
 {
 	qDebug() << "MainWindowImpl::doSomethingExperimental()";
@@ -517,6 +520,31 @@ void MainWindowImpl::doSomethingExperimental()
 	//impl->gstate.scene()->addWidget( new QFrame );
 
 	if(1)
+	{
+	    QGraphicsLineItem * li =
+		new QGraphicsLineItem;
+	    QLineF co(20,20,100,100);
+	    li->setLine( co );
+	    li->setFlag(QGraphicsItem::ItemIsMovable, true);
+	    li->setFlag(QGraphicsItem::ItemIsSelectable, false);
+	    impl->gstate.scene()->addItem( li );
+
+	    QGIDot * dot = new QGIDot;
+	    dot->setFlag(QGraphicsItem::ItemIsMovable, false);
+	    //dot->setFlag(QGraphicsItem::ItemIsSelectable, false);
+	    dot->setParentItem(li);
+	    dot->setPos( dot->mapFromParent( co.p2() ) );
+	    dot->setProperty("color","white");
+	}
+
+	if(0)
+	{
+	    QGraphicsItem * dot = new QGIDot;
+	    dot->setPos( QPointF(40, 40) );
+	    impl->gstate.scene()->addItem( dot );
+	}
+
+	if(0)
 	{
 	    QGIPiece * pc = new QGIPiece;
 	    pc->setProperty("color",QColor("#ffff00") );
