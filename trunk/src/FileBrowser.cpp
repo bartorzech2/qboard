@@ -45,6 +45,7 @@
 #include <QRegExp>
 #endif
 
+
 class FBFileIconProvider : public QFileIconProvider
 {
 public:
@@ -91,14 +92,31 @@ public:
     }
 };
 
+struct FileBrowser::Impl
+{
+    QString nameFilter;
+    QString basePath;
+    QFileIconProvider * iconer;
+    bool showHidden;
+    Impl() :
+	nameFilter(),
+	basePath(),
+	iconer(new FBFileIconProvider),
+	showHidden(false)
+    {
+    }
+    ~Impl()
+    {
+	delete iconer;
+    }
+};
+
 FileBrowser::FileBrowser (const QString & filter, QWidget * parent):
     QListWidget (parent),
-    basePath(),
-    iconer( new FBFileIconProvider ),
-    showHidden(false)
+    impl(new Impl)
 {
 
-    nameFilter = filter;
+    impl->nameFilter = filter;
     this->setDir(QDir::currentPath());
     this->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     connect(this, SIGNAL(itemActivated(QListWidgetItem*)), this, SLOT(somethingSelected(QListWidgetItem*)));
@@ -106,7 +124,12 @@ FileBrowser::FileBrowser (const QString & filter, QWidget * parent):
 
 FileBrowser::~FileBrowser()
 {
-    delete this->iconer;
+    delete impl;
+}
+
+QFileIconProvider * FileBrowser::iconProvider()
+{
+    return impl->iconer;
 }
 
 void
@@ -116,7 +139,7 @@ FileBrowser::setDir (const QString & path)
 #if FileBrowser_USE_QBOARD
     QString qbhome( qboard::home().canonicalPath() );
 #endif
-    QDir dir(path, nameFilter, QDir::DirsFirst);
+    QDir dir(path, impl->nameFilter, QDir::DirsFirst);
     if (!dir.isReadable ())	return;
     dir.setFilter( QDir::AllDirs | QDir::Files );
     clear();
@@ -135,16 +158,16 @@ FileBrowser::setDir (const QString & path)
 	    if( path == "/" ) continue;
 	}
 	QFileInfo fi(dir.absoluteFilePath(fn));
-	if( showHidden && fi.isHidden() ) continue;
-	this->addItem(new QListWidgetItem( iconer->icon(fi), fn ) );
+	if( impl->showHidden && fi.isHidden() ) continue;
+	this->addItem(new QListWidgetItem( impl->iconer->icon(fi), fn ) );
     }
-    basePath = dir.canonicalPath();
+    impl->basePath = dir.canonicalPath();
 }
 
 void FileBrowser::reloadDir()
 {
     this->blockSignals(true);
-    this->setDir( this->basePath );
+    this->setDir( impl->basePath );
     this->blockSignals(false);
 }
 
@@ -152,7 +175,7 @@ void FileBrowser::somethingSelected( QListWidgetItem * item)
 {
     QString txt( item->text() );
     if( txt.isEmpty() ) return;
-    QString path = QDir::toNativeSeparators(basePath + "/" +txt);
+    QString path = QDir::toNativeSeparators(impl->basePath + "/" +txt);
 #if FileBrowser_USE_QBOARD
     path = qboard::homeRelative(path);
 #endif
