@@ -235,6 +235,35 @@ namespace s11n { namespace qt {
 	QSharedDataPointer<SharedS11nNode> proxy;
     };
 
+
+    /**
+       A "partial" s11n proxy which de/serializes QObject "dynamic"
+       properties (those set with QObject::setProperty()). See
+       QVariant_s11n for the supported property types. Other
+       properties will cause de/serialization to fail.
+    */
+    struct QObjectProperties_s11n
+    {
+	/**
+	   Serializes all "dynamic" Properties from the src object to
+	   dest.  Each propery is saved in a separate subnode, named
+	   after the property.  Properties which begin with an
+	   underscore are skipped.
+	*/
+	bool operator()( S11nNode & dest, QObject const & src ) const;
+	/**
+	   Deserializes subnodes of src and inserts them as properties
+	   of dest from src. If this routine returns false, dest may
+	   be partially deserialized - its state is effectively
+	   undefined.
+
+	   As per s11n convention, this routine clears out any
+	   existing properties of dest before populating it.
+	*/
+	bool operator()( S11nNode const & src, QObject & dest ) const;
+
+    };
+
 }} // namespaces
 using s11n::qt::VariantS11n; // we don't want the namespace part stored by QMetaType
 Q_DECLARE_METATYPE(VariantS11n);
@@ -257,48 +286,50 @@ right thing and move all the code into namespaces.
 
 
 #include <QByteArray>
-/**
-   An s11n proxy for QByteArrays. See the compressionThreshold member
-   for important notes.
-
-   Note that since you can read/write directly from/to QByteArrays
-   using the QIODevice interface, it is in principal possible to save
-   arbitrary binary data using libs11n this way. Not necessarily an
-   efficient way to save binary data, but maybe useful for some
-   cases (e.g. saving QPixmaps as inlined data).
-*/
-struct QByteArray_s11n
-{
+namespace s11n { namespace qt {
     /**
-       Serializes src to dest, saving the data in a bin64-encoded
-       string. If src.size() is greater than
-       QByteArray_s11n::compressionThreshold then the serialized
-       copy is compressed using qCompress() before bin64 encoding
-       is applied.
-
-       See the compressionThreshold for more info.
+       An s11n proxy for QByteArrays. See the compressionThreshold member
+       for important notes.
+       
+       Note that since you can read/write directly from/to QByteArrays
+       using the QIODevice interface, it is in principal possible to save
+       arbitrary binary data using libs11n this way. Not necessarily an
+       efficient way to save binary data, but maybe useful for some
+       cases (e.g. saving QPixmaps as inlined data).
     */
-    bool operator()( S11nNode & dest, QByteArray const & src ) const;
+    struct QByteArray_s11n
+    {
+	/**
+	   Serializes src to dest, saving the data in a bin64-encoded
+	   string. If src.size() is greater than
+	   QByteArray_s11n::compressionThreshold then the serialized
+	   copy is compressed using qCompress() before bin64 encoding
+	   is applied.
+	   
+	   See the compressionThreshold for more info.
+	*/
+	bool operator()( S11nNode & dest, QByteArray const & src ) const;
+	
+	/** Deserializes dest from src. */
+	bool operator()( S11nNode const & src, QByteArray & dest ) const;
+	
+	/**
+	   The value of compressionThreshold influences how the serialize
+	   operator works.
+	   
+	   It is intended that an application set this only once, and not
+	   twiddle it back and forth.
 
-    /** Deserializes dest from src. */
-    bool operator()( S11nNode const & src, QByteArray & dest ) const;
-
-    /**
-       The value of compressionThreshold influences how the serialize
-       operator works.
-
-       It is intended that an application set this only once, and not
-       twiddle it back and forth.
-
-       If set to 0 then compression is disabled. The default value is
-       quite small - technically undefined, but "probably" around 100.
-    */
-    static unsigned short compressionThreshold;
-};
+	   If set to 0 then compression is disabled. The default value is
+	   quite small - technically undefined, but "probably" around 100.
+	*/
+	static unsigned short compressionThreshold;
+    };
+}} // namespaces
 /* s11n proxy for QByteArray. */
 #define S11N_TYPE QByteArray
 #define S11N_TYPE_NAME "QByteArray"
-#define S11N_SERIALIZE_FUNCTOR QByteArray_s11n
+#define S11N_SERIALIZE_FUNCTOR s11n::qt::QByteArray_s11n
 #include <s11n.net/s11n/reg_s11n_traits.hpp>
 
 
@@ -352,6 +383,13 @@ Handles only the following properties of QFont:
 #define S11N_TYPE QLineF
 #define S11N_TYPE_NAME "QLineF"
 #define S11N_SERIALIZE_FUNCTOR QLineF_s11n
+#include "reg_qt_s11n.h"
+
+#include <QMatrix>
+/* s11n proxy for QMatrix. */
+#define S11N_TYPE QMatrix
+#define S11N_TYPE_NAME "QMatrix"
+#define S11N_SERIALIZE_FUNCTOR QMatrix_s11n
 #include "reg_qt_s11n.h"
 
 #include <QRectF>
@@ -420,6 +458,13 @@ to store the data.
 #define S11N_SERIALIZE_FUNCTOR QPointF_s11n
 #include "reg_qt_s11n.h"
 
+#include <QRegExp>
+/* s11n proxy for QRegExp. */
+#define S11N_TYPE QRegExp
+#define S11N_TYPE_NAME "QRegExp"
+#define S11N_SERIALIZE_FUNCTOR QRegExp_s11n
+#include "reg_qt_s11n.h"
+
 #include <QSize>
 /* s11n proxy for QSize. */
 #define S11N_TYPE QSize
@@ -435,6 +480,7 @@ to store the data.
 #include "reg_qt_s11n.h"
 
 #include <QString>
+namespace s11n { namespace qt {
 /**
 	s11n proxy for QStrings. See the tryAscii member for important
 	notes.
@@ -462,10 +508,11 @@ struct QString_s11n
 	*/
 	static bool tryAscii;
 };
+}} // namespaces
 /* Register QString_s11n as a proxy for QString. */
 #define S11N_TYPE QString
 #define S11N_TYPE_NAME "QString"
-#define S11N_SERIALIZE_FUNCTOR QString_s11n
+#define S11N_SERIALIZE_FUNCTOR s11n::qt::QString_s11n
 #include <s11n.net/s11n/reg_s11n_traits.hpp>
 
 #include <QStringList>
@@ -475,6 +522,7 @@ struct QString_s11n
 #define S11N_SERIALIZE_FUNCTOR QStringList_s11n
 #include "reg_qt_s11n.h"
 
+//#include <QTime>
 #include <QTime>
 /* Register QTime_s11n as a proxy for QTime. */
 #define S11N_TYPE QTime
@@ -482,10 +530,20 @@ struct QString_s11n
 #define S11N_SERIALIZE_FUNCTOR QTime_s11n
 #include "reg_qt_s11n.h"
 
+//#include <QTransform>
+#include <QTransform>
+/* Register QTransform_s11n as a proxy for QTransform. */
+#define S11N_TYPE QTransform
+#define S11N_TYPE_NAME "QTransform"
+#define S11N_SERIALIZE_FUNCTOR QTransform_s11n
+#include "reg_qt_s11n.h"
+
 
 #include <QVariant>
-/* s11n proxy for QVariant.
+namespace s11n { namespace qt {
+/**
 
+s11n proxy for QVariant.
 It supports the following QVariant types (as defined in the
 QVariant::Type enum):
 
@@ -502,7 +560,7 @@ QVariant::Type enum):
 - ByteArray
 - Pixmap
 - Any Serializable Type (as defined by libs11n), via the 
-s11n::qt::VariantS11n proxy type.
+VariantS11n proxy type.
 
 If an attempt is made to serialize a different type, serialization
 will fail. If, upon deserialization, the integer values defined by
@@ -524,37 +582,11 @@ struct QVariant_s11n
 	*/
 	static bool canHandle( int t );
 };
+}} // namespaces
 #define S11N_TYPE QVariant
 #define S11N_TYPE_NAME "QVariant"
-#define S11N_SERIALIZE_FUNCTOR QVariant_s11n
+#define S11N_SERIALIZE_FUNCTOR s11n::qt::QVariant_s11n
 #include <s11n.net/s11n/reg_s11n_traits.hpp>
-
-/**
-	A "partial" s11n proxy which de/serializes QObject "dynamic"
-	properties (those set with QObject::setProperty()).	See QVariant_s11n
-	for the supported property types. Other	properties will cause
-	de/serialization to fail.
-*/
-struct QObjectProperties_s11n
-{
-    /**
-       Serializes all "dynamic" Properties from the src object to dest.
-       Each propery is saved in a separate subnode, named after the property.
-       Properties which begin with an underscore are skipped.
-    */
-    bool operator()( S11nNode & dest, QObject const & src ) const;
-    /**
-       Deserializes subnodes of src and inserts them as properties
-       of dest from src. If this routine returns false, dest may be partially
-       deserialized - its state is effectively undefined.
-
-       As per s11n convention, this routine clears out any existing
-       properties of dest before populating it.
-    */
-    bool operator()( S11nNode const & src, QObject & dest ) const;
-
-};
-
 
 
 #endif
