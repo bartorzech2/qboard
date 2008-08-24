@@ -38,18 +38,20 @@ struct QGIPiece::Impl
     QPixmap pixcache;
 #endif
     int borderLineStyle;
-    int alpha;
-    int borderAlpha;
+    qreal alpha;
+    qreal borderAlpha;
     /**
        When block is true, QGIPiece will reject piece property updates.
        This is a kludge to allow QGIPiece to properly update the piece
        position.
     */
     bool block;
+    bool isCovered;
     size_t countPaintCache;
     size_t countRepaint;
     Impl()
     {
+	isCovered = false;
 	borderSize = 1;
 	borderLineStyle = Qt::SolidLine;
 	block = false;
@@ -155,15 +157,22 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     if( "borderColor" == key )
     {
 	impl->borderColor = var.value<QColor>();
-	impl->borderColor.setAlpha(impl->alpha);
+	impl->borderColor.setAlpha(impl->borderAlpha);
 	impl->clearPix();
 	this->update();
 	return;
     }
     if( "colorAlpha" == key )
     {
-	impl->alpha = var.toInt();
-	impl->backgroundColor.setAlpha(impl->alpha);
+	impl->alpha = var.toDouble();
+	if( impl->alpha > 1.0 )
+	{ // assume it's int-encoded
+	    impl->backgroundColor.setAlpha( int(impl->alpha) );
+	}
+	else
+	{
+	    impl->backgroundColor.setAlphaF(impl->alpha);
+	}
 	impl->clearPix();
     	this->update();
 	return;
@@ -171,7 +180,14 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     if( "borderAlpha" == key )
     {
 	impl->borderAlpha = var.toInt();
-	impl->borderColor.setAlpha(impl->borderAlpha);
+	if( impl->borderAlpha > 1.0 )
+	{ // assume it's int-encoded
+	    impl->borderColor.setAlpha( int(impl->borderAlpha) );
+	}
+	else
+	{
+	    impl->borderColor.setAlphaF(impl->borderAlpha);
+	}
 	impl->clearPix();
 	this->update();
 	return;
@@ -242,6 +258,14 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	{
 	    this->setFlag( QGraphicsItem::ItemIsMovable, true );
 	}
+	return;
+    }
+    if( "isCovered" == key )
+    {
+	int i = var.toInt();
+	impl->isCovered = (0 != i);
+	impl->clearPix();
+	this->update();
 	return;
     }
     if( "pixmap" == key )
@@ -427,6 +451,13 @@ void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * optio
 	QPen linePen(Qt::red, 4, Qt::DotLine, Qt::FlatCap, Qt::MiterJoin);
 	paintLinesToChildren( this, painter, linePen );
     }
+    /**
+       Using a pixmap cache for the rendering saves a lot of repainting,
+       but it causes rounding errors because QPixmap is int-based.
+       The borders don't show up properly (off-by-one errors) at certain
+       sizes and scales.
+    */
+
     QRectF bounds( this->boundingRect().normalized() );
 #define AMSG if(0) qDebug() << "QGIPixmap::paint():"
     if( 
@@ -459,14 +490,24 @@ void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * optio
 	}
 	const qreal bs = impl->borderSize;
 	qreal xl = bs / 2.0;
-	//if( 0 == (int(xl*10) % 5) ) xl -= 0.0001; // kludge
-	if( ! impl->pixmap.isNull() )
+
+	if( ! impl->isCovered )
 	{
-	    // Weird: if i use impl->pixmap.rect() i get (0.5,0.5,W,H)
-	    QRectF pmr( QPointF(0,0), impl->pixmap.size() );
-	    //QRectF pmr( impl->pixmap.rect() );
-	    AMSG << "drawPixmap("<<pmr<<"...)";
-	    cp->drawPixmap(pmr, impl->pixmap, impl->pixmap.rect() );
+	    if( ! impl->pixmap.isNull() )
+	    {
+		// Weird: if i use impl->pixmap.rect() i get (0.5,0.5,W,H)
+		QRectF pmr( QPointF(0,0), impl->pixmap.size() );
+		//QRectF pmr( impl->pixmap.rect() );
+		AMSG << "drawPixmap("<<pmr<<"...)";
+		cp->drawPixmap(pmr, impl->pixmap, impl->pixmap.rect() );
+	    }
+	}
+	else
+	{
+	    cp->fillRect( bounds.toRect(),
+			  QBrush(impl->borderColor.lighter(),
+				 Qt::Dense7Pattern)
+			  );
 	}
 
 	if( bs && impl->borderColor.isValid() )
@@ -716,43 +757,55 @@ void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent 
 	mBrd->addMenu( QObjectPropertyMenu::makeNumberListMenu("Size",selected,"borderSize",0,8) );
     }
 
+    QMenu * mMisc = m->addMenu("Misc.");
+
     if(1)
     {
-	QMenu * mMisc = m->addMenu("Misc.");
+	QVariant vcov = pv->property("isCovered");
+	int icov = vcov.toInt();
+	vcov = icov ? QVariant(int(0)) : QVariant(1);
+	QObjectPropertyAction * act =
+	    new QObjectPropertyAction( selected,
+				       "isCovered",
+				       vcov );
+	act->setText( icov ? "Uncover" : "Cover" );
+	act->setCheckable(true);
+	if( icov ) act->setChecked(true);
+	mMisc->addAction( act );
+    }
 
-	if(1)
-	{
-	    QObjectPropertyMenu * pm =
-		QObjectPropertyMenu::makeNumberListMenu("Scale",
-							selected, "scale",
-							0.25, 3.01, 0.25);
-	    pm->setIcon(QIcon(":/QBoard/icon/viewmag.png"));
-	    mMisc->addMenu(pm);
-	}
-
-	if(1)
-	{
-	    QMenu * mAdd = mMisc->addMenu("Create child...");
-	    mAdd->addAction( "QGIHtml", this, SLOT(addChild()) );
-	    mAdd->addAction( "QGIDot", this, SLOT(addChild()) );
-	}
-
-	if(1)
-	{
-	    QVariant lock = pv->property("dragDisabled");
-	    bool locked = lock.isValid()
-		? (lock.toInt() ? true : false)
-		: false;
-	    QVariant newVal = locked ? QVariant(int(0)) : QVariant(int(1));
-	    QObjectPropertyAction * act = new QObjectPropertyAction(selected,"dragDisabled",newVal);
-	    act->setIcon(QIcon(":/QBoard/icon/unlock.png"));
-	    act->setCheckable( true );
-	    act->blockSignals(true);
-	    act->setChecked( locked );
-	    act->blockSignals(false);
-	    act->setText(locked ? "Unlock position" : "Lock position");
-	    mMisc->addAction(act);
-	}
+    if(1)
+    {
+	QObjectPropertyMenu * pm =
+	    QObjectPropertyMenu::makeNumberListMenu("Scale",
+						    selected, "scale",
+						    0.25, 3.01, 0.25);
+	pm->setIcon(QIcon(":/QBoard/icon/viewmag.png"));
+	mMisc->addMenu(pm);
+    }
+    
+    if(1)
+    {
+	QMenu * mAdd = mMisc->addMenu("Create child...");
+	mAdd->addAction( "QGIHtml", this, SLOT(addChild()) );
+	mAdd->addAction( "QGIDot", this, SLOT(addChild()) );
+    }
+    
+    if(1)
+    {
+	QVariant lock = pv->property("dragDisabled");
+	bool locked = lock.isValid()
+	    ? (lock.toInt() ? true : false)
+	    : false;
+	QVariant newVal = locked ? QVariant(int(0)) : QVariant(int(1));
+	QObjectPropertyAction * act = new QObjectPropertyAction(selected,"dragDisabled",newVal);
+	act->setIcon(QIcon(":/QBoard/icon/unlock.png"));
+	act->setCheckable( true );
+	act->blockSignals(true);
+	act->setChecked( locked );
+	act->blockSignals(false);
+	act->setText(locked ? "Unlock position" : "Lock position");
+	mMisc->addAction(act);
     }
 
 #if 1
