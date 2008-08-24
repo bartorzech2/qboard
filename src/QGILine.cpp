@@ -133,6 +133,7 @@ void QGILineBinder::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 }
 bool QGILineBinder::serialize( S11nNode & dest ) const
 {
+    using namespace s11n::qt;
 	if( ! this->Serializable::serialize( dest ) ) return false;
 	if( ! impl->ends.first || ! impl->ends.second ) return false;
 	// We must ensure that the "pos" property is synced, but we have
@@ -162,6 +163,7 @@ bool QGILineBinder::serialize( S11nNode & dest ) const
 
 bool QGILineBinder::deserialize( S11nNode const & src )
 {
+    using namespace s11n::qt;
 	if( ! this->Serializable::deserialize( src ) ) return false;
 	typedef S11nNodeTraits NT;
 	if( impl->ends.first ) delete impl->ends.first;
