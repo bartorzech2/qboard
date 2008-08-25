@@ -85,10 +85,12 @@ public:
 public Q_SLOTS:
 	void clipboardCopy();
 	void clipboardCut();
+private Q_SLOTS:
     void copyList();
     void cutList();
     void copyOne();
     void cutOne();
+    void cloneItem();
 private:
     static void clipOne( QGraphicsItem *, bool copy );
     static void clipList( QGraphicsItem *, bool copy );
