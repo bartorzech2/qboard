@@ -11,6 +11,8 @@ are at the top. Dates written extra large are release dates.
 
 - Removed the classes GamePiece, QGIGamePiece, and friends. This means that games saved with QBoard older than v20080820 will no longer load (or at least not completely load).
 
+- Added Clone option to the copy/cut item menus. Cloning an item (or selected items) creates a copy of those items and places it directly on top of the original item, offset by a small amount.
+
 - Started adding JavaScript support. Not yet sure where that's going, but it could be pretty cool.
 
 
