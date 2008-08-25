@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="/QBoard" >
+    <file alias='javascript/jquery.js'>javascript/jquery-1.2.1.pack.js</file>
+    <file alias='javascript/bogodice.jquery.js'>javascript/bogodice.jquery.pack.js</file>
+    <file alias='javascript/spoilers.jquery.js'>javascript/spoilers.jquery.pack.js</file>
+    <file alias='javascript/togglepane.jquery.js'>javascript/togglepane.jquery.pack.js</file>
+  </qresource>
+</RCC>
