@@ -15,7 +15,6 @@
 
 
 #include "Serializable.h"
-#include "GamePiece.h"
 class QBoard;
 #include <QGraphicsScene>
 #include <QPoint>
@@ -87,28 +86,7 @@ public Q_SLOTS:
 //     */
 //     void setPlacementPos( QPoint const & );
 
-private Q_SLOTS:
-    /**
-       Creates a new View for pc and adds it to the scene.
-    */
-    QGraphicsItem * pieceAdded( GamePiece * pc );
-    /**
-       Currently does nothing. It should find the associated
-       View and remove it.
-    */
-    void pieceRemoved( GamePiece * pc );
-
 private:
-    /**
-       This holds all GamePieces. When a piece
-       is added to this list, it is automatically
-       added to this object with a new View object
-       for the piece. When a piece is removed, it's
-       view is only automatically removed if the
-       piece is destroyed.
-     */
-    GamePieceList & pieces();
-
     bool pasteTryHarder( S11nNode const & root,
 			 QPoint const & pos );
     struct Impl;

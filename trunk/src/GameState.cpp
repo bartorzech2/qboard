@@ -12,9 +12,12 @@
  */
 
 #include "GameState.h"
+
 #include <QDebug>
 #include <QGraphicsItem>
 #include <QList>
+#include <QScriptEngine>
+
 #include "S11nQt.h"
 #include "S11nQtList.h"
 #include "QGIPiece.h"
@@ -27,34 +30,39 @@
 
 struct GameState::Impl
 {
-    mutable GamePieceList pieces;
     QBoard board;
 //     QPoint placeAt;
     mutable QGraphicsScene * scene;
     /** lameKludge exists for the "addPiece() QGraphicsItem return workaround" */
     QGraphicsItem * lameKludge;
     Impl() :
-	pieces(),
 	board(),
 	scene( new QBoardScene() ),
-	lameKludge(0)
+	lameKludge(0),
+	engine(0)
     {
 	scene->setSceneRect( QRectF(0,0,200,200) );
     }
     ~Impl()
     {
+	delete this->engine;
 	delete this->scene;
     }
+    QScriptEngine * js()
+    {
+	if( ! engine ) engine = new QScriptEngine;
+	return engine;
+    }
+
+private:
+    QScriptEngine * engine;
+
 };
 
 GameState::GameState() :
     Serializable("GameState"),
     impl(new Impl)
 {
-    QObject::connect( &impl->pieces, SIGNAL(pieceAdded(GamePiece*)),
-		      this, SLOT(pieceAdded(GamePiece*)) );
-    QObject::connect( &impl->pieces, SIGNAL(pieceRemoved(GamePiece*)),
-		      this, SLOT(pieceRemoved(GamePiece*)) );
 }
 
 
@@ -86,47 +94,17 @@ void GameState::addItem( QGraphicsItem * it )
     impl->scene->addItem( it );
 }
 
-QGraphicsItem * GameState::pieceAdded( GamePiece * pc )
-{
-#if 0
-    return (impl->lameKludge = new QGIGamePiece(pc,impl->scene));
-#else
-    QGIPiece * gvi = new QGIPiece;
-    typedef QList<QByteArray> QL;
-    QL ql( pc->dynamicPropertyNames() );
-    QL::const_iterator it( ql.begin() );
-    QL::const_iterator et( ql.end() );
-    for( ; et != it; ++it )
-    {
-	char const * key = it->constData();
-	if( key && (*key == '_') ) continue; // Qt reserves the "_q_" prefix, so we'll elaborate on that.
-	gvi->setProperty( key, pc->property(key) );
-    }
-    impl->scene->addItem( gvi );
-    return gvi;
-#endif
-    //qDebug() << "GameState::pieceAdded() added QGIGamePiece" << static_cast<QObject*>(pv);
-}
-void GameState::pieceRemoved( GamePiece * )
-{
-    // We don't really care - the view will destroy itself when the piece goes.
-}
 
 void GameState::clear()
 {
     // Pieces should be cleared first, to avoid potential double or otherwise inappropriate
     // deletes due to the use QObject::deleteLater() in QGIGamePiece.
     impl->board.clear();
-    this->pieces().clearPieces();
     QList<QGraphicsItem *> ql(impl->scene->items()); 
     //qDebug() <<"GameState::clear() trying to clear"<<ql.size()<<" QGI items";
     qboard::destroyToplevelItems( ql );
 }
 
-GamePieceList & GameState::pieces()
-{
-    return impl->pieces;
-}
 QBoard & GameState::board()
 {
     return impl->board;
@@ -198,38 +176,8 @@ bool GameState::deserialize(  S11nNode const & src )
 	    throw;
 	}
     }
-#if 1 // for backwards compatibility only
-    ch = s11n::find_child_by_name(src, "pieces");
-    if( ch )
-    {
-	if( ! s11n::deserialize( *ch, this->impl->pieces ) ) return false;
-    }
-#endif // backwards compat
     return true;
 }
-
-
-#if 0
-static void adjustPos( QObject * obj, QPoint const & pos )
-{
-    if( ! obj ) return;
-    QVariant vpos( obj->property("pos") );
-    QPoint cpos = vpos.isValid() ? vpos.toPoint() : QPoint();
-    QPoint pD;
-    if( ! pos.isNull() && ! cpos.isNull() )
-    {
-	pD = cpos - pos;
-    }
-    QPoint newpos = cpos.isNull() ?  pos : cpos;
-    if(0) qDebug() << "adjustPos("<<obj<<","<<pos<<"): delta="<<pD<<"cpos="<<cpos<<"newpos="<<newpos;
-    newpos -= pD;
-    if(0) qDebug() << "adjustPos("<<obj<<","<<pos<<"): delta="<<pD<<"cpos="<<cpos<<"newpos="<<newpos;
-    if( newpos != cpos )
-    {
-	obj->setProperty("pos", newpos);
-    }
-}
-#endif // adjustPos(QObject...)
 
 static void adjustPos( QGraphicsItem * obj, QPoint const & pos )
 {
@@ -299,7 +247,7 @@ bool GameState::pasteTryHarder( S11nNode const & root,
 	    if(1) qDebug() << "GameState::pasteTryHarder(node,"<<pos<<") QList<Serializable*>";
     	    QPoint xpos( pos );
 	    QPoint step(10,10);
-	    //qDebug() << "GameState::pasteTryHarder(): pasting GamePieceList @"<<pos;
+	    //qDebug() << "GameState::pasteTryHarder(): pasting QList<Serializable*> @"<<pos;
 	    impl->scene->clearSelection();
 	    for( SerList::iterator it = pli.begin();
 		 it != pli.end(); ++it )

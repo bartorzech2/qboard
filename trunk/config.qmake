@@ -54,7 +54,7 @@ REL_SRCDIR = $$(PWD)
 REL_SRCDIR=$$replace(REL_SRCDIR,$$TOP_SRCDIR/,)
 REL_SRCDIR=$$replace(REL_SRCDIR,[^/]+,..)
 
-CONFIG += stl warn_on debug ordered
+CONFIG += stl warn_on debug ordered script
 # CONFIG += debug_and_release
 
 VERSION = $$QBOARD_VERSION
@@ -148,12 +148,10 @@ S11NQT_SOURCES = \
 # in the lib:
 QBOARD_HEADERS_LIB = \
  $$S11NQT_HEADERS \
- $$SRC_DIR/GamePiece.h \
  $$SRC_DIR/GameState.h \
  $$SRC_DIR/GL.h \
  $$SRC_DIR/MenuHandlerBoard.h \
  $$SRC_DIR/MenuHandlerGeneric.h \
- $$SRC_DIR/MenuHandlerPiece.h \
  $$SRC_DIR/parsepp.hpp \
  $$SRC_DIR/parsepp_strings.hpp \
  $$SRC_DIR/parsepp_typelist_10.hpp \
@@ -169,7 +167,6 @@ QBOARD_HEADERS_LIB = \
  $$SRC_DIR/QBoardView.h \
  $$SRC_DIR/QGI.h \
  $$SRC_DIR/QGIDot.h \
- $$SRC_DIR/QGIGamePiece.h \
  $$SRC_DIR/QGIHtml.h \
  $$SRC_DIR/QGILine.h \
  $$SRC_DIR/QGIPiece.h \
@@ -180,11 +177,9 @@ QBOARD_HEADERS_LIB = \
 
 QBOARD_SOURCES_LIB = \
  $$S11NQT_SOURCES \
- $$SRC_DIR/GamePiece.cpp \
  $$SRC_DIR/GameState.cpp \
  $$SRC_DIR/MenuHandlerBoard.cpp \
  $$SRC_DIR/MenuHandlerGeneric.cpp \
- $$SRC_DIR/MenuHandlerPiece.cpp \
  $$SRC_DIR/PieceAppearanceWidget.cpp \
  $$SRC_DIR/PropObj.cpp \
  $$SRC_DIR/Serializable.cpp \
@@ -195,7 +190,6 @@ QBOARD_SOURCES_LIB = \
  $$SRC_DIR/QBoardScene.cpp \
  $$SRC_DIR/QBoardView.cpp \
  $$SRC_DIR/QGIDot.cpp \
- $$SRC_DIR/QGIGamePiece.cpp \
  $$SRC_DIR/QGIHtml.cpp \
  $$SRC_DIR/QGILine.cpp \
  $$SRC_DIR/QGIPiece.cpp \

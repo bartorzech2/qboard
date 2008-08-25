@@ -18,7 +18,6 @@
 #include <cmath>
 
 #include "QGIPiece.h"
-#include "GamePiece.h"
 #include "utility.h"
 #include "S11nQt.h"
 #include "S11nQtList.h"
@@ -60,8 +59,8 @@ struct QGIPiece::Impl
     }
     ~Impl()
     {
-	qDebug() << "QGIPiece: repaint count ="<<countRepaint
-		 << "cached paint count ="<<countPaintCache;
+	if(0) qDebug() << "QGIPiece: repaint count ="<<countRepaint
+		       << "cached paint count ="<<countPaintCache;
     }
     void clearPix()
     {

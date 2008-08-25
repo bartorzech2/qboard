@@ -23,7 +23,6 @@
 
 #include "QBoardView.h"
 #include "GameState.h"
-#include "GamePiece.h"
 #include "GL.h"
 #if QBOARD_USE_OPENGL
 #include <QGLWidget>
