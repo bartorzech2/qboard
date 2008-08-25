@@ -17,7 +17,7 @@ QBoard is very free-form and will allow you to use any directory structure you l
 
 If you want the QBoard GUI to show you a custom icon for a given directory, put a small (16x16 pixel) PNG-format icon file named `.diricon.png` in that directory. QBoard's file list will then show that icon instead of a folder icon. QBoard does not show files with a leading period in their name, so this file will not show up in the QBoard file browser.
 
-= Available sets =
+= Available sets (in alphabetical order) =
 
 Below are short descriptions of the gamesets released via the downloads page, in
 alphabetical order. To install a given gameset, simply unpack it to your QBoard home directory.
@@ -31,6 +31,10 @@ You can actually find many !BattleTech maps in PDF format at:
 
 Search that page for "map". But you'll need to extract them from the PDFs before using them with QBoard (their license doesn't allow us to redistribute them here). Tip: you can
 use [http://www.gimp.org The Gimp] to open the PDFs and then save them as an image file.)
+
+== GenericSciFiGroundCombat ==
+
+This set contains tons of good-looking counters created by Fransisco "Cisco" Cestero. Originally created as printable replacements for worn-out Ogre/GEV pieces, they are generic enough to be used with a variety of ground combat games. The counters tend to have a slightly sci-fi feel to them, though, and aren't suitable for WW2-themed games.
 
 
 == Hex ==
