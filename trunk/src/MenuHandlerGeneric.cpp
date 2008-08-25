@@ -133,11 +133,64 @@ void MenuHandlerCopyCut::cutList()
     clipList( m_gi, false );
 }
 
+void MenuHandlerCopyCut::cloneItem()
+{
+    if( ! m_gi ) return;
+    QGraphicsScene * sc = m_gi->scene();
+    if( ! sc ) return; // shouldn't happen
+    typedef QList<QGraphicsItem*> QGIL;
+    typedef QPair<Serializable *,QGraphicsItem *> Pair;
+    typedef QList<Pair> SL;
+    SL sl;
+    typedef QList<QGraphicsItem *> QIL;
+    QIL gl;
+    if( m_gi->isSelected() )
+    {
+	gl = sc->selectedItems();
+    }
+    else
+    {
+	gl.push_back(m_gi);
+    }
+    //sl = qboard::graphicsItemsCast<Serializable>( gl );
+    foreach( QGraphicsItem * gi, gl )
+    {
+	Serializable * ser = dynamic_cast<Serializable*>( gi );
+	if( ! ser ) continue;
+	sl.push_back( Pair(ser, gi) );
+    }
+    const int offset = 5;
+    sc->clearSelection();
+    foreach( Pair p, sl )
+    {
+	Serializable * s = p.first->clone();
+	if( ! s )
+	{
+	    qDebug() << "MenuHandlerCopyCut::cloneItem(): cloning of Serializable failed!";
+	    continue;
+	}
+	QGraphicsItem * gi = dynamic_cast<QGraphicsItem*>(s);
+	if( ! gi ) // not possible, i think, but why not...
+	{
+	    s11n::cleanup_serializable( s );
+	    continue;
+	}
+	QPointF pos( p.second->pos() + QPointF(offset,offset));
+	gi->setPos( pos );
+	gi->setZValue( gi->zValue() + 0.001 );
+	sc->addItem( gi );
+	gi->setSelected( true );
+    }
+}
+
 QMenu * MenuHandlerCopyCut::addDefaultEntries( QMenu * m, bool cut, bool list )
 {
     if( ! m_gi ) return 0;
+    if( ! dynamic_cast<Serializable *>( m_gi ) ) return 0;
     QString const icoCopy(":/QBoard/icon/editcopy.png");
     QString const icoCut(":/QBoard/icon/editcut.png");
+    m->addAction(QIcon(icoCopy),
+		 "Clone",this,SLOT(cloneItem()) );
     if( list && m_gi->isSelected() )
     {
 	m->addAction(QIcon(icoCopy),
