@@ -18,8 +18,6 @@
 #include <QGraphicsScene>
 #include <QGraphicsItem>
 #include "Serializable.h"
-#include "QGIGamePiece.h"
-#include "GamePiece.h"
 #include "utility.h"
 
 #include "S11nQtList.h"
