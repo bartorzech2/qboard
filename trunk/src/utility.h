@@ -211,27 +211,38 @@ namespace qboard
 
 
     /**
-       For each selected item in sc, an attempt is made to cast it to
+       For each item in the list, an attempt is made to cast it to
        a (T*). On success, the (T*) is added to the which is returned
        by this function. This does not change ownership of sc nor the
        (T*) contained in the returned list.
 
-       T must be a non-cv-qualified type.
+       T must(?) be a non-cv-qualified type.
     */
     template <typename T>
-    static QList<T*> selectedItemsCast( QGraphicsScene * sc )
+    static QList<T*> graphicsItemsCast( QList<QGraphicsItem*> const & src )
     {
 	typedef QList<QGraphicsItem*> QGIL;
-	QGIL sel = sc ? sc->selectedItems() : QGIL();
-	typedef QList<T *> OL;
-	OL ol;
-	for( QGIL::iterator it = sel.begin();
-	     sel.end() != it; ++it )
+	typedef QList<T*> TL;
+	TL ol;
+	for( QGIL::const_iterator it = src.begin();
+	     src.end() != it; ++it )
 	{
 	    T * obj = dynamic_cast<T*>( *it );
 	    if( obj ) ol.push_back(obj);
 	}
 	return ol;
+    }
+
+    /**
+       Equivalent to graphicsItemCast<T>(sc->selectedItems()).
+       If (!sc) then an empty list is returned.
+    */
+    template <typename T>
+    static QList<T*> selectedItemsCast( QGraphicsScene * sc )
+    {
+	return sc
+	    ? graphicsItemsCast<T>( sc->selectedItems() )
+	    : QList<T*>();
     }
 
     
