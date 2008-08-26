@@ -14,7 +14,7 @@
 #include <QDebug>
 #include <QFont>
 #include <QGraphicsItem>
-
+#include <QStringList>
 #include <cmath>
 
 #include "QGIPiece.h"
@@ -29,7 +29,7 @@
 
 struct QGIPiece::Impl
 {
-    QColor backgroundColor;
+    QColor bgColor;
     QColor borderColor;
     qreal borderSize;
     QPixmap pixmap;
@@ -37,8 +37,6 @@ struct QGIPiece::Impl
     QPixmap pixcache;
 #endif
     int borderLineStyle;
-    qreal alpha;
-    qreal borderAlpha;
     /**
        When block is true, QGIPiece will reject piece property updates.
        This is a kludge to allow QGIPiece to properly update the piece
@@ -48,14 +46,15 @@ struct QGIPiece::Impl
     bool isCovered;
     size_t countPaintCache;
     size_t countRepaint;
+    qreal alpha;
     Impl()
     {
 	isCovered = false;
 	borderSize = 1;
 	borderLineStyle = Qt::SolidLine;
 	block = false;
-	alpha = borderAlpha = 255;
 	countPaintCache = countRepaint = 0;
+	alpha = 1;
     }
     ~Impl()
     {
@@ -147,28 +146,35 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     }
     if( "color" == key )
     {
-	impl->backgroundColor = var.value<QColor>();
-	if( 255 == impl->backgroundColor.alpha() )
-	{
-	    // Bummer: this handling makes '1' a special value which
-	    // works as expected for floats and not for ints:
-	    if( impl->alpha > 1.0 ) impl->backgroundColor.setAlpha(impl->alpha);
-	    else impl->backgroundColor.setAlphaF(impl->alpha);
-	}
+ 	QColor col = var.value<QColor>();
+ 	if( 255 == col.alpha() )
+ 	{
+	    if( impl->alpha > 1 )
+	    {
+		col.setAlpha( int(impl->alpha) );
+	    }
+	    else
+	    {
+		col.setAlphaF( impl->alpha );
+	    }
+ 	}
+	impl->alpha = col.alpha();
+	impl->bgColor = col;
+	if(0) qDebug() << "QGIPiece::propertySet(color):"<<impl->bgColor<<" alpha ="<<impl->alpha;
 	impl->clearCache();
 	this->update();
 	return;
     }
     if( "colorAlpha" == key )
     {
-	impl->alpha = var.toDouble();
-	if( impl->alpha > 1.0 )
+	qreal a = impl->alpha = var.toDouble();
+	if( a > 1.0 )
 	{ // assume it's int-encoded
-	    impl->backgroundColor.setAlpha( int(impl->alpha) );
+	    impl->bgColor.setAlpha( int(a) );
 	}
 	else
 	{
-	    impl->backgroundColor.setAlphaF(impl->alpha);
+	    impl->bgColor.setAlphaF( a );
 	}
 	impl->clearCache();
     	this->update();
@@ -176,32 +182,31 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     }
     if( "borderColor" == key )
     {
-	impl->borderColor = var.value<QColor>();
-	if( 255 == impl->borderColor.alpha() )
-	{
-	    if( impl->alpha > 1.0 )
-	    { // assume it's int-encoded
-		impl->borderColor.setAlpha(impl->borderAlpha);
-	    }
-	    else
-	    {
-		impl->borderColor.setAlphaF(impl->borderAlpha);
-	    }
-	}
+// 	QColor old = impl->borderColor;
+	QColor col = var.value<QColor>();
+ 	if( 255 == col.alpha() )
+ 	{
+	    col.setAlphaF( impl->borderColor.alphaF() );
+ 	}
+	impl->borderColor = col;
+// 	if( 255 ==  )
+// 	{
+// 	    impl->borderColor.setAlphaF( old.alphaF() );
+// 	}
 	impl->clearCache();
 	this->update();
 	return;
     }
     if( "borderAlpha" == key )
     {
-	impl->borderAlpha = var.toInt();
-	if( impl->borderAlpha > 1.0 )
+	qreal a = var.toDouble();
+	if( a > 1.0 )
 	{ // assume it's int-encoded
-	    impl->borderColor.setAlpha( int(impl->borderAlpha) );
+	    impl->borderColor.setAlpha( int(a) );
 	}
 	else
 	{
-	    impl->borderColor.setAlphaF(impl->borderAlpha);
+	    impl->borderColor.setAlphaF( a );
 	}
 	impl->clearCache();
 	this->update();
@@ -498,9 +503,9 @@ void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * optio
 #endif
 	if( 1 ) // Background color
 	{
-	    if( impl->backgroundColor.isValid() )
+	    if( impl->bgColor.isValid() )
 	    {
-		cp->fillRect( bounds, impl->backgroundColor );
+		cp->fillRect( bounds, impl->bgColor );
 	    }
 	}
 	const qreal bs = impl->borderSize;
@@ -590,6 +595,20 @@ bool QGIPiece::serialize( S11nNode & dest ) const
     // object :/
     PropObj props;
     qboard::copyProperties( this, &props );
+#if 0
+    QStringList no;
+    no << "colorAlpha"
+       << "borderAlpha"
+	;
+    foreach( QString k, no )
+    {
+	props.setProperty(k.toAscii().constData(), QVariant());
+    }
+#endif
+    // i can't get the QColor alpha property to serialize (it's as if... well, no...)
+    // so we save the alpha properties separately.
+    props.setProperty("colorAlpha", impl->bgColor.alpha());
+    props.setProperty("borderAlpha", impl->borderColor.alpha());
     props.setProperty("pos", this->pos() );
     return s11n::serialize_subnode( dest,"props", props );
 }
