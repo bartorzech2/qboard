@@ -324,13 +324,17 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 		scriptFile.close();
 		rv = js.evaluate(contents,qboard::homeRelative(fn) );
 	    }
-	    if( js.hasUncaughtException() )
-	    { // in Qt 4.4.1 ^^^^ this fails!
+#if QT_VERSION >= 0x040400
+	    if( rv.isError() )
+#else
+	    if( js.hasUncaughtException() ) // in Qt 4.4.1 this fails!
+#endif
+	    {
 		QStringList bt( js.uncaughtExceptionBacktrace() );
-		QScriptValue exv = js.uncaughtException();
-		QString msg("Script threw an exception:\n");
+		QScriptValue exv = rv.isError() ? rv : js.uncaughtException();
+		QString msg("Script threw or returned an exception:\n");
 		msg += exv.toString()
-		    + "Backtrace:\n"
+		    + "\nBacktrace:\n"
 		    + bt.join("\n");
 		QMessageBox::warning( this, "JavaScript Exception",
 				      msg,
