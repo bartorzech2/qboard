@@ -54,8 +54,9 @@ REL_SRCDIR = $$(PWD)
 REL_SRCDIR=$$replace(REL_SRCDIR,$$TOP_SRCDIR/,)
 REL_SRCDIR=$$replace(REL_SRCDIR,[^/]+,..)
 
-CONFIG += stl warn_on debug ordered script
-# CONFIG += debug_and_release
+QBOARD_QMAKE_CONFIG = script
+CONFIG += warn_on debug script
+# CONFIG +=  ordered debug_and_release
 
 VERSION = $$QBOARD_VERSION
 message(QBoard version $$QBOARD_VERSION)
@@ -159,7 +160,6 @@ QBOARD_HEADERS_LIB = \
  $$SRC_DIR/PieceAppearanceWidget.h \
  $$SRC_DIR/PropObj.h \
  $$SRC_DIR/Serializable.h \
- $$SRC_DIR/QBBatch.h \
  $$SRC_DIR/QBoard.h \
  $$SRC_DIR/QBoardHomeView.h \
  $$SRC_DIR/QBoardPlugin.h \
@@ -183,7 +183,6 @@ QBOARD_SOURCES_LIB = \
  $$SRC_DIR/PieceAppearanceWidget.cpp \
  $$SRC_DIR/PropObj.cpp \
  $$SRC_DIR/Serializable.cpp \
- $$SRC_DIR/QBBatch.cpp \
  $$SRC_DIR/QBoard.cpp \
  $$SRC_DIR/QBoardHomeView.cpp \
  $$SRC_DIR/QBoardPlugin.cpp \
