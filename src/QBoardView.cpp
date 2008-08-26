@@ -11,6 +11,7 @@
  *
  */
 
+#include <QApplication>
 #include <QScrollBar>
 #include <QImage>
 #include <cmath>
@@ -20,6 +21,7 @@
 #include <QMouseEvent>
 #include <QDragMoveEvent>
 #include <QGraphicsScene>
+#include <QAction>
 
 #include "QBoardView.h"
 #include "GameState.h"
@@ -86,7 +88,35 @@ QBoardView::QBoardView( GameState & gs ) :
 
     //this->setCacheMode(QGraphicsView::CacheBackground);
     this->setOptimizationFlags( QGraphicsView::DontClipPainter );
+#if 0
+    // i can't seem to get local hotkeys for these objects. i have to
+    // rely on app-global shortcuts. :(
+    Qt::ShortcutContext cx( Qt::WindowShortcut );
+#if QT_VERSION >= 0x040400
+    cx = Qt::WidgetWithChildrenShortcut;
+#endif
+    QObject * acp = this; // this->viewport();
+    QAction * ac = new QAction(acp);
+    ac->setObjectName(QString::fromUtf8("actionCopy"));
+    ac->setIcon(QIcon(QString::fromUtf8(":/QBoard/icon/editcopy.png")));
+    ac->setShortcut(QString("Ctrl+C"));
+    ac->setShortcutContext(cx);
+    connect(ac,SIGNAL(triggered(bool)), this,SLOT(clipCopy()));
 
+    ac = new QAction(acp);
+    ac->setObjectName(QString::fromUtf8("actionCut"));
+    ac->setIcon(QIcon(QString::fromUtf8(":/QBoard/icon/editccut.png")));
+    ac->setShortcut(QString("Ctrl+X"));
+    ac->setShortcutContext(cx);
+    connect(ac,SIGNAL(triggered(bool)), this,SLOT(clipCut()));
+    
+    ac = new QAction(acp);
+    ac->setObjectName(QString::fromUtf8("actionPaste"));
+    ac->setIcon(QIcon(QString::fromUtf8(":/QBoard/icon/editpaste.png")));
+    ac->setShortcut(QString("Ctrl+V"));
+    ac->setShortcutContext(cx);
+    connect(ac,SIGNAL(triggered(bool)), this,SLOT(clipPaste()));
+#endif
     this->updateBoardPixmap();
 
 }
@@ -163,6 +193,83 @@ bool QBoardView::event( QEvent * e )
 	break;
     }
     return this->QGraphicsView::event(e);
+}
+
+
+static QGraphicsItem * firstSelectedQGI( QGraphicsScene * sc )
+{
+    if( ! sc ) return 0;
+    typedef QList<QGraphicsItem *> QGIL;
+    QGIL li = sc->selectedItems();
+    QGraphicsItem * qgi = 0;
+    for( QGIL::iterator it = li.begin();
+	 li.end() != it; ++it )
+    {
+	if( (*it)->isSelected() )
+	{
+	    qgi = *it;
+	    break;
+	}
+    }
+    return qgi;
+}
+
+static void clipboardQGI( QGraphicsScene * sc, bool copy )
+{
+    QGraphicsItem * qgi = firstSelectedQGI( sc );
+    if( qgi )
+    {
+	QPoint pos;
+#if 0
+	// Works!
+	QRectF r( qboard::calculateBounds( qgi ) );
+	qDebug() << "clipboardQGI() rect ="<<r;
+	pos = r.topLeft().toPoint();
+#else
+	pos = qboard::calculateCenter( qgi ).toPoint();
+	qDebug() << "clipboardQGI() center ="<<pos;
+	//pos = qgi->pos().toPoint();
+	//pos = qboard::calculateCenter(qgi).toPoint();
+	//pos = impl->gv->placementPos();// works, but barely
+#endif
+	qDebug() << "clipboardQGI() pos ="<<pos;
+	qboard::clipboardScene( qgi->scene(), copy, pos );
+    }
+    return;
+}
+
+void QBoardView::clipCopy()
+{
+    clipboardQGI( impl->gs.scene(), true  );
+}
+
+void QBoardView::clipCut()
+{
+    clipboardQGI( impl->gs.scene(), false  );
+}
+
+static QPoint findBoardPastePoint( QGraphicsView * board )
+{
+    QPoint ret;
+    QWidget * vp = board->viewport();
+    if(1) qDebug() << "findBoardPastePoint("<<board<<") viewport ="<<vp
+		   << "viewport parent ="<<vp->parent();
+    QPoint glpos( QCursor::pos() );
+    QWidget * wa = QApplication::widgetAt( glpos );
+    if(0) qDebug() << "findBoardPastePoint("<<board<<") widgetAt("<<glpos<<") ="<<wa;
+    if( wa != vp ) return ret;
+    ret = board->mapToScene( board->mapFromGlobal(glpos) ).toPoint();
+    if(0) qDebug() << "findBoardPastePoint("<<board<<") ret ="<<ret;
+    return ret;
+}
+
+void QBoardView::clipPaste()
+{
+    //bool pasteGraphicsItems( impl->gs, QPoint() );
+    //impl->gs.pasteClipboard( QPoint() );
+    impl->gs.pasteClipboard( findBoardPastePoint(this) );
+    //impl->gs.pasteClipboard( impl->gv->placementPos() ); // too randomish
+
 }
 
 
