@@ -7,13 +7,21 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top. Dates written extra large are release dates.
 
 ----
+*2008 August 26:*
+
+- Double-clicking .js files now runs them in the GameState's JavaScript engine.
+
+- The Clone command now works properly for child objects (i.e. gives the clone the same parent).
+
 *2008 August 25:*
 
 - Removed the classes GamePiece, QGIGamePiece, and friends. This means that games saved with QBoard older than v20080820 will no longer load (or at least not completely load).
 
 - Added Clone option to the copy/cut item menus. Cloning an item (or selected items) creates a copy of those items and places it directly on top of the original item, offset by a small amount.
 
-- Started adding JavaScript support. Not yet sure where that's going, but it could be pretty cool. Removed QBoardBatch because JS will quickly make it useless.
+- Started adding JavaScript support. Not yet sure where that's going, but it could be pretty cool.
+
+- Removed QBoardBatch because JS will quickly make it useless.
 
 
 *2008 August 24:*
