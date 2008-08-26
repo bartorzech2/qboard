@@ -183,6 +183,7 @@ void MenuHandlerCopyCut::cloneItem()
 	QPointF pos( p.second->pos() + QPointF(offset,offset));
 	gi->setPos( pos );
 	gi->setZValue( gi->zValue() + 0.001 );
+	gi->setParentItem( p.second->parentItem() );
 	sc->addItem( gi );
 	gi->setSelected( true );
     }
