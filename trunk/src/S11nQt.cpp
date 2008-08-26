@@ -94,11 +94,11 @@ bool QColor_s11n::operator()( S11nNode const & src, QColor & dest ) const
 {
 	typedef s11nlite::node_traits NT;
 	std::string key("rgba");
-	bool hasAlpha = true;
+	bool alphaKey = true;
 	std::string sval = NT::get( src, key, std::string() );
 	if( sval.empty() )
 	{
-	    hasAlpha = false;
+	    alphaKey = false;
 	    key = "rgb";
 	    sval = NT::get( src, key, std::string() );
 	}
@@ -111,11 +111,20 @@ bool QColor_s11n::operator()( S11nNode const & src, QColor & dest ) const
 	DO(setGreen);
 	DO(setBlue);
 #undef DO
-	if( hasAlpha )
+	if( alphaKey )
 	{
-	    is >> fl;
-	    nil.setAlpha( fl );
+	    int a;
+	    is >> a;
+	    nil.setAlpha( a );
 	}
+#if 0
+	qreal a = NT::get( src, "alpha", -1.0 );
+	if( a >= 0 )
+	{
+	    if( a > 1 ) nil.setAlpha(int(a));
+	    else nil.setAlphaF(a);
+	}
+#endif
 	dest = nil;
 	return true;	
 }
