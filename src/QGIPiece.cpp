@@ -62,7 +62,7 @@ struct QGIPiece::Impl
 	if(0) qDebug() << "QGIPiece: repaint count ="<<countRepaint
 		       << "cached paint count ="<<countPaintCache;
     }
-    void clearPix()
+    void clearCache()
     {
 #if QGIPiece_USE_PIXCACHE
 	pixcache = QPixmap();
@@ -148,16 +148,14 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     if( "color" == key )
     {
 	impl->backgroundColor = var.value<QColor>();
-	impl->backgroundColor.setAlpha(impl->alpha);
-	impl->clearPix();
-	this->update();
-	return;
-    }
-    if( "borderColor" == key )
-    {
-	impl->borderColor = var.value<QColor>();
-	impl->borderColor.setAlpha(impl->borderAlpha);
-	impl->clearPix();
+	if( 255 == impl->backgroundColor.alpha() )
+	{
+	    // Bummer: this handling makes '1' a special value which
+	    // works as expected for floats and not for ints:
+	    if( impl->alpha > 1.0 ) impl->backgroundColor.setAlpha(impl->alpha);
+	    else impl->backgroundColor.setAlphaF(impl->alpha);
+	}
+	impl->clearCache();
 	this->update();
 	return;
     }
@@ -172,8 +170,26 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	{
 	    impl->backgroundColor.setAlphaF(impl->alpha);
 	}
-	impl->clearPix();
+	impl->clearCache();
     	this->update();
+	return;
+    }
+    if( "borderColor" == key )
+    {
+	impl->borderColor = var.value<QColor>();
+	if( 255 == impl->borderColor.alpha() )
+	{
+	    if( impl->alpha > 1.0 )
+	    { // assume it's int-encoded
+		impl->borderColor.setAlpha(impl->borderAlpha);
+	    }
+	    else
+	    {
+		impl->borderColor.setAlphaF(impl->borderAlpha);
+	    }
+	}
+	impl->clearCache();
+	this->update();
 	return;
     }
     if( "borderAlpha" == key )
@@ -187,7 +203,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	{
 	    impl->borderColor.setAlphaF(impl->borderAlpha);
 	}
-	impl->clearPix();
+	impl->clearCache();
 	this->update();
 	return;
     }
@@ -195,13 +211,13 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     {
 	double bs = var.toDouble();;
 	impl->borderSize = (bs >= 0) ? bs : 0;
-	impl->clearPix();
+	impl->clearCache();
 	this->update();
 	return;
     }
     if( "borderStyle" == key )
     {
-	impl->clearPix();
+	impl->clearCache();
 	if( var.type() == QVariant::Int )
 	{
 	    const int i = var.toInt();
@@ -236,7 +252,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     }
     if( "size" == key )
     {
-	impl->clearPix();
+	impl->clearCache();
 	if( impl->pixmap.isNull() )
 	{
 	    QPixmap bogus( var.toSize() );
@@ -263,14 +279,14 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     {
 	int i = var.toInt();
 	impl->isCovered = (0 != i);
-	impl->clearPix();
+	impl->clearCache();
 	this->update();
 	return;
     }
     if( "pixmap" == key )
     {
 	this->prepareGeometryChange();
-	impl->clearPix();
+	impl->clearCache();
 	QPixmap pix;
 	if( var.canConvert<QPixmap>() )
 	{
