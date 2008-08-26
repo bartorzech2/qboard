@@ -13,7 +13,7 @@ are at the top. Dates written extra large are release dates.
 
 - Added Clone option to the copy/cut item menus. Cloning an item (or selected items) creates a copy of those items and places it directly on top of the original item, offset by a small amount.
 
-- Started adding JavaScript support. Not yet sure where that's going, but it could be pretty cool.
+- Started adding JavaScript support. Not yet sure where that's going, but it could be pretty cool. Removed QBoardBatch because JS will quickly make it useless.
 
 
 *2008 August 24:*
