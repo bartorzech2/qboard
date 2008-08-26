@@ -3,7 +3,8 @@ TEMPLATE = app
 QT += script svg
 QMAKE_CXXFLAGS = $$QBOARD_CXXFLAGS
 RESOURCES = $$RESOURCES_DIR/icons.qrc \
-	$$RESOURCES_DIR/help.qrc
+	$$RESOURCES_DIR/help.qrc \
+	$$RESOURCES_DIR/javascript.qrc
 
 FORMS = \
  $$UI_SRCDIR/AboutQBoard.ui \
