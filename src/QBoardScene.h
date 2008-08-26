@@ -34,6 +34,7 @@ protected:
 			    QGraphicsItem ** items,
 			    const QStyleOptionGraphicsItem * options,
 			    QWidget * widget = 0 );
+    bool event( QEvent * event );
 private:
     struct Impl;
     Impl * impl;

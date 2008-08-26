@@ -2,7 +2,7 @@
 #include <QPainter>
 #include <QGraphicsItem>
 #include <QDebug>
-
+#include <QEvent>
 #include "QBoardScene.h"
 #include "utility.h"
 
@@ -27,7 +27,8 @@ QBoardScene::~QBoardScene()
     delete impl;
 }
 
-static void paintLinesToChildren( QGraphicsItem * qgi,
+//static
+void paintLinesToChildren( QGraphicsItem * qgi,
 				  QPainter * painter,
 				  QPen const & pen )
 {
@@ -87,3 +88,16 @@ bool QBoardScene::deserialize( S11nNode const & src )
 }
 
 
+bool QBoardScene::event( QEvent * event )
+{
+    /**
+       Apparently there's no way in hell to get notification
+       of a new child object. addItem()/removeItem() are not virtual
+       and ChildAdded/Removed events are limited to QObjects (which
+       QGraphicsScene is not).
+
+       That's a pisser.
+    */
+    if(0) qDebug() << "QBoardScene::event(): type =="<<event->type();
+    return this->QGraphicsScene::event(event);
+}
