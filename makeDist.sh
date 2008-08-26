@@ -32,11 +32,15 @@ for d in $sdirs; do
 	| sed -e '/\/bak/d' \
 	-e '/\/nono/d' \
 	-e '/\/debug/d' \
+	-e '/\/release/d' \
 	-e '/\.#/d' \
+	-e '/\.svn/d' \
+	-e '/qrc_*.cpp/d' \
 	> filelist
     cp --parents $(cat filelist) $DEST || {
 	err=$?
 	echo "Copy failed!"
+	rm filelist
 	exit $err
     }
     rm filelist
