@@ -17,6 +17,10 @@ QBoard is very free-form and will allow you to use any directory structure you l
 
 If you want the QBoard GUI to show you a custom icon for a given directory, put a small (16x16 pixel) PNG-format icon file named `.diricon.png` in that directory. QBoard's file list will then show that icon instead of a folder icon. QBoard does not show files with a leading period in their name, so this file will not show up in the QBoard file browser.
 
+If you want to include HTML content in your set, you may do so, but only QBoard built with
+Qt 4.4+ can use it. HTML may use IMG with paths relative to the directory containing the HTML file, and they will be displayed as expected. In this way you can, for example, create charts of the available game pieces and their descriptions. The HTML documents may also include JavaScript code, insofar as it is supported by Qt's QWebKit classes. (i have successfully used the [http://www.jquery.com jQuery JS library] with it, and it seems to work fine.)
+
+
 = Available sets (in alphabetical order) =
 
 Below are short descriptions of the gamesets released via the downloads page, in
