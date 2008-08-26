@@ -19,9 +19,9 @@
 #include <QVariant>
 
 QBoard::QBoard() 
-    : QObject(), Serializable("QBoard")
+    : QObject(),
+      Serializable("QBoard")
 {
-    this->s11nFileExtension( ".QBoard" );
 }
 
 QBoard::~QBoard()
@@ -44,16 +44,12 @@ bool QBoard::event( QEvent * e )
 		    this->m_file.clear();
 		    this->m_px = var.value<QPixmap>();
 		}
-		else if( var.isValid() )
+		else if( var.canConvert<QString>() )
 		{
-		    this->load( var.toString() );
+		    this->m_file = var.value<QString>();
+		    this->m_px = QPixmap(m_file);
 		}
-		else
-		{
-		    this->m_file = QString();
-		    this->m_px = QPixmap();
-		}
-		emit loaded();
+		emit loadedBoard();
 	    }
 	    return true;
 	}
@@ -98,7 +94,7 @@ bool QBoard::deserialize(  S11nNode const & src )
 				   psz.width(), psz.height() );
     }
 #else
-    if( ! this->load(this->m_file) ) return false;
+    if( ! this->s11nLoad(this->m_file) ) return false;
 #endif
     return true;
 }
@@ -138,28 +134,29 @@ void QBoard::clear()
 #endif
 }
 
-bool QBoard::save( QString const & fn) const
+bool QBoard::s11nSave( QString const & fn) const
 {
-    return this->Serializable::save(fn, true);
+    return this->Serializable::s11nSave(fn, true);
 }
-bool QBoard::load( QString const & fn )
+
+bool QBoard::loadPixmap( QString const & fn )
 {
+    this->setProperty("pixmap",QVariant(fn));
+    return !m_px.isNull();
+}
+
+bool QBoard::s11nLoad( QString const & fn )
+{
+    if( fn.isEmpty() ) return false;
     this->m_file = fn;
     if( this->fileNameMatches(fn) )
     {
-	if( this->Serializable::load( fn ) )
-	{
-	    emit loaded();
-	    return true;
-	}
+	bool ret = this->Serializable::s11nLoad( fn );
+	if( ret ) emit loadedBoard();
+	return ret;
     }
     else
     {
-	if( this->m_px.load(fn) )
-	{
-	    emit loaded();
-	    return true;
-	}
+	return this->loadPixmap(fn);
     }
-    return false;
 }

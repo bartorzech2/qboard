@@ -62,7 +62,7 @@ QBoardView::QBoardView( GameState & gs ) :
 {
     this->setProperty("scale", 1.0);
     this->setProperty("angle", 0.0);
-    connect( &impl->board, SIGNAL(loaded()), this, SLOT(updateBoardPixmap()) );
+    connect( &impl->board, SIGNAL(loadedBoard()), this, SLOT(updateBoardPixmap()) );
     this->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     this->setInteractive(true);
     this->setTransformationAnchor(QGraphicsView::NoAnchor);

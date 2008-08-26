@@ -68,6 +68,13 @@ public:
 //     */
 //     QPoint placementPos() const;
 
+    static char const * KeyClipboard;
+
+    QScriptEngine & jsEngine();
+
+public Q_SLOTS:
+
+
     /**
        Tries to paste the contents of the clipboard into the current
        game. pos is a reference position, and the positions of clipboarded
@@ -75,11 +82,6 @@ public:
     */
     bool pasteClipboard( QPoint const & pos );
 
-    static char const * KeyClipboard;
-
-    QScriptEngine & jsEngine();
-
-public Q_SLOTS:
     void clear();
 //     /**
 //        Sets the "placement position". If addPiece(piece,true) is called,
@@ -87,8 +89,8 @@ public Q_SLOTS:
 //     */
 //     void setPlacementPos( QPoint const & );
     /**
-       Transfers ownership of the item to this object's
-       QGraphicsScene.
+       If it returns true, it transfers ownership of the item to this
+       object's QGraphicsScene, otherwise the caller owns the item.
     */
     bool addItem( QGraphicsItem * item );
 

@@ -28,6 +28,7 @@
 #include "QBoard.h"
 #include "QBoardScene.h"
 #include "S11nClipboard.h"
+#include "ScriptQt.h"
 
 #include <s11n.net/s11n/s11n_debuggering_macros.hpp>
 
@@ -114,67 +115,9 @@ static QScriptValue jsEtGameProperty(QScriptContext *context,
     return QScriptValue();
 }
 
-QScriptValue QPoint_ctor(QScriptContext *context, QScriptEngine *engine)
-{
-    int argc = context->argumentCount();
-    int x = (argc>0) ? context->argument(0).toInt32() : 0;
-    int y = (argc>1) ? context->argument(1).toInt32() : x;
-    return engine->toScriptValue(QPoint(x, y));
-}
-
-QScriptValue QSize_ctor(QScriptContext *context, QScriptEngine *engine)
-{
-    int argc = context->argumentCount();
-    int x = (argc>0) ? context->argument(0).toInt32() : 0;
-    int y = (argc>1) ? context->argument(1).toInt32() : x;
-    return engine->toScriptValue(QSize(x, y));
-}
-
-QScriptValue QColor_ctor(QScriptContext *context, QScriptEngine *engine)
-{
-    int argc = context->argumentCount();
-    if( ! argc ) return engine->toScriptValue(QColor());
-    if( 1 == argc )
-    {
-	QScriptValue arg = context->argument(0);
-	if( arg.isNumber() )
-	{
-	    return engine->toScriptValue(QColor(arg.toInt32()));
-	}
-	else if( arg.isString() )
-	{
-	    return engine->toScriptValue(QColor(arg.toString()));
-	}
-	return QScriptValue();
-    }
-    if( (3 == argc) || (4 == argc) )
-    {
-	int arg = 0;
-	int r = context->argument(arg++).toInt32();
-	int g = context->argument(arg++).toInt32();
-	int b = context->argument(arg++).toInt32();
-	int a = ( argc == 4 )
-	    ? context->argument(arg++).toInt32()
-	    : 255;
-	return engine->toScriptValue(QColor(r,g,b,a));
-    }
-    return QScriptValue();
-}
 
 //Q_DECLARE_METATYPE(QGraphicsItem*);
 
-QScriptValue qgiToScriptValue(QScriptEngine *engine, QGraphicsItem* const &in)
-{
-    QObject * obj = dynamic_cast<QObject*>(in);
-    return obj
-	? engine->newQObject(obj)
-	: QScriptValue();
-}
-
-void qgiFromScriptValue(const QScriptValue &object, QGraphicsItem* &out)
-{
-    out = dynamic_cast<QGraphicsItem*>(object.toQObject());
-}
 
 
 GameState::GameState() :
@@ -194,7 +137,7 @@ GameState::~GameState()
 
 void GameState::setup()
 {
-    impl->js = new QScriptEngine(this);
+    impl->js = qboard::createScriptEngine(this);
     impl->jsThis = impl->js->newQObject( this,
 					 QScriptEngine::QtOwnership,
 					 QScriptEngine::AutoCreateDynamicProperties
@@ -205,23 +148,21 @@ void GameState::setup()
     {
 	throw std::runtime_error("GameState::setup(): jsThis is not a QObject.");
     }
-    QScriptValue sval = impl->js->newFunction(jsEtGameProperty);
+    QScriptValue sval;
+#if 0
+    sval = impl->js->newFunction(jsEtGameProperty);
     if( ! sval.isFunction() )
     {
 	throw std::runtime_error("GameState::setup(): could not create JS function.");
     }
     impl->jsThis.setProperty( "P", sval );
     impl->jsThis.setProperty( "x", QScriptValue(impl->js,"hi") );
+#endif
     sval = impl->js->newQObject(&impl->board,
-					 QScriptEngine::QtOwnership,
-					 QScriptEngine::AutoCreateDynamicProperties
+				QScriptEngine::QtOwnership,
+				QScriptEngine::AutoCreateDynamicProperties
 				);
     impl->jsThis.setProperty( "board", sval );
-    glob.setProperty("QPoint", impl->js->newFunction(QPoint_ctor));
-    glob.setProperty("QSize", impl->js->newFunction(QSize_ctor));
-    glob.setProperty("QColor", impl->js->newFunction(QColor_ctor));
-    qScriptRegisterMetaType(impl->js, qgiToScriptValue, qgiFromScriptValue); 
-
 }
 // QPoint GameState::placementPos() const
 // {

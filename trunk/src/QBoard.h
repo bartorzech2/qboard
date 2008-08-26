@@ -45,14 +45,20 @@ public Q_SLOTS:
     /**
        Reimplemented to accept image files as an argument.
     */
-    virtual bool load( QString const & );
-    virtual bool save( QString const & ) const;
+    virtual bool s11nLoad( QString const & );
+    virtual bool s11nSave( QString const & ) const;
+
+    /**
+       Tries to load the given pixmap, returning true on success,
+       false on error.
+    */
+    bool loadPixmap( QString const & );
     /**
        Clears the state of the board.
     */
     void clear();
 Q_SIGNALS:
-	void loaded();
+	void loadedBoard();
 private:
 	QString m_file;
 	QPixmap m_px;

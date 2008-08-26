@@ -66,11 +66,11 @@ public:
        Subclasses may reimplement to, e.g., support other
        file types.
     */
-    virtual bool load( QString const & );
+    virtual bool s11nLoad( QString const & );
     /**
        Loads this object from the given stream.
      */
-    virtual bool load( std::istream & );
+    virtual bool s11nLoad( std::istream & );
     /**
        Serializes this object's state to the given file.  If a
        s11nFileExtension() has been set and autoAddFileExtension is
@@ -82,11 +82,11 @@ public:
        The autoAddFileExtension parameter SHOULD default to true,
        but i don't like the idea of virtuals having default values.
     */
-    virtual bool save( QString const &, bool autoAddFileExtension ) const;
+    virtual bool s11nSave( QString const &, bool autoAddFileExtension ) const;
     /**
        Saves this object to the given stream using serialize().
     */
-    virtual bool save( std::ostream & ) const;
+    virtual bool s11nSave( std::ostream & ) const;
     /**
        Returns the file extension associated with this type.
     */
@@ -144,7 +144,7 @@ protected:
     void s11nClass( char const * );
     /**
        Sets the file extension for this type. When
-       save() is called, that file extension is
+       s11nSave() is called, that file extension is
        appended to the filename automatically
        if needed. The extension may be 0.
 		

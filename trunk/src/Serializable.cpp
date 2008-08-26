@@ -126,11 +126,11 @@ void Serializable::s11nFileExtension( char const * ext )
     impl->ext = ext ? ext : "";
 }
 
-bool Serializable::save( std::ostream & os) const
+bool Serializable::s11nSave( std::ostream & os) const
 {
     return s11nlite::save<Serializable>( *this, os );
 }
-bool Serializable::load( std::istream & is )
+bool Serializable::s11nLoad( std::istream & is )
 {
     typedef std::auto_ptr<S11nNode> NP;
     NP np( s11nlite::load_node( is ) );
@@ -139,7 +139,7 @@ bool Serializable::load( std::istream & is )
 	: false;
 }
 
-bool Serializable::save( QString const & src, bool autoAddFileExtension ) const
+bool Serializable::s11nSave( QString const & src, bool autoAddFileExtension ) const
 {
     QString rn( src );
     if( autoAddFileExtension && ! impl->ext.empty() )
@@ -154,7 +154,7 @@ bool Serializable::save( QString const & src, bool autoAddFileExtension ) const
     return s11nlite::save<Serializable>( *this, rn.toAscii().constData() );
 }
 
-bool Serializable::load( QString const & fn)
+bool Serializable::s11nLoad( QString const & fn)
 {
     if( fn.isEmpty() ) return false;
     typedef std::auto_ptr<S11nNode> NP;
@@ -168,6 +168,7 @@ bool Serializable::fileNameMatches( QString const & fn ) const
 {
     if( impl->ext.empty() ) return false;
     char const * ext = impl->ext.c_str();
+    if( ! ext ) return false;
     QString pat(ext);
     pat.replace( ".", "\\." );
     pat.append("$");
