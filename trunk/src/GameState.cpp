@@ -18,6 +18,9 @@
 #include <QList>
 #include <QScriptEngine>
 
+
+#include <stdexcept>
+
 #include "S11nQt.h"
 #include "S11nQtList.h"
 #include "QGIPiece.h"
@@ -35,34 +38,151 @@ struct GameState::Impl
     mutable QGraphicsScene * scene;
     /** lameKludge exists for the "addPiece() QGraphicsItem return workaround" */
     QGraphicsItem * lameKludge;
+    QScriptValue jsThis;
+    QScriptEngine * js;
     Impl() :
 	board(),
 	scene( new QBoardScene() ),
 	lameKludge(0),
-	engine(0)
+	jsThis(),
+	js(0)
     {
 	scene->setSceneRect( QRectF(0,0,200,200) );
     }
     ~Impl()
     {
-	delete this->engine;
 	delete this->scene;
     }
-    QScriptEngine * js()
-    {
-	if( ! engine ) engine = new QScriptEngine;
-	return engine;
-    }
 
-private:
-    QScriptEngine * engine;
 
 };
+/**
+   Requires:
+
+   $1 = QObject target
+   $2 = property name
+   $3 = value
+*/
+static QScriptValue jsEtGameProperty(QScriptContext *context,
+				     QScriptEngine *engine)
+{
+    const int argc = context->argumentCount();
+    qDebug() << "jsEtGameProperty: argc =="<<argc;
+    if( argc < 2 ) return QScriptValue();
+    int arg = 0;
+    QScriptValue so( context->argument(arg++) );
+    QObject * o = so.toQObject();
+    if( ! o ) return QScriptValue();
+    if( argc == 3 )
+    {
+	QString k = context->argument(arg++).toString();
+	if( k.isEmpty() ) return QScriptValue();
+	QScriptValue sv( context->argument(arg++) );
+	QVariant v( sv.toVariant() );
+	//if( ! v.isValid() ) return QScriptValue();
+	char const * key = k.toAscii().constData();
+	qDebug() << "jsEtGameProperty: SET"<<k<<" ="<<v;
+	so.setProperty( key, sv );
+	o->setProperty( key, v );
+	return QScriptValue();
+    }
+    else if( 2 == argc )
+    {
+	QString key = context->argument(1).toString();
+	if( ! key.isEmpty() ) return QScriptValue();
+	QVariant const var( o->property(key.toAscii().constData()) );
+	qDebug() << "jsEtGameProperty: GET"<<key<<" ="<<var;
+	if( ! var.isValid() ) return QScriptValue();
+	const int vt = var.type();
+	switch(vt)
+	{
+#define VT(T,F) case QVariant::T: return QScriptValue(engine,F);
+	    VT(Int,var.toInt());
+	    VT(UInt,var.toUInt());
+	    VT(Double,qsreal(var.toDouble()));
+	    VT(Bool,var.toBool());
+	    VT(String,var.toString());
+#undef VT
+#define VT(T,V) case QVariant::T: return engine->newVariant( var.value<V>() );
+	    VT(Point,QPoint);
+	    VT(Size,QSize);
+#undef VT
+	  default:
+	      break;
+	};
+    }
+    return QScriptValue();
+}
+
+QScriptValue QPoint_ctor(QScriptContext *context, QScriptEngine *engine)
+{
+    int argc = context->argumentCount();
+    int x = (argc>0) ? context->argument(0).toInt32() : 0;
+    int y = (argc>1) ? context->argument(1).toInt32() : x;
+    return engine->toScriptValue(QPoint(x, y));
+}
+
+QScriptValue QSize_ctor(QScriptContext *context, QScriptEngine *engine)
+{
+    int argc = context->argumentCount();
+    int x = (argc>0) ? context->argument(0).toInt32() : 0;
+    int y = (argc>1) ? context->argument(1).toInt32() : x;
+    return engine->toScriptValue(QSize(x, y));
+}
+
+QScriptValue QColor_ctor(QScriptContext *context, QScriptEngine *engine)
+{
+    int argc = context->argumentCount();
+    if( ! argc ) return engine->toScriptValue(QColor());
+    if( 1 == argc )
+    {
+	QScriptValue arg = context->argument(0);
+	if( arg.isNumber() )
+	{
+	    return engine->toScriptValue(QColor(arg.toInt32()));
+	}
+	else if( arg.isString() )
+	{
+	    return engine->toScriptValue(QColor(arg.toString()));
+	}
+	return QScriptValue();
+    }
+    if( (3 == argc) || (4 == argc) )
+    {
+	int arg = 0;
+	int r = context->argument(arg++).toInt32();
+	int g = context->argument(arg++).toInt32();
+	int b = context->argument(arg++).toInt32();
+	int a = ( argc == 4 )
+	    ? context->argument(arg++).toInt32()
+	    : 255;
+	return engine->toScriptValue(QColor(r,g,b,a));
+    }
+    return QScriptValue();
+}
+
+//Q_DECLARE_METATYPE(QGraphicsItem*);
+
+QScriptValue qgiToScriptValue(QScriptEngine *engine, QGraphicsItem* const &in)
+{
+    QObject * obj = dynamic_cast<QObject*>(in);
+    return obj
+	? engine->newQObject(obj)
+	: QScriptValue();
+}
+
+void qgiFromScriptValue(const QScriptValue &object, QGraphicsItem* &out)
+{
+    out = dynamic_cast<QGraphicsItem*>(object.toQObject());
+}
+
 
 GameState::GameState() :
+    QObject(),
     Serializable("GameState"),
     impl(new Impl)
 {
+    this->setup();
 }
 
 
@@ -72,6 +192,37 @@ GameState::~GameState()
     delete impl;
 }
 
+void GameState::setup()
+{
+    impl->js = new QScriptEngine(this);
+    impl->jsThis = impl->js->newQObject( this,
+					 QScriptEngine::QtOwnership,
+					 QScriptEngine::AutoCreateDynamicProperties
+					 );
+    QScriptValue glob( impl->js->globalObject() );
+    glob.setProperty( "qboard", impl->jsThis );
+    if( ! impl->jsThis.isQObject() )
+    {
+	throw std::runtime_error("GameState::setup(): jsThis is not a QObject.");
+    }
+    QScriptValue sval = impl->js->newFunction(jsEtGameProperty);
+    if( ! sval.isFunction() )
+    {
+	throw std::runtime_error("GameState::setup(): could not create JS function.");
+    }
+    impl->jsThis.setProperty( "P", sval );
+    impl->jsThis.setProperty( "x", QScriptValue(impl->js,"hi") );
+    sval = impl->js->newQObject(&impl->board,
+					 QScriptEngine::QtOwnership,
+					 QScriptEngine::AutoCreateDynamicProperties
+				);
+    impl->jsThis.setProperty( "board", sval );
+    glob.setProperty("QPoint", impl->js->newFunction(QPoint_ctor));
+    glob.setProperty("QSize", impl->js->newFunction(QSize_ctor));
+    glob.setProperty("QColor", impl->js->newFunction(QColor_ctor));
+    qScriptRegisterMetaType(impl->js, qgiToScriptValue, qgiFromScriptValue); 
+
+}
 // QPoint GameState::placementPos() const
 // {
 //     return impl->placeAt;
@@ -84,14 +235,117 @@ GameState::~GameState()
 // }
 
 
+QScriptEngine & GameState::jsEngine()
+{
+    return *impl->js;
+}
+static QScriptValue getObjectPos(QScriptContext *context, QScriptEngine *engine)
+ {
+     qDebug() << "GameState static getObjectPos()";
+     QGraphicsItem * gi = engine->fromScriptValue<QGraphicsItem*>( context->argument(0) );
+     return gi
+	 ? QScriptValue(engine,"this is not a point")
+	 : engine->toScriptValue<QPoint>( gi->pos().toPoint() );
+//      if (context->argumentCount() == 1) // writing?
+//          callee.setProperty("value", context->argument(0));
+//     return callee.property("value");
+ }
+
+QObject * GameState::createObject( QString const & className )
+{
+    Serializable * s = s11n::cl::classload<Serializable>( className.toAscii().constData() );
+    if( ! s )
+    {
+	qDebug() <<"GameState::createObject("<<className<<") classload failed.";
+	return 0;
+    }
+    QObject * o = dynamic_cast<QObject*>(s);
+    if( ! o )
+    {
+	qDebug() <<"GameState::createObject(obj) object not-a QGraphicsItem.";
+	s11n::cleanup_serializable( s );
+	return 0;
+    }
+    QScriptValue v = impl->js->newQObject(o,
+					  QScriptEngine::AutoOwnership
+					  //QScriptEngine::AutoCreateDynamicProperties
+					  //| QScriptEngine::PreferExistingWrapperObject
+					  );
+    v.setProperty("x", QScriptValue(impl->js,"hi"));
+    // never being called when obj.pos called.
+    v.setProperty("pos", impl->js->newFunction(getObjectPos), QScriptValue::PropertyGetter );
+    QScriptValue fun = impl->js->newFunction(jsEtGameProperty);
+    if( ! fun.isFunction() )
+    {
+	qDebug() <<"GameState::createObject(obj) prop function creation failed.";
+    }
+    else
+    {
+	// WTF does this end up undefined in script:
+	v.setProperty("xyz",fun);
+	//v.setProperty("xyz",QScriptValue(impl->js,"wtf"));
+    }
+
+    return o;
+}
+
+#if 0
+//bool GameState::addObject( QScriptValue vobj )
+bool GameState::addObject( QObject * obj ) //QScriptValue const & vobj )
+{
+    //if( !vobj || ! vobj->isQObject() ) return false;
+    //QObject * obj = vobj->toQObject();
+    QGraphicsItem * it = dynamic_cast<QGraphicsItem*>( obj );
+    if( ! it )
+    {
+	qDebug() <<"GameState::addObject(obj) object not-a QGraphicsItem.";
+	return 0;
+    }
+#if 0
+    QScriptValue fun = impl->js->newFunction(jsEtGameProperty);
+    if( ! fun.isFunction() )
+    {
+	qDebug() <<"GameState::addObject(obj) prop function creation failed.";
+	return 0;
+    }
+    // WTF does this end up undefined in script:
+    //vobj->.setProperty("prop",fun);
+#endif
+    this->addItem( it );
+    return true;
+}
+#endif
+bool GameState::prop( QObject * obj,
+		      QString const & name,
+		      //QVariant const & val
+		      QScriptValue const & val
+		      )
+{
+    if( ! obj || name.isEmpty() ) return false;
+    QVariant var(val.toVariant());
+    qDebug() << "GameState::prop(obj,"<<name<<","<<var<<")";
+    obj->setProperty(name.toAscii().constData(),var);
+    return var.isValid();
+}
+QScriptValue
+GameState::prop( QObject * obj,
+		 QString const & name )
+{
+    return (obj && !name.isEmpty())
+	? impl->js->newVariant( obj->property(name.toAscii().constData()) )
+	: QScriptValue();
+}
+
 QGraphicsScene * GameState::scene()
 {
     return impl->scene;
 }
 
-void GameState::addItem( QGraphicsItem * it )
+bool GameState::addItem( QGraphicsItem * it )
 {
-    impl->scene->addItem( it );
+    return it
+	? (impl->scene->addItem( it ),true)
+	: false;
 }
 
 
