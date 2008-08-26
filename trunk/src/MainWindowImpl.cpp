@@ -29,6 +29,7 @@
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QSplitter>
+#include <QScriptEngine>
 
 #include <cmath>
 #include <s11n.net/s11n/s11nlite.hpp>
@@ -70,7 +71,7 @@ struct MainWindowImpl::Impl
 	QString fn = pdir.canonicalPath() + "/" + fileName;
 	try
 	{
-	    if( ! paw->load(fn) )
+	    if( ! paw->s11nLoad(fn) )
 	    {
 		paw->setupDefaultTemplates();
 	    }
@@ -86,7 +87,7 @@ struct MainWindowImpl::Impl
 	QString fn = pdir.canonicalPath() + "/" + fileName;
 	try
 	{
-	    paw->save(fn,false);
+	    paw->s11nSave(fn,false);
 	}
 	catch(...){}
 	/** Reminder: we could rely on the fact that the member QWidgets
@@ -255,7 +256,7 @@ bool MainWindowImpl::saveGame( QString const & fn )
     std::ostringstream os;
     try
     {
-	b = impl->gstate.save( fn, true );
+	b = impl->gstate.s11nSave( fn, true );
 	os << "failed for unknown reason.";
     }
     catch( std::exception const & ex )
@@ -297,11 +298,50 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 	bool worked = false;
 	if( impl->gstate.board().fileNameMatches(fn) )
 	{
-		worked = impl->gstate.board().load(fn);
+		worked = impl->gstate.board().s11nLoad(fn);
 	}
 	else if( impl->gstate.fileNameMatches(fn) )
 	{
 		worked = this->loadGame(fn);
+	}
+	else if( QRegExp("\\.js$",Qt::CaseInsensitive).indexIn(fn) > 0 )
+	{
+	    QScriptEngine & js( impl->gstate.jsEngine() );
+	    qDebug() << "[ running script"<<fn<<"]";
+	    QScriptValue rv;
+	    {
+		QFile scriptFile(fn);
+		if (!scriptFile.open(QIODevice::ReadOnly))
+		{
+		    QString msg = QString("MainWindowImpl::loadFile(%1)").arg(fn);
+		    QMessageBox::warning( this, "Open failed",
+					  msg,
+					  QMessageBox::Ok, QMessageBox::Ok );
+		    return false;
+		}
+		QTextStream stream(&scriptFile);
+		QString contents = stream.readAll();
+		scriptFile.close();
+		rv = js.evaluate(contents,qboard::homeRelative(fn) );
+	    }
+	    if( js.hasUncaughtException() )
+	    { // in Qt 4.4.1 ^^^^ this fails!
+		QStringList bt( js.uncaughtExceptionBacktrace() );
+		QScriptValue exv = js.uncaughtException();
+		QString msg("Script threw an exception:\n");
+		msg += exv.toString()
+		    + "Backtrace:\n"
+		    + bt.join("\n");
+		QMessageBox::warning( this, "JavaScript Exception",
+				      msg,
+				      QMessageBox::Ok, QMessageBox::Ok );
+		return false;
+	    }
+	    else
+	    {
+		worked = true;
+	    }
+	    qDebug() << "[ done running script"<<fn<<"]";
 	}
 	else if( QRegExp("\\.(html|txt)$",Qt::CaseInsensitive).indexIn(fn) > 0 )
 	{
@@ -329,7 +369,7 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 		}
 		else
 		{
-			worked = this->impl->gstate.board().load(fn); // fi.absoluteFilePath());
+			worked = this->impl->gstate.board().s11nLoad(fn); // fi.absoluteFilePath());
 		}
 	}
 	if( worked )
@@ -351,7 +391,7 @@ bool MainWindowImpl::loadPiece( QFileInfo const & fi )
 	{
 	    try
 	    {
-		if( ! pc->load( fn ) )
+		if( ! pc->s11nLoad( fn ) )
 		{
 		    delete pc;
 		    QMessageBox::warning( this, "Load failed!",
@@ -383,7 +423,7 @@ bool MainWindowImpl::loadPiece( QFileInfo const & fi )
 bool MainWindowImpl::loadGame( QString const & fn )
 {
 	QApplication::setOverrideCursor(Qt::BusyCursor);
-	bool b = impl->gstate.load(fn); 
+	bool b = impl->gstate.s11nLoad(fn); 
 	QApplication::restoreOverrideCursor();
 	if( ! b )
 	{
