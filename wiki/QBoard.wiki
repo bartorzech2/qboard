@@ -25,7 +25,7 @@ You can find screenshots on the [Screenshots screenshots page].
   * Supports an arbitrary number of dockable "minimap" views, all fully interactive and synchronized in real time.
   * On-board HTML widgets, so you can annotate your game as much as you like. You can also attach HTML widgets directly to arbitrary game pieces.
   * On-board lines, with customizable colors, line size, and transparency level. Useful for marking movement paths (or histories), firing ranges or arcs, line of sight, and such.
-  * A very simple batch scripting tool for generating game setups (e.g. use shell scripts to generate games using existing graphics files).
+  * JavaScript bindings are in the works. The basic stuff works, but this work ongoing.
 
 See also: the [TODOs] Page
 
