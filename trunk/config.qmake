@@ -159,6 +159,7 @@ QBOARD_HEADERS_LIB = \
  $$SRC_DIR/parsepp_typelist.hpp \
  $$SRC_DIR/PieceAppearanceWidget.h \
  $$SRC_DIR/PropObj.h \
+ $$SRC_DIR/ScriptQt.h \
  $$SRC_DIR/Serializable.h \
  $$SRC_DIR/QBoard.h \
  $$SRC_DIR/QBoardHomeView.h \
@@ -182,6 +183,7 @@ QBOARD_SOURCES_LIB = \
  $$SRC_DIR/MenuHandlerGeneric.cpp \
  $$SRC_DIR/PieceAppearanceWidget.cpp \
  $$SRC_DIR/PropObj.cpp \
+ $$SRC_DIR/ScriptQt.cpp \
  $$SRC_DIR/Serializable.cpp \
  $$SRC_DIR/QBoard.cpp \
  $$SRC_DIR/QBoardHomeView.cpp \
