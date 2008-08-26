@@ -10,16 +10,21 @@
  * included in the packaging of this file.
  *
  */
+
 #include "MenuHandlerGeneric.h"
-#include "S11nClipboard.h"
+
 #include <s11n.net/s11n/serialize.hpp>
+
 #include <QDebug>
-//#include <Q>
 #include <QGraphicsScene>
 #include <QGraphicsItem>
-#include "Serializable.h"
-#include "utility.h"
+#include <QIcon>
+#include <QPainter>
+#include <QStyleOptionGraphicsItem>
 
+#include "utility.h"
+#include "S11nClipboard.h"
+#include "Serializable.h"
 #include "S11nQtList.h"
 MenuHandlerCopyCut::MenuHandlerCopyCut(QGraphicsItem * gi,QObject * parent)
     : QObject(parent),
@@ -261,9 +266,38 @@ void SceneSelectionDestroyer::destroyItem()
 }
 QMenu * MenuHandlerCommon::createMenu( QGraphicsItem *gi ) //, QGraphicsSceneContextMenuEvent *ev )
 {
-    QString label = gi->isSelected() ? tr("Selected items...") : tr("Item...");
+    QString label;
+    QString ico;
+    if( gi->isSelected() )
+    {
+	label = tr("Selected items...");
+	ico = ":/QBoard/icon/multiple.png";
+    }
+    else
+    {
+	label = tr("Item...");
+    }
     QMenu * menu = new QMenu(label);
-    menu->addAction(label)->setEnabled(false);
+    QAction * act = menu->addAction(label);
+
+    if( !ico.isEmpty() )
+    {
+	act->setIcon(QIcon(ico));
+	act->setEnabled(false);
+    }
+    else
+    {
+#if 1
+	QRectF bounds = gi->boundingRect();
+	QPixmap tgt(bounds.size().toSize());
+	tgt.fill(QColor(Qt::transparent));
+	QPainter pain(&tgt);
+	QStyleOptionGraphicsItem bogus;
+	bogus.exposedRect = bounds;
+	gi->paint( &pain, &bogus, 0 );
+	act->setIcon( QIcon( tgt.scaled(16,16) ) );
+#endif
+    }
     SceneSelectionDestroyer * destroyer = new SceneSelectionDestroyer( menu, gi );
     menu->addAction(QIcon(":/QBoard/icon/button_cancel.png"),"Destroy",destroyer,SLOT(destroyItem()) );
     menu->addSeparator();
