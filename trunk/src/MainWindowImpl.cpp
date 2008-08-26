@@ -119,9 +119,6 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	connect( this->actionQuickSave, SIGNAL(triggered(bool)), this, SLOT(quickSave()) );
 	connect( this->actionQuickLoad, SIGNAL(triggered(bool)), this, SLOT(quickLoad()) );
 
-	connect( this->actionCopy, SIGNAL(triggered(bool)), this, SLOT(slotCopy()) );
-	connect( this->actionCut, SIGNAL(triggered(bool)), this, SLOT(slotCut()) );
-	connect( this->actionPaste, SIGNAL(triggered(bool)), this, SLOT(slotPaste()) );
 
 #if ! QBOARD_VERSION
 	// For "end user builds" we won't show this action.
@@ -158,6 +155,11 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	connect( this->actionToggleBoardDragMode, SIGNAL(toggled(bool)),
 		impl->gv, SLOT(setHandDragMode(bool)) );
 	this->actionToggleBoardDragMode->setChecked(false);
+
+	connect( this->actionCopy, SIGNAL(triggered(bool)), impl->gv, SLOT(clipCopy()) );
+	connect( this->actionCut, SIGNAL(triggered(bool)), impl->gv, SLOT(clipCut()) );
+	connect( this->actionPaste, SIGNAL(triggered(bool)), impl->gv, SLOT(clipPaste()) );
+
 	connect( this->actionSelectAll, SIGNAL(triggered(bool)), impl->gv, SLOT(selectAll()) );
 	connect( this->actionZoomIn, SIGNAL(triggered(bool)), impl->gv, SLOT(zoomIn()) );
 	connect( this->actionZoomOut, SIGNAL(triggered(bool)), impl->gv, SLOT(zoomOut()) );	
@@ -772,93 +774,3 @@ void MainWindowImpl::quickSave()
 }
 
 
-static QGraphicsItem * firstSelectedQGI( QGraphicsScene * sc )
-{
-    if( ! sc ) return 0;
-    typedef QList<QGraphicsItem *> QGIL;
-    QGIL li = sc->selectedItems();
-    QGraphicsItem * qgi = 0;
-    for( QGIL::iterator it = li.begin();
-	 li.end() != it; ++it )
-    {
-	if( (*it)->isSelected() )
-	{
-	    qgi = *it;
-	    break;
-	}
-    }
-    return qgi;
-}
-
-
-static void clipboardQGI( QStatusBar * sb, QGraphicsScene * sc, bool copy )
-{
-    QGraphicsItem * qgi = firstSelectedQGI( sc );
-    if( qgi )
-    {
-	QPoint pos;
-#if 0
-	// Works!
-	QRectF r( qboard::calculateBounds( qgi ) );
-	qDebug() << "clipboardQGI() rect ="<<r;
-	pos = r.topLeft().toPoint();
-#else
-	pos = qboard::calculateCenter( qgi ).toPoint();
-	qDebug() << "clipboardQGI() center ="<<pos;
-	//pos = qgi->pos().toPoint();
-	//pos = qboard::calculateCenter(qgi).toPoint();
-	//pos = impl->gv->placementPos();// works, but barely
-#endif
-	qDebug() << "clipboardQGI() pos ="<<pos;
-	qboard::clipboardScene( qgi->scene(), copy, pos );
-
-	sb->showMessage( QString("Selected items were %1 to the clipboard.").arg(copy?"copied":"cut") );
-    }
-    else
-    {
-	sb->showMessage( QString("%1: no on-board items selected").arg(copy?"copy":"cut") );
-    }
-
-}
-
-void MainWindowImpl::slotCopy()
-{
-    clipboardQGI( this->statusBar(), impl->gstate.scene(), true  );
-//     else
-//     {
-// 	this->statusBar()->showMessage( tr("Copy: no on-board items selected") );
-//     }
-}
-
-void MainWindowImpl::slotCut()
-{
-    clipboardQGI( this->statusBar(), impl->gstate.scene(), false  );
-//     else
-//     {
-// 	this->statusBar()->showMessage( tr("Cut: no on-board items selected") );
-//     }
-}
-
-static QPoint findBoardPastePoint( QGraphicsView * board )
-{
-    QPoint ret;
-    QWidget * vp = board->viewport();
-    if(1) qDebug() << "findBoardPastePoint("<<board<<") viewport ="<<vp
-		   << "viewport parent ="<<vp->parent();
-    QPoint glpos( QCursor::pos() );
-    QWidget * wa = QApplication::widgetAt( glpos );
-    if(0) qDebug() << "findBoardPastePoint("<<board<<") widgetAt("<<glpos<<") ="<<wa;
-    if( wa != vp ) return ret;
-    ret = board->mapToScene( board->mapFromGlobal(glpos) ).toPoint();
-    if(0) qDebug() << "findBoardPastePoint("<<board<<") ret ="<<ret;
-    return ret;
-}
-
-void MainWindowImpl::slotPaste()
-{
-    //bool pasteGraphicsItems( impl->gstate, QPoint() );
-    //impl->gstate.pasteClipboard( QPoint() );
-    impl->gstate.pasteClipboard( findBoardPastePoint(impl->gv) );
-    //impl->gstate.pasteClipboard( impl->gv->placementPos() ); // too randomish
-
-}

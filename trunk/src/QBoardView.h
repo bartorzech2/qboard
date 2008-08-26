@@ -51,6 +51,10 @@ public Q_SLOTS:
 	/* If handMode is true then grabbing-hand-style drag is used,
 	otherwise rubber-band-style is used. */
 	void setHandDragMode(bool handMode);
+
+    void clipCopy();
+    void clipCut();
+    void clipPaste();
     /**
 
     */
