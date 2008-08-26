@@ -31,7 +31,7 @@ class QGraphicsSceneDragDropEvent;
    and defines their expected types as follows:
 	
    - color (QColor or QString #RGB)
-   - colorAlpha (int (0-255), applies to 'color')
+   - colorAlpha (int (0-255), applies to 'color') (deprecated: set alpha of color instead)
    - pixmapFile (QString)
    - pixmapFiles (QStringList)
    - borderColor (QColor)
@@ -43,7 +43,6 @@ class QGraphicsSceneDragDropEvent;
    - size (QSize or QSizeF)
    - zLevel (qreal)
    - name (QString)
-   - geometry (QRect, read-only)
    
    Client code using their own properties are encouraged to
    use a common prefix (e.g. "myFoo" and "myBar").
