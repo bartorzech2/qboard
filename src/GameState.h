@@ -18,8 +18,12 @@
 class QBoard;
 #include <QGraphicsScene>
 #include <QPoint>
+#include <QVariant>
 class QGraphicsItem;
-class GameState : public QObject, public Serializable
+class QScriptEngine;
+#include <QScriptValue>
+class GameState : public QObject,
+		  public Serializable
 {
     Q_OBJECT
 public:
@@ -57,11 +61,6 @@ public:
 //     QList<QObject*> selectedObjects();
 //     QList<Serializable*> selectedSerializables();
 
-    /**
-       Transfers ownership of the item to this object's
-       QGraphicsScene.
-    */
-    void addItem( QGraphicsItem * item );
 
 //     /**
 //        Returns the current placement position. See addPiece() for
@@ -78,6 +77,8 @@ public:
 
     static char const * KeyClipboard;
 
+    QScriptEngine & jsEngine();
+
 public Q_SLOTS:
     void clear();
 //     /**
@@ -85,8 +86,35 @@ public Q_SLOTS:
 //        the piece is moved to this position.
 //     */
 //     void setPlacementPos( QPoint const & );
+    /**
+       Transfers ownership of the item to this object's
+       QGraphicsScene.
+    */
+    bool addItem( QGraphicsItem * item );
+
+#if 0
+    /**
+
+    */
+    bool addObject( QObject * tgt );
+#endif
+    //bool addObject( QScriptValue obj );
+    /**
+
+    */
+    QObject * createObject( QString const & className );
+    /**
+       Calls tgt->setProperty() with the given property.
+    */
+    bool prop( QObject * tgt, QString const &,
+	       QScriptValue const & val );
+	       //QVariant const & val );
+    //QVariant
+    QScriptValue
+    prop( QObject * tgt, QString const & name );
 
 private:
+    void setup();
     bool pasteTryHarder( S11nNode const & root,
 			 QPoint const & pos );
     struct Impl;
