@@ -41,7 +41,6 @@
 #include "QGILine.h"
 #include "utility.h"
 #include "S11nClipboard.h"
-#include "QBBatch.h"
 #include "QBoard.h"
 #include "PieceAppearanceWidget.h"
 #include "AboutQBoardImpl.h"
@@ -333,48 +332,6 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 			worked = this->impl->gstate.board().load(fn); // fi.absoluteFilePath());
 		}
 	}
-	else if ( -1 != QRegExp("\\.QBBatch$", Qt::CaseInsensitive).indexIn(fn) )
-	{
-	    try
-	    {
-		QStringList li;
-		li << "-v"
-		   << fn;
-#if 1
-		/**
-		   FIXME: when we pass impl->gstate, it WORKS in
-		   principal, but the pieces do not appear. They are
-		   there - they can be serialized - but they are not visible until
-		   the same is saved and loaded again. So we will avoid that problem
-		   for now by not allowing QBBatch to modify our state...
-		*/
-		GameState bogo;
-		QBBatch::process_scripts( &bogo, li );
-		//impl->fb->reloadDir();// in case script generated anything.
-		impl->tree->refresh();
-		S11nNode node;
-		if( bogo.serialize(node) && impl->gstate.deserialize(node) )
-		{
-		    worked = true;
-		}
-#else
-		// WTF won't this work right?
-		QBBatch::process_scripts( &(impl->gstate), li );
-		//impl->fb->reloadDir();// in case script generated anything.
-		impl->tree->refresh();
-		worked = true;
-#endif
-	    }
-	    catch(std::exception const & ex)
-	    {
-		worked = false;
-		std::ostringstream os;
-		os << "Script threw an exception! The error text is:\n"
-		   << ex.what();
-		QMessageBox::warning( this, "Script failed!", os.str().c_str(),
-				      QMessageBox::Ok, QMessageBox::Ok );
-	    }
-	}
 	if( worked )
 	{
 		this->statusBar()->showMessage("Loaded: "+fn); // fi.absoluteFilePath());
@@ -511,7 +468,7 @@ void MainWindowImpl::addLine()
 #include <QGraphicsLineItem>
 #include <QGraphicsSimpleTextItem>
 #include <QLineF>
-
+#include <QScriptEngine>
 void MainWindowImpl::doSomethingExperimental()
 {
 	qDebug() << "MainWindowImpl::doSomethingExperimental()";
@@ -520,6 +477,20 @@ void MainWindowImpl::doSomethingExperimental()
 	//impl->gstate.scene()->addWidget( new QFrame );
 
 	if(1)
+	{
+	    QString fileName("eval.js");
+	    QFile scriptFile(fileName);
+	    if (!scriptFile.open(QIODevice::ReadOnly)) return;
+	    qDebug() << "[ running script"<<fileName<<"]";
+	    QScriptEngine & eng( impl->gstate.jsEngine() );
+	    QTextStream stream(&scriptFile);
+	    QString contents = stream.readAll();
+	    scriptFile.close();
+	    eng.evaluate(contents, fileName);
+	    qDebug() << "[ done running script"<<fileName<<"]";
+	}
+
+	if(0)
 	{
 	    QBoardHomeView * v = new QBoardHomeView(0);
 	    v->show();
