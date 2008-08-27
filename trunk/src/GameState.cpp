@@ -139,8 +139,8 @@ void GameState::setup()
 {
     impl->js = qboard::createScriptEngine(this);
     impl->jsThis = impl->js->newQObject( this,
-					 QScriptEngine::QtOwnership,
-					 QScriptEngine::AutoCreateDynamicProperties
+					 QScriptEngine::QtOwnership
+					 //QScriptEngine::AutoCreateDynamicProperties
 					 );
     QScriptValue glob( impl->js->globalObject() );
     glob.setProperty( "qboard", impl->jsThis );
@@ -159,8 +159,8 @@ void GameState::setup()
     impl->jsThis.setProperty( "x", QScriptValue(impl->js,"hi") );
 #endif
     sval = impl->js->newQObject(&impl->board,
-				QScriptEngine::QtOwnership,
-				QScriptEngine::AutoCreateDynamicProperties
+				QScriptEngine::QtOwnership
+				//,QScriptEngine::AutoCreateDynamicProperties
 				);
     impl->jsThis.setProperty( "board", sval );
 }
@@ -208,8 +208,8 @@ QObject * GameState::createObject( QString const & className )
 	return 0;
     }
     QScriptValue v = impl->js->newQObject(o,
-					  QScriptEngine::AutoOwnership,
-					  QScriptEngine::AutoCreateDynamicProperties
+					  QScriptEngine::AutoOwnership
+					  //,QScriptEngine::AutoCreateDynamicProperties
 					  //| QScriptEngine::PreferExistingWrapperObject
 					  );
     v.setProperty("x", QScriptValue(impl->js,"hi"));
@@ -266,7 +266,7 @@ bool GameState::prop( QObject * obj,
     QVariant var(val.toVariant());
     qDebug() << "GameState::prop(obj,"<<name<<","<<var<<")";
     obj->setProperty(name.toAscii().constData(),var);
-    return var.isValid();
+    return val.isValid();
 }
 QScriptValue
 GameState::prop( QObject * obj,
@@ -280,15 +280,12 @@ GameState::prop( QObject * obj,
 bool GameState::props( QObject * tgt, QScriptValue const & props )
 {
     qDebug() << "GameState::prop(obj,properties)";
-    if( !tgt ) return false;
+    if( !tgt || ! props.isObject() ) return false;
     QScriptValueIterator it( props );
     while( it.hasNext() )
     {
 	it.next();
-	QString k( it.name() );
-	QScriptValue v( it.value() );
-	tgt->setProperty( k.toAscii().constData(),
-			  v.toVariant() );
+	prop( tgt, it.name(), it.value() ); // .toVariant() );
     }
     return true;
 }
