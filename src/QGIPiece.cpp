@@ -823,7 +823,10 @@ void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent 
 	QMenu * mAdd = mMisc->addMenu("Create child...");
 	mAdd->addAction( "QGIHtml", this, SLOT(addChild()) );
 	mAdd->addAction( "QGIDot", this, SLOT(addChild()) );
+#if ! QBOARD_VERSION
+	// QGIDie isn't ready yet (20080827)
 	mAdd->addAction( "QGIDie", this, SLOT(addChild()) );
+#endif
     }
     
     if(1)
