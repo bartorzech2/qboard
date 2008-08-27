@@ -149,7 +149,8 @@ void MenuHandlerCopyCut::cloneItem()
     SL sl;
     typedef QList<QGraphicsItem *> QIL;
     QIL gl;
-    if( m_gi->isSelected() )
+    bool setSelection = m_gi->isSelected();
+    if( setSelection )
     {
 	gl = sc->selectedItems();
     }
@@ -165,7 +166,10 @@ void MenuHandlerCopyCut::cloneItem()
 	sl.push_back( Pair(ser, gi) );
     }
     const int offset = 5;
-    sc->clearSelection();
+    if( setSelection )
+    {
+	sc->clearSelection();
+    }
     foreach( Pair p, sl )
     {
 	Serializable * s = p.first->clone();
@@ -185,7 +189,10 @@ void MenuHandlerCopyCut::cloneItem()
 	gi->setZValue( gi->zValue() + 0.001 );
 	gi->setParentItem( p.second->parentItem() );
 	sc->addItem( gi );
-	gi->setSelected( true );
+	if( setSelection )
+	{
+	    gi->setSelected( true );
+	}
     }
 }
 
