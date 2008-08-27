@@ -338,6 +338,7 @@ namespace s11n { namespace qt {
 #define S11N_TYPE QColor
 #define S11N_TYPE_NAME "QColor"
 #define S11N_SERIALIZE_FUNCTOR QColor_s11n
+//#define S11NQT_FUNCTOR QColor_s11n
 #include "reg_qt_s11n.h"
 
 #include <QDate>
