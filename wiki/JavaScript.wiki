@@ -59,8 +59,4 @@ Here is an overview of the list of common properties (in alphabetical order), th
 || `pos` || QPoint(X,Y) || x || the position of the piece, in x/y coordinates. ||
 || `scale` || positive floating-point number || QGIPiece, QGIHtml, QGIDot || Relative scale of the item, 1.0 being normal, 0.0 being non-existent, and 2.0 being double normal size. ||
 
-
-  *   =  Piece types: 
-  *  () = the picture used for a piece. This determines the piece's size. QGIPiece only.
-  * () = . Piece types: all
-  *  () =  Piece types: 
+The on-board lines (QGILine) are not currently scriptable because they will be replaced at some point (their current model requires to much special-case handling of events and serialization).
