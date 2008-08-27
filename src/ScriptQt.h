@@ -14,12 +14,100 @@
  */
 
 #include <QObject>
-#include "Serializable.h"
 #include <QScriptEngine>
 #include <QScriptValue>
+#include <QSharedData>
+#include <QString>
+
 namespace qboard {
 
+    /**
+       Creates a new QScriptEngine (which the caller owns).  It is
+       preconfigured with qboard-specific functionality.
+
+       The following Qt types can be created in script code,
+       but see the major caveat below:
+
+       QColor(int r, int g, int b [, int alpha])
+
+       QPoint( int x, int y )
+
+       QSize( int x, int y )
+
+       Such types can be used as parameters to native code,
+       but cannot currently be manipulated directly in JS code.
+    */
     QScriptEngine * createScriptEngine( QObject * parent = 0 );
+
+    /**
+       ScriptPacket is intended to be a scriptable package of code for
+       use in event handlers and such.
+    */
+    class ScriptPacket : public QObject
+    {
+	Q_OBJECT;
+    public:
+	ScriptPacket( QScriptEngine * e = 0,
+		      QString const & code = QString(),
+		      QString const & name = QString() );
+	ScriptPacket( ScriptPacket const & rhs );
+	ScriptPacket & operator=(ScriptPacket const & rhs );
+	virtual ~ScriptPacket();
+	/**
+	   Returns this object's JS code.
+	*/
+	QString code() const;
+	/**
+	   Returns this object's script's name.
+	*/
+	QString name() const;
+	/**
+	   Sets the script's name, for error reporting purposes.
+	*/
+	void setScriptName(QString const &);
+	/**
+	   Sets this object's script engine. Does not change ownership
+	   of the engine.
+	*/
+	void setEngine( QScriptEngine * );
+	/**
+	   Returns this object's script engine. Does not change
+	   ownership of the engine.
+	*/
+	QScriptEngine * engine() const;
+
+	/**
+	   If quickCheck is true (the default) then this function
+	   returns true if this->engine() is not null, else false. If
+	   quickCheck is false then it returns true only if engine()
+	   is not null and engine()->canEvaluate(code()) is true.
+	*/
+	bool isValid( bool quickCheck = true ) const;
+	/**
+	   Equivalent to eval().
+	*/
+	QScriptValue operator()() const;
+    public Q_SLOTS:
+        /**
+	   Evaluates this->code() and returns the result.
+	*/
+        QScriptValue eval() const;
+	/**
+	   Sets this object's script code.
+	*/
+	void setCode( QString const & );
+    private:
+	/** Implementation detail. */
+	struct Impl : public QSharedData
+	{
+	    QString code;
+	    QString name;
+	    mutable QScriptEngine * js;
+	    Impl();
+	    ~Impl();
+	};
+	QSharedDataPointer<Impl> impl;
+    };
 
 }
 

@@ -17,15 +17,61 @@
 #include <QColor>
 #include <QDebug>
 #include <QGraphicsItem>
+#include <QSharedData>
 
 namespace qboard {
+
+ 
+    QScriptValue qpointToScriptValue(QScriptEngine *engine, const QPoint &s)
+    {
+	qDebug() << "qpointToScriptValue(engine,"<<s<<")";
+	QScriptValue obj = engine->newObject();
+	obj.setProperty("x", QScriptValue(engine, s.x()));
+	obj.setProperty("y", QScriptValue(engine, s.y()));
+	return obj;
+    }
+
+    void qpointFromScriptValue(const QScriptValue &obj, QPoint &s)
+    {
+	s.setX( obj.property("x").toInt32() );
+	s.setY( obj.property("y").toInt32() );
+	qDebug() << "qpointFromScriptValue(engine,"<<s<<")";
+    }
 
     QScriptValue QPoint_ctor(QScriptContext *context, QScriptEngine *engine)
     {
 	int argc = context->argumentCount();
+	qDebug() << "QPoint_ctor(cx,engine) argc =="<<argc;
+#if 0
 	int x = (argc>0) ? context->argument(0).toInt32() : 0;
 	int y = (argc>1) ? context->argument(1).toInt32() : x;
 	return engine->toScriptValue(QPoint(x, y));
+#else
+	if( 1 == argc )
+	{
+	    QScriptValue arg = context->argument(0);
+	    if( arg.isNumber() )
+	    { // QPoint(x,x)
+		int x = arg.toInt32();
+		QPoint p(x,x);
+		return engine->toScriptValue(p);
+	    }
+	    else if( arg.isObject() )
+	    { // copy ctor
+		QPoint pt;
+		qpointFromScriptValue(arg,pt);
+		return engine->toScriptValue(pt );
+	    }
+	    return QScriptValue();
+	}
+	else if( 2 == argc )
+	{ // QPoint(x,y)
+	    int x = (argc>0) ? context->argument(0).toInt32() : 0;
+	    int y = (argc>1) ? context->argument(1).toInt32() : x;
+	    return engine->toScriptValue(QPoint(x,y));
+	}
+	return QScriptValue();
+#endif
     }
 
     QScriptValue QSize_ctor(QScriptContext *context, QScriptEngine *engine)
@@ -82,20 +128,6 @@ namespace qboard {
     {
 	out = dynamic_cast<QGraphicsItem*>(object.toQObject());
     }
- 
-    QScriptValue qpointToScriptValue(QScriptEngine *engine, const QPoint &s)
-    {
-	QScriptValue obj = engine->newObject();
-	obj.setProperty("x", QScriptValue(engine, s.x()));
-	obj.setProperty("y", QScriptValue(engine, s.y()));
-	return obj;
-    }
-
-    void qpointFromScriptValue(const QScriptValue &obj, QPoint &s)
-    {
-	s.setX( obj.property("x").toInt32() );
-	s.setY( obj.property("y").toInt32() );
-    }
 
     QScriptValue qsizeToScriptValue(QScriptEngine *engine, const QSize &s)
     {
@@ -115,13 +147,109 @@ namespace qboard {
     {
 	QScriptEngine * js = new QScriptEngine( parent );
 	QScriptValue glob( js->globalObject() );
-	glob.setProperty("QPoint", js->newFunction(QPoint_ctor));
-	glob.setProperty("QSize", js->newFunction(QSize_ctor));
-	glob.setProperty("QColor", js->newFunction(QColor_ctor));
+
 	qScriptRegisterMetaType(js, qgiToScriptValue, qgiFromScriptValue);
-// 	qScriptRegisterMetaType(js, qpointToScriptValue, qpointFromScriptValue);
+
+	glob.setProperty("QSize", js->newFunction(QSize_ctor));
 // 	qScriptRegisterMetaType(js, qsizeToScriptValue, qsizeFromScriptValue);
+
+	glob.setProperty("QColor", js->newFunction(QColor_ctor));
+
+	glob.setProperty("QPoint", js->newFunction(QPoint_ctor));
+ 	/**
+	   Damn... if i have both a QPoint ctor and to/fromScriptValue routines
+	   then none of it works.
+	*/
+	//qScriptRegisterMetaType(js, qpointToScriptValue, qpointFromScriptValue);
 	return js;
     }
+
+
+
+    ScriptPacket::Impl::Impl() : code(),
+				 name(),
+				 js(0)
+    {
+    }
+    ScriptPacket::Impl::~Impl()
+    {
+    }
+
+    ScriptPacket::ScriptPacket( QScriptEngine * js,
+				QString const & code,
+				QString const & name )
+	: QObject(),
+	impl(new Impl)
+    {
+	impl->js = js;
+	impl->code = code;
+	impl->name = name;
+    }
+
+    ScriptPacket::ScriptPacket( ScriptPacket const & rhs )
+	: QObject(),
+	  impl(rhs.impl)
+    {
+    }
+    ScriptPacket & ScriptPacket::operator=(ScriptPacket const & rhs )
+    {
+	if( this != &rhs )
+	{
+	    this->impl = rhs.impl;
+	}
+	return *this;
+    }
+
+    bool ScriptPacket::isValid( bool quickCheck ) const
+    {
+	if( quickCheck )
+	{
+	    return 0 != impl->js;
+	}
+	else
+	{
+	    return impl->js && impl->js->canEvaluate( impl->code );
+	}
+    }
+
+    QScriptEngine * ScriptPacket::engine() const
+    {
+	return impl->js;
+    }
+    QScriptValue ScriptPacket::eval() const
+    {
+	return impl->js
+	    ? impl->js->evaluate( impl->code,
+				  impl->name.isEmpty()
+				  ? "ScriptPacket"
+				  : impl->name )
+	    : QScriptValue();
+    }
+
+    QScriptValue ScriptPacket::operator()() const
+    {
+	return this->eval();
+    }
+
+    void ScriptPacket::setEngine( QScriptEngine * js )
+    {
+	impl->js = js;
+    }
+    void ScriptPacket::setCode( QString const & code )
+    {
+	impl->code = code;
+    }
+
+    void ScriptPacket::setScriptName( QString const & name )
+    {
+	impl->name = name;
+    }
+
+    ScriptPacket::~ScriptPacket()
+    {
+    }
+
+
+
 
 } //namespace
