@@ -25,6 +25,7 @@ for d in $sdirs; do
 	-o -name '*.ui' \
 	-o -name '*.qrc' \
 	-o -name '*.png' \
+	-o -name '*.js' \
 	-o -name '*.html' \
 	| sed -e '/\/bak/d' \
 	-e '/\/nono/d' \
