@@ -110,20 +110,44 @@ public Q_SLOTS:
     QObject * createObject( QString const & className );
     /**
        Calls tgt->setProperty() with the given property.
+
+       This is intended to be called from JS code.
     */
     bool prop( QObject * tgt, QString const &,
 	       QScriptValue const & val );
-	       //QVariant const & val );
+    //QVariant const & val );
     /**
        Assumes that props contains a single-dimension set of
        properties. Each property is copied to tgt via
        tgt->setProperty().
+
+       This is intended to be called from JS code.
+
+       Example JS:
+
+       \code
+       var pc = qboard.createObject('QGIPiece');
+       qboard.props( pc, { pos:QPoint(200,200),
+           pixmap:'path/to/my.png'} );
+       qboard.addItem( pc );
+       \endcode
+
     */
     bool props( QObject * tgt, QScriptValue const & props );
 
     /**
        Returns the script-side value of tgt->property(name), or an
        invalid value if the property is not set.
+
+       This is intended to be called from JS code.
+
+       Example JS:
+
+       \code
+       var pc = qboard.createObject('QGIPiece');
+       qboard.prop( pc, 'pos', QPoint(200,200) );
+       qboard.prop( pc, 'pixmap', 'path/to/my.png' );
+       \endcode
     */
     QScriptValue
     prop( QObject * tgt, QString const & name );
