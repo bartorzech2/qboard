@@ -102,7 +102,10 @@ public Q_SLOTS:
 #endif
     //bool addObject( QScriptValue obj );
     /**
-
+       Creates a new object of the given type name.  On success, the
+       object is returned on error, 0 is returned. The caller owns the
+       returned object.  It should normally be passed to addItem()
+       (assuming the type is-also-a QGraphicsItem type).
     */
     QObject * createObject( QString const & className );
     /**
@@ -111,7 +114,17 @@ public Q_SLOTS:
     bool prop( QObject * tgt, QString const &,
 	       QScriptValue const & val );
 	       //QVariant const & val );
-    //QVariant
+    /**
+       Assumes that props contains a single-dimension set of
+       properties. Each property is copied to tgt via
+       tgt->setProperty().
+    */
+    bool props( QObject * tgt, QScriptValue const & props );
+
+    /**
+       Returns the script-side value of tgt->property(name), or an
+       invalid value if the property is not set.
+    */
     QScriptValue
     prop( QObject * tgt, QString const & name );
 
