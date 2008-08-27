@@ -149,6 +149,7 @@ S11NQT_SOURCES = \
 # in the lib:
 QBOARD_HEADERS_LIB = \
  $$S11NQT_HEADERS \
+ $$SRC_DIR/Dice.h \
  $$SRC_DIR/GameState.h \
  $$SRC_DIR/GL.h \
  $$SRC_DIR/MenuHandlerBoard.h \
@@ -178,6 +179,7 @@ QBOARD_HEADERS_LIB = \
 
 QBOARD_SOURCES_LIB = \
  $$S11NQT_SOURCES \
+ $$SRC_DIR/Dice.cpp \
  $$SRC_DIR/GameState.cpp \
  $$SRC_DIR/MenuHandlerBoard.cpp \
  $$SRC_DIR/MenuHandlerGeneric.cpp \
