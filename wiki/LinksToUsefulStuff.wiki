@@ -1,0 +1,8 @@
+#summary Third-party stuff which may be useful with QBoard
+
+Here are some links to third-party materials which one might find useful with QBoard:
+
+  * [http://www.webwargaming.com/maps/blankmap.html A set of blank hex maps of various sizes].
+  * [http://www.wanderinghorse.net/gaming/maps/ Free gaming maps]
+  * [http://www.wanderinghorse.net/gaming/counters/ Free gaming counters]
+  * [http://www.grognard.com/aides.html links to PBEM-related aids]
