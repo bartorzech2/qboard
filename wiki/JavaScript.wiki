@@ -1,16 +1,14 @@
 #summary Scripting QBoard with JavaScript
-#labels Docs-User
+#labels Docs-User,Featured
 
 = Introduction =
 
-Starting with version 20080827, QBoard is getting JavaScript support.
-
-This document gives an overview of what's possible with the current code.
+Starting with version 20080827, QBoard is getting JavaScript support. This document gives an overview of what's possible with the current code.
 
 The things it can currently do:
 
   * Load new pieces by class name.
-  * Set most basic properties (numbers, colors, and positions), though using a bit of an odd workaround (see the examples). By setting properties, pieces can be controlled.
+  * Set most basic properties (numbers, colors, and positions), though using a bit of an odd workaround (see the examples). By setting properties, pieces can be controlled in various ways.
 
 Things that it cannot currently do:
 
@@ -25,6 +23,7 @@ Some notable things which need improving include:
   * Child objects. It's not currently possible to traverse or manipulate them.
   * Use of JS property syntax to get at object properties.
   * Useful script-side representations of some basic Qt types, like QPoint.
+  * Attach JS script code as event handlers for native objects. The catch here is that the native objects currently don't know about the underlying JS engine, and so they have nowhere to actually run the JS code.
 
 = Running JavaScript files =
 
@@ -38,9 +37,9 @@ Currently only the following QBoard-related types are even remotely scriptable:
   * QGIDot - a colorful dot
   * QGIHtml - like little notes you can paste on your board
 
+QPoint and QColor objects can be created for use as property values, but cannot be used in any other way (you can't currently get at their values from script code).
 
 = Examples =
-
 
 Here are some example of things which currently work:
 
@@ -53,6 +52,7 @@ qboard.props( pc,{ // set a few properties:
   html:"<body bgcolor='#ffffff'>This is my text</body>",
   pos:QPoint(30,50)
 });
+// Create a new piece:
 pc = qboard.createObject('QGIPiece');
 qboard.addItem(pc);
 qboard.props(pc,{
