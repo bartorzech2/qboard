@@ -704,6 +704,7 @@ bool s11n::qt::QVariant_s11n::canHandle( int t )
 	    || (t == QVariant::Matrix)
 	    || (t == QVariant::Rect)
 	    || (t == QVariant::RectF)
+	    || (t == QVariant::RegExp)
 	    || (t == QVariant::Pixmap)
 	    || (t == QVariant::Point)
 	    || (t == QVariant::PointF)
@@ -906,6 +907,7 @@ bool s11n::qt::QVariant_s11n::operator()( S11nNode & dest, QVariant const & src 
 	    CASE_OBJ(PointF, src.toPointF() );
 	    CASE_OBJ(Rect, src.toRect() );
 	    CASE_OBJ(RectF, src.toRectF() );
+	    CASE_OBJ(RegExp, src.toRegExp() );
 	    CASE_OBJ(Size, src.toSize() );
 	    CASE_OBJ(SizeF, src.toSizeF() );
 	    CASE_OBJ(String, src.toString() );
@@ -970,6 +972,7 @@ bool s11n::qt::QVariant_s11n::operator()( S11nNode const & src, QVariant & dest 
 	    CASE_OBJ(PointF,QPointF);
 	    CASE_OBJ(Rect,QRect);
 	    CASE_OBJ(RectF,QRectF);
+	    CASE_OBJ(RegExp,QRegExp);
 	    CASE_OBJ(Size,QSize);
 	    CASE_OBJ(SizeF,QSizeF);
 	    CASE_OBJ(String,QString);
