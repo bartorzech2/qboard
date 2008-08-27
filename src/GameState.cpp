@@ -17,7 +17,7 @@
 #include <QGraphicsItem>
 #include <QList>
 #include <QScriptEngine>
-
+#include <QScriptValueIterator>
 
 #include <stdexcept>
 
@@ -208,8 +208,8 @@ QObject * GameState::createObject( QString const & className )
 	return 0;
     }
     QScriptValue v = impl->js->newQObject(o,
-					  QScriptEngine::AutoOwnership
-					  //QScriptEngine::AutoCreateDynamicProperties
+					  QScriptEngine::AutoOwnership,
+					  QScriptEngine::AutoCreateDynamicProperties
 					  //| QScriptEngine::PreferExistingWrapperObject
 					  );
     v.setProperty("x", QScriptValue(impl->js,"hi"));
@@ -275,6 +275,22 @@ GameState::prop( QObject * obj,
     return (obj && !name.isEmpty())
 	? impl->js->newVariant( obj->property(name.toAscii().constData()) )
 	: QScriptValue();
+}
+
+bool GameState::props( QObject * tgt, QScriptValue const & props )
+{
+    qDebug() << "GameState::prop(obj,properties)";
+    if( !tgt ) return false;
+    QScriptValueIterator it( props );
+    while( it.hasNext() )
+    {
+	it.next();
+	QString k( it.name() );
+	QScriptValue v( it.value() );
+	tgt->setProperty( k.toAscii().constData(),
+			  v.toVariant() );
+    }
+    return true;
 }
 
 QGraphicsScene * GameState::scene()
