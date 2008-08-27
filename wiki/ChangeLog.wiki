@@ -7,7 +7,7 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top. Dates written extra large are release dates.
 
 ----
-*2008 August 27:*
+=== *2008 August 27:* ===
 
 - Fixed serialization of 'pos' property of QGIDot objects, which sometimes caused pasted dots to be mis-placed.
 
