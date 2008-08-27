@@ -29,6 +29,7 @@ for d in $sdirs; do
 	-o -name '*.qrc' \
 	-o -name '*.png' \
 	-o -name '*.html' \
+	-o -name '*.js' \
 	| sed -e '/\/bak/d' \
 	-e '/\/nono/d' \
 	-e '/\/debug/d' \
