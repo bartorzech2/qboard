@@ -270,22 +270,35 @@ bool QGIDot::serialize( S11nNode & dest ) const
 	typedef S11nNodeTraits NT;
 	if( this->metaObject()->propertyCount() )
 	{
-		S11nNode & pr( s11n::create_child( dest, "properties" ) );
-		if( ! s11n::qt::QObjectProperties_s11n()( pr, *this ) ) return false;
+	    QObject props;
+	    qboard::copyProperties( this, &props );
+	    // i can't get the QColor alpha property to serialize (it's as if... well, no...)
+	    // so we save the alpha properties separately.
+	    props.setProperty("colorAlpha", impl->color.alpha());
+	    props.setProperty("pos", this->pos() );
+	    S11nNode & pr( s11n::create_child( dest, "properties" ) );
+	    QObject const & kludge( props );
+	    if( ! s11n::qt::QObjectProperties_s11n()( pr, kludge ) ) return false;
 	}
 	return s11n::serialize_subnode( dest, "pos", this->pos() );
 }
+
 bool QGIDot::deserialize(  S11nNode const & src )
 {
-	if( ! this->Serializable::deserialize( src ) ) return false;
-	typedef S11nNodeTraits NT;
+    if( ! this->Serializable::deserialize( src ) ) return false;
+    typedef S11nNodeTraits NT;
+    S11nNode const * ch = s11n::find_child_by_name( src, "pos" );
+    if( ch )
+    {
+	// older data format used this extra property
 	QPointF p;
-	if( ! s11n::deserialize_subnode( src, "pos", p ) ) return false;
+	if( ! s11n::deserialize( *ch, p ) ) return false;
 	this->setPos( p );
-	S11nNode const * ch = s11n::find_child_by_name(src, "properties");
-	return ch
-		? s11n::qt::QObjectProperties_s11n()( *ch, *this )
-		: true;
+    }
+    ch = s11n::find_child_by_name(src, "properties");
+    return ch
+	? s11n::qt::QObjectProperties_s11n()( *ch, *this )
+	: true;
 }
 
 struct MenuHandlerDot::Impl
@@ -308,7 +321,7 @@ MenuHandlerDot::~MenuHandlerDot()
 
 void MenuHandlerDot::showHelp()
 {
-    qboard::showHelpResource("Lines", ":/QBoard/help/classes/QGIDot.html");
+    qboard::showHelpResource("Dots", ":/QBoard/help/classes/QGIDot.html");
 }
 
 void MenuHandlerDot::doMenu( QGIDot *gvi, QGraphicsSceneContextMenuEvent * ev )
@@ -341,7 +354,7 @@ void MenuHandlerDot::doMenu( QGIDot *gvi, QGraphicsSceneContextMenuEvent * ev )
 				    "Radius",
 				    selected,
 				    "radius",
-				    8,37,8) );
+				    8,33,4) );
     }
     if(1)
     {
