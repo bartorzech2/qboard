@@ -7,11 +7,19 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top. Dates written extra large are release dates.
 
 ----
+*2008 August 27:*
+
+- Fixed serialization of 'pos' property of QGIDot objects, which sometimes caused pasted dots to be mis-placed.
+
+- Minor forward movement on the JS scriptability of pieces.
+
+
 *2008 August 26:*
 
 - Double-clicking .js files now runs them in the GameState's JavaScript engine.
 
 - The Clone command now works properly for child objects (i.e. gives the clone the same parent).
+
 
 *2008 August 25:*
 
