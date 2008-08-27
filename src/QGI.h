@@ -22,17 +22,19 @@
 struct QGITypes
 {
 	/**
-		All QBoard QGraphicsItems should have a type entry here.
+	   All QBoard QGraphicsItems should have a type entry here.
 	*/
 	enum Types {
 	_TypesStart = QGraphicsItem::UserType + 100,
-	GamePiece, // obsolete
+// 	GamePiece, // obsolete
 	LineNode,
 	LineNodeBinder,
+	QGIDie,
 	QGIDot,
 	QGIHtml,
 	QGIPiece,
-	QGIPiecePlacemarker
+	QGIPiecePlacemarker,
+	_TypesEnd
 	};
 };
 #endif // __QGI_H__
