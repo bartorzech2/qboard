@@ -1,7 +1,12 @@
 include(../../config.qmake)
 TEMPLATE = lib
-CONFIG += plugin
+CONFIG += plugin script
 RESOURCES = counters.qrc
+
+# Kludge to work around missing QtScript includes (qmake bug, i think)
+INCLUDEPATH -= $$QMAKE_INCDIR_QT/QtScript
+INCLUDEPATH = $$QMAKE_INCDIR_QT/QtScript $$INCLUDEPATH
+
 # TARGET = CGMEJoe
 # DLLDESTDIR = $$DESTDIR
 DESTDIR = $$QBOARD_PLUGINS_DESTDIR
