@@ -15,18 +15,29 @@ The things it can currently do:
 Things that it cannot currently do:
 
   * Set piece properties using the natural JS properties syntax (it requires a function call instead).
-  * Non-trivial properties cannot be properly _read_, only set. This includes colors (in some cases) and positions (QPoint objects).
+  * Non-trivial properties cannot be properly _read_, only set. This includes QColor and QPoint objects, both of which are used in script code for various piece properties.
 
 Some of those are on the to-fix list, but i'm not currently sure how/if some of it can be properly done (that is, the way i want to see it work).
 
 Some notable things which need improving include:
 
   * Send print() output somewhere sensible. It currently goes to stdout, which is only (marginally) useful if you launch QBoard from a console (i always do).
-
+  * Child objects. It's not currently possible to traverse or manipulate them.
+  * Use of JS property syntax to get at object properties.
+  * Useful script-side representations of some basic Qt types, like QPoint.
 
 = Running JavaScript files =
 
 To run a JS file in QBoard, simply double-click it. The JS print() command will send the output to stdout (your console, if you started QBoard from a console). Exceptions thrown from the script will be shown (with a stacktrace) in a dialog window.
+
+= QBoard data types in JS =
+
+Currently only the following QBoard-related types are even remotely scriptable:
+
+  * QGIPiece - the basic piece type, represented by a small image file.
+  * QGIDot - a colorful dot
+  * QGIHtml - like little notes you can paste on your board
+
 
 = Examples =
 
@@ -41,6 +52,13 @@ qboard.addItem( pc ); // add piece to the board
 qboard.props( pc,{ // set a few properties:
   html:"<body bgcolor='#ffffff'>This is my text</body>",
   pos:QPoint(30,50)
+});
+pc = qboard.createObject('QGIPiece');
+qboard.addItem(pc);
+qboard.props(pc,{
+  pixmap:'counters/sample/003-mage.png',
+  pos:QPoint(50,50),
+  color:QColor(255,0,0,127)
 });
 }}}
 
