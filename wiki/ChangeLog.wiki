@@ -13,6 +13,8 @@ are at the top. Dates written extra large are release dates.
 
 - Improved the piece "covers" significantly. All QGIs can be covered (not just QGIPiece). Covered items are now replaced by a proxy piece and they don't reveal what they're covering (at least, not to the casual observer).
 
+- Changed: to set the board "placemarker" position, double-click the board instead of middle-clicking.
+
 
 == *2008 August 27:* ==
 
