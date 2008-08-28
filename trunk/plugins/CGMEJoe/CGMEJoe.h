@@ -8,7 +8,7 @@
 #  include "../../src/QBoardPlugin.h"
 #endif
 
-class CGMEJoe : public QObject, QBoardPlugin
+class CGMEJoe : public QBoardBasePlugin
 {
 Q_OBJECT
 Q_INTERFACES(QBoardPlugin)
@@ -16,8 +16,6 @@ public:
     CGMEJoe();
     virtual ~CGMEJoe();
     virtual QWidget * widget();
-    virtual void setGameState(GameState *);
-    virtual QBoardPluginInfo pluginInfo();
 private Q_SLOTS:
     void widgetDestroyed();
 private:
