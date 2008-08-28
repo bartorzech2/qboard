@@ -4,7 +4,8 @@
 #include <QDirModel>
 #include <QDebug>
 #include <QFileInfo>
-
+#include <QMessageBox>
+#include <QKeyEvent>
 
 #include "utility.h"
 
@@ -169,10 +170,33 @@ void QBoardHomeView::mouseDoubleClickEvent( QMouseEvent * event )
     }
 }
 
+void QBoardHomeView::keyReleaseEvent( QKeyEvent * event )
+{
+    if( event->key() == Qt::Key_Delete )
+    {
+	QModelIndex cur = impl->current;
+	QString fn = qboard::homeRelative( impl->model->filePath(cur) );
+	QString msg = QString("Please confirm deletion of file:\n%1").
+	    arg(fn);
+	event->accept();
+	int rc = QMessageBox::question( this,
+					"Delete file?",
+					msg,
+					QMessageBox::Ok
+					| QMessageBox::Cancel );
+	if( QMessageBox::Ok == rc )
+	{
+	    impl->model->remove( cur );
+	}
+	return;
+    }
+    return QTreeView::keyReleaseEvent(event);
+}
 void QBoardHomeView::refresh()
 {
-    impl->model->refresh(); // causes a segfault when called during ctor
-    this->setRootIndex( impl->model->index(qboard::home().absolutePath()) );
+    QModelIndex h = impl->model->index(qboard::home().absolutePath());
+    this->setRootIndex( h );
+    impl->model->refresh(h); // causes a segfault when called during ctor
 }
 
 void QBoardHomeView::currentChanged( const QModelIndex & current,
