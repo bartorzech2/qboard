@@ -14,7 +14,7 @@
  */
 
 #include <QGraphicsItem>
-
+class QGraphicsSceneMouseEvent;
 /**
    QGITypes holds the custom QGraphicsItem::type() values used
    by QBoard-related QGraphicsItem types.
@@ -26,8 +26,7 @@ struct QGITypes
 	*/
 	enum Types {
 	_TypesStart = QGraphicsItem::UserType + 100,
-// 	GamePiece, // obsolete
-	LineNode,
+	LineNode, // will go away.
 	LineNodeBinder,
 	QGIDie,
 	QGIDot,
@@ -36,5 +35,13 @@ struct QGITypes
 	QGIPiecePlacemarker,
 	_TypesEnd
 	};
+
+    /**
+       If the event is a left click then item is moved to the top of
+       the view stack via adjustment of its zLevel, based on the
+       zLevel of all items intersecting the item.
+    */
+    static bool handleClickRaise( QGraphicsItem * item,
+				  QGraphicsSceneMouseEvent * ev );
 };
 #endif // __QGI_H__

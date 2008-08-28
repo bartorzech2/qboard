@@ -25,6 +25,23 @@
 #include "MenuHandlerGeneric.h"
 #include "PropObj.h"
 
+bool QGITypes::handleClickRaise( QGraphicsItem * it,
+				 QGraphicsSceneMouseEvent * ev )
+{
+    if( ev->buttons() & Qt::LeftButton )
+    {
+	ev->accept();
+	qreal zV = qboard::nextZLevel(it);
+	if( zV > it->zValue() )
+	{
+	    //it->setProperty( "zLevel", zV );
+	    it->setZValue( zV );
+	}
+	return true;
+    }
+    return false;
+}
+
 #define QGIPiece_USE_PIXCACHE 1
 
 struct QGIPiece::Impl
@@ -344,15 +361,7 @@ void QGIPiece::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 	// ev->accept();
 	return;
     }
-    else if( ev->buttons() & Qt::LeftButton )
-    {
-	ev->accept();
-	qreal zV = qboard::nextZLevel(this);
-	if( zV > this->zValue() )
-	{
-	    this->setProperty( "zLevel", zV );
-	}
-    }
+    QGITypes::handleClickRaise( this, ev );
     this->QGraphicsPixmapItem::mousePressEvent(ev);
 }
 
@@ -610,6 +619,7 @@ bool QGIPiece::serialize( S11nNode & dest ) const
     props.setProperty("colorAlpha", impl->bgColor.alpha());
     props.setProperty("borderAlpha", impl->borderColor.alpha());
     props.setProperty("pos", this->pos() );
+    props.setProperty("zLevel", this->zValue() );
     return s11n::serialize_subnode( dest,"props", props );
 }
 
