@@ -97,7 +97,7 @@ protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *ev);
 private:
     /**
-       Calls h->unhideItem() and deleted h.
+       Calls h->unhideItem() and calls h->deleteLater().
     */
     static void unhideItem( QGIHider * h );
     /**
