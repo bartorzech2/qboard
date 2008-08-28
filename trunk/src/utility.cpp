@@ -19,6 +19,8 @@
 #include <QDebug>
 #include <QGraphicsView>
 
+#include <stdexcept>
+
 #include "utility.h"
 #include "Serializable.h"
 #include "S11nClipboard.h" // another horrible dep!
@@ -54,6 +56,32 @@ source releases config.qmake is filtered to contain the release version.
 // #endif
 
 namespace qboard {
+
+
+    void ScopedChdir::chdir( QString const & newDir )
+    {
+	if( ! QDir::setCurrent( newDir ) )
+	{
+	    QString msg = QString("Could not change to dir [%1]!").
+		arg(newDir);
+	    throw std::runtime_error(msg.toAscii().constData());
+	}
+
+    }
+    ScopedChdir::ScopedChdir( QString const & newDir )
+	: old(QDir::current())
+    {
+	this->chdir(newDir);
+    }
+    ScopedChdir::ScopedChdir( QDir const & newDir )
+	: old(QDir::current())
+    {
+	this->chdir( newDir.absolutePath() );
+    }
+    ScopedChdir::~ScopedChdir()
+    {
+	QDir::setCurrent( this->old.absolutePath() );
+    }
 
     const QString versionString()
     {
