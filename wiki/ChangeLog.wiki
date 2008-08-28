@@ -11,7 +11,7 @@ are at the top. Dates written extra large are release dates.
 
 - Fixed a few instances of mis-serialization of the zLevel, which caused pieces to be mis-stacked when loaded.
 
-- Improved the piece "covers" significantly. Covered pieces are now replaced by a proxy piece, and they don't reveal what they're covering (at least, not to the casual observer).
+- Improved the piece "covers" significantly. All QGIs can be covered (not just QGIPiece). Covered items are now replaced by a proxy piece and they don't reveal what they're covering (at least, not to the casual observer).
 
 
 == *2008 August 27:* ==
