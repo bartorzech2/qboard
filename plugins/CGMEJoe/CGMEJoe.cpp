@@ -8,10 +8,8 @@
 struct CGMEJoe::Impl
 {
     QWidget * wid;
-    GameState * gs;
     Impl() :
-	wid(0),
-	gs(0)
+	wid(0)
     {
     }
     ~Impl()
@@ -21,10 +19,18 @@ struct CGMEJoe::Impl
     }
 };
 
-CGMEJoe::CGMEJoe() : QBoardPlugin(),
+CGMEJoe::CGMEJoe() : QBoardBasePlugin(),
 		     impl(new Impl)
 {
     qDebug() << "CGMEJoe()";
+
+    QBoardPluginInfo & in( this->pluginInfo() );
+    in.name = "CGME Joe Gameset";
+    in.version = __DATE__ " " __TIME__;
+    in.license = "GPLv3";
+    in.url = "http://code.google.com/p/qboard";
+    in.author = "Stephan Beal";
+    in.comments = "A dummy plugin for testing QBoard's plugin support.";
 }
 
 CGMEJoe::~CGMEJoe()
@@ -41,6 +47,7 @@ void CGMEJoe::widgetDestroyed()
 {
     impl->wid = 0;
 }
+
 QWidget * CGMEJoe::widget()
 {
     if( ! impl->wid )
@@ -50,21 +57,6 @@ QWidget * CGMEJoe::widget()
 	connect( impl->wid, SIGNAL(destroyed(QObject*)), this, SLOT(widgetDestroyed()) );
     }
     return impl->wid;
-}
-void CGMEJoe::setGameState(GameState *s)
-{
-    impl->gs = s;
-}
-
-QBoardPluginInfo CGMEJoe::pluginInfo()
-{
-    QBoardPluginInfo in;
-    in.name = "CGME Joe Gameset";
-    in.version = __DATE__ " " __TIME__;
-    in.license = "GPLv3";
-    in.url = "http://code.google.com/p/qboard";
-    in.author = "Stephan Beal";
-    return in;
 }
 
 Q_EXPORT_PLUGIN2(CGMEJoe, CGMEJoe)
