@@ -765,6 +765,12 @@ void QGIPieceMenuHandler::addChild()
     }
 }
 
+#include "QGIHider.h"
+QGraphicsItem * QGIPieceMenuHandler::hideItem()
+{
+    return QGIHider::createHider( impl->piece );
+}
+
 void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent * ev )
 {
     if( ! pv ) return;
@@ -803,7 +809,7 @@ void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent 
 
     QMenu * mMisc = m->addMenu("Misc.");
 
-    if(1)
+    if(0)
     {
 	QVariant vcov = pv->property("isCovered");
 	int icov = vcov.toInt();
@@ -816,6 +822,11 @@ void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent 
 	act->setCheckable(true);
 	if( icov ) act->setChecked(true);
 	mMisc->addAction( act );
+    }
+
+    if(1)
+    {
+	mMisc->addAction("Cover",this,SLOT(hideItem()));
     }
 
     if(1)
@@ -874,3 +885,4 @@ void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent 
     m->exec( ev->screenPos() );
     delete m;
 }
+

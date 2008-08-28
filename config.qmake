@@ -169,6 +169,7 @@ QBOARD_HEADERS_LIB = \
  $$SRC_DIR/QBoardView.h \
  $$SRC_DIR/QGI.h \
  $$SRC_DIR/QGIDot.h \
+ $$SRC_DIR/QGIHider.h \
  $$SRC_DIR/QGIHtml.h \
  $$SRC_DIR/QGILine.h \
  $$SRC_DIR/QGIPiece.h \
@@ -193,6 +194,7 @@ QBOARD_SOURCES_LIB = \
  $$SRC_DIR/QBoardScene.cpp \
  $$SRC_DIR/QBoardView.cpp \
  $$SRC_DIR/QGIDot.cpp \
+ $$SRC_DIR/QGIHider.cpp \
  $$SRC_DIR/QGIHtml.cpp \
  $$SRC_DIR/QGILine.cpp \
  $$SRC_DIR/QGIPiece.cpp \

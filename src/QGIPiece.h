@@ -124,12 +124,14 @@ public:
 public Q_SLOTS:
         void showHelp();
 	void doMenu( QGIPiece *, QGraphicsSceneContextMenuEvent * );
+
 private Q_SLOTS:
     void copyList();
     void cutList();
     bool copyPiece();
     bool cutPiece();
     void addChild();
+    QGraphicsItem * hideItem();
 private:
     static void clipList( QGIPiece * src, bool copy );
     struct Impl;
