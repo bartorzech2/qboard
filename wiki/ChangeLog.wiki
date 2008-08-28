@@ -7,7 +7,12 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top. Dates written extra large are release dates.
 
 ----
-=== *2008 August 27:* ===
+*2008 August 28:*
+
+- Fixed a few instances of mis-serialization of the zLevel, which caused pieces to be mis-stacked when loaded.
+
+
+== *2008 August 27:* ==
 
 - Fixed serialization of 'pos' property of QGIDot objects, which sometimes caused pasted dots to be mis-placed.
 
@@ -41,7 +46,7 @@ are at the top. Dates written extra large are release dates.
 - Fixed: in Qt 4.3 the HTML widgets would become immobile after editing them via double-clicking them.
 
 
-=== *2008 August 23:* ===
+== *2008 August 23:* ==
 
 - Added new item type, QGIDot - a simple dot to place around the board or as a child of another piece.
 
@@ -70,7 +75,7 @@ Now we can scale down larger piece graphics for use with game boards which have 
 proxy type.
 
 
-=== *2008 August 20:* ===
+== *2008 August 20:* ==
 
 - The popup menus have been more unified. e.g. using Rotate will now
 rotate all selected objects which support that property, instead of all
@@ -108,7 +113,7 @@ there's no guaranty.
 - Clipboard is now better synchronized with the global Qt/X11 clipboard.
 
 
-=== *2008 August 16:* ===
+== *2008 August 16:* ==
 
 - Added s11n support for QMap, plus QByteArray and QPixmap with compression.
 
@@ -141,7 +146,7 @@ to use those resources as pixmap sources for in-play pieces. So the basics
 seem to work, anyway.
 
 
-=== *2008 August 11:* ===
+== *2008 August 11:* ==
 
 - Added "piece templates" to the main UI. The appearance of the
 currently-selected template is used as the basis when loading piece
@@ -159,7 +164,7 @@ persistant across QBoard sessions.
 
 - Corrected several compile warnings caught by gcc 4.2.3.
 
-=== *2008 June 15:* ===
+== *2008 June 15:* ==
 
 - Fixed a major bug under Qt 4.3 which caused non-piece gameboard items
 to be not removed. The end effect was duplicate or extra items at
@@ -185,6 +190,6 @@ what a bitch it was to get the event handling right in conjunction with
 overlapping pieces and the board.
 
 
-=== *2008 June 13:* ===
+== *2008 June 13:* ==
 
 - Initial release via Google Code.
