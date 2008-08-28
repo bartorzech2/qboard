@@ -87,7 +87,7 @@ QBoardView::QBoardView( GameState & gs ) :
      */
 
     //this->setCacheMode(QGraphicsView::CacheBackground);
-    this->setOptimizationFlags( QGraphicsView::DontClipPainter );
+    //this->setOptimizationFlags( QGraphicsView::DontClipPainter );
 #if 0
     // i can't seem to get local hotkeys for these objects. i have to
     // rely on app-global shortcuts. :(
@@ -346,11 +346,30 @@ void QBoardView::updateBoardPixmap()
 {
     //this->setBackgroundBrush(impl->board.pixmap());
     //if( impl->board.pixmap().isNull() ) return;
-    QSize isz = impl->board.pixmap().size();
-    if( isz.isValid() )
+    if( ! impl->board.pixmap().isNull() )
     {
+	QSize isz = impl->board.pixmap().size();
 	QRectF rect( 0, 0, isz.width(),  isz.height() );
+	//qDebug() << "QBoardView::updateBoardPixmap() setting scene rect ="<<rect;
 	this->setSceneRect( rect );
+#if 0
+	/**
+	   Kludge to force the scene rect to grow (if needed). My
+	   setting of it up there apparently gets lost along the way
+	   at times.
+	*/
+	
+	if( impl->placer )
+	{
+	    QGraphicsItem * it = impl->placer;
+	    QPointF p1( it->pos() );
+	    QRectF itb( it->boundingRect() );
+	    QPointF p2( rect.right() - (itb.width() / 2),
+			rect.bottom() - (itb.height() / 2) );
+	    impl->placer->setPos( p2 );
+	    impl->placer->setPos( p1 );
+	}
+#endif
     }
     //this->setBackgroundBrush(impl->board.pixmap());
     // Kludge to get boards to keep their scale on a reload:
