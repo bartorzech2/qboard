@@ -22,7 +22,7 @@ struct QGIHider::Impl
     }
     ~Impl()
     {
-	if( item ) delete item;
+	delete item;
     }
 };
 
@@ -41,6 +41,7 @@ void QGIHider::setup()
 
 QGIHider::~QGIHider()
 {
+    qDebug() << "QGIHider::~QGIHider()";
     delete impl;
 }
 
@@ -106,8 +107,13 @@ void QGIHider::hideItem( QGraphicsItem * toHide )
     }
     if( (impl->item = toHide) )
     {
+	bool sel = toHide->isSelected();
+	toHide->setSelected(false);
 	this->setParentItem(0);
 	this->setTransform( toHide->transform() );
+	this->setFlags( toHide->flags() );
+	this->setZValue( toHide->zValue() );
+	this->setPath( this->shape() );
 	QGraphicsScene * sc = toHide->scene();
 	QGraphicsItem * par = toHide->parentItem();
 	if( par )
@@ -127,9 +133,6 @@ void QGIHider::hideItem( QGraphicsItem * toHide )
 	    this->setPos( toHide->pos() );
 	}
 	//toHide->setPos(QPointF(0,0));
-	this->setFlags( toHide->flags() );
-	this->setZValue( toHide->zValue() );
-	this->setPath( this->shape() );
 	QObject * obj = dynamic_cast<QObject*>(toHide);
 	if( obj )
 	{
@@ -145,6 +148,29 @@ void QGIHider::hideItem( QGraphicsItem * toHide )
 	}
 	this->setParentItem(par);
 	this->setVisible(true);
+	this->setSelected( sel );
+    }
+}
+
+void QGIHider::hideItems( QGraphicsItem * toHide )
+{
+    if( ! toHide ) return;
+    typedef QList<QGraphicsItem*> QGIL;
+    QGIL li;
+    if( toHide->isSelected() && toHide->scene() )
+    {
+	li = toHide->scene()->selectedItems();
+    }
+    else
+    {
+	li.push_back( toHide );
+    }
+    for( QGIL::iterator it = li.begin();
+	 it != li.end(); ++it )
+    {
+	QGraphicsItem * i = *it;
+	if( QGITypes::QGIHider == i->type() ) continue;
+	QGIHider::createHider( i );
     }
 }
 
@@ -153,7 +179,9 @@ QGraphicsItem * QGIHider::unhideItem()
     if( ! impl->item ) return 0;
     QGraphicsItem * it = impl->item;
     impl->item = 0;
+    bool sel = this->isSelected();
     this->setVisible(false);
+    this->setSelected(false);
     it->setPos( this->pos() );
     it->setZValue( this->zValue() );
     QGraphicsItem * par = this->parentItem();
@@ -167,16 +195,43 @@ QGraphicsItem * QGIHider::unhideItem()
     it->setParentItem(par);
     sc->removeItem(this);
     it->setVisible(true);
+    it->setSelected( sel );
     return it;
 }
 
-QGraphicsItem * QGIHider::replaceItem()
+
+
+void QGIHider::unhideItem( QGIHider * h )
 {
-    QGraphicsItem * it = impl->item;
-    this->unhideItem();
-    // Is this really legal?
-    this->deleteLater();
-    return it;
+    if( h )
+    {
+	h->unhideItem();
+	h->deleteLater();
+    }
+}
+/* static */ void QGIHider::unhideItems( QGIHider * h )
+{
+    if( ! h ) return;
+    typedef QList<QGIHider*> QGIL;
+    QGIL li;
+    if( h->isSelected() && h->scene() )
+    {
+	li = qboard::graphicsItemsCast<QGIHider>( h->scene()->selectedItems() );
+    }
+    else
+    {
+	li.push_back( h );
+    }
+    for( QGIL::iterator it = li.begin();
+	 it != li.end(); ++it )
+    {
+	QGIHider::unhideItem( *it );
+    }
+}
+
+void QGIHider::unhideItems()
+{
+    QGIHider::unhideItems( this );
 }
 
 void QGIHider::mousePressEvent( QGraphicsSceneMouseEvent * ev )
@@ -186,7 +241,7 @@ void QGIHider::mousePressEvent( QGraphicsSceneMouseEvent * ev )
 }
 
 
-QGIHider * QGIHider::createHider( QGraphicsItem * it )
+/* static */ QGIHider * QGIHider::createHider( QGraphicsItem * it )
 {
     if( ! it ) return 0;
     QGIHider * h = new QGIHider;
@@ -224,15 +279,10 @@ void QGIHider::contextMenuEvent( QGraphicsSceneContextMenuEvent * ev )
     MenuHandlerCommon proxy;
     ev->accept();
     QMenu * m = proxy.createMenu( this );
-    m->addAction( "Uncover", this, SLOT(unhideItem()) );
+    m->addAction( "Uncover", this, SLOT(unhideItems()) );
     m->addSeparator();
     MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( this, m );
     clipper->addDefaultEntries( m, true, this->isSelected() );
-
     m->exec( ev->screenPos() );
     delete m;
-    if( ! impl->item )
-    {
-	this->deleteLater();
-    }
 }

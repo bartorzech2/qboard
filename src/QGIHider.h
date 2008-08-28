@@ -53,6 +53,13 @@ public:
     */
     static QGIHider * createHider( QGraphicsItem * qgi );
 
+    /**
+       Hides toHide, as per createHider(). If toHide->isSelected()
+       then all selected items which are not themselves of type
+       QGIHider are also hidden.
+    */
+    static void hideItems( QGraphicsItem * toHide );
+
 public Q_SLOTS:
 
     /**
@@ -62,7 +69,6 @@ public Q_SLOTS:
        scene). Calling unhideItem() will reverse the process.
     */
     void hideItem( QGraphicsItem * toHide );
-
     /**
        Transfers ownership of the hidden object (if any) as follows:
 
@@ -77,15 +83,30 @@ public Q_SLOTS:
     QGraphicsItem * unhideItem();
 
     /**
-       Identical to unhideItem(), but calls this->deleteLater()
-       to free this object.
+       If this object is selected, this unhides all selected items,
+       otherwise it just unhides this object.
+
+       This object (or all selected QGIHiders, if this object is
+       selected) is/are destroyed via this->deleteLater() by this
+       routine!
     */
-    QGraphicsItem * replaceItem();
+    void unhideItems();
 
 protected:
     virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent * event );
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *ev);
 private:
+    /**
+       Calls h->unhideItem() and deleted h.
+    */
+    static void unhideItem( QGIHider * h );
+    /**
+       Unhides h. If h is selected then all selected QGIHiders
+       are processed.
+
+       At the end of this routine, h is deleted.
+    */
+    static void unhideItems( QGIHider * h );
     struct Impl;
     Impl * impl;
     void setup();

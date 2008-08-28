@@ -768,7 +768,9 @@ void QGIPieceMenuHandler::addChild()
 #include "QGIHider.h"
 QGraphicsItem * QGIPieceMenuHandler::hideItem()
 {
-    return QGIHider::createHider( impl->piece );
+    QGraphicsItem * i = impl->piece;
+    QGIHider::hideItems( impl->piece );
+    return i ? i->parentItem() : 0;
 }
 
 void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent * ev )
