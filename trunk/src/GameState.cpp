@@ -428,7 +428,8 @@ static void adjustPos( QGraphicsItem * obj, QPoint const & pos )
 bool GameState::pasteTryHarder( S11nNode const & root,
 				QPoint const & pos )
 {
-    if(1) qDebug() << "GameState::pasteTryHarder(node,"<<pos<<")";
+    // FIXME: refactor this into reusable parts!
+    if(0) qDebug() << "GameState::pasteTryHarder(node,"<<pos<<")";
     /**
        We will be randomly attempting deserializations which are likely
        to fail. This may cause warning messages from s11n, via its
@@ -449,7 +450,7 @@ bool GameState::pasteTryHarder( S11nNode const & root,
 	Serializable * ser = s11nlite::deserialize<Serializable>(root);
 	if( ser )
 	{
-	    if(1) qDebug() << "GameState::pasteTryHarder(node,"<<pos<<") <Serializable>";
+	    if(0) qDebug() << "GameState::pasteTryHarder(node,"<<pos<<") <Serializable>";
 	    QGraphicsItem * qgi = dynamic_cast<QGraphicsItem*>(ser);
 	    if( qgi )
 	    {
@@ -471,10 +472,13 @@ bool GameState::pasteTryHarder( S11nNode const & root,
 	if( s11nlite::deserialize(root, pli) )
 	{
 	    if(1) qDebug() << "GameState::pasteTryHarder(node,"<<pos<<") QList<Serializable*>";
-    	    QPoint xpos( pos );
-	    QPoint step(10,10);
+	    const int stride = 10;
+	    QPoint step(stride,stride);
+    	    QPoint xpos( pos - step );
 	    //qDebug() << "GameState::pasteTryHarder(): pasting QList<Serializable*> @"<<pos;
 	    impl->scene->clearSelection();
+	    qreal zL = -1;
+	    QRectF bounds( impl->scene->sceneRect() );
 	    for( SerList::iterator it = pli.begin();
 		 it != pli.end(); ++it )
 	    {
@@ -485,19 +489,36 @@ bool GameState::pasteTryHarder( S11nNode const & root,
 		    if(1) qDebug() << "GameState::pasteTryHarder(node,"<<pos<<") skipping non-QGraphicsItem Serializable:"<<(*it)->s11nClass();
 		    continue;
 		}
-		if(1) qDebug() << "GameState::pasteTryHarder(node,"<<pos<<") got QGraphicsItem:"<<gi;
-		gi->setPos( xpos );
+		if(0) qDebug() << "GameState::pasteTryHarder(node,"<<pos<<") got QGraphicsItem:"<<gi;
+		if( zL < 0 ) zL = gi->zValue();
+		if( zL < 0 ) zL = 0.01;
+		gi->setZValue(zL);
+		zL += 0.01;
+		gi->setSelected(true);
 #if 0
-		// i don't like this, but it might be necessary for keeping cut/paste/s11n pos prop in sync?
-		if( QObject * obj = dynamic_cast<QObject*>(*it) )
+// i would like to do this, but bounds is always (0,0,200,200), and i don't know why.
+		QRectF gb( gi->boundingRect() );
+		qDebug() << "pos="<<pos<<", xpos="<<xpos<<", step="<<step<<", bounds="<<bounds<<", gi->bounds="<<gb;
+		if( (xpos.x() + gb.width()) >= bounds.right() )
 		{
-		    obj->setProperty( "pos", xpos );
+		    step = QPoint(-stride, stride);
+		}
+		else if( xpos.x() <= bounds.left() )
+		{
+		    step = QPoint(stride,stride);
+		}
+		if( (xpos.y() + gb.height()) >= bounds.bottom() )
+		{
+		    step = QPoint(step.x(),-stride);
+		}
+		else if( xpos.y() <= bounds.top() )
+		{
+		    step = QPoint(step.x(),stride);
 		}
 #endif
-		gi->setSelected(true);
-		this->addItem( gi );
 		xpos += step;
-		// FIXME: wrap at the edge of the board, or negate step direction.
+		gi->setPos( xpos );
+		this->addItem( gi );
 	    }
 	    pli.clear();
 	    s11n::cleanup_serializable( serToClean );
