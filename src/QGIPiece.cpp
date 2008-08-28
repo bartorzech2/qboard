@@ -60,13 +60,11 @@ struct QGIPiece::Impl
        position.
     */
     bool block;
-    bool isCovered;
     size_t countPaintCache;
     size_t countRepaint;
     qreal alpha;
     Impl()
     {
-	isCovered = false;
 	borderSize = 1;
 	borderLineStyle = Qt::SolidLine;
 	block = false;
@@ -297,14 +295,6 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	}
 	return;
     }
-    if( "isCovered" == key )
-    {
-	int i = var.toInt();
-	impl->isCovered = (0 != i);
-	impl->clearCache();
-	this->update();
-	return;
-    }
     if( "pixmap" == key )
     {
 	this->prepareGeometryChange();
@@ -520,25 +510,14 @@ void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * optio
 	const qreal bs = impl->borderSize;
 	qreal xl = bs / 2.0;
 
-	if( ! impl->isCovered )
+	if( ! impl->pixmap.isNull() )
 	{
-	    if( ! impl->pixmap.isNull() )
-	    {
-		// Weird: if i use impl->pixmap.rect() i get (0.5,0.5,W,H)
-		QRectF pmr( QPointF(0,0), impl->pixmap.size() );
-		//QRectF pmr( impl->pixmap.rect() );
-		AMSG << "drawPixmap("<<pmr<<"...)";
-		cp->drawPixmap(pmr, impl->pixmap, impl->pixmap.rect() );
-	    }
+	    // Weird: if i use impl->pixmap.rect() i get (0.5,0.5,W,H)
+	    QRectF pmr( QPointF(0,0), impl->pixmap.size() );
+	    //QRectF pmr( impl->pixmap.rect() );
+	    AMSG << "drawPixmap("<<pmr<<"...)";
+	    cp->drawPixmap(pmr, impl->pixmap, impl->pixmap.rect() );
 	}
-	else
-	{
-	    cp->fillRect( bounds.toRect(),
-			  QBrush(impl->borderColor.lighter(),
-				 Qt::Dense7Pattern)
-			  );
-	}
-
 	if( bs && impl->borderColor.isValid() )
 	{
 	    QRectF br( bounds );
@@ -655,6 +634,13 @@ bool QGIPiece::deserialize( S11nNode const & src )
     return true;
 }
 
+#include "QGIHider.h"
+QGraphicsItem * QGIPiece::hideItems()
+{
+    QGIHider::hideItems( this );
+    return this->parentItem();
+}
+
 
 struct QGIPieceMenuHandler::Impl
 {
@@ -765,13 +751,6 @@ void QGIPieceMenuHandler::addChild()
     }
 }
 
-#include "QGIHider.h"
-QGraphicsItem * QGIPieceMenuHandler::hideItem()
-{
-    QGraphicsItem * i = impl->piece;
-    QGIHider::hideItems( impl->piece );
-    return i ? i->parentItem() : 0;
-}
 
 void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent * ev )
 {
@@ -810,25 +789,9 @@ void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent 
     }
 
     QMenu * mMisc = m->addMenu("Misc.");
-
-    if(0)
-    {
-	QVariant vcov = pv->property("isCovered");
-	int icov = vcov.toInt();
-	vcov = icov ? QVariant(int(0)) : QVariant(1);
-	QObjectPropertyAction * act =
-	    new QObjectPropertyAction( selected,
-				       "isCovered",
-				       vcov );
-	act->setText( icov ? "Uncover" : "Cover" );
-	act->setCheckable(true);
-	if( icov ) act->setChecked(true);
-	mMisc->addAction( act );
-    }
-
     if(1)
     {
-	mMisc->addAction("Cover",this,SLOT(hideItem()));
+	mMisc->addAction("Cover",pv,SLOT(hideItems()));
     }
 
     if(1)

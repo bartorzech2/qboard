@@ -36,7 +36,7 @@ QGIHider::QGIHider() : QObject(),
 
 void QGIHider::setup()
 {
-    this->setBrush( QColor(Qt::lightGray) );
+    this->setBrush( QBrush(QColor(Qt::lightGray), Qt::Dense6Pattern) );
 }
 
 QGIHider::~QGIHider()
