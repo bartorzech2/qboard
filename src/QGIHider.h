@@ -14,6 +14,32 @@ class QEvent;
 #include "Serializable.h"
 #include "QGI.h"
 
+/**
+   QGIHider is a special type of QGraphicsItem which "hides"
+   other QGIs. When it does so, it takes on the "hidden"
+   item as a child and replaces the child with this item
+   in the parent's coordinates. This item takes on the overall
+   shape of the covered item.
+
+   Intended usage:
+
+   \code
+   QGIHider * h = new QGIHider;
+   h->hideItem( myQGI );
+   ...
+   h->unhideItem();
+   delete h;
+   \code
+
+   Alternately, unhideItems() (plural) will not only
+   unhide the item (and all selected items, if the item
+   is selected), but will also:
+
+   - unhide all selected QGIHider items IFF this object
+   is selected.
+   - destroy this object (and all selected QGIHider objects
+   IFF this object is selected).
+*/
 class QGIHider : public QObject,
 		 public QGraphicsPathItem,
 		 public Serializable
@@ -24,7 +50,8 @@ public:
     virtual ~QGIHider();
 
     /**
-       Serializes this object to dest.
+       Serializes this object to dest. The currently hidden
+       object gets serialized as well.
     */
     virtual bool serialize( S11nNode & dest ) const;
 
@@ -34,8 +61,18 @@ public:
     virtual bool deserialize( S11nNode const & src );
 
     virtual int type() const { return QGITypes::QGIHider; }
+
+    /**
+       Reimplemented to return the rect for the hidden piece.
+    */
     virtual QRectF boundingRect() const;
+    /**
+       Reimplemented to return the shape of the hidden piece.
+    */
     virtual QPainterPath shape() const;
+    /**
+
+    */
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     virtual bool event( QEvent * e );
 
@@ -59,7 +96,7 @@ public:
        QGIHider are also hidden.
     */
     static void hideItems( QGraphicsItem * toHide );
-
+    virtual QPainterPath opaqueArea() const;
 public Q_SLOTS:
 
     /**
@@ -67,6 +104,9 @@ public Q_SLOTS:
        it from the scene and hide it from view. In toHide's place,
        this object will move itself to toHide's parent item (or the
        scene). Calling unhideItem() will reverse the process.
+
+       As a special case, if toHide is-a QObject and has a property
+       named 'color', this object will set its color to that color.
     */
     void hideItem( QGraphicsItem * toHide );
     /**
@@ -77,8 +117,10 @@ public Q_SLOTS:
        object's current position.  If there is no scene, the caller
        owns the returned object.
 
-       This routine will leave this object invisible. This object
-       should normally be deleted after calling this.
+       This routine will leave this object invisible, and thus not
+       reachable via a GUI. This object should normally be deleted
+       after calling unhideItem(). Alternately, use unhideItems(),
+       which destroys this object after unhiding the hidden item.
     */
     QGraphicsItem * unhideItem();
 
@@ -94,7 +136,11 @@ public Q_SLOTS:
 
 protected:
     virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent * event );
+    /**
+       Reimplemented to handle raise-on-click.
+    */
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *ev);
+
 private:
     /**
        Calls h->unhideItem() and calls h->deleteLater().

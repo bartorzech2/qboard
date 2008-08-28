@@ -16,13 +16,15 @@
 struct QGIHider::Impl
 {
     QGraphicsItem * item;
+    Qt::BrushStyle bstyle;
     Impl()
-	: item(0)
+	: item(0),
+	  bstyle(Qt::SolidPattern)
     {
     }
     ~Impl()
     {
-	delete item;
+	// reminder: we don't own this->item
     }
 };
 
@@ -36,7 +38,7 @@ QGIHider::QGIHider() : QObject(),
 
 void QGIHider::setup()
 {
-    this->setBrush( QBrush(QColor(Qt::lightGray), Qt::Dense6Pattern) );
+    this->setBrush( QBrush(QColor(Qt::lightGray), impl->bstyle) );
 }
 
 QGIHider::~QGIHider()
@@ -146,7 +148,7 @@ void QGIHider::hideItem( QGraphicsItem * toHide )
 	    QVariant cv( obj->property("color") );
 	    if( cv.canConvert<QColor>() )
 	    {
-		this->setBrush( cv.value<QColor>() );
+		this->setBrush( QBrush(cv.value<QColor>(), impl->bstyle) );
 	    }
 	}
 	if( sc )
@@ -264,11 +266,22 @@ QRectF QGIHider::boundingRect() const
 }
 QPainterPath QGIHider::shape() const
 {
+#if 0
 	QPainterPath path;
 	path.addRect( this->boundingRect() );
 	return path;
-
+#else
+	return impl->item
+	    ? impl->item->shape()
+	    : this->QGraphicsPathItem::shape();
+#endif
 }
+
+QPainterPath QGIHider::opaqueArea() const
+{
+    return this->shape();
+}
+
 void QGIHider::paint(QPainter *painter,
 		     const QStyleOptionGraphicsItem *opt,
 		     QWidget *wid)
@@ -286,7 +299,8 @@ void QGIHider::contextMenuEvent( QGraphicsSceneContextMenuEvent * ev )
     MenuHandlerCommon proxy;
     ev->accept();
     QMenu * m = proxy.createMenu( this );
-    m->addAction( "Uncover", this, SLOT(unhideItems()) );
+    m->addAction(QIcon(":/QBoard/icon/box_unwrapped.png"),
+		 "Uncover", this, SLOT(unhideItems()) );
     m->addSeparator();
     MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( this, m );
     clipper->addDefaultEntries( m, true, this->isSelected() );
