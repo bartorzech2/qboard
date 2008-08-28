@@ -55,6 +55,7 @@ protected:
        mode - use F2 for that.
      */
     virtual void mouseDoubleClickEvent( QMouseEvent * event );
+    virtual void keyReleaseEvent( QKeyEvent * event );
 private Q_SLOTS:
     void currentChanged( const QModelIndex & current, const QModelIndex & previous );
 private:
