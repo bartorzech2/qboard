@@ -38,6 +38,14 @@ public:
     /** Deserializes src to this object. */
     virtual bool deserialize( S11nNode const & src );
     virtual int type() const { return QGITypes::QGIHtml; }
+public Q_SLOTS:
+   /**
+      See QGIHider::hideItems(). Returns object is this item's new
+      parent (which may technically be 0 but is "likely" to be a
+      QGIHider).
+   */
+    QGraphicsItem * hideItems();
+
 protected:
     virtual void mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event );
     virtual void focusOutEvent( QFocusEvent * event );

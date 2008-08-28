@@ -273,7 +273,12 @@ void QGIHtml::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
     }
 }
 
-
+#include "QGIHider.h"
+QGraphicsItem * QGIHtml::hideItems()
+{
+    QGIHider::hideItems( this );
+    return this->parentItem();
+}
 
 
 QGIHtmlEditor::QGIHtmlEditor(QGIHtml * item, QWidget * parent) 
@@ -373,6 +378,12 @@ void MenuHandlerQGIHtml::doMenu( QGIHtml * pv, QGraphicsSceneContextMenuEvent * 
 	    pm->setIcon(QIcon(":/QBoard/icon/rotate_cw.png"));
 	    m->addMenu(pm);
 	}
+	QMenu * mMisc = m->addMenu("Misc.");
+	if(1)
+	{
+	    mMisc->addAction("Cover",pv,SLOT(hideItems()));
+	}
+
 	if(1)
 	{
 	    QObjectPropertyMenu * pm =
@@ -380,7 +391,7 @@ void MenuHandlerQGIHtml::doMenu( QGIHtml * pv, QGraphicsSceneContextMenuEvent * 
 							list, "scale",
 							0.25, 3.01, 0.25);
 	    pm->setIcon(QIcon(":/QBoard/icon/viewmag.png"));
-	    m->addMenu(pm);
+	    mMisc->addMenu(pm);
 	}
 	m->addSeparator();
 	MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( pv, m );

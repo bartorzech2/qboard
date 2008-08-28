@@ -243,6 +243,13 @@ void QGIDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QWidg
     this->QGraphicsEllipseItem::paint(painter,opt,wid); // draws our selection box
 }
 
+#include "QGIHider.h"
+QGraphicsItem * QGIDot::hideItems()
+{
+    QGIHider::hideItems( this );
+    return this->parentItem();
+}
+
 void QGIDot::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
 {
 	event->accept();
@@ -357,6 +364,12 @@ void MenuHandlerDot::doMenu( QGIDot *gvi, QGraphicsSceneContextMenuEvent * ev )
 						    0.5, 3.01, 0.5);
 	pm->setIcon(QIcon(":/QBoard/icon/viewmag.png"));
 	m->addMenu(pm);
+    }
+
+    QMenu * mMisc = m->addMenu("Misc.");
+    if(1)
+    {
+	mMisc->addAction("Cover",gvi,SLOT(hideItems()));
     }
 
     m->addSeparator();

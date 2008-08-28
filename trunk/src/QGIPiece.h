@@ -83,6 +83,13 @@ public:
     */
     virtual bool deserialize( S11nNode const & src );
 
+public Q_SLOTS:
+   /**
+      See QGIHider::hideItems(). Returns object is this item's new
+      parent (which may technically be 0 but is "likely" to be a
+      QGIHider).
+   */
+    QGraphicsItem * hideItems();
 protected:
     virtual void mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event );
     virtual void mouseMoveEvent( QGraphicsSceneMouseEvent * event );
@@ -122,8 +129,8 @@ public:
 	virtual ~QGIPieceMenuHandler();
 
 public Q_SLOTS:
-        void showHelp();
-	void doMenu( QGIPiece *, QGraphicsSceneContextMenuEvent * );
+    void showHelp();
+    void doMenu( QGIPiece *, QGraphicsSceneContextMenuEvent * );
 
 private Q_SLOTS:
     void copyList();
@@ -131,7 +138,6 @@ private Q_SLOTS:
     bool copyPiece();
     bool cutPiece();
     void addChild();
-    QGraphicsItem * hideItem();
 private:
     static void clipList( QGIPiece * src, bool copy );
     struct Impl;
