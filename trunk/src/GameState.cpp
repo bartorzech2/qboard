@@ -474,11 +474,11 @@ bool GameState::pasteTryHarder( S11nNode const & root,
 	    if(1) qDebug() << "GameState::pasteTryHarder(node,"<<pos<<") QList<Serializable*>";
 	    const int stride = 10;
 	    QPoint step(stride,stride);
-    	    QPoint xpos( pos - step );
+    	    QPoint xpos( pos );
 	    //qDebug() << "GameState::pasteTryHarder(): pasting QList<Serializable*> @"<<pos;
 	    impl->scene->clearSelection();
 	    qreal zL = -1;
-	    QRectF bounds( impl->scene->sceneRect() );
+	    //QRectF bounds( impl->scene->sceneRect() );
 	    for( SerList::iterator it = pli.begin();
 		 it != pli.end(); ++it )
 	    {
@@ -516,8 +516,8 @@ bool GameState::pasteTryHarder( S11nNode const & root,
 		    step = QPoint(step.x(),stride);
 		}
 #endif
-		xpos += step;
 		gi->setPos( xpos );
+		xpos += step;
 		this->addItem( gi );
 	    }
 	    pli.clear();
@@ -609,7 +609,10 @@ bool GameState::pasteClipboard( QPoint const & target )
 		}
 	    }
 	    newpos -= pD;
-	    
+
+#if 1	    
+	    qgi->setPos( newpos );
+#else
 	    if( QObject * qobj = dynamic_cast<QObject*>(*it) )
 	    {
 		qobj->setProperty( "pos", newpos );
@@ -618,6 +621,7 @@ bool GameState::pasteClipboard( QPoint const & target )
 	    {
 		qgi->setPos( newpos );
 	    }
+#endif
 	    if(0) qDebug() << "qboard::pasteClipboard() adding Serializable QGI to scene:"
 			   << "newpos ="<<newpos
 			   << qgi;
