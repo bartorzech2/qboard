@@ -294,7 +294,7 @@ QMenu * MenuHandlerCommon::createMenu( QGraphicsItem *gi ) //, QGraphicsSceneCon
 	act->setEnabled(false);
     }
     else
-    {
+    { // make our own mini-icon by painting gi...
 #if 1
 	QRectF bounds = gi->boundingRect();
 	QPixmap tgt(bounds.size().toSize());
