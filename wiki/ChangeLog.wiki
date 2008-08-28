@@ -7,6 +7,12 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top. Dates written extra large are release dates.
 
 ----
+*2008 August 29:*
+
+- In the tree browser view, clicking Refresh to update the file view no longer collapses open dirs (unless those dirs no longer exist). (This feature was an accident, actually.)
+
+- Tapping the Delete key in the tree view will now delete the selected file (after asking for confirmation).
+
 *2008 August 28:*
 
 - Fixed a few instances of mis-serialization of the zLevel, which caused pieces to be mis-stacked when loaded.
