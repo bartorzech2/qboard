@@ -39,6 +39,36 @@ namespace qboard
 	*/
 	QString homeRelative( QString const & fn );
 
+    /***
+	ScopedDir changes the current working directory for its
+	lifetime, setting it back to the pre-construction state upon
+	destruction.
+    */
+    class ScopedChdir
+    {
+    public:
+	/**
+	   Sets current dir to newDir, or throws a std::exception if
+	   it cannot.
+	*/
+	ScopedChdir( QDir const & newDir );
+	/**
+	   Sets current dir to newDir, or throws a std::exception if
+	   it cannot.
+	*/
+	ScopedChdir( QString const & newDir );
+	/**
+	   Re-sets the current dir to the state it was in when this
+	   object was constructed. Unlike the ctor, it does not throw
+	   on error.
+	*/
+	~ScopedChdir();
+    private:
+	ScopedChdir( const ScopedChdir & ); // not implemented!
+	ScopedChdir & operator=(ScopedChdir const &); // not implemented!
+	void chdir( QString const & newDir );
+	QDir old;
+    };
 
     /**
        Returns the directory (from somewhere under home()/QBoard/...)
