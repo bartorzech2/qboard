@@ -381,7 +381,8 @@ void MenuHandlerQGIHtml::doMenu( QGIHtml * pv, QGraphicsSceneContextMenuEvent * 
 	QMenu * mMisc = m->addMenu("Misc.");
 	if(1)
 	{
-	    mMisc->addAction("Cover",pv,SLOT(hideItems()));
+	    mMisc->addAction(QIcon(":/QBoard/icon/box_wrapped.png"),
+			     "Cover",pv,SLOT(hideItems()));
 	}
 
 	if(1)
