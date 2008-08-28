@@ -1,4 +1,4 @@
-#summary This history of QBoard
+#summary A brief history of QBoard
 
 = A brief history of QBoard =
 
@@ -10,7 +10,7 @@ Soon after i decided to take another whack at learning C++. So GUB became, some 
 
 In the summer of 2008, i got an itch to rewrite QUB, and started working on QBoard. QBoard, while probably not as overall flexible as QUB, has many features which QUB could not have so easily provided, some examples being transparent pieces, piece scaling, and scaling of the game board. (QUB's over-flexibility was also a big contributor to its downfall - it evolved way too much special-case handling code for specific cases which didn't fit into its generic model.) QBoard also takes advantage of Qt's newer 2D graphics classes, which are much more useful for gaming purposes than normal UI widgets are.
 
-Earlier i wrote "in the beginning there was GUB", but that wasn't exactly true. Shortly after i started work on GUB i found out about V_MAP, a long-defunct application with only the most basic boardgame support (but rock solid at what it did). V_MAP's simplicity has always remained an inspiration, but i need more out of a boardgame interface than V_MAP could ever provide.
+Earlier i wrote "in the beginning there was GUB", but that wasn't exactly true. Shortly after i started work on GUB i found out about V_MAP, a now-defunct application with only the most basic boardgame support (but rock solid at what it did). V_MAP's simplicity has always remained an inspiration, but i need more out of a boardgame interface than V_MAP could ever provide.
 
 Aside from V_MAP, other programs of this nature have also come and go. The ones i know about are:
 
