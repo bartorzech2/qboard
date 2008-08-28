@@ -26,6 +26,12 @@
 #include <QRegExp>
 #endif
 
+#define QBHomeView_USE_QBOARD_FILEEXT_RESOURCES 1
+#if QBHomeView_USE_QBOARD_FILEEXT_RESOURCES
+#include <QRegExp>
+#endif
+
+
 
 QBoardFileIconProvider::QBoardFileIconProvider() :
     QFileIconProvider()
@@ -70,6 +76,17 @@ QIcon QBoardFileIconProvider::icon( const QFileInfo & info ) const
 	}
     }
 #endif // QBHomeView_GENERATE_MINIICONS
+#if QBHomeView_USE_QBOARD_FILEEXT_RESOURCES
+    if( ! info.isDir() )
+    {
+	QIcon ico( QString( ":/QBoard/icon/fileext/%1.png" ).
+		   arg(info.completeSuffix()) );
+	if( ! ico.isNull() )
+	{
+	    return ico;
+	}
+    }
+#endif // QBHomeView_USE_QBOARD_FILEEXT_RESOURCES
     return this->QFileIconProvider::icon(info);
 }
 

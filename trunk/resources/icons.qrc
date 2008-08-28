@@ -4,6 +4,8 @@
     <file>icon/unlock.png</file>
     <file>icon/lock.png</file>
     <file>icon/1rightarrow.png</file>
+    <file>icon/box_unwrapped.png</file>
+    <file>icon/box_wrapped.png</file>
     <file>icon/button_cancel.png</file>
     <file>icon/button_fewer.png</file>
     <file>icon/color_fill.png</file>
@@ -100,5 +102,26 @@
     <file>icon/window_fullscreen.png</file>
     <file>icon/window_new.png</file>
     <file>icon/window_nofullscreen.png</file>
+
+	<file>icon/fileext/bat.png</file>
+	<file>icon/fileext/bmp.png</file>
+	<file>icon/fileext/bz2.png</file>
+	<file>icon/fileext/com.png</file>
+	<file>icon/fileext/exe.png</file>
+	<file>icon/fileext/gif.png</file>
+	<file>icon/fileext/gz.png</file>
+	<file>icon/fileext/html.png</file>
+	<file>icon/fileext/js.png</file>
+	<file>icon/fileext/jpg.png</file>
+	<file>icon/fileext/png.png</file>
+	<file>icon/fileext/sh.png</file>
+	<file>icon/fileext/svg.png</file>
+	<file>icon/fileext/tar.bz2.png</file>
+	<file>icon/fileext/tar.gz.png</file>
+	<file>icon/fileext/tar.png</file>
+	<file>icon/fileext/tgz.png</file>
+	<file>icon/fileext/txt.png</file>
+	<file>icon/fileext/xpm.png</file>
+	<file>icon/fileext/zip.png</file>
   </qresource>
 </RCC>
