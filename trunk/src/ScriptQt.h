@@ -41,16 +41,28 @@ namespace qboard {
 
     /**
        ScriptPacket is intended to be a scriptable package of code for
-       use in event handlers and such.
+       use in event handlers and such. It is copyable and uses
+       reference counting and copy-on-write to reduce the actual
+       copying which goes on.
     */
     class ScriptPacket : public QObject
     {
 	Q_OBJECT;
     public:
+	/**
+	   Initialized the object with the given JS engine, JS code
+	   string, and optional script name (used in error reporting).
+	*/
 	ScriptPacket( QScriptEngine * e = 0,
 		      QString const & code = QString(),
 		      QString const & name = QString() );
+	/**
+	   Copies rhs.
+	*/
 	ScriptPacket( ScriptPacket const & rhs );
+	/**
+	   Copies rhs.
+	*/
 	ScriptPacket & operator=(ScriptPacket const & rhs );
 	virtual ~ScriptPacket();
 	/**
