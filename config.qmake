@@ -54,8 +54,8 @@ REL_SRCDIR = $$(PWD)
 REL_SRCDIR=$$replace(REL_SRCDIR,$$TOP_SRCDIR/,)
 REL_SRCDIR=$$replace(REL_SRCDIR,[^/]+,..)
 
-QBOARD_QMAKE_CONFIG = script
-CONFIG += warn_on debug script
+CONFIG += warn_on debug
+QT += script
 # CONFIG +=  ordered debug_and_release
 
 VERSION = $$QBOARD_VERSION
