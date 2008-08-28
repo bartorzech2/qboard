@@ -41,7 +41,7 @@ void QGIHider::setup()
 
 QGIHider::~QGIHider()
 {
-    qDebug() << "QGIHider::~QGIHider()";
+    //qDebug() << "QGIHider::~QGIHider()";
     delete impl;
 }
 
@@ -50,7 +50,6 @@ bool QGIHider::serialize( S11nNode & dest ) const
     if( ! this->Serializable::serialize( dest ) ) return false;
     typedef S11nNodeTraits NT;
     if( ! impl->item ) return true;
-    //impl->item->setPos( this->pos() );
     Serializable const * s = dynamic_cast<Serializable const *>( impl->item );
     if( ! s )
     {
@@ -115,6 +114,14 @@ void QGIHider::hideItem( QGraphicsItem * toHide )
 	this->setZValue( toHide->zValue() );
 	this->setPath( this->shape() );
 	QGraphicsScene * sc = toHide->scene();
+#if 0
+	// During deserialization, neither of us have a scene...
+ 	if( ! sc )
+ 	{
+ 	    sc = this->scene();
+// 	    if( sc ) sc->removeItem(this);
+ 	}
+#endif
 	QGraphicsItem * par = toHide->parentItem();
 	if( par )
 	{
@@ -186,9 +193,10 @@ QGraphicsItem * QGIHider::unhideItem()
     it->setZValue( this->zValue() );
     QGraphicsItem * par = this->parentItem();
     QGraphicsScene * sc = this->scene();
-    if( sc )
+    if( sc && !par )
     {
 	//qDebug() << "QGIHider::unhideItem("<<it<<") adding item to scene.";
+	sc->removeItem(it); // avoids "QGraphicsScene::addItem: item has already been added to this scene"
 	sc->addItem(it);
     }
     //qDebug() << "QGIHider::unhideItem("<<it<<") parenting item to"<<par;
@@ -200,8 +208,7 @@ QGraphicsItem * QGIHider::unhideItem()
 }
 
 
-
-void QGIHider::unhideItem( QGIHider * h )
+/* static */ void QGIHider::unhideItem( QGIHider * h )
 {
     if( h )
     {
