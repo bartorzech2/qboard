@@ -28,13 +28,15 @@
 bool QGITypes::handleClickRaise( QGraphicsItem * it,
 				 QGraphicsSceneMouseEvent * ev )
 {
-    if( ev->buttons() & Qt::LeftButton )
+    if( (ev->buttons() & Qt::LeftButton)
+	|| (ev->buttons() & Qt::MidButton)
+	)
     {
+	bool high = (ev->buttons() & Qt::LeftButton);
 	ev->accept();
-	qreal zV = qboard::nextZLevel(it);
-	if( zV > it->zValue() )
+	qreal zV = qboard::nextZLevel(it,high);
+	if( zV != it->zValue() )
 	{
-	    //it->setProperty( "zLevel", zV );
 	    it->setZValue( zV );
 	}
 	return true;
@@ -791,7 +793,8 @@ void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent 
     QMenu * mMisc = m->addMenu("Misc.");
     if(1)
     {
-	mMisc->addAction("Cover",pv,SLOT(hideItems()));
+	mMisc->addAction(QIcon(":/QBoard/icon/box_wrapped.png"),
+			 "Cover",pv,SLOT(hideItems()));
     }
 
     if(1)

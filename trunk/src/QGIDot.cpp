@@ -369,7 +369,8 @@ void MenuHandlerDot::doMenu( QGIDot *gvi, QGraphicsSceneContextMenuEvent * ev )
     QMenu * mMisc = m->addMenu("Misc.");
     if(1)
     {
-	mMisc->addAction("Cover",gvi,SLOT(hideItems()));
+	mMisc->addAction(QIcon(":/QBoard/icon/box_wrapped.png"),
+			 "Cover",gvi,SLOT(hideItems()));
     }
 
     m->addSeparator();
