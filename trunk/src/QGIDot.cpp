@@ -74,15 +74,7 @@ void QGIDot::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 {
 	impl->active = true;
 	this->updatePainter();
-	if( (ev->buttons() & Qt::LeftButton) )
-	{
-	    ev->accept();
-	    qreal zV = qboard::nextZLevel(this);
-	    if( zV > this->zValue() )
-	    {
-		this->setZValue(zV);
-	    }
-	}
+	QGITypes::handleClickRaise(this, ev);
 	this->QGraphicsEllipseItem::mousePressEvent(ev);
 }
 
@@ -276,11 +268,12 @@ bool QGIDot::serialize( S11nNode & dest ) const
 	    // so we save the alpha properties separately.
 	    props.setProperty("colorAlpha", impl->color.alpha());
 	    props.setProperty("pos", this->pos() );
+	    props.setProperty("zLevel", this->zValue() );
 	    S11nNode & pr( s11n::create_child( dest, "properties" ) );
-	    QObject const & kludge( props );
-	    if( ! s11n::qt::QObjectProperties_s11n()( pr, kludge ) ) return false;
+	    QObject const & constnessKludge( props );
+	    if( ! s11n::qt::QObjectProperties_s11n()( pr, constnessKludge ) ) return false;
 	}
-	return s11n::serialize_subnode( dest, "pos", this->pos() );
+	return true;
 }
 
 bool QGIDot::deserialize(  S11nNode const & src )
@@ -290,7 +283,7 @@ bool QGIDot::deserialize(  S11nNode const & src )
     S11nNode const * ch = s11n::find_child_by_name( src, "pos" );
     if( ch )
     {
-	// older data format used this extra property
+	// QBoard < 20080828 used this extra property
 	QPointF p;
 	if( ! s11n::deserialize( *ch, p ) ) return false;
 	this->setPos( p );

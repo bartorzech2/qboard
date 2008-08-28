@@ -79,6 +79,7 @@ bool QGIHtml::event( QEvent * e )
 	map["html"] = 1;
 	map["angle"] = 1;
 	map["scale"] = 1;
+	map["zLevel"] = 1;
     }
     while( e->type() == QEvent::DynamicPropertyChange )
     {
@@ -102,6 +103,10 @@ bool QGIHtml::event( QEvent * e )
 		 || (QString("scale") == key) )
 	{
 	    this->refreshTransformation();
+	}
+	else if( QString("zLevel") == key )
+	{
+	    this->setZValue( val.toDouble() );
 	}
 	else
 	{
@@ -175,23 +180,17 @@ void QGIHtml::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 		ed.exec();
 		return;
 	}
-	if( (ev->buttons() & Qt::LeftButton) )
-	{
-		ev->accept();
-		qreal zV = qboard::nextZLevel(this);
-		if( zV > this->zValue() )
-		{
-			this->setZValue(zV);
-		}
-	}
+	QGITypes::handleClickRaise( this, ev );
 	this->QGraphicsTextItem::mousePressEvent(ev);
 }
 bool QGIHtml::serialize( S11nNode & dest ) const
 {
+    // TODO: refactor this to use an approach similar to QGIPiece/QGIDot.
 	if( ! this->Serializable::serialize( dest ) ) return false;
 	typedef S11nNodeTraits NT;
 	NT::set( dest, "angle", this->property("angle").toInt() );
 	NT::set( dest, "scale", this->property("scale").toDouble() );
+	NT::set( dest, "zLevel", this->zValue() );
 	{
 	    QList<QGraphicsItem *> chgi( qboard::childItems(this) );
 	    if( ! chgi.isEmpty() )
@@ -235,14 +234,13 @@ bool QGIHtml::deserialize(  S11nNode const & src )
 	{
 	    this->setProperty("angle", NT::get( src, "angle", qreal(0.0) ) );
 	    double dbl = NT::get( src, "scale", qreal(1.0) );
-	    if( dbl == 0.0 )
-	    {
-		dbl = 1.0;
-	    }
+	    if( dbl == 0.0 ) dbl = 1.0;
 	    this->setProperty("scale", QVariant(dbl));
 	}
+	this->setZValue( NT::get( src, "zLevel", this->zValue() ) );
+	S11nNode const * ch = 0;
 	{
-	    S11nNode const * ch = s11n::find_child_by_name(src, "children");
+	    ch = s11n::find_child_by_name(src, "children");
 	    if( ch )
 	    {
 		typedef QList<QGraphicsItem *> QGIL;
