@@ -10,15 +10,15 @@ The code is available via the QBoard source tree (look for `src/*11n*.*`) or as 
 The distribution contains code for de/serializing the following Qt types:
 
   * QString, both ASCII and Unicode strings (though it internally uses different formats for each).
-  * Most of the commonly-used utility classes, including: QPoint, QColor, QRect, QSize, QLine, QPolygon, QPair, QFont, QDate/Time/DateTime, QTransform, QMatrix, QRegExp.
-  * QByteArray and QPixmap, with compression
+  * Most of the commonly-used utility classes, including: QString QPoint/QPointF, QColor, QRect/QRectF, QSize/QSizeF, QLine/QLineF, QPolygon, QPair, QFont, QDate/QTime/QDateTime, QTransform, QMatrix, QRegExp.
+  * QByteArray and QPixmap, with optional zlib compression of the serialized data.
   * Many forms of QVariant, including storing any SerializableType object.
   * QList, QStringList, QVector, QMap
   * QObject properties. They are internally stored as QVariants, which implies that only property values of QVariant types supported by this code will work for purposes of serialization.
 
 It also comes with proxy objects which allow QIODevices to be used via the STL i/ostream interfaces (so you can e.g. save s11n data out to a QFile instead of a std::ofile).
 
-The code gets pretty heavy use in QBoard and is believed to work quite well.
+The code is central to QBoard's save/load features and is believed to work quite well.
 
 Suggestions, fixes, etc., are of course always welcome.
 
