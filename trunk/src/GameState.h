@@ -22,10 +22,36 @@ class QBoard;
 class QGraphicsItem;
 class QScriptEngine;
 #include <QScriptValue>
+
+/**
+   GameState is the central point of a QBoard game. It holds the
+   various parts of the game together.
+
+   GameState is essentially made up of:
+
+   - a single QGraphicsScene to put "game pieces" on.
+
+   - an arbitrary number of QGraphicsItem ("game pieces"), which are
+   managed by the QGraphicsScene. In order to fully integrate into
+   QBoard, each item needs to subclass QObject and Serializable.
+
+   - a single QBoard object (the game board)
+
+   - a single QBoardView object (the visual representation of the board).
+
+   - a QScriptEngine with some QBoard-specific functionality added to
+   it.
+
+   To start a "new game", simply create a GameState object, then
+   manipulate it at will. When you're ready to save it, use the
+   s11nSave() member and use s11nLoad() to load its contents from a
+   file or stream.
+
+*/
 class GameState : public QObject,
 		  public Serializable
 {
-    Q_OBJECT
+Q_OBJECT
 public:
     GameState();
     virtual ~GameState();
@@ -70,7 +96,7 @@ public:
 
     static char const * KeyClipboard;
 
-    QScriptEngine & jsEngine();
+    QScriptEngine & jsEngine() const;
 
 public Q_SLOTS:
 
@@ -152,8 +178,20 @@ public Q_SLOTS:
     QScriptValue
     prop( QObject * tgt, QString const & name );
 
+    /**
+       Evaluates the given file as JavaScript code, in the context of
+       this object's JS engine (see jsEngine()). If the file cannot
+       be opened in read mode, the returned value will be an Error
+       object.
+    */
+    QScriptValue evalScriptFile( QString const & filename );
+
 private:
+    GameState & operator=(GameState const &); // not implemented!
+    GameState(GameState const &); // not implemented!
+    /** internal detail. */
     void setup();
+    /** internal detail. */
     bool pasteTryHarder( S11nNode const & root,
 			 QPoint const & pos );
     struct Impl;

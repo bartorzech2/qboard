@@ -36,15 +36,12 @@ struct GameState::Impl
 {
     QBoard board;
 //     QPoint placeAt;
-    mutable QGraphicsScene * scene;
-    /** lameKludge exists for the "addPiece() QGraphicsItem return workaround" */
-    QGraphicsItem * lameKludge;
+    QGraphicsScene * scene;
     QScriptValue jsThis;
     QScriptEngine * js;
     Impl() :
 	board(),
 	scene( new QBoardScene() ),
-	lameKludge(0),
 	jsThis(),
 	js(0)
     {
@@ -52,6 +49,7 @@ struct GameState::Impl
     }
     ~Impl()
     {
+	delete this->js;
 	delete this->scene;
     }
 
@@ -176,7 +174,7 @@ void GameState::setup()
 // }
 
 
-QScriptEngine & GameState::jsEngine()
+QScriptEngine & GameState::jsEngine() const
 {
     return *impl->js;
 }
@@ -288,6 +286,26 @@ bool GameState::props( QObject * tgt, QScriptValue const & props )
 	prop( tgt, it.name(), it.value() ); // .toVariant() );
     }
     return true;
+}
+
+QScriptValue GameState::evalScriptFile( QString const & fn )
+{
+    QFile scriptFile(fn);
+    QString sname;
+    QString contents;
+    if (!scriptFile.open(QIODevice::ReadOnly))
+    {
+	sname = QString("GameState::evalScriptFile(%1)").arg(fn);
+	contents = QString("new Error(\"GameState::evalScriptFile() could not open file [%1]\")").arg(fn);
+    }
+    else
+    {
+	sname = fn;
+	QTextStream stream(&scriptFile);
+	contents = stream.readAll();
+	scriptFile.close();
+    }
+    return impl->js->evaluate( contents, sname );
 }
 
 QGraphicsScene * GameState::scene()
