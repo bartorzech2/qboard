@@ -77,10 +77,11 @@ public Q_SLOTS:
 protected:
 	virtual void drawBackground( QPainter *, const QRectF & );
 	virtual void mousePressEvent ( QMouseEvent * event );
+	virtual void mouseReleaseEvent ( QMouseEvent * event );
     virtual void dragMoveEvent( QDragMoveEvent * event );
     virtual void contextMenuEvent( QContextMenuEvent * event );
     virtual bool event( QEvent * e );
-
+    virtual void mouseDoubleClickEvent( QMouseEvent * e );
 private Q_SLOTS:
     void placemarkerDestroyed();
 

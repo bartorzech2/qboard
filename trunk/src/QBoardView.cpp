@@ -43,13 +43,15 @@ struct QBoardView::Impl
     bool glmode;
     QGIPiecePlacemarker * placer;
     QPoint placeAt;
+    bool inMoveMode;
     Impl(GameState & s)
 	: gs(s),
 	  board(s.board()),
 	  scale(1.0),
 	  glmode(false),
 	  placer(0),
-	  placeAt(50,50)
+	  placeAt(50,50),
+	  inMoveMode(false)
     {
     }
     ~Impl()
@@ -221,18 +223,15 @@ static void clipboardQGI( QGraphicsScene * sc, bool copy )
     {
 	QPoint pos;
 #if 0
-	// Works!
+	// Works, but centering is nicer.
 	QRectF r( qboard::calculateBounds( qgi ) );
-	qDebug() << "clipboardQGI() rect ="<<r;
+	if(0) qDebug() << "clipboardQGI() rect ="<<r;
 	pos = r.topLeft().toPoint();
 #else
 	pos = qboard::calculateCenter( qgi ).toPoint();
-	qDebug() << "clipboardQGI() center ="<<pos;
-	//pos = qgi->pos().toPoint();
-	//pos = qboard::calculateCenter(qgi).toPoint();
-	//pos = impl->gv->placementPos();// works, but barely
+	if(0) qDebug() << "clipboardQGI() center ="<<pos;
 #endif
-	qDebug() << "clipboardQGI() pos ="<<pos;
+	if(0) qDebug() << "clipboardQGI() pos ="<<pos;
 	qboard::clipboardScene( qgi->scene(), copy, pos );
     }
     return;
@@ -492,6 +491,35 @@ void QBoardView::placemarkerDestroyed()
     }
 }
 
+void QBoardView::mouseReleaseEvent( QMouseEvent * event )
+{
+    if( impl->inMoveMode )
+    {
+	impl->inMoveMode = false;
+	this->setHandDragMode( false );
+	this->setInteractive( true );
+	event->accept();
+	return;
+    }
+    this->QGraphicsView::mouseReleaseEvent(event);
+}
+
+void QBoardView::mouseDoubleClickEvent( QMouseEvent * event )
+{
+    if( event->button() & Qt::LeftButton )
+    {
+	impl->placeAt = this->mapToScene(event->pos()).toPoint();
+	if( impl->placer )
+	{
+ 	    impl->placer->setPos( impl->placeAt );
+	}
+	event->accept();
+	return;
+    }
+    this->QGraphicsView::mouseDoubleClickEvent(event);
+
+}
+
 void QBoardView::mousePressEvent( QMouseEvent * event )
 {
 #if 0
@@ -501,20 +529,26 @@ void QBoardView::mousePressEvent( QMouseEvent * event )
 	qDebug() << "QBoardView::mousePressEvent(): You didn't click on an item.";
     }
 #endif
-    if( event->button() & Qt::MidButton )
-    {
-	impl->placeAt = this->mapToScene(event->pos()).toPoint();
-	if( impl->placer )
-	{
- 	    impl->placer->setPos( impl->placeAt );
-	}
 #if 0
-	else
-	{
-	    // center view on clicked pos.
-	    this->centerOn( impl->placeAt );
-	}
+    /**
+       Weird: if i enable this Ctrl-LMB-drag-mode, all items
+       become (and stay) immobile once the drag is completed
+       (mouseReleaseEvent()).
+    */
+    if( (event->button() & Qt::LeftButton)
+	&&
+	(event->modifiers() & Qt::ControlModifier)
+	)
+// #else
+//     if( event->button() & Qt::MidButton ) // not triggering for me?
+#else
+    if(0)
 #endif
+    {
+	impl->inMoveMode = true;
+	this->setInteractive( true );
+	this->setHandDragMode( true );
+	this->QGraphicsView::mousePressEvent(event);
 	event->accept();
 	return;
     }
@@ -626,7 +660,7 @@ void QBoardView::enablePlacemarker( bool en )
 	    impl->gs.scene()->addItem( impl->placer );
 	    QStringList help;
 	    help << "<html><body>This is a \"piece placemarker\"."
-		 << "To move it, middle-click the board or drag it around."
+		 << "To move it, double-click the board or drag it around."
 		 << "Pieces which are loaded from individual files (as opposed to being part of a game)"
 		 << "start out at this position."
 		 << "</body></html>"
