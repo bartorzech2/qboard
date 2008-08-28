@@ -1,45 +1,55 @@
 #summary Exceedingly brief overview of the QBoard code and architecture
 #labels Phase-Implementation
 
-*This stuff is not current, as of 2008 Aug 20. i'll get around to it someday, maybe.*
+Current as of 20080828...
 
 = Introduction =
 
 QBoard _could_ have been implemented as a library and a thin wrapper client app around it, but it's not. Maybe someday it will be restructured to be so, but today it's not. This page provides an overview of the app parts and major classes.
 
-QBoard essentially uses MVC - Model/View/Controller - as its primary UI mechanism. Game pieces and the game board are represented by non-graphical objects. The Controller (the main app) creates Views to visualize those underlying objects. There are exceptions to this (game components which are themselves QGraphicsItems (Views)), but the core-most parts try to be MVC.
+Historical note: the primary (probably only) reason for not building QBoard as a library is because on Windows platforms libs11n cannot work as a DLL (due to linker rules which completely break down where class templates are involved). Thus we have to build libs11n as part of the application, so that we can hopefully get QBoard building on Windows some day.
 
-=== GamePiece / QGIGamePiece ===
+= The core objects =
 
-This is probably the core-most class. It represents a very abstract playing piece. It is essentially a `QObject` subclass with a couple operations added to it. It acts primarily as a set of property keys/values, which other UI components use to render the piece. A GamePiece is not a UI widget itself.
+Here is an overview of the major C++ classes in QBoard.
 
-The "default" View type for a GamePiece is QGIGamePiece, which is basically a custom QGraphicsItem which uses published properties from GamePiece to render a piece in a manner appropriate for boardgame-style play.
+== GameState ==
 
-=== QBoard / QGIBoardView ===
+This class acts as a wrapper for a QGraphicsScene, QBoard (game board), and an arbitrary number of QGraphicsItems (managed by the QGraphicsScene). GameState can serialize the parts as a whole, which is what happens when you use the Load/Save menus/buttons.
 
-QBoard is a small class representing only a playing surface (and a non-graphical one at that). It's only significant property is that it stores a background pixmap (i.e. the game board) for a game. While conceptually GamePieces are placed on a game board, QBoard actually has no relationship whatsoever with the GamePiece class, and doesn't know that it exists.
+To add a piece to a game, one must create a QGraphicsItem (abbreviated QGI) and call GameState::addItem().
 
-QGIBoardView is the default QGraphicsView class for viewing a QBoard object. It provides features like scrolling and zooming.
+== QBoard / QBoardView ==
 
-=== GamePieceList ===
+The QBoard class is an abstraction of a game board. It currently doesn't do much - just holds the name of an image file to represent a playing surface.
 
-This QList type holds GamePieces and manages their ownership, automatically removing them from the list when a GamePiece is destroyed by outside forces. Listeners can be alterted of insertions/removals from the list. This management is key to the implementation of the GameState...
+QBoardView is a QGraphicsView subclass which is specialized for viewing a QBoard object. It supports scaling, rotating, and a few other options.
 
-=== GameState ===
+== QGraphicsItems / game pieces ==
 
-This class acts as a wrapper for a QGraphicsScene, a QBoard, and a list of GamePieces. It can serialize the parts as a whole, which is what happens when you use the Load/Save menus/buttons.
+QBoard uses QGraphicsItems (QGI) to represent game pieces of various types. In principal, QBoard can display QGI type, but to be fully integrated into QBoard (including copy/paste support), the QGI subclasses must also subclass QObject and Serializable. The QObject dependency is because the framework uses QObject::property() and QObject::setProperty() extensively to control the appearance of objects. The Serializable dependency is to provide a common serialization interface. That allows, e.g., the clipboard and load/save support, along with things like polymorphic cloning.
 
-To add a piece to a game, it is actually added to the GameState's GamePieceList member, with which the GameState object has a fairly intimate relationship.
+The current QGI types which come with QBoard are:
 
-=== MainWindowImpl ===
+  * QGIPiece: basic playing pieces, represented by a small image file.
+  * QGIDot: a round dot which can be resized and recolored.
+  * QGIHtml: for annotating a board with arbitrary text (it allows a subset of HTML, actually).
+  * QGILine: a line between two points on the board.
 
-This class is the main window UI element. It wraps up the functionality of the other stuff into a usable interface. The GUI is mostly managed using Qt Designer, but certain parts are hand-coded in `MainWindowImpl.{h,cpp}`.
+=== Game piece properties ===
 
-=== Serializable / s11n ===
+The game piece objects are designed to be controlled via the setting of properties. Properties are key/value pairs with strings as keys and QVariants as values. (This is the approach used by the underlying QObject class.) The [S11nQt serialization layer] can serialize a variety of native types supported by QVariant, and we can therefor fully serialize all game-related properties of a piece. This approach allows us to uniformly handle the control and serialization of all game piece objects.
 
-s11n is the name of the underlying serialization framework (http://s11n.net). It is responsible for the process of serializing (saving) and deserializing (loading) all game data. This support is the second core-most component of the framework, right behind Qt. The libs11n support is mostly encapsulated in the `Serializable` base class, which many other classes in the tree inherit from. The Qt/s11n proxying code (so we can de/serialize Qt types) is in `S11n*.{h,cpp}`.
+
+== MainWindowImpl ==
+
+This class is the main window UI element. It wraps up the functionality of the other stuff into a usable interface. The GUI is mostly managed using Qt Designer, but the implementation code is in `MainWindowImpl.{h,cpp}`.
+
+== Serializable / s11n ==
+
+s11n is the name of the underlying serialization framework (http://s11n.net). It is responsible for the process of serializing (saving) and deserializing (loading) all game data. This support is the second core-most component of the framework, right behind Qt. The libs11n support is mostly encapsulated in the `Serializable` base class, which many other classes in the tree inherit from. The Qt/s11n proxying code (so we can de/serialize Qt types) is in `S11n*.{h,cpp}`. There are many examples in the source tree of how to use it (simply grep *.cpp for "::serialize" and "::deserialize").
 
 
 === Misc. ===
 
-There are tons of other less important classes and files.
+There are tons of other less important classes and files, and lots of things which we hope to go into detail about someday.
