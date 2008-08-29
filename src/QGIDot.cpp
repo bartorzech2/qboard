@@ -37,7 +37,7 @@ struct QGIDot::Impl
     QPen pen;
     QBrush brush;
     Impl() : active(false),
-	     radius(8),
+	     radius(12),
 	     color(Qt::yellow),
 	     pen(Qt::NoPen),
 	     brush()
