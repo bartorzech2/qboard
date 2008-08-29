@@ -13,6 +13,9 @@ are at the top. Dates written extra large are release dates.
 
 - Tapping the Delete key in the tree view will now delete the selected file (after asking for confirmation).
 
+- Changed: QGIHtml needs only a single middle-click to launch the editor, instead of a double-middle-click.
+
+
 *2008 August 28:*
 
 - Fixed a few instances of mis-serialization of the zLevel, which caused pieces to be mis-stacked when loaded.
