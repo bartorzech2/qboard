@@ -190,7 +190,15 @@ static QScriptValue getObjectPos(QScriptContext *context, QScriptEngine *engine)
 //     return callee.property("value");
  }
 
-QObject * GameState::createObject( QString const & className )
+// static QScriptValue pieceSetProp(QScriptContext *ctx,
+// 				 QScriptEngine *eng)
+// {
+//     if( ! ctx || !eng) return QScriptValue();
+//     return QScriptValue();
+// }
+
+QObject * GameState::createObject( QString const & className,
+				   QScriptValue const & props )
 {
     Serializable * s = s11n::cl::classload<Serializable>( className.toAscii().constData() );
     if( ! s )
@@ -205,6 +213,15 @@ QObject * GameState::createObject( QString const & className )
 	s11n::cleanup_serializable( s );
 	return 0;
     }
+    if( props.isObject() )
+    {
+	this->props( o, props );
+    }
+    QGraphicsItem * git = dynamic_cast<QGraphicsItem*>(s);
+    if( git )
+    {
+	this->addItem(git);
+    }
     QScriptValue v = impl->js->newQObject(o,
 					  QScriptEngine::AutoOwnership
 					  //,QScriptEngine::AutoCreateDynamicProperties
@@ -212,7 +229,7 @@ QObject * GameState::createObject( QString const & className )
 					  );
     v.setProperty("x", QScriptValue(impl->js,"hi"));
     // never being called when obj.pos called.
-    v.setProperty("pos", impl->js->newFunction(getObjectPos), QScriptValue::PropertyGetter );
+    //v.setProperty("pos", impl->js->newFunction(getObjectPos), QScriptValue::PropertyGetter );
     QScriptValue fun = impl->js->newFunction(jsEtGameProperty);
     if( ! fun.isFunction() )
     {
