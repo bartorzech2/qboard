@@ -88,6 +88,7 @@ S11N_SOURCES = $$S11N_DIR/data_node_io.cpp \
  $$S11N_DIR/funtxt_serializer.cpp \
  $$S11N_DIR/funxml.flex.cpp \
  $$S11N_DIR/funxml_serializer.cpp \
+ $$S11N_DIR/js_serializer.cpp \
  $$S11N_DIR/parens.flex.cpp \
  $$S11N_DIR/parens_serializer.cpp \
  $$S11N_DIR/path_finder.cpp \
