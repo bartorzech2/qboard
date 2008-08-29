@@ -30,6 +30,7 @@
 #define QBHomeView_USE_QBOARD_FILEEXT_RESOURCES 1
 #if QBHomeView_USE_QBOARD_FILEEXT_RESOURCES
 #include <QRegExp>
+#include <QResource>
 #endif
 
 
@@ -80,11 +81,18 @@ QIcon QBoardFileIconProvider::icon( const QFileInfo & info ) const
 #if QBHomeView_USE_QBOARD_FILEEXT_RESOURCES
     if( ! info.isDir() )
     {
-	QIcon ico( QString( ":/QBoard/icon/fileext/%1.png" ).
-		   arg(info.completeSuffix()) );
-	if( ! ico.isNull() )
+	char const * fmt = ":/QBoard/icon/fileext/%1.png";
+	QString res = QString(fmt).
+	    arg(info.completeSuffix());
+	QPixmap pm( res ); // when i use QIcon here, isNull() always returns false
+	if( pm.isNull() )
 	{
-	    return ico;
+	    res = QString(fmt).arg(info.suffix());
+	    pm = QPixmap(res);
+	}
+	if( ! pm.isNull() )
+	{
+	    return QIcon(pm);
 	}
     }
 #endif // QBHomeView_USE_QBOARD_FILEEXT_RESOURCES
@@ -137,9 +145,9 @@ QBoardHomeView::QBoardHomeView( QWidget * parent ) :
 	this->setColumnHidden(i, true);
     }
     this->setUniformRowHeights(true);
-#if QT_VERSION >= 0x040400
-    this->QTreeView::setHeaderHidden(true);
-#endif
+//#if QT_VERSION >= 0x040400
+//     this->QTreeView::setHeaderHidden(true);
+//#endif
     connect( impl->sel, SIGNAL(currentChanged( const QModelIndex &, const QModelIndex & )),
 	     this, SLOT(currentChanged( const QModelIndex &, const QModelIndex & )));
     //this->setSortingEnabled(true);
@@ -194,9 +202,16 @@ void QBoardHomeView::keyReleaseEvent( QKeyEvent * event )
 }
 void QBoardHomeView::refresh()
 {
-    QModelIndex h = impl->model->index(qboard::home().absolutePath());
-    this->setRootIndex( h );
-    impl->model->refresh(h); // causes a segfault when called during ctor
+#if 1
+    QModelIndex h = impl->model->index("./"); // qboard::home().absolutePath());
+//     if( h.isValid() )
+//     {
+	this->setRootIndex( h );
+	impl->model->refresh(h); // causes a segfault when called during ctor
+//     }
+#else
+    impl->model->refresh(); // causes a segfault when called during ctor
+#endif
 }
 
 void QBoardHomeView::currentChanged( const QModelIndex & current,
