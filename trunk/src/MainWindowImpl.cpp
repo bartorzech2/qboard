@@ -22,7 +22,6 @@
 #include <QGraphicsView>
 #include <QGridLayout>
 #include <QMessageBox>
-#include <QMessageBox>
 #include <QPrintDialog>
 #include <QPrinter>
 #include <QRegExp>
