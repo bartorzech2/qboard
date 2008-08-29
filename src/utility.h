@@ -100,12 +100,14 @@ namespace qboard
 		
 		\code
 		qreal z = nextZLevel(this);
-		if( this->zValue() < z) this->setZValue(z);
+		if( this->zValue() != z) this->setZValue(z);
 		\endcode
 
 		or similar.
+
+		If high is false, then the lowest zLevel is calculated.
 	*/
-	qreal nextZLevel( QGraphicsItem const * gi );
+    qreal nextZLevel( QGraphicsItem const * gi, bool high = true );
 	
 	/**
 		Destroys the given item using the QBoard-kludgy approach.

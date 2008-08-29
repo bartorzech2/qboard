@@ -120,7 +120,7 @@ namespace qboard {
 	return rel;
     }
 
-    qreal nextZLevel( QGraphicsItem const * gi )
+    qreal nextZLevel( QGraphicsItem const * gi, bool high )
     {
 	if( ! gi ) return 0.0;
 	typedef QList<QGraphicsItem *> QL;
@@ -133,15 +133,22 @@ namespace qboard {
 	for( ; it != li.end(); ++it )
 	{
 	    qreal tmp = (*it)->zValue();
-	    if( zmax < tmp ) zmax = tmp;
-	    else if( tmp == myZ )
+	    if( high )
+	    {
+		if( zmax < tmp ) zmax = tmp;
+	    }
+	    else
+	    {
+		if( zmax > tmp ) zmax = tmp;
+	    }
+	    if( tmp == myZ )
 	    { // we can't know if we're at the same level here, so we'll advance.
-		zmax += stride;
+		zmax += high ? stride : -stride;
 	    }
 	}
-	if( myZ < zmax )
+	if( myZ != zmax )
 	{
-	    zmax += stride;
+	    zmax += high ? stride : -stride;
 	}
 	return zmax;
     } // nextZLevel()
