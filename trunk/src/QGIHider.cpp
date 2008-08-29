@@ -271,9 +271,17 @@ QPainterPath QGIHider::shape() const
 	path.addRect( this->boundingRect() );
 	return path;
 #else
-	return impl->item
-	    ? impl->item->shape()
-	    : this->QGraphicsPathItem::shape();
+ 	return impl->item
+ 	    ? impl->item->shape() // Qt4.4 = always rectangles
+ 	    : this->QGraphicsPathItem::path();
+	/**
+	   Curious:
+
+	return this->QGraphicsPathItem::shape();
+	
+	On Qt4.3 that leaves us with an empty object. On Qt4.4
+	it gives us rectangles.
+	*/
 #endif
 }
 
