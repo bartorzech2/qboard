@@ -18,6 +18,7 @@
 #include <QScriptValue>
 #include <QSharedData>
 #include <QString>
+#include <QAction>
 
 namespace qboard {
 
@@ -121,6 +122,30 @@ namespace qboard {
 	QSharedDataPointer<Impl> impl;
     };
 
-}
+
+    /**
+       JavaScriptAction is a QAction type which evaluates JavaScript
+       code when it is triggered.
+    */
+    class JavaScriptAction : public QAction
+    {
+	Q_OBJECT;
+    public:
+	/**
+	*/
+	JavaScriptAction(QString const & label,
+			 QScriptEngine & eng,
+			 QString const & code );
+	virtual ~JavaScriptAction();
+    private Q_SLOTS:
+        void evaluateJS();
+    private:
+	void setup();
+	struct Impl;
+	Impl * impl;
+    };
+
+
+} // namespace
 
 #endif // QBOARD_ScriptQt_H_INCLUDED

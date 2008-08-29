@@ -18,6 +18,7 @@
 #include <QDebug>
 #include <QGraphicsItem>
 #include <QSharedData>
+#include <QIcon>
 
 namespace qboard {
 
@@ -38,39 +39,45 @@ namespace qboard {
 	qDebug() << "qpointFromScriptValue(engine,"<<s<<")";
     }
 
-    QScriptValue QPoint_ctor(QScriptContext *context, QScriptEngine *engine)
+    QScriptValue QPoint_ctor(QScriptContext *ctx, QScriptEngine *eng)
     {
-	int argc = context->argumentCount();
+	int argc = ctx->argumentCount();
 	qDebug() << "QPoint_ctor(cx,engine) argc =="<<argc;
 #if 0
-	int x = (argc>0) ? context->argument(0).toInt32() : 0;
-	int y = (argc>1) ? context->argument(1).toInt32() : x;
-	return engine->toScriptValue(QPoint(x, y));
-#else
+	QScriptValue jobj;
+	if (ctx->isCalledAsConstructor())
+	{
+	    jobj = ctx->thisObject();
+	}
+	else
+	{
+	    jobj = eng->newObject();
+	    jobj.setPrototype(ctx->callee().property("prototype"));
+	}
+#endif
+	int x = 0;
+	int y = 0;
 	if( 1 == argc )
 	{
-	    QScriptValue arg = context->argument(0);
-	    if( arg.isNumber() )
-	    { // QPoint(x,x)
-		int x = arg.toInt32();
-		QPoint p(x,x);
-		return engine->toScriptValue(p);
-	    }
-	    else if( arg.isObject() )
-	    { // copy ctor
-		QPoint pt;
-		qpointFromScriptValue(arg,pt);
-		return engine->toScriptValue(pt );
-	    }
-	    return QScriptValue();
+	    x = y = ctx->argument(0).toInt32();
 	}
 	else if( 2 == argc )
 	{ // QPoint(x,y)
-	    int x = (argc>0) ? context->argument(0).toInt32() : 0;
-	    int y = (argc>1) ? context->argument(1).toInt32() : x;
-	    return engine->toScriptValue(QPoint(x,y));
+	    x = ctx->argument(0).toInt32();
+	    y = ctx->argument(1).toInt32();
 	}
-	return QScriptValue();
+#if 0
+	jobj.setProperty("x",QScriptValue(eng,x));
+	jobj.setProperty("y",QScriptValue(eng,y));
+	return jobj;
+#else
+	return eng->toScriptValue(QPoint(x,y));
+	/** what's the difference between toScriptValue()
+	    and qpointToScriptValue(eng,p) ???
+
+	    The former does essentially what i want, the latter
+	    does not.
+	*/
 #endif
     }
 
@@ -249,7 +256,42 @@ namespace qboard {
     {
     }
 
+    struct JavaScriptAction::Impl
+    {
+	QScriptEngine * js;
+	QString code;
+	Impl( QScriptEngine * j, QString const & c )
+	    : js(j),
+	      code(c)
+	{
+	}
+	~Impl()
+	{
+	}
+    };
 
 
+    JavaScriptAction::JavaScriptAction( QString const & label,
+					QScriptEngine & e,
+					QString const & code )
+	: QAction( label, &e ),
+	  impl( new Impl(&e,code) )
+    {
+	connect( this, SIGNAL(triggered(bool)),
+		 this, SLOT(evaluateJS()) );
+	this->setCheckable(false);
+	this->setIcon(QIcon(":/QBoard/icon/fileext/js.png"));
+    }
+
+    JavaScriptAction::~JavaScriptAction()
+    {
+	delete this->impl;
+    }
+
+    void JavaScriptAction::evaluateJS()
+    {
+	impl->js->evaluate( impl->code,
+			    this->objectName() );
+    }
 
 } //namespace
