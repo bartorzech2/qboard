@@ -9,7 +9,7 @@ are at the top. Dates written extra large are release dates.
 ----
 *2008 August 29:*
 
-- In the tree browser view, clicking Refresh to update the file view no longer collapses open dirs (unless those dirs no longer exist). (This feature was an accident, actually.)
+- In the tree browser view, clicking Refresh to update the file view no longer collapses open dirs (unless those dirs no longer exist). Correction: this works only in Qt4.3. In Qt4.4 all open dirs are collapsed.
 
 - Tapping the Delete key in the tree view will now delete the selected file (after asking for confirmation).
 
