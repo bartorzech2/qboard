@@ -506,7 +506,8 @@ void QBoardView::mouseReleaseEvent( QMouseEvent * event )
 
 void QBoardView::mouseDoubleClickEvent( QMouseEvent * event )
 {
-    if( event->button() & Qt::LeftButton )
+    QGraphicsItem *item = itemAt(event->pos());
+    if( (!item) && (event->button() & Qt::LeftButton) )
     {
 	impl->placeAt = this->mapToScene(event->pos()).toPoint();
 	if( impl->placer )
