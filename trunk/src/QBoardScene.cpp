@@ -20,6 +20,8 @@ QBoardScene::QBoardScene() : QGraphicsScene(),
     Serializable("QBoardScene"),
     impl(new Impl)
 {
+    this->setItemIndexMethod(QGraphicsScene::NoIndex);
+
 }
 
 QBoardScene::~QBoardScene()
