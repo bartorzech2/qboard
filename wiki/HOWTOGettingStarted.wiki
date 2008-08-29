@@ -20,13 +20,13 @@ Before getting started with QBoard, you will need to put some files in the home 
 
 You may structure your data however you like under the home directory, with the
 exception that the subdirectory named `QBoard` is reserved for use with
-QBoard-specific application data.
+QBoard-specific application data. If you need some ideas, see the available [Gamesets].
 
 
 == Loading Files ==
 
-  * Double-clicking an image file will load it as a game board (if it is bigger than 10KB) or a game piece (if it is smaller).
-  * Double-clicking on files named .GameState, .QBoard, or .QBoardPiece will load a game, a board, or a piece. The same happens when using the Open File menu/button.
+  * Double-clicking an image file will load it as a game board (if it is bigger than 10KB) or a game piece (if it is smaller). Pieces loaded this way will be placed on the board at the same spot where the yellow and red "placemarker" is.
+  * Double-clicking on files named .GameState, .QBoard, or .QGIPiece will load a game, a board, or a piece. The same happens when using the Open File menu/button.
   * Double-clicking a .txt or .html file will open it in a browser (only when compiled against Qt 4.4!).
 
 == Saving ==
@@ -34,6 +34,13 @@ QBoard-specific application data.
   * To save a game, click the Save button or File->Save menu item. That will save the entire game state.
   * It is in principal possible to save any in-game object individually (e.g. individual pieces or JUST the board, without the pieces), but there is currently no UI for doing so.
   * Use the Quicksave and Quickload features to quickly save and load.
+
+== Manipulating items ==
+
+Most items have a popup menu (accessible via right-clicking). If an item is selected and its menu is activated, many of the menu operations may apply to all selected pieces (e.g. Destroy, Cut/Copy, rotation, etc.). If a piece is not selected, actions taking through its popup menu will affect only that item (and potentially child items).
+
+Explore the menus for the available options. Note that different types of game pieces will have different menus.
+
 
 == Minimaps ==
 
@@ -48,11 +55,11 @@ In any case, try to avoid zooming the main view unless you need it temporarily. 
 
 == Piece style templates ==
 
-The colorful squares in the bottom/left of the main window are piece style templates. If you click one of those, newly-added pieces will take on that style. Use the right-click menu to edit them. You can also paste items copied from the board into this area, so you can customize your templates any way you like.
+The colorful squares in the bottom/left of the main window are piece style templates. If you click one of those, newly-added pieces will take on that style. Use the right-click menu to edit them. You can also paste items copied from the board into this area, so you can customize your templates in any ways you like, including adding new ones or removing them.
 
 The templates area is saved automatically when QBoard exits. If you have hosed your templates beyond repair and want to start with a new set, close QBoard, delete the file `~/.QBoard/QBoard/persistance/MainWindow/default-templates`, then start QBoard. Deleting or replacing the file while QBoard is open will have no effect and the file will be replaced or overwritten when QBoard exits.
 
 
 == The clipboard ==
 
-Most in-play objects can be copied, cut, and pasted within the board. When objects are copied or cut, their data is available as text in the Qt clipboard, which means you can paste it into another application (e.g. a text editor). From there, you can edit it, copy it, and paste it back into QBoard.
+Most in-play objects can be copied, cut, and pasted within the board. When objects are copied or cut, their data is available as text in the Qt clipboard, which means you can paste it into another application (e.g. a text editor). From there, you can edit it, copy it, and paste it back into QBoard. Some people might call that cheating, but this ability is often useful for testing, or even as a poor man's substitute for File-->Save. It's also useful for pasting in sets of pieces which are commonly used.
