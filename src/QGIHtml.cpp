@@ -122,23 +122,6 @@ bool QGIHtml::event( QEvent * e )
 }
 
 
-void QGIHtml::mouseDoubleClickEvent( QGraphicsSceneMouseEvent * ev )
-{
-	if( ev->buttons() & Qt::LeftButton )
-	{
-	    impl->giflags = this->flags();
-	    ev->accept();
-	    this->setTextInteractionFlags( Qt::TextEditorInteraction );
-	    this->setFocus();
-	    // ^^^ setFocus() is necessary for correct Qt4.3 interaction.
-	}
-	else
-	{
-	    this->QGraphicsTextItem::mouseDoubleClickEvent(ev);
-	}
-}
-
-
 void QGIHtml::focusInEvent( QFocusEvent * event )
 {
     if(0) qDebug() << "QGIHtml::focusInEvent()";
@@ -171,6 +154,23 @@ void QGIHtml::focusOutEvent( QFocusEvent * event )
 #endif
 }
 
+
+void QGIHtml::mouseDoubleClickEvent( QGraphicsSceneMouseEvent * ev )
+{
+	if( ev->buttons() & Qt::LeftButton )
+	{
+	    impl->giflags = this->flags();
+	    ev->accept();
+	    this->setTextInteractionFlags( Qt::TextEditorInteraction );
+	    this->setFocus();
+	    // ^^^ setFocus() is necessary for correct Qt4.3 interaction.
+	}
+	else
+	{
+	    this->QGraphicsTextItem::mouseDoubleClickEvent(ev);
+	}
+}
+
 void QGIHtml::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 {
 	if( ev->buttons() & Qt::MidButton )
@@ -181,6 +181,7 @@ void QGIHtml::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 		return;
 	}
 	QGITypes::handleClickRaise( this, ev );
+	ev->accept();
 	this->QGraphicsTextItem::mousePressEvent(ev);
 }
 bool QGIHtml::serialize( S11nNode & dest ) const
