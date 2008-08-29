@@ -130,10 +130,15 @@ public Q_SLOTS:
     /**
        Creates a new object of the given type name.  On success, the
        object is returned on error, 0 is returned. The caller owns the
-       returned object.  It should normally be passed to addItem()
-       (assuming the type is-also-a QGraphicsItem type).
+       returned object unless: if they created item is-a QGraphicsItem then
+       addItem(theItem) is called, transfering ownership to the graphics
+       scene.
+
+       If props.isObject() is true then this->props(object,props)
+       is called to set the properties of the new object.
     */
-    QObject * createObject( QString const & className );
+    QObject * createObject( QString const & className, QScriptValue const & props = QScriptValue() );
+
     /**
        Calls tgt->setProperty() with the given property.
 
