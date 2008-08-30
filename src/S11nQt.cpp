@@ -22,6 +22,54 @@
 #include "S11nQtList.h"
 #include "S11nQtMap.h"
 
+bool QBrush_s11n::operator()( S11nNode & dest, QBrush const & src ) const
+{
+    typedef s11nlite::node_traits NT;
+    NT::set( dest, "style", long(src.style()) );
+    bool ret = true;
+#define SER(C,N,X) if(C) ret = s11n::serialize_subnode(dest,N,X)
+    SER( ret, "color", src.color() );
+    if(ret)
+    {
+	QMatrix m( src.matrix() );
+	SER( !m.isIdentity(), "matrix", src.matrix() );
+    }
+    if(ret)
+    {
+	QTransform m( src.matrix() );
+	SER( !m.isIdentity(), "transform", src.transform() );
+    }
+    if(ret)
+    {
+	QPixmap const m( src.texture() );
+	SER( !m.isNull(), "texture", src.texture() );
+    }
+#undef SER
+    return ret;
+}
+bool QBrush_s11n::operator()( S11nNode const & src, QBrush & dest ) const
+{
+	typedef s11nlite::node_traits NT;
+	QBrush bogo;
+	bogo.setStyle( Qt::BrushStyle( NT::get( src, "style", long(dest.style()) ) ) );
+	S11nNode const * ch = 0;
+#define DESER(T,N,X) \
+	ch = s11n::find_child_by_name(src,N);	\
+	if( ch ) {				\
+	    T tmp;						 \
+	    if( ! s11n::deserialize(*ch,tmp) ) return false;	 \
+	    bogo.X( tmp );					 \
+	}
+	DESER( QColor, "color", setColor );
+	DESER( QMatrix, "matrix", setMatrix );
+	DESER( QTransform, "transform", setTransform );
+	DESER( QPixmap, "texture", setTexture );
+#undef DESER
+	dest = bogo;
+	return true;
+}
+
+
 typedef unsigned long long hashval_t; // FIXME: some platforms don't have long long
 static const hashval_t hashval_t_err = static_cast<hashval_t>(-1);
 static hashval_t hash_cstring_djb2( void const * vstr)
@@ -37,7 +85,6 @@ static hashval_t hash_cstring_djb2( void const * vstr)
     }
     return hash;
 }
-
 
 unsigned short s11n::qt::QByteArray_s11n::compressionThreshold = 100;
 bool s11n::qt::QByteArray_s11n::operator()( S11nNode & dest, QByteArray const & src ) const
@@ -297,9 +344,46 @@ bool QMatrix_s11n::operator()( S11nNode const & src, QMatrix & dest ) const
 }
 
 
+bool QPen_s11n::operator()( S11nNode & dest, QPen const & src ) const
+{
+    typedef S11nNodeTraits NT;
+    NT::set(dest,"style", int(src.style()) );
+    NT::set(dest,"capStyle", int(src.capStyle()) );
+    NT::set(dest,"joinStyle", int(src.joinStyle()) );
+    NT::set(dest,"miterLimit", int(src.miterLimit()) );
+    NT::set(dest,"width", src.width() );
+    // TODO: dashOffset() + dashPattern()
+    return s11n::serialize_subnode( dest, "brush", src.brush() )
+	&& s11n::serialize_subnode( dest, "color", src.color() )
+	;
+}
+bool QPen_s11n::operator()( S11nNode const & src, QPen & dest ) const
+{
+    QPen tmp(dest);
+    {
+	QBrush br;
+	if( ! s11n::deserialize_subnode( src, "brush", br ) ) return false;
+	tmp.setBrush(br);
+    }
+    {
+	QColor x;
+	if( ! s11n::deserialize_subnode( src, "color", x ) ) return false;
+	tmp.setColor(x);
+    }
+    typedef S11nNodeTraits NT;
+    tmp.setStyle( Qt::PenStyle( NT::get(src,"style",int(tmp.style()))));
+    tmp.setCapStyle( Qt::PenCapStyle(NT::get(src,"capStyle", int(tmp.capStyle()))));
+    tmp.setJoinStyle( Qt::PenJoinStyle(NT::get(src,"joinStyle", int(tmp.joinStyle()))));
+    tmp.setMiterLimit( NT::get(src,"miterLimit", int(tmp.miterLimit())) );
+    tmp.setWidth( NT::get(src,"width", tmp.width() ) );
+    dest = tmp;
+    return true;
+}
+
 bool QPixmap_s11n::operator()( S11nNode & dest, QPixmap const & src ) const
 {
 	QByteArray ba;
+	if( ! src.isNull() )
 	{
 	    QBuffer buf(&ba);
 	    if( ! src.save( &buf, "PNG" ) )
