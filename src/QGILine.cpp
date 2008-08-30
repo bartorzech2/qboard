@@ -30,6 +30,9 @@
 #include <QEvent>
 #include <cmath>
 
+#include "S11nQt/QMap.h"
+#include "S11nQt/QPointF.h"
+
 // If QGILineBinder_do_arrow is true then code is added for QGILineBinder to draw
 // arrows at its endpoints.
 #define QGILineBinder_do_arrow 0

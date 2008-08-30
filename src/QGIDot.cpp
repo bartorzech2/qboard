@@ -15,7 +15,7 @@
 #include "S11nQt.h"
 #include "utility.h"
 #include "MenuHandlerGeneric.h"
-#include "S11nQtList.h"
+#include "S11nQt/QList.h"
 #include <QGraphicsSceneMouseEvent>
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsScene>
@@ -31,6 +31,10 @@
 #include <QEvent>
 
 #include <cmath> // acos()
+
+#include "S11nQt/QBrush.h"
+#include "S11nQt/QPen.h"
+#include "S11nQt/QPointF.h"
 
 struct QGIDot::Impl
 {
@@ -564,6 +568,7 @@ QGIDotLine::QGIDotLine() : QObject(),
 {
     this->setPen( impl->pen );
     //this->setFlags( QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable );
+this->setFlags( QGraphicsItem::ItemIsSelectable );
 }
 
 QGIDotLine::~QGIDotLine()

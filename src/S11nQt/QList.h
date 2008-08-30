@@ -1,5 +1,5 @@
-#ifndef __S11NQTLIST_H__
-#define __S11NQTLIST_H__
+#ifndef S11NQT_QLIST_H_INCLUDED
+#define S11NQT_QLIST_H_INCLUDED
 /*
  * This file is (or was, at some point) part of the QBoard project
  * (http://code.google.com/p/qboard)
@@ -14,9 +14,9 @@
  */
 
 /**
-	S11n routines specific to the QList/QVector types. Unfortunately we have to copy a large
-	chunk of the s11n::list source code here just because the QList types don't have a
-	swap() member, which s11n::list code relies on for more efficient deserialization. 
+   S11n routines specific to the QList/QVector types. Unfortunately we have to copy a large
+   chunk of the s11n::list source code here just because the QList types don't have a
+   swap() member, which s11n::list code relies on for more efficient deserialization. 
 */
 #include <list>
 #include <vector>
@@ -214,14 +214,14 @@ namespace s11n { namespace qt {
 #define S11N_LIST_TYPE_NAME "QVector"
 #define S11N_LIST_TYPE_PROXY QTLIST_SERIALIZE_FUNCTOR
 #define S11N_LIST_TYPE_DESER_PROXY QTLIST_DESERIALIZE_FUNCTOR
-#include "S11nQtListReg.h"
+#include "QList_reg.h"
 
 /* s11n proxy for QList<SerializableT>. */
 #define S11N_LIST_TYPE QList
 #define S11N_LIST_TYPE_NAME "QList"
 #define S11N_LIST_TYPE_PROXY QTLIST_SERIALIZE_FUNCTOR
 #define S11N_LIST_TYPE_DESER_PROXY QTLIST_DESERIALIZE_FUNCTOR
-#include "S11nQtListReg.h"
+#include "QList_reg.h"
 
 #include <QPolygon>
 #include <QPoint>
@@ -240,4 +240,4 @@ namespace s11n { namespace qt {
 #undef QTLIST_SERIALIZE_FUNCTOR
 #undef QTLIST_DESERIALIZE_FUNCTOR
 
-#endif // __S11NQTLIST_H__
+#endif // S11NQT_QLIST_H_INCLUDED

@@ -25,8 +25,11 @@
 #include "Serializable.h"
 #include "S11nClipboard.h" // another horrible dep!
 #include "S11nQt.h"
-#include "S11nQtList.h"
+#include "S11nQt/QList.h"
 #include "GameState.h"
+
+#include "S11nQt/QPointF.h"
+#include "S11nQt/QPoint.h"
 
 /************************************************************************
 The sad, sad story of the QBOARD_VERSION variable...

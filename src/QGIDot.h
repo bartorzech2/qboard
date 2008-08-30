@@ -13,6 +13,9 @@
 #include <QGraphicsEllipseItem>
 #include <QGraphicsLineItem>
 class QGIDotLine;
+/**
+   QGIDot represent a simple dot with configurable colors.
+*/
 class QGIDot : public QObject,
 	       public QGraphicsEllipseItem,
 	       public Serializable
@@ -40,7 +43,13 @@ public Q_SLOTS:
       parent (which may technically be 0 but is "likely" to be a
       QGIHider).
    */
-    QGraphicsItem * hideItems();
+   QGraphicsItem * hideItems();
+
+    /**
+       "Splits" this dot into two dots and an adjoining line.
+       The line becomes a child of this object and the new dot
+       becomes a child of the line.
+    */
     void split();
 protected:
 	//virtual void mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event );
@@ -76,6 +85,12 @@ private:
 #define S11N_TYPE_NAME "QGIDot"
 #include <s11n.net/s11n/reg_s11n_traits.hpp>
 
+/**
+   QGIDotLine represents a line between two QGIDots. Do not
+   use this class from client code. It has an embarassingly
+   intimate relationship with QGIDot, and is intended to
+   be used via that class' interface.
+*/
 class QGIDotLine : public QObject,
 		   public QGraphicsLineItem,
 		   public Serializable
@@ -84,13 +99,6 @@ Q_OBJECT
 public:
     QGIDotLine();
     virtual ~QGIDotLine();
-
-    void setNodes( QGIDot * src, QGIDot * dest );
-    void setSourceNode( QGIDot * d );
-    void setDestNode( QGIDot * d );
-    QGIDot * srcNode();
-    QGIDot * destNode();
-    void adjust();
 
     virtual int type() const { return QGITypes::QGIDotLine; }
 
@@ -113,6 +121,12 @@ Q_SIGNALS:
 private Q_SLOTS:
     void destDestroyed( QGIDot * );
     void propertySet( char const *pname, QVariant const & var );
+    void setNodes( QGIDot * src, QGIDot * dest );
+    void setSourceNode( QGIDot * d );
+    void setDestNode( QGIDot * d );
+    QGIDot * srcNode();
+    QGIDot * destNode();
+    void adjust();
 
 private:
     friend class QGIDot;

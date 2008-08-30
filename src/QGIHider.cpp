@@ -11,7 +11,7 @@
 #include "S11nQt.h"
 #include "utility.h"
 #include "MenuHandlerGeneric.h"
-
+#include "S11nQt/QPointF.h"
 
 struct QGIHider::Impl
 {
