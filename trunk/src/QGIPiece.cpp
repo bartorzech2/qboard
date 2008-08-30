@@ -574,8 +574,8 @@ bool QGIPiece::serialize( S11nNode & dest ) const
     QList<QGraphicsItem *> chgi( qboard::childItems(this) );
     if( ! chgi.isEmpty() )
     {
-	if( ! s11n::qt::serializeQGIList<Serializable>( s11n::create_child(dest,"children"),
-							chgi, false ) )
+	if( -1 == s11n::qt::serializeQGIList<Serializable>( s11n::create_child(dest,"children"),
+							    chgi, false ) )
 	{
 	    return false;
 	}
