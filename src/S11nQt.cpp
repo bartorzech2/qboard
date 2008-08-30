@@ -14,7 +14,7 @@
 #include <QChar>
 #include <QBuffer>
 #include <QDebug>
-
+#include <QMap>
 
 #include "S11nQt.h"
 #include <s11n.net/s11n/functional.hpp>
@@ -22,10 +22,118 @@
 #include "S11nQtList.h"
 #include "S11nQtMap.h"
 
+Qt::PenStyle s11n::qt::stringToPenStyle( QString const &val )
+{
+    typedef QMap<QString,Qt::PenStyle> MapT;
+    static MapT bob;
+    if( bob.isEmpty() )
+    {
+#define MAP(VT) \
+	bob[# VT] = Qt::VT;		\
+	bob[QString("%1").arg(int(Qt::VT))] = Qt::VT;
+	MAP(NoPen);
+	MAP(SolidLine);
+	MAP(DashLine);
+	MAP(DotLine);
+	MAP(DashDotLine);
+	MAP(DashDotDotLine);
+	MAP(CustomDashLine);
+#undef MAP
+    }
+    return bob.value( val, Qt::NoPen );
+}
+
+QString s11n::qt::penStyleToString( int i )
+{
+    typedef QMap<int,QString> MapT;
+    static MapT bob;
+    if( bob.isEmpty() )
+    {
+#define MAP(VT) \
+	bob[Qt::VT] = # VT;
+	MAP(NoPen);
+	MAP(SolidLine);
+	MAP(DashLine);
+	MAP(DotLine);
+	MAP(DashDotLine);
+	MAP(DashDotDotLine);
+	MAP(CustomDashLine);
+#undef MAP
+    }
+    return bob.value( i, QString("NoPen") );
+}
+
+Qt::BrushStyle s11n::qt::stringToBrushStyle( QString const &val )
+{
+    typedef QMap<QString,Qt::BrushStyle> MapT;
+    static MapT bob;
+    if( bob.isEmpty() )
+    {
+#define MAP(VT) \
+	bob[# VT] = Qt::VT;		\
+	bob[QString("%1").arg(int(Qt::VT))] = Qt::VT;
+	MAP(NoBrush);
+	MAP(SolidPattern);
+	MAP(Dense1Pattern);
+	MAP(Dense2Pattern);
+	MAP(Dense3Pattern);
+	MAP(Dense4Pattern);
+	MAP(Dense5Pattern);
+	MAP(Dense6Pattern);
+	MAP(Dense7Pattern);
+	MAP(HorPattern);
+	MAP(VerPattern);
+	MAP(CrossPattern);
+	MAP(BDiagPattern);
+	MAP(FDiagPattern);
+	MAP(DiagCrossPattern);
+	MAP(LinearGradientPattern);
+	MAP(ConicalGradientPattern);
+	MAP(RadialGradientPattern);
+	MAP(TexturePattern);
+#undef MAP
+    }
+    return bob.value( val, Qt::NoBrush );
+}
+
+QString s11n::qt::brushStyleToString( int i )
+{
+    typedef QMap<int,QString> MapT;
+    static MapT bob;
+    if( bob.isEmpty() )
+    {
+#define MAP(VT) \
+	bob[Qt::VT] = # VT;
+	MAP(NoBrush);
+	MAP(SolidPattern);
+	MAP(Dense1Pattern);
+	MAP(Dense2Pattern);
+	MAP(Dense3Pattern);
+	MAP(Dense4Pattern);
+	MAP(Dense5Pattern);
+	MAP(Dense6Pattern);
+	MAP(Dense7Pattern);
+	MAP(HorPattern);
+	MAP(VerPattern);
+	MAP(CrossPattern);
+	MAP(BDiagPattern);
+	MAP(FDiagPattern);
+	MAP(DiagCrossPattern);
+	MAP(LinearGradientPattern);
+	MAP(ConicalGradientPattern);
+	MAP(RadialGradientPattern);
+	MAP(TexturePattern);
+#undef MAP
+    }
+    return bob.value( i, QString("NoBrush") );
+}
+
+
 bool QBrush_s11n::operator()( S11nNode & dest, QBrush const & src ) const
 {
     typedef s11nlite::node_traits NT;
-    NT::set( dest, "style", long(src.style()) );
+    NT::set( dest, "style",
+	     s11n::qt::brushStyleToString(src.style()).toAscii().constData() );
     bool ret = true;
 #define SER(C,N,X) if(C) ret = s11n::serialize_subnode(dest,N,X)
     SER( ret, "color", src.color() );
@@ -51,7 +159,10 @@ bool QBrush_s11n::operator()( S11nNode const & src, QBrush & dest ) const
 {
 	typedef s11nlite::node_traits NT;
 	QBrush bogo;
-	bogo.setStyle( Qt::BrushStyle( NT::get( src, "style", long(dest.style()) ) ) );
+	{
+	    QString sty = NT::get(src,"style",std::string("NoPen")).c_str();
+	    bogo.setStyle( s11n::qt::stringToBrushStyle(sty) );
+	}
 	S11nNode const * ch = 0;
 #define DESER(T,N,X) \
 	ch = s11n::find_child_by_name(src,N);	\
@@ -347,7 +458,7 @@ bool QMatrix_s11n::operator()( S11nNode const & src, QMatrix & dest ) const
 bool QPen_s11n::operator()( S11nNode & dest, QPen const & src ) const
 {
     typedef S11nNodeTraits NT;
-    NT::set(dest,"style", int(src.style()) );
+    NT::set(dest,"style", s11n::qt::penStyleToString(src.style()).toAscii().constData() );
     NT::set(dest,"capStyle", int(src.capStyle()) );
     NT::set(dest,"joinStyle", int(src.joinStyle()) );
     NT::set(dest,"miterLimit", int(src.miterLimit()) );
@@ -371,7 +482,7 @@ bool QPen_s11n::operator()( S11nNode const & src, QPen & dest ) const
 	tmp.setColor(x);
     }
     typedef S11nNodeTraits NT;
-    tmp.setStyle( Qt::PenStyle( NT::get(src,"style",int(tmp.style()))));
+    tmp.setStyle( s11n::qt::stringToPenStyle( NT::get(src,"style", std::string("NoPen")).c_str() ) );
     tmp.setCapStyle( Qt::PenCapStyle(NT::get(src,"capStyle", int(tmp.capStyle()))));
     tmp.setJoinStyle( Qt::PenJoinStyle(NT::get(src,"joinStyle", int(tmp.joinStyle()))));
     tmp.setMiterLimit( NT::get(src,"miterLimit", int(tmp.miterLimit())) );
@@ -806,7 +917,7 @@ bool s11n::qt::QVariant_s11n::canHandle( int t )
 
 
 typedef QMap<QString,int> VariantNameTypeIDMap;
-#include <s11n.net/s11n/proxy/pod/int.hpp>
+//#include <s11n.net/s11n/proxy/pod/int.hpp>
 static VariantNameTypeIDMap & vNTMap()
 {
     static VariantNameTypeIDMap bob;

@@ -153,30 +153,6 @@ namespace qboard {
 	return zmax;
     } // nextZLevel()
 	
-    int stringToPenStyle( QString const &val )
-    {
-	if( val == "SolidLine" ) return Qt::SolidLine;
-	else if( val == "DashLine" ) return Qt::DashLine;
-	else if( val == "DotLine" ) return Qt::DotLine;
-	else if( val == "DashDotLine" ) return Qt::DashDotLine;
-	else if( val == "DashDotDotLine" ) return Qt::DashDotDotLine;
-	return Qt::NoPen;
-    }
-    QString penStyleToString( int i )
-    {
-	switch( i )
-	{
-	  case Qt::SolidLine: return "SolidLine";
-	  case Qt::DashLine: return "DashLine";
-	  case Qt::DotLine: return "DotLine";
-	  case Qt::DashDotLine: return "DashDotLine" ;
-	  case Qt::DashDotDotLine: return "DashDotDotLine";
-	  default:
-	      break;
-	}
-	return "NoPen";
-    }
-
     void destroyToplevelItems( QList<QGraphicsItem *> & tops )
     {
 	typedef QList<QGraphicsItem *> QL;
@@ -228,7 +204,14 @@ namespace qboard {
 	}
 	destroyToplevelItems( tops );
     }
-	
+
+    void destroyQGIList( QList<QGraphicsItem *> const & li )
+    {
+	foreach( QGraphicsItem * it, li )
+	{
+	    delete it;
+	}
+    }	
 	
     QList<QColor> colorList()
     {
