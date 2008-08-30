@@ -9,7 +9,7 @@ are at the top. Dates written extra large are release dates.
 ----
 *2008 August 30:*
 
-- A QGIDot can now create any number of childs dot with a line connecting the child to the parent. I'm not at all happy with the parent/child relationship (and its effects on moving items), but i currently have no way to properly re-build the line/dot connections if they're not hierarchical.
+- A QGIDot can now create any number of childs dot with a line connecting the child to the parent. I'm not at all happy with the parent/child relationship (and its effects on moving items), but i currently have no way to properly re-build the line/dot connections during deserialization if they're not hierarchical.
 
 
 *2008 August 29:*
