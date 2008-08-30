@@ -1,7 +1,13 @@
 #include "QBoardHomeView.h"
 
 #include <QItemSelectionModel>
-#include <QDirModel>
+
+#define QBOARD_USE_FSMODEL 0 && (QT_VERSION >= 0x040400)
+#if QBOARD_USE_FSMODEL
+#  include <QFileSystemModel> // would seem to be more suitable, but QFileSystemModel::setRootPath() isn't working how i'd expect
+#else
+#  include <QDirModel>
+#endif
 #include <QDebug>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -102,11 +108,16 @@ QIcon QBoardFileIconProvider::icon( const QFileInfo & info ) const
 
 struct QBoardHomeView::Impl
 {
-    QDirModel * model;
+#if QBOARD_USE_FSMODEL
+    typedef QFileSystemModel ModelType;
+#else
+    typedef QDirModel ModelType;
+#endif
+    ModelType * model;
     QItemSelectionModel * sel;
     QModelIndex current;
     static QBoardFileIconProvider * iconer;
-    Impl() : model( new QDirModel ),
+    Impl() : model( new ModelType ), // QDirModel ),
 	     sel( new QItemSelectionModel(model) ),
 	     current()
     {
@@ -116,7 +127,9 @@ struct QBoardHomeView::Impl
 	    iconer = new QBoardFileIconProvider;
 	}
 	model->setIconProvider( iconer );
+#if ! QBOARD_USE_FSMODEL
 	model->setSorting( QDir::DirsFirst | QDir::IgnoreCase );
+#endif
 	model->setReadOnly( false );
     }
     ~Impl()
@@ -140,6 +153,14 @@ QBoardHomeView::QBoardHomeView( QWidget * parent ) :
     impl(new Impl)
 {
     this->setModel( impl->model );
+#if ! QBOARD_USE_FSMODEL
+    this->setRootIndex( impl->model->index(qboard::home().absolutePath()) );
+#else
+    //impl->model->setFilter( QDir::AllEntries | QDir::Hidden );
+    //impl->model->setNameFilterDisables(false);
+    impl->model->setRootPath( qboard::home().absolutePath() );
+    qDebug() << "QBoardHomeView: model root =="<<impl->model->rootPath();
+#endif
     for( int i = 1; i < 4; ++i )
     {
 	this->setColumnHidden(i, true);
@@ -151,7 +172,6 @@ QBoardHomeView::QBoardHomeView( QWidget * parent ) :
     connect( impl->sel, SIGNAL(currentChanged( const QModelIndex &, const QModelIndex & )),
 	     this, SLOT(currentChanged( const QModelIndex &, const QModelIndex & )));
     //this->setSortingEnabled(true);
-    this->setRootIndex( impl->model->index(qboard::home().absolutePath()) );
 }
 
 QBoardHomeView::~QBoardHomeView()
@@ -202,15 +222,15 @@ void QBoardHomeView::keyReleaseEvent( QKeyEvent * event )
 }
 void QBoardHomeView::refresh()
 {
-#if 1
+#if ! QBOARD_USE_FSMODEL
     QModelIndex h = impl->model->index("./"); // qboard::home().absolutePath());
-//     if( h.isValid() )
-//     {
-	this->setRootIndex( h );
-	impl->model->refresh(h); // causes a segfault when called during ctor
-//     }
+    //     if( h.isValid() )
+    //     {
+    this->setRootIndex( h );
+    impl->model->refresh(h); // causes a segfault when called during ctor
+    //     }
 #else
-    impl->model->refresh(); // causes a segfault when called during ctor
+    impl->model->setRootPath( qboard::home().absolutePath() );
 #endif
 }
 
