@@ -44,6 +44,7 @@ Probably the most interesting part of the QVariant/S11n support is the ability t
 
 {{{
 #include "S11nQt.h"
+#include "S11nQt/QVariant.h"
 using namespace s11n::qt;
 ...
 QVariant var( VariantS11n(mySerializable) );
