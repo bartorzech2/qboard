@@ -2,14 +2,20 @@
 #define S11NQT_QColor_H_INCLUDED 1
 #include <QColor>
 namespace s11n { namespace qt {
-/* s11n proxy template.*/
-struct QColor_s11n
-{
-  /** Serializes src to dest. */
-  bool operator()( S11nNode & dest, QColor const & src ) const;
-  /** Deserializes dest from src. */
-  bool operator()( S11nNode const & src, QColor & dest ) const;
-};
+    /*
+      s11n proxy for QColor.
+
+      De/serializes the RGBA values of a color.
+
+      FIXME: handle other color models.
+    */
+    struct QColor_s11n
+    {
+	/** Serializes src to dest. */
+	bool operator()( S11nNode & dest, QColor const & src ) const;
+	/** Deserializes dest from src. */
+	bool operator()( S11nNode const & src, QColor & dest ) const;
+    };
 }} // namespace
 /** s11n proxy for QColor. */
 #define S11N_TYPE QColor
