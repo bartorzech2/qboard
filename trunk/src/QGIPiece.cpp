@@ -240,32 +240,9 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     if( "borderStyle" == key )
     {
 	impl->clearCache();
-	if( var.type() == QVariant::Int )
-	{
-	    const int i = var.toInt();
-	    switch( i )
-	    {
-	      case Qt::NoPen:
-	      case Qt::SolidLine:
-	      case Qt::DashLine:
-	      case Qt::DotLine:
-	      case Qt::DashDotLine:
-	      case Qt::DashDotDotLine:
-		  impl->borderLineStyle = i;
-		  break;
-	      default:
-		  impl->borderLineStyle = Qt::NoPen;
-		  break;
-	    }
-	    this->update();
-	    return;
-	}
-	else
-	{
-	    impl->borderLineStyle = qboard::stringToPenStyle(var.toString());
-	    this->update();
-	    return;
-	}
+	impl->borderLineStyle = s11n::qt::stringToPenStyle(var.toString());
+	this->update();
+	return;
     }
     if( ("scale" == key) || ("angle" == key) )
     {
@@ -607,6 +584,7 @@ bool QGIPiece::serialize( S11nNode & dest ) const
 bool QGIPiece::deserialize( S11nNode const & src )
 {
     if( ! this->Serializable::deserialize( src ) ) return false;
+    qboard::destroyQGIList( qboard::childItems(this) );
     {
 	qboard::clearProperties(this);
 	PropObj props;

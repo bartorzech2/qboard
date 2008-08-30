@@ -106,12 +106,14 @@ public:
 
     virtual QRectF boundingRect() const;
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+protected:
+    virtual bool event( QEvent * e );
 Q_SIGNALS:
     void lineDestructing( QGIDotLine * );
-    //private Q_SLOTS:
-//void cleanup();
 private Q_SLOTS:
     void destDestroyed( QGIDot * );
+    void propertySet( char const *pname, QVariant const & var );
+
 private:
     friend class QGIDot;
     struct Impl;
