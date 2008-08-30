@@ -284,6 +284,13 @@ right thing and move all the code into namespaces.
 
  ************************************************************************/
 
+#include <QBrush>
+/* s11n proxy for QBrush. */
+#define S11N_TYPE QBrush
+#define S11N_TYPE_NAME "QBrush"
+#define S11N_SERIALIZE_FUNCTOR QBrush_s11n
+#include "reg_qt_s11n.h"
+
 
 #include <QByteArray>
 namespace s11n { namespace qt {
@@ -312,7 +319,6 @@ namespace s11n { namespace qt {
 	
 	/** Deserializes dest from src. */
 	bool operator()( S11nNode const & src, QByteArray & dest ) const;
-	
 	/**
 	   The value of compressionThreshold influences how the serialize
 	   operator works.
@@ -325,6 +331,7 @@ namespace s11n { namespace qt {
 	*/
 	static unsigned short compressionThreshold;
     };
+   
 }} // namespaces
 /* s11n proxy for QByteArray. */
 #define S11N_TYPE QByteArray
@@ -433,6 +440,13 @@ namespace s11n {
 		}
 	};
 }
+
+#include <QPen>
+/* s11n proxy for QPen. */
+#define S11N_TYPE QPen
+#define S11N_TYPE_NAME "QPen"
+#define S11N_SERIALIZE_FUNCTOR QPen_s11n
+#include "reg_qt_s11n.h"
 
 #include <QPixmap>
 /*
