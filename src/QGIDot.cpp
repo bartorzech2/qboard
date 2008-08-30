@@ -167,7 +167,7 @@ void QGIDot::updatePainter()
     gradient.setColorAt(1, darker);
     impl->brush = QBrush(gradient);
     this->setBrush(impl->brush);
-    this->setPen(impl->pen);
+    //this->setPen(impl->pen);
     this->setRect( QRectF(-r,-r,r*2,r*2) );
 }
 
@@ -412,7 +412,7 @@ bool QGIDot::deserialize(  S11nNode const & src )
 	this->setPos( p );
     }
 #if 1
-    // FIXME: delete any existing children
+    qboard::destroyQGIList( qboard::childItems(this) );
     ch = s11n::find_child_by_name(src, "children");
     if( ch )
     {
@@ -569,7 +569,7 @@ QGIDotLine::QGIDotLine() : QObject(),
 QGIDotLine::~QGIDotLine()
 {
     emit lineDestructing(this);
-    qDebug() << "QGIDotLine::~QGIDotLine()";
+    //qDebug() << "QGIDotLine::~QGIDotLine()";
     delete impl;
 }
 
@@ -588,14 +588,13 @@ void QGIDotLine::adjust()
     QLineF line(mapFromItem(impl->src, 0, 0), mapFromItem(impl->dest, 0, 0));
     qreal length = line.length();
     QPointF edgeOffset((line.dx() * 10) / length, (line.dy() * 10) / length);
-
     impl->arrowSize = impl->dest->boundingRect().width() / 2;
-
     this->prepareGeometryChange();
     impl->pSrc = line.p1() + edgeOffset;
     impl->pDest = line.p2() - edgeOffset;
     this->setLine( QLineF( impl->pSrc, impl->pDest ) );
 }
+
 QRectF QGIDotLine::boundingRect() const
 {
     if (!impl->src || !impl->dest)
@@ -637,7 +636,8 @@ void QGIDotLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, Q
     QPointF ap2 = start
 	+ QPointF(::sin(angle - Pi + Pi / 3) * asz,
 		  ::cos(angle - Pi + Pi / 3) * asz);
-    painter->setBrush(impl->brush);
+    painter->setBrush(impl->pen.brush());
+    painter->setPen(impl->pen);
     painter->drawPolygon(QPolygonF() << start << ap1 << ap2);
     
 }
@@ -694,24 +694,63 @@ QGIDot * QGIDotLine::destNode()
     return impl->dest;
 }
 
+void QGIDotLine::propertySet( char const *pname,
+			      QVariant const & var )
+{
+    if( ! pname ) return;
+    QString key( pname );
+    QPen pen = impl->pen;
+    if( "width" == key )
+    {
+	pen.setWidth( var.toInt() );
+    }
+    else if( "style" == key )
+    {
+	pen.setStyle( Qt::PenStyle( s11n::qt::stringToPenStyle(var.toString()) ) );
+    }
+    this->setPen(impl->pen);
+}
+
+bool QGIDotLine::event( QEvent * e )
+{
+    while( e->type() == QEvent::DynamicPropertyChange )
+    {
+	QDynamicPropertyChangeEvent *chev = dynamic_cast<QDynamicPropertyChangeEvent *>(e);
+	if( ! chev ) break;
+	char const * key = chev->propertyName().constData();
+	this->propertySet( key, this->property(key) );
+	e->accept();
+	break;
+    }
+    return QObject::event(e);
+}
+
 bool QGIDotLine::serialize( S11nNode & dest ) const
 {
     if( ! this->Serializable::serialize( dest ) ) return false;
+    if( ! impl->dest )
+    {
+	throw s11n::s11n_exception("QGIDotLine cannot serialize when no destination Dot is set!");
+    }
     typedef S11nNodeTraits NT;
     if(0) qDebug() <<"QGIDotLine::serialize() this =="<<(void const *)this
 	     << "impl->src =="<<(void const *)impl->src
 	     << "impl->dest =="<<(void const *)impl->dest
 	;
-    return impl->dest
-	? s11nlite::serialize_subnode( dest, "dest", *impl->dest )
-	: false;
+    if( ! s11nlite::serialize_subnode( dest, "pen", impl->pen ) )
+    {
+	qDebug() << "QGIDotLine::serialize(): pen serialization failed.";
+    }
+    return s11nlite::serialize_subnode( dest, "dest", *impl->dest ); 
 }
 
 bool QGIDotLine::deserialize( S11nNode const & src )
 {
     if( ! this->Serializable::deserialize( src ) ) return false;
-    // FIXME: delete any existing children
-    typedef S11nNodeTraits NT;
+    qboard::destroyQGIList( qboard::childItems(this) );
+    //typedef S11nNodeTraits NT;
+    s11nlite::deserialize_subnode( src, "pen", impl->pen );
+    this->setPen( impl->pen );
     S11nNode const * ch = 0;
     ch = s11n::find_child_by_name(src, "dest");
     if( ch )

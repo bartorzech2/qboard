@@ -465,7 +465,7 @@ QObjectPropertyMenu * QObjectPropertyMenu::makePenStyleMenu(
     QObjectPropertyMenu * pm = new QObjectPropertyMenu("Style", objs, propertyName, 0 );
     for( int i = Qt::NoPen; i < Qt::CustomDashLine; ++i )
     {
-	pm->addItem( QVariant(i), qboard::penStyleToString(i) );
+	pm->addItem( QVariant(i), s11n::qt::penStyleToString(i) );
     }
     return pm;
 }
