@@ -7,6 +7,11 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top. Dates written extra large are release dates.
 
 ----
+*2008 August 30:*
+
+- A QGIDot can now create any number of childs dot with a line connecting the child to the parent. I'm not at all happy with the parent/child relationship (and its effects on moving items), but i currently have no way to properly re-build the line/dot connections if they're not hierarchical.
+
+
 *2008 August 29:*
 
 - In the tree browser view, clicking Refresh to update the file view no longer collapses open dirs (unless those dirs no longer exist). Correction: this works only in Qt4.3. In Qt4.4 all open dirs are collapsed.
