@@ -3,7 +3,7 @@
 = Serializing Qt-based objects using libs11n =
 
 Since i'm the maintainer of the s11n project (http://s11n.net), a library for serializing
-objects in C++, QBoard uses libs11n for its serialization needs (that is, loading and saving). As QBoard develops, code is written to bind Qt-based types to the s11n serialization framework. That code is independent of QBoard and may be helpful to coders working on arbitrary Qt-based projects.
+objects in C++, QBoard uses libs11n for its serialization needs (that is, loading and saving). As QBoard develops, code is written to bind Qt-based types to the s11n serialization framework. That code is independent of QBoard and may be helpful to coders working on arbitrary Qt-based projects. (Historical note: libs11n was originally written with the express intent of (someday) supporting this very application.)
 
 The code is available via the QBoard source tree (look for `src/*11n*.*`) or as a separate download on the downloads page (look for `s11n-qt-VERSION.tar.gz`, though those versions may be older than what is the in the current QBoard tree).
 
