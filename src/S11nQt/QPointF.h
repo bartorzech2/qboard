@@ -1,13 +1,17 @@
 #include <QPointF>
 namespace s11n { namespace qt {
-/* s11n proxy for QPointF.*/
-struct QPointF_s11n
-{
-  /** Serializes src to dest. */
-  bool operator()( S11nNode & dest, QPointF const & src ) const;
-  /** Deserializes dest from src. */
-  bool operator()( S11nNode const & src, QPointF & dest ) const;
-};
+    /*
+      s11n proxy for QPointF.
+
+      De/serializes the x/y coordinates of a point.
+    */
+    struct QPointF_s11n
+    {
+	/** Serializes src to dest. */
+	bool operator()( S11nNode & dest, QPointF const & src ) const;
+	/** Deserializes dest from src. */
+	bool operator()( S11nNode const & src, QPointF & dest ) const;
+    };
 }} // namespace
 /** register s11n proxy for QPointF. */
 #define S11N_TYPE QPointF
