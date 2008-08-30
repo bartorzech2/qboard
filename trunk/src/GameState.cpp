@@ -178,6 +178,7 @@ QScriptEngine & GameState::jsEngine() const
 {
     return *impl->js;
 }
+#if 0
 static QScriptValue getObjectPos(QScriptContext *context, QScriptEngine *engine)
  {
      qDebug() << "GameState static getObjectPos()";
@@ -188,7 +189,8 @@ static QScriptValue getObjectPos(QScriptContext *context, QScriptEngine *engine)
 //      if (context->argumentCount() == 1) // writing?
 //          callee.setProperty("value", context->argument(0));
 //     return callee.property("value");
- }
+}
+#endif
 
 // static QScriptValue pieceSetProp(QScriptContext *ctx,
 // 				 QScriptEngine *eng)
