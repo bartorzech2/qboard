@@ -2,14 +2,26 @@
 #define S11NQT_QPen_H_INCLUDED 1
 #include <QPen>
 namespace s11n { namespace qt {
-/* s11n proxy template.*/
-struct QPen_s11n
-{
-  /** Serializes src to dest. */
-  bool operator()( S11nNode & dest, QPen const & src ) const;
-  /** Deserializes dest from src. */
-  bool operator()( S11nNode const & src, QPen & dest ) const;
-};
+    /*
+      s11n proxy for QPen.
+
+      De/serializes the following properties of a QPen:
+
+      - style
+      - capStyle
+      - joinStyle
+      - miterLimit
+      - width
+      - brush
+      - color
+    */
+    struct QPen_s11n
+    {
+	/** Serializes src to dest. */
+	bool operator()( S11nNode & dest, QPen const & src ) const;
+	/** Deserializes dest from src. */
+	bool operator()( S11nNode const & src, QPen & dest ) const;
+    };
 }} // namespace
 /** s11n proxy for QPen. */
 #define S11N_TYPE QPen
