@@ -11,25 +11,29 @@
 #include <QList>
 #include <QPainterPath>
 #include <QGraphicsEllipseItem>
+#include <QGraphicsLineItem>
+class QGIDotLine;
 class QGIDot : public QObject,
 	       public QGraphicsEllipseItem,
 	       public Serializable
 {
 Q_OBJECT
 public:
-	QGIDot();
-	virtual ~QGIDot();
-	/** Serializes this object to dest. The following properties are saved:
-		position, text (as HTML), QObject "dynamic" properties.
-	*/
-	virtual bool serialize( S11nNode & dest ) const;
-	/** Deserializes src to this object. */
-	virtual bool deserialize( S11nNode const & src );
-	virtual int type() const { return QGITypes::QGIDot; }
-	QRectF boundingRect() const;
+QGIDot();
+    virtual ~QGIDot();
+    /** Serializes this object to dest. The following properties are saved:
+	position, text (as HTML), QObject "dynamic" properties.
+    */
+    virtual bool serialize( S11nNode & dest ) const;
+    /** Deserializes src to this object. */
+    virtual bool deserialize( S11nNode const & src );
+    virtual int type() const { return QGITypes::QGIDot; }
+    QRectF boundingRect() const;
     QPainterPath shape() const;
-	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-	virtual bool event( QEvent * e );
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    virtual bool event( QEvent * e );
+Q_SIGNALS:
+    void dotDestructing( QGIDot * );
 public Q_SLOTS:
    /**
       See QGIHider::hideItems(). Returns object is this item's new
@@ -37,7 +41,7 @@ public Q_SLOTS:
       QGIHider).
    */
     QGraphicsItem * hideItems();
-
+    void split();
 protected:
 	//virtual void mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event );
 	//virtual void focusOutEvent( QFocusEvent * event );
@@ -48,8 +52,15 @@ protected:
 private Q_SLOTS:
     /** Handles property changes. */
     void propertySet( char const * key, QVariant const & val );
+    //void lineDestroyed( QGIDotLine * );
+    void addEdge( QGIDotLine * );
+    void removeEdge( QGIDotLine * );
 
 private:
+    friend class QGIDotLine;
+    typedef QList<QGIDotLine*> EdgeList;
+    EdgeList edges() const;
+
     void updatePainter();
     struct Impl;
     Impl * impl;
@@ -63,6 +74,58 @@ private:
 #define S11N_TYPE QGIDot
 #define S11N_SERIALIZE_FUNCTOR Serializable_s11n
 #define S11N_TYPE_NAME "QGIDot"
+#include <s11n.net/s11n/reg_s11n_traits.hpp>
+
+class QGIDotLine : public QObject,
+		   public QGraphicsLineItem,
+		   public Serializable
+{
+Q_OBJECT
+public:
+    QGIDotLine();
+    virtual ~QGIDotLine();
+
+    void setNodes( QGIDot * src, QGIDot * dest );
+    void setSourceNode( QGIDot * d );
+    void setDestNode( QGIDot * d );
+    QGIDot * srcNode();
+    QGIDot * destNode();
+    void adjust();
+
+    virtual int type() const { return QGITypes::QGIDotLine; }
+
+    /**
+       Serializes this object to dest.
+    */
+    virtual bool serialize( S11nNode & dest ) const;
+
+    /**
+       Deserializes this object from src.
+    */
+    virtual bool deserialize( S11nNode const & src );
+
+    virtual QRectF boundingRect() const;
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+Q_SIGNALS:
+    void lineDestructing( QGIDotLine * );
+    //private Q_SLOTS:
+//void cleanup();
+private Q_SLOTS:
+    void destDestroyed( QGIDot * );
+private:
+    friend class QGIDot;
+    struct Impl;
+    Impl * impl;
+};
+
+// Register QGIDotLine with s11n:
+#define S11N_TYPE QGIDotLine
+#define S11N_BASE_TYPE Serializable
+#define S11N_TYPE_NAME "QGIDotLine"
+#include <s11n.net/s11n/reg_s11n_traits.hpp>
+#define S11N_TYPE QGIDotLine
+#define S11N_SERIALIZE_FUNCTOR Serializable_s11n
+#define S11N_TYPE_NAME "QGIDotLine"
 #include <s11n.net/s11n/reg_s11n_traits.hpp>
 
 
