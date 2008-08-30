@@ -20,10 +20,12 @@
 #include "QGIPiece.h"
 #include "utility.h"
 #include "S11nQt.h"
-#include "S11nQtList.h"
+#include "S11nQt/QList.h"
 #include "S11nClipboard.h"
 #include "MenuHandlerGeneric.h"
 #include "PropObj.h"
+#include "S11nQt/QPointF.h"
+#include "S11nQt/QPoint.h"
 
 bool QGITypes::handleClickRaise( QGraphicsItem * it,
 				 QGraphicsSceneMouseEvent * ev )

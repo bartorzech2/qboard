@@ -132,12 +132,7 @@ contains(QT,opengl){
 S11NQT_HEADERS = \
  $$SRC_DIR/S11n.h \
  $$SRC_DIR/S11nClipboard.h \
- $$SRC_DIR/S11nQt.h \
- $$SRC_DIR/S11nQtList.h \
- $$SRC_DIR/S11nQtListReg.h \
- $$SRC_DIR/S11nQtMap.h \
- $$SRC_DIR/S11nQtMapReg.h \
- $$SRC_DIR/S11nQtStream.h
+ $$SRC_DIR/S11nQt.h
 
 S11NQT_SOURCES = \
  $$SRC_DIR/S11nClipboard.cpp \

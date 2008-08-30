@@ -14,7 +14,7 @@
 #include "QBoard.h"
 
 #include "S11nQt.h"
-
+#include "S11nQt/QString.h"
 #include <QDebug>
 #include <QVariant>
 

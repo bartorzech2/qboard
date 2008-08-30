@@ -25,7 +25,7 @@
 #include "utility.h"
 #include "S11nClipboard.h"
 #include "Serializable.h"
-#include "S11nQtList.h"
+#include "S11nQt/QList.h"
 MenuHandlerCopyCut::MenuHandlerCopyCut(QGraphicsItem * gi,QObject * parent)
     : QObject(parent),
       m_gi(gi)

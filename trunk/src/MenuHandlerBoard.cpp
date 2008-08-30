@@ -20,15 +20,17 @@
 #include <QDebug>
 #include <QIcon>
 
+#include <stdexcept>
+
 //#include "MenuHandlerGeneric.h"
 #include "GameState.h"
 #include "utility.h"
 #include "S11nClipboard.h"
-#include <stdexcept>
 #include "QBoard.h"
 #include "QBoardView.h"
 #include "GL.h"
 #include "MenuHandlerGeneric.h"
+#include "ScriptQt.h"
 
 struct MenuHandlerBoard::Impl
 {
@@ -131,6 +133,16 @@ void MenuHandlerBoard::doMenu( GameState & gs, QBoardView * pv, QContextMenuEven
 	m.addMenu(pm);
     }
 
+    if(!QBOARD_VERSION)
+    {
+	QMenu * mMisc = m.addMenu( "Misc." );
+
+	QString code( "function(){var p=qboard.createObject('QGIDot',{pos:QPoint(50,50)});}()");
+	QAction * ac = new qboard::JavaScriptAction( QString("Add QGIDot"),
+						     gs.jsEngine(),
+						     code );
+	mMisc->addAction( ac );
+    }
 
 #if QBOARD_USE_OPENGL
     {

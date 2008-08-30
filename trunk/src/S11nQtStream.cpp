@@ -11,7 +11,7 @@
  *
  */
 
-#include "S11nQtStream.h"
+#include "S11nQt/Stream.h"
 #include <stdexcept>
 struct StdToQtOBuf::Impl
 {

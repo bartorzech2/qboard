@@ -21,10 +21,11 @@
 #include <QtGlobal>
 
 #include "S11nQt.h"
-#include "S11nQtList.h"
+#include "S11nQt/QList.h"
 #include "utility.h"
 #include "MenuHandlerGeneric.h"
 #include "S11nClipboard.h"
+#include "S11nQt/QPointF.h"
 
 #include "Dice.h"
 

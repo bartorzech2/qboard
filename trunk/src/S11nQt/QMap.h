@@ -1,5 +1,5 @@
-#ifndef __S11NQTMAP_H__
-#define __S11NQTMAP_H__
+#ifndef S11NQT_QMap_H_INCLUDED
+#define S11NQT_QMap_H_INCLUDED 1
 /*
  * This file is (or was, at some point) part of the QBoard project
  * (http://code.google.com/p/qboard)
@@ -18,25 +18,23 @@
 	have to copy a large chunk of the s11n::map source code here
 	due to differences in the QMap-vs-std::map APIs.
 */
-#include <list>
-#include <vector>
-#include <set>
-#include <memory>
 #include <iterator> // insert_iterator
 #include <algorithm> // for_each()
-#include <s11n.net/s11n/variant.hpp> // lexical casting
 #include <s11n.net/s11n/traits.hpp> // node_traits<>
-#include <s11n.net/s11n/type_traits.hpp> // type_traits<>
-#include <s11n.net/s11n/serialize.hpp> // core serialize funcs
 #include <s11n.net/s11n/abstract_creator.hpp> // abstract_creator class
 #include <s11n.net/s11n/exception.hpp> // s11n_exception class
 #include <s11n.net/s11n/s11n_debuggering_macros.hpp> // tracing macros
 #include <s11n.net/s11n/proxy/mapish.hpp>
-#include "S11nQt.h"
+#include <QMap>
+#include "S11nQt/QPair.h"
 
 namespace s11n { namespace qt {
     using namespace s11n;
-
+    /**
+       Serializes a QMap. It is almost a 100% copy of s11n::map::serialize_map(),
+       except that the QMap has a slightly different API from std::map (e.g.
+       doesn't support swap()).
+     */
     template <typename NodeType, typename MapType>
     bool serialize_qmap( NodeType & dest, const MapType & src )
     {
@@ -73,8 +71,8 @@ namespace s11n { namespace qt {
 
     template <typename NodeType, typename MapType>
     bool serialize_qmap( NodeType & dest,
-				   const std::string & subnodename,
-				   const MapType & src )
+			 const std::string & subnodename,
+			 const MapType & src )
     {
 	typedef node_traits<NodeType> TR;
 	std::auto_ptr<NodeType> ch( TR::create(subnodename) );
@@ -132,9 +130,9 @@ namespace s11n { namespace qt {
     }
 
     template <typename NodeType, typename MapType>
-    bool deserialize_map( const NodeType & src,
-			  const std::string & subnodename,
-			  MapType & dest )
+    bool deserialize_qmap( const NodeType & src,
+			   const std::string & subnodename,
+			   MapType & dest )
     {
 	const NodeType * ch = ::s11n::find_child_by_name( src, subnodename );
 	if( ! ch ) return false;
@@ -160,16 +158,51 @@ namespace s11n { namespace qt {
     };
 }} // namespaces
 
+namespace s11n {
 
+        /**
+           Specialization for QMap-like types.
+        */
+        template <typename T1, typename T2>
+        struct S11N_EXPORT_API default_cleanup_functor< QMap<T1,T2> >
+        {
+                typedef QMap<T1,T2> serializable_type;
+
+                /**
+                   ACHTUNG: it can only deallocate the .second member
+                   of each mapped pair, because the first is const.
+                   Since it would be very unusual to serialize a map
+                   keyed on unmanaged pointers, this is not seen as a
+                   major problem.
+
+                   After this call, p is empty.
+                */
+                void operator()( serializable_type & p ) const throw()
+                {
+                        using namespace ::s11n::debug;
+                        S11N_TRACE(TRACE_CLEANUP) << "default_cleanup_functor<> specialization cleaning up map<>...\n";
+                        // reminder: pair type has a const .first member. If it weren't
+                        // for that pesky const, we could do this all in a simple
+                        // for_each() call.
+                        typedef typename serializable_type::mapped_type MT;
+                        typedef typename ::s11n::type_traits<MT>::type mapped_type; // strip pointer part
+                        typedef typename serializable_type::iterator MIT;
+                        MIT b = p.begin();
+                        MIT e = p.end();
+                        for( ; e != b; ++b )
+                        {
+                            ::s11n::cleanup_serializable<mapped_type>( b.value() );
+                        }
+                        p.clear();
+                }
+        };
+}
 
 /* s11n proxy for QMap<SerializableT,SerializableT>. */
-#define S11N_MAP_TYPE QMap
-#define S11N_MAP_TYPE_NAME "QMap"
-#include "S11nQtMapReg.h"
+#define S11N_TEMPLATE_TYPE QMap
+#define S11N_TEMPLATE_TYPE_NAME "QMap"
+#define S11N_TEMPLATE_TYPE_PROXY s11n::qt::serialize_qmap_f
+#define S11N_TEMPLATE_TYPE_DESER_PROXY s11n::qt::deserialize_qmap_f
+#include <s11n.net/s11n/proxy/reg_s11n_traits_template2.hpp>
 
-// #define QTMAP_SERIALIZE_FUNCTOR s11n::qt::serialize_qmap_f
-// #define QTMAP_DESERIALIZE_FUNCTOR s11n::qt::deserialize_qmap_f
-// #undef QTMAP_SERIALIZE_FUNCTOR
-// #undef QTMAP_DESERIALIZE_FUNCTOR
-
-#endif // __S11NQTMAP_H__
+#endif // S11NQT_QMap_H_INCLUDED
