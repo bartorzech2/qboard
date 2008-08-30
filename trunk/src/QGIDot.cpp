@@ -35,6 +35,7 @@
 #include "S11nQt/QBrush.h"
 #include "S11nQt/QPen.h"
 #include "S11nQt/QPointF.h"
+#include "S11nQt/QGraphicsItem.h"
 
 struct QGIDot::Impl
 {
@@ -568,7 +569,6 @@ QGIDotLine::QGIDotLine() : QObject(),
 {
     this->setPen( impl->pen );
     //this->setFlags( QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable );
-this->setFlags( QGraphicsItem::ItemIsSelectable );
 }
 
 QGIDotLine::~QGIDotLine()
