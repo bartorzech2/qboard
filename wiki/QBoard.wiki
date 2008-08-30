@@ -14,6 +14,16 @@ QBoard is a "re-imagining" of a much older project of mine called
 
 You can find screenshots on the [Screenshots screenshots page].
 
+== What can one do with QBoard? ==
+
+Some things QBoard can be used for:
+
+  * Quickly prototype boardgame designs.
+  * Play boardgames for which you have appropriate graphics.
+  * PBEM (play-by-email) gaming
+  * Maintaining maps for a roleplaying game. e.g. a campaign map can be annotated, locations of the characters can be recorded with counters, etc.
+  * For me, programming it has been a good way to burn hundreds of hours which i should have spent with my girlfriend and [http://picasaweb.google.com/sgbeal/TheDog my dog].
+
 == Features ==
 
   * A simple interface for quickly setting up and playing a boardgame.
@@ -31,7 +41,6 @@ You can find screenshots on the [Screenshots screenshots page].
   * JavaScript bindings are in the works. The basic stuff works, but this work ongoing.
 
 See also: the [TODOs] Page
-
 
 == Requirements ==
 
