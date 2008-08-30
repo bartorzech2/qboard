@@ -256,9 +256,9 @@ namespace s11n { namespace qt {
 	    S11nNodeTraits::clear( proxy->node );
 	}
     private:
+	static const int registration;
 	QSharedDataPointer<SharedS11nNode> proxy;
     };
-
 
     /**
        A "partial" s11n proxy which de/serializes QObject "dynamic"
@@ -289,7 +289,7 @@ namespace s11n { namespace qt {
     };
 
 }} // namespaces
-typedef s11n::qt::VariantS11n VariantS11n; // we don't want the namespace part stored by QMetaType
+using s11n::qt::VariantS11n; // kludge: we don't want the namespace part stored by QMetaType
 Q_DECLARE_METATYPE(VariantS11n);
 
 #endif

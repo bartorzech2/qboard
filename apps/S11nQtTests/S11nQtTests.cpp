@@ -20,12 +20,37 @@
 #endif
 
 #include "S11nQt.h"
-#include "S11nQtList.h"
-#include "S11nQtStream.h"
+
+#include "S11nQt/QBrush.h"
+#include "S11nQt/QByteArray.h"
+#include "S11nQt/QColor.h"
+#include "S11nQt/QDate.h"
+#include "S11nQt/QDateTime.h"
+#include "S11nQt/QFont.h"
+#include "S11nQt/QLineF.h"
+#include "S11nQt/QLine.h"
+#include "S11nQt/QList.h"
+#include "S11nQt/QMap.h"
+#include "S11nQt/QMatrix.h"
+#include "S11nQt/QPair.h"
+#include "S11nQt/QPen.h"
+#include "S11nQt/QPixmap.h"
+#include "S11nQt/QPointF.h"
+#include "S11nQt/QPoint.h"
+#include "S11nQt/QRectF.h"
+#include "S11nQt/QRect.h"
+#include "S11nQt/QRegExp.h"
+#include "S11nQt/QSizeF.h"
+#include "S11nQt/QSize.h"
+#include "S11nQt/QString.h"
+#include "S11nQt/QStringList.h"
+#include "S11nQt/QTime.h"
+#include "S11nQt/QTransform.h"
+#include "S11nQt/QVariant.h"
+#include "S11nQt/Stream.h"
+
 #include <s11n.net/s11n/proxy/pod/int.hpp>
 
-#include <QTransform>
-#include <QTime>
 void try_s11n()
 {
     // test out our s11n-qt routines...
@@ -33,7 +58,7 @@ void try_s11n()
     S11nNode node;
     typedef s11nlite::node_traits NT;
 #define THROW(MSG) throw std::runtime_error(MSG);
-    if(1)
+    if(0)
     {
 	s11nlite::serialize( node, qs );
 	s11nlite::save( node, std::cout );
@@ -58,7 +83,7 @@ void try_s11n()
 
 	
     NT::clear(node);
-    if(1)
+    if(0)
     {
 	QStringList li;
 	li << "Item 1" << "Item 2" << "Item 3";
@@ -71,7 +96,7 @@ void try_s11n()
     }
 	
     NT::clear(node);
-    if(1)
+    if(0)
     {
 	typedef QVector<QRect> QV;
 	QV vec;
@@ -88,7 +113,7 @@ void try_s11n()
     }
 
     NT::clear(node);
-    if(1)
+    if(0)
     {
 	//QVector<QPoint> poly;
 	QPolygon poly;
@@ -105,7 +130,7 @@ void try_s11n()
     }
 
     NT::clear(node);
-    if(1)
+    if(0)
     {
 	QByteArray qb;
 	if( 0 )
@@ -134,7 +159,7 @@ void try_s11n()
     }
 
     NT::clear(node);
-    if(1)
+    if(0)
     {
 	QPixmap pm(500,500);
 	pm.fill(QColor(255,0,0));
@@ -178,24 +203,28 @@ void try_s11n()
     {
 	using namespace s11n::qt;
 	QVariant qv;
-	qv.setValue( VariantS11n(QString("hi, world")) );
+	QString const orig("hi, world");
+	qv.setValue( VariantS11n(orig) );
 	COUT << "VariantS11n::variantType() == " << VariantS11n::variantType()
-	     << " qv.type() == "<<qv.type()<<'\n';
+	     << "\nqv.type() == "<<qv.type()
+	     << "\nqv.userType() == "<<qv.userType()<<'\n';
+	COUT << "save(qv):\n";
+	s11nlite::save( qv, std::cout );
 	QVariant vcp( qv );
+	COUT << "save(vcp):\n";
+	s11nlite::save( vcp, std::cout );
 	COUT << "VariantS11n::variantType() == " << VariantS11n::variantType()
 	     << " vcp.type() == "<<vcp.type()<<'\n';
 	COUT << "vcp.typeName() == "
 	     << vcp.typeName() <<'\n';
 	COUT << "vcp.userType() == "
 	     << vcp.userType() <<'\n';
-	COUT << "typeToName("<<VariantS11n::variantType()<<") == "
+	COUT << "QVariant::typeToName("<<VariantS11n::variantType()<<") == "
 	     << QVariant::typeToName(QVariant::Type(VariantS11n::variantType()))<<"\n";
 	COUT << "QVariant::typeToName(vcp.type()=="<<vcp.type()<<") == "
 	     << QVariant::typeToName(vcp.type())<<"\n";
 	COUT << "QVariant::nameToType("<<vcp.typeName()<<") == "
 	     << QVariant::nameToType(vcp.typeName()) << '\n';
-	COUT << "save(qv):\n";
-	s11nlite::save( qv, std::cout );
 	VariantS11n vsn( vcp.value<VariantS11n>() );
 	COUT << "save(vsn.node()):\n";
 	s11nlite::save( vsn.node(), std::cout );
@@ -203,6 +232,10 @@ void try_s11n()
 	if( ! vsn.deserialize(deser) )
 	{
 	    throw s11n::s11n_exception("VariantS11n deserialization of QString failed!");
+	}
+	if( deser != QString(orig) )
+	{
+	    throw s11n_exception("Deserialized QVariant/QString is not the same as the original!");
 	}
 	QSize bogus;
 	if( vsn.deserialize(bogus) )
@@ -213,7 +246,7 @@ void try_s11n()
 	s11nlite::save( deser, std::cout );
     }
 
-    if(1)
+    if(0)
     {
 	QTransform tr(11,12,13,21,22,23,31,32,33);
 	COUT << "QTransform:\n";
@@ -225,7 +258,7 @@ void try_s11n()
 	s11nlite::save( tr2, std::cout );
     }
 
-    if(1)
+    if(0)
     {
 	QMatrix tr(11,12,21,22,3,4);
 	COUT << "QMatrix:\n";
@@ -237,7 +270,7 @@ void try_s11n()
 	s11nlite::save( tr2, std::cout );
     }
 
-    if(1)
+    if(0)
     {
 	QDateTime tr = QDateTime::currentDateTime();
 	COUT << "QDateTime:\n";
@@ -254,7 +287,6 @@ int main(int argc, char ** argv)
 {
     s11nlite::serializer_class("parens");
     QApplication app( argc, argv );
-    qRegisterMetaType<s11n::qt::VariantS11n>("VariantS11n");
     try
     {
 	try_s11n();

@@ -48,6 +48,8 @@
 #include "S11nQt/QVariant.h"
 
 
+const int s11n::qt::VariantS11n::registration = s11n::qt::VariantS11n::variantType();
+
 Qt::PenStyle s11n::qt::stringToPenStyle( QString const &val )
 {
     typedef QMap<QString,Qt::PenStyle> MapT;
@@ -1136,6 +1138,7 @@ bool s11n::qt::QVariant_s11n::operator()( S11nNode & dest, QVariant const & src 
 	    S11nNodeTraits::swap( vsn.node(), ch );
 	    return true;
 	}
+	qDebug() << "QVariants_s11n::serialize: unhandled variant type. userType =="<<src.userType();
 	return false;
 }
 
