@@ -29,7 +29,7 @@ are at the top. Dates written extra large are release dates.
 
 - Changed: to set the board "placemarker" position, double-click the board instead of middle-clicking.
 
-- Midding-clicking most items will now lower them to the bottom of the stack. Left-clicking them will, as ever, raise them to the top.
+- Middle-clicking most items will now lower them to the bottom of the stack. Left-clicking them will, as ever, raise them to the top.
 
 
 == *2008 August 27:* ==
