@@ -47,10 +47,11 @@
 #include "S11nQt/QTransform.h"
 #include "S11nQt/QVariant.h"
 
+namespace s11n { namespace qt {
 
-const int s11n::qt::VariantS11n::registration = s11n::qt::VariantS11n::variantType();
+const int VariantS11n::registration = VariantS11n::variantType();
 
-Qt::PenStyle s11n::qt::stringToPenStyle( QString const &val )
+Qt::PenStyle stringToPenStyle( QString const &val )
 {
     typedef QMap<QString,Qt::PenStyle> MapT;
     static MapT bob;
@@ -71,7 +72,7 @@ Qt::PenStyle s11n::qt::stringToPenStyle( QString const &val )
     return bob.value( val, Qt::NoPen );
 }
 
-QString s11n::qt::penStyleToString( int i )
+QString penStyleToString( int i )
 {
     typedef QMap<int,QString> MapT;
     static MapT bob;
@@ -91,7 +92,7 @@ QString s11n::qt::penStyleToString( int i )
     return bob.value( i, QString("NoPen") );
 }
 
-Qt::BrushStyle s11n::qt::stringToBrushStyle( QString const &val )
+Qt::BrushStyle stringToBrushStyle( QString const &val )
 {
     typedef QMap<QString,Qt::BrushStyle> MapT;
     static MapT bob;
@@ -124,7 +125,7 @@ Qt::BrushStyle s11n::qt::stringToBrushStyle( QString const &val )
     return bob.value( val, Qt::NoBrush );
 }
 
-QString s11n::qt::brushStyleToString( int i )
+QString brushStyleToString( int i )
 {
     typedef QMap<int,QString> MapT;
     static MapT bob;
@@ -156,11 +157,11 @@ QString s11n::qt::brushStyleToString( int i )
     return bob.value( i, QString("NoBrush") );
 }
 
-bool s11n::qt::QBrush_s11n::operator()(S11nNode & dest, QBrush const & src ) const
+bool QBrush_s11n::operator()(S11nNode & dest, QBrush const & src ) const
 {
     typedef s11nlite::node_traits NT;
     NT::set( dest, "style",
-	     s11n::qt::brushStyleToString(src.style()).toAscii().constData() );
+	     brushStyleToString(src.style()).toAscii().constData() );
     bool ret = true;
 #define SER(C,N,X) if(C) ret = s11n::serialize_subnode(dest,N,X)
     SER( ret, "color", src.color() );
@@ -182,13 +183,13 @@ bool s11n::qt::QBrush_s11n::operator()(S11nNode & dest, QBrush const & src ) con
 #undef SER
     return ret;
 }
-bool s11n::qt::QBrush_s11n::operator()( S11nNode const & src, QBrush & dest ) const
+bool QBrush_s11n::operator()( S11nNode const & src, QBrush & dest ) const
 {
 	typedef s11nlite::node_traits NT;
 	QBrush bogo;
 	{
 	    QString sty = NT::get(src,"style",std::string("NoPen")).c_str();
-	    bogo.setStyle( s11n::qt::stringToBrushStyle(sty) );
+	    bogo.setStyle( stringToBrushStyle(sty) );
 	}
 	S11nNode const * ch = 0;
 #define DESER(T,N,X) \
@@ -224,8 +225,8 @@ static hashval_t hash_cstring_djb2( void const * vstr)
     return hash;
 }
 
-unsigned short s11n::qt::QByteArray_s11n::compressionThreshold = 100;
-bool s11n::qt::QByteArray_s11n::operator()( S11nNode & dest, QByteArray const & src ) const
+unsigned short QByteArray_s11n::compressionThreshold = 100;
+bool QByteArray_s11n::operator()( S11nNode & dest, QByteArray const & src ) const
 {
     if( src.isEmpty() ) return true;
     typedef s11nlite::node_traits NT;
@@ -240,7 +241,7 @@ bool s11n::qt::QByteArray_s11n::operator()( S11nNode & dest, QByteArray const & 
     NT::set( dest, "bin64", std::string( b64.constData(), b64.size()-1 ) );
     return true;
 }
-bool s11n::qt::QByteArray_s11n::operator()( S11nNode const & src, QByteArray & dest ) const
+bool QByteArray_s11n::operator()( S11nNode const & src, QByteArray & dest ) const
 {
 	typedef s11nlite::node_traits NT;
 	QByteArray tmp;
@@ -264,7 +265,7 @@ bool s11n::qt::QByteArray_s11n::operator()( S11nNode const & src, QByteArray & d
 	return true;
 }
 
-bool s11n::qt::QColor_s11n::operator()( S11nNode & dest, QColor const & src ) const
+bool QColor_s11n::operator()( S11nNode & dest, QColor const & src ) const
 {
 	typedef s11nlite::node_traits NT;
 	std::ostringstream os;
@@ -275,7 +276,7 @@ bool s11n::qt::QColor_s11n::operator()( S11nNode & dest, QColor const & src ) co
 	NT::set( dest, "rgba", os.str() );
 	return true;
 }
-bool s11n::qt::QColor_s11n::operator()( S11nNode const & src, QColor & dest ) const
+bool QColor_s11n::operator()( S11nNode const & src, QColor & dest ) const
 {
 	typedef s11nlite::node_traits NT;
 	std::string key("rgba");
@@ -314,7 +315,7 @@ bool s11n::qt::QColor_s11n::operator()( S11nNode const & src, QColor & dest ) co
 	return true;	
 }
 
-bool s11n::qt::QDate_s11n::operator()( S11nNode & dest, QDate const & src ) const
+bool QDate_s11n::operator()( S11nNode & dest, QDate const & src ) const
 {
 	typedef S11nNodeTraits NT;
 	std::ostringstream os;
@@ -324,7 +325,7 @@ bool s11n::qt::QDate_s11n::operator()( S11nNode & dest, QDate const & src ) cons
 	NT::set( dest, "ymd", os.str() );
 	return true;
 }
-bool s11n::qt::QDate_s11n::operator()( S11nNode const & src, QDate & dest ) const
+bool QDate_s11n::operator()( S11nNode const & src, QDate & dest ) const
 {
 	typedef S11nNodeTraits NT;
 	std::istringstream is(NT::get( src, "ymd", std::string() ));
@@ -341,13 +342,13 @@ bool s11n::qt::QDate_s11n::operator()( S11nNode const & src, QDate & dest ) cons
 	return true;	
 }
 
-bool s11n::qt::QDateTime_s11n::operator()( S11nNode & dest, QDateTime const & src ) const
+bool QDateTime_s11n::operator()( S11nNode & dest, QDateTime const & src ) const
 {
     return s11n::serialize_subnode( dest, "date", src.date() )
 	&& s11n::serialize_subnode( dest, "time", src.time() );
 }
 
-bool s11n::qt::QDateTime_s11n::operator()( S11nNode const & src, QDateTime & dest ) const
+bool QDateTime_s11n::operator()( S11nNode const & src, QDateTime & dest ) const
 {
     QDate d;
     QTime t;
@@ -362,7 +363,7 @@ bool s11n::qt::QDateTime_s11n::operator()( S11nNode const & src, QDateTime & des
 }
 
 
-bool s11n::qt::QFont_s11n::operator()( S11nNode & dest, QFont const & src ) const
+bool QFont_s11n::operator()( S11nNode & dest, QFont const & src ) const
 {
 	typedef s11nlite::node_traits NT;
 	NT::set( dest, "B", src.bold() );
@@ -372,7 +373,7 @@ bool s11n::qt::QFont_s11n::operator()( S11nNode & dest, QFont const & src ) cons
 	NT::set( dest, "fam", std::string( src.family().toAscii() ) );
 	return true;
 }
-bool s11n::qt::QFont_s11n::operator()( S11nNode const & src, QFont & dest ) const
+bool QFont_s11n::operator()( S11nNode const & src, QFont & dest ) const
 {
 	typedef s11nlite::node_traits NT;
 	QFont nil;
@@ -385,7 +386,7 @@ bool s11n::qt::QFont_s11n::operator()( S11nNode const & src, QFont & dest ) cons
 	dest = nil;
 	return true;	
 }
-bool s11n::qt::QLineF_s11n::operator()( S11nNode & dest, QLineF const & src ) const
+bool QLineF_s11n::operator()( S11nNode & dest, QLineF const & src ) const
 {
 #if 0
     return s11n::serialize_subnode( dest, "p1", src.p1() )
@@ -401,7 +402,7 @@ bool s11n::qt::QLineF_s11n::operator()( S11nNode & dest, QLineF const & src ) co
 #endif
     return true;
 }
-bool s11n::qt::QLineF_s11n::operator()( S11nNode const & src, QLineF & dest ) const
+bool QLineF_s11n::operator()( S11nNode const & src, QLineF & dest ) const
 {
     typedef s11nlite::node_traits NT;
     std::string xystr( NT::get( src, "xyXY", std::string() ) );
@@ -433,11 +434,11 @@ bool s11n::qt::QLineF_s11n::operator()( S11nNode const & src, QLineF & dest ) co
     return false;
 }
 
-bool s11n::qt::QLine_s11n::operator()( S11nNode & dest, QLine const & src ) const
+bool QLine_s11n::operator()( S11nNode & dest, QLine const & src ) const
 {
 	return QLineF_s11n()( dest, QLineF(src) );
 }
-bool s11n::qt::QLine_s11n::operator()( S11nNode const & src, QLine & dest ) const
+bool QLine_s11n::operator()( S11nNode const & src, QLine & dest ) const
 {
 	QLineF proxy;
 	if( QLineF_s11n()( src, proxy ) )
@@ -448,7 +449,7 @@ bool s11n::qt::QLine_s11n::operator()( S11nNode const & src, QLine & dest ) cons
 	return false;
 }
 
-bool s11n::qt::QMatrix_s11n::operator()( S11nNode & dest, QMatrix const & src ) const
+bool QMatrix_s11n::operator()( S11nNode & dest, QMatrix const & src ) const
 {
     typedef s11nlite::node_traits NT;
     std::ostringstream os;
@@ -462,7 +463,7 @@ bool s11n::qt::QMatrix_s11n::operator()( S11nNode & dest, QMatrix const & src ) 
     return true;
 }
 
-bool s11n::qt::QMatrix_s11n::operator()( S11nNode const & src, QMatrix & dest ) const
+bool QMatrix_s11n::operator()( S11nNode const & src, QMatrix & dest ) const
 {
     typedef s11nlite::node_traits NT;
     std::string str( NT::get( src, "matrix", std::string() ) );
@@ -478,10 +479,10 @@ bool s11n::qt::QMatrix_s11n::operator()( S11nNode const & src, QMatrix & dest ) 
     return true;
 }
 
-bool s11n::qt::QPen_s11n::operator()( S11nNode & dest, QPen const & src ) const
+bool QPen_s11n::operator()( S11nNode & dest, QPen const & src ) const
 {
     typedef S11nNodeTraits NT;
-    NT::set(dest,"style", s11n::qt::penStyleToString(src.style()).toAscii().constData() );
+    NT::set(dest,"style", penStyleToString(src.style()).toAscii().constData() );
     NT::set(dest,"capStyle", int(src.capStyle()) );
     NT::set(dest,"joinStyle", int(src.joinStyle()) );
     NT::set(dest,"miterLimit", int(src.miterLimit()) );
@@ -491,7 +492,7 @@ bool s11n::qt::QPen_s11n::operator()( S11nNode & dest, QPen const & src ) const
 	&& s11n::serialize_subnode( dest, "color", src.color() )
 	;
 }
-bool s11n::qt::QPen_s11n::operator()( S11nNode const & src, QPen & dest ) const
+bool QPen_s11n::operator()( S11nNode const & src, QPen & dest ) const
 {
     QPen tmp(dest);
     {
@@ -505,7 +506,7 @@ bool s11n::qt::QPen_s11n::operator()( S11nNode const & src, QPen & dest ) const
 	tmp.setColor(x);
     }
     typedef S11nNodeTraits NT;
-    tmp.setStyle( s11n::qt::stringToPenStyle( NT::get(src,"style", std::string("NoPen")).c_str() ) );
+    tmp.setStyle( stringToPenStyle( NT::get(src,"style", std::string("NoPen")).c_str() ) );
     tmp.setCapStyle( Qt::PenCapStyle(NT::get(src,"capStyle", int(tmp.capStyle()))));
     tmp.setJoinStyle( Qt::PenJoinStyle(NT::get(src,"joinStyle", int(tmp.joinStyle()))));
     tmp.setMiterLimit( NT::get(src,"miterLimit", int(tmp.miterLimit())) );
@@ -514,7 +515,7 @@ bool s11n::qt::QPen_s11n::operator()( S11nNode const & src, QPen & dest ) const
     return true;
 }
 
-bool s11n::qt::QPixmap_s11n::operator()( S11nNode & dest, QPixmap const & src ) const
+bool QPixmap_s11n::operator()( S11nNode & dest, QPixmap const & src ) const
 {
 	QByteArray ba;
 	if( ! src.isNull() )
@@ -527,7 +528,7 @@ bool s11n::qt::QPixmap_s11n::operator()( S11nNode & dest, QPixmap const & src ) 
 	}
 	return s11n::serialize_subnode( dest, "bytes", ba );
 }
-bool s11n::qt::QPixmap_s11n::operator()( S11nNode const & src, QPixmap & dest ) const
+bool QPixmap_s11n::operator()( S11nNode const & src, QPixmap & dest ) const
 {
     dest = QPixmap();
     QByteArray ba;
@@ -539,7 +540,7 @@ bool s11n::qt::QPixmap_s11n::operator()( S11nNode const & src, QPixmap & dest ) 
 }
 
 
-bool s11n::qt::QPointF_s11n::operator()( S11nNode & dest, QPointF const & src ) const
+bool QPointF_s11n::operator()( S11nNode & dest, QPointF const & src ) const
 {
 	typedef S11nNodeTraits NT;
 	std::ostringstream os;
@@ -548,7 +549,7 @@ bool s11n::qt::QPointF_s11n::operator()( S11nNode & dest, QPointF const & src ) 
 	NT::set( dest, "xy", os.str() );
 	return true;
 }
-bool s11n::qt::QPointF_s11n::operator()( S11nNode const & src, QPointF & dest ) const
+bool QPointF_s11n::operator()( S11nNode const & src, QPointF & dest ) const
 {
 	typedef S11nNodeTraits NT;
 	QPointF nil;
@@ -565,11 +566,11 @@ bool s11n::qt::QPointF_s11n::operator()( S11nNode const & src, QPointF & dest ) 
 	return true;	
 }
 
-bool s11n::qt::QPoint_s11n::operator()( S11nNode & dest, QPoint const & src ) const
+bool QPoint_s11n::operator()( S11nNode & dest, QPoint const & src ) const
 {
 	return QPointF_s11n()( dest, QPointF(src) );
 }
-bool s11n::qt::QPoint_s11n::operator()( S11nNode const & src, QPoint & dest ) const
+bool QPoint_s11n::operator()( S11nNode const & src, QPoint & dest ) const
 {
 	QPointF proxy;
 	if( QPointF_s11n()( src, proxy ) )
@@ -579,7 +580,7 @@ bool s11n::qt::QPoint_s11n::operator()( S11nNode const & src, QPoint & dest ) co
 	}
 	return false;
 }
-bool s11n::qt::QRectF_s11n::operator()( S11nNode & dest, QRectF const & src ) const
+bool QRectF_s11n::operator()( S11nNode & dest, QRectF const & src ) const
 {
 	typedef s11nlite::node_traits NT;
 	std::ostringstream os;
@@ -590,7 +591,7 @@ bool s11n::qt::QRectF_s11n::operator()( S11nNode & dest, QRectF const & src ) co
 	NT::set( dest, "xywh", os.str() );
 	return true;
 }
-bool s11n::qt::QRectF_s11n::operator()( S11nNode const & src, QRectF & dest ) const
+bool QRectF_s11n::operator()( S11nNode const & src, QRectF & dest ) const
 {
 	typedef s11nlite::node_traits NT;
 	QRectF nil;
@@ -612,11 +613,11 @@ bool s11n::qt::QRectF_s11n::operator()( S11nNode const & src, QRectF & dest ) co
 	return true;	
 }
 
-bool s11n::qt::QRect_s11n::operator()( S11nNode & dest, QRect const & src ) const
+bool QRect_s11n::operator()( S11nNode & dest, QRect const & src ) const
 {
 	return QRectF_s11n()( dest, QRectF(src) );
 }
-bool s11n::qt::QRect_s11n::operator()( S11nNode const & src, QRect & dest ) const
+bool QRect_s11n::operator()( S11nNode const & src, QRect & dest ) const
 {
 	QRectF proxy;
 	if( QRectF_s11n()( src, proxy ) )
@@ -626,7 +627,7 @@ bool s11n::qt::QRect_s11n::operator()( S11nNode const & src, QRect & dest ) cons
 	}
 	return false;
 }
-bool s11n::qt::QRegExp_s11n::operator()( S11nNode & dest, QRegExp const & src ) const
+bool QRegExp_s11n::operator()( S11nNode & dest, QRegExp const & src ) const
 {
 	typedef S11nNodeTraits NT;
 	if( ! s11n::serialize_subnode( dest, "pattern", src.pattern() ) ) return false;
@@ -635,7 +636,7 @@ bool s11n::qt::QRegExp_s11n::operator()( S11nNode & dest, QRegExp const & src ) 
 	NT::set( dest, "min", int(src.caseSensitivity()) );
 	return true;
 }
-bool s11n::qt::QRegExp_s11n::operator()( S11nNode const & src, QRegExp & dest ) const
+bool QRegExp_s11n::operator()( S11nNode const & src, QRegExp & dest ) const
 {
 	typedef S11nNodeTraits NT;
 	QString p;
@@ -649,7 +650,7 @@ bool s11n::qt::QRegExp_s11n::operator()( S11nNode const & src, QRegExp & dest ) 
 	return true;	
 }
 
-bool s11n::qt::QSizeF_s11n::operator()( S11nNode & dest, QSizeF const & src ) const
+bool QSizeF_s11n::operator()( S11nNode & dest, QSizeF const & src ) const
 {
 	typedef S11nNodeTraits NT;
 	std::ostringstream os;
@@ -658,7 +659,7 @@ bool s11n::qt::QSizeF_s11n::operator()( S11nNode & dest, QSizeF const & src ) co
 	NT::set( dest, "wh", os.str() );
 	return true;
 }
-bool s11n::qt::QSizeF_s11n::operator()( S11nNode const & src, QSizeF & dest ) const
+bool QSizeF_s11n::operator()( S11nNode const & src, QSizeF & dest ) const
 {
 	typedef S11nNodeTraits NT;
 	QSizeF nil;
@@ -673,11 +674,11 @@ bool s11n::qt::QSizeF_s11n::operator()( S11nNode const & src, QSizeF & dest ) co
 	dest = nil;
 	return true;	
 }
-bool s11n::qt::QSize_s11n::operator()( S11nNode & dest, QSize const & src ) const
+bool QSize_s11n::operator()( S11nNode & dest, QSize const & src ) const
 {
 	return QSizeF_s11n()( dest, QSizeF(src) );
 }
-bool s11n::qt::QSize_s11n::operator()( S11nNode const & src, QSize & dest ) const
+bool QSize_s11n::operator()( S11nNode const & src, QSize & dest ) const
 {
 	QSizeF proxy;
 	if( QSizeF_s11n()( src, proxy ) )
@@ -689,8 +690,8 @@ bool s11n::qt::QSize_s11n::operator()( S11nNode const & src, QSize & dest ) cons
 }
 
 typedef unsigned short unicode_char_t;
-bool s11n::qt::QString_s11n::tryAscii = true;
-bool s11n::qt::QString_s11n::operator()( S11nNode & dest, QString const & src ) const
+bool QString_s11n::tryAscii = true;
+bool QString_s11n::operator()( S11nNode & dest, QString const & src ) const
 {
 	typedef s11nlite::node_traits NT;
 	size_t slen = src.length();
@@ -773,7 +774,7 @@ bool s11n::qt::QString_s11n::operator()( S11nNode & dest, QString const & src ) 
 	}
 	return true;
 }
-bool s11n::qt::QString_s11n::operator()( S11nNode const & src, QString & dest ) const
+bool QString_s11n::operator()( S11nNode const & src, QString & dest ) const
 {
 	typedef s11nlite::node_traits NT;
 	if( NT::is_set( src, "ascii" ) )
@@ -810,7 +811,7 @@ bool s11n::qt::QString_s11n::operator()( S11nNode const & src, QString & dest ) 
 	return true;	
 }
 
-bool s11n::qt::QStringList_s11n::operator()( S11nNode & dest, QStringList const & src ) const
+bool QStringList_s11n::operator()( S11nNode & dest, QStringList const & src ) const
 {
 	std::for_each( src.begin(), src.end(),
 		       s11n::ser_to_subnode_unary_f( dest, "string" ) );
@@ -828,7 +829,7 @@ bool s11n::qt::QStringList_s11n::operator()( S11nNode & dest, QStringList const 
 	long sz = src.size();
 	return (sz>=0) && (sz == long(S11nNodeTraits::children(dest).size()));
 }
-bool s11n::qt::QStringList_s11n::operator()( S11nNode const & src, QStringList & dest ) const
+bool QStringList_s11n::operator()( S11nNode const & src, QStringList & dest ) const
 {
     dest.clear();
     typedef S11nNodeTraits NT;
@@ -840,7 +841,7 @@ bool s11n::qt::QStringList_s11n::operator()( S11nNode const & src, QStringList &
 }
 
 
-bool s11n::qt::QTime_s11n::operator()( S11nNode & dest, QTime const & src ) const
+bool QTime_s11n::operator()( S11nNode & dest, QTime const & src ) const
 {
 	typedef S11nNodeTraits NT;
 	std::ostringstream os;
@@ -851,7 +852,7 @@ bool s11n::qt::QTime_s11n::operator()( S11nNode & dest, QTime const & src ) cons
 	NT::set( dest, "hmsm", os.str() );
 	return true;
 }
-bool s11n::qt::QTime_s11n::operator()( S11nNode const & src, QTime & dest ) const
+bool QTime_s11n::operator()( S11nNode const & src, QTime & dest ) const
 {
 	typedef S11nNodeTraits NT;
 	std::istringstream is(NT::get( src, "hmsm", std::string() ));
@@ -871,7 +872,7 @@ bool s11n::qt::QTime_s11n::operator()( S11nNode const & src, QTime & dest ) cons
 	return true;	
 }
 
-bool s11n::qt::QTransform_s11n::operator()( S11nNode & dest, QTransform const & src ) const
+bool QTransform_s11n::operator()( S11nNode & dest, QTransform const & src ) const
 {
     typedef s11nlite::node_traits NT;
     std::ostringstream os;
@@ -884,7 +885,7 @@ bool s11n::qt::QTransform_s11n::operator()( S11nNode & dest, QTransform const & 
     return true;
 }
 
-bool s11n::qt::QTransform_s11n::operator()( S11nNode const & src, QTransform & dest ) const
+bool QTransform_s11n::operator()( S11nNode const & src, QTransform & dest ) const
 {
     typedef s11nlite::node_traits NT;
     std::string str( NT::get( src, "matrix", std::string() ) );
@@ -900,8 +901,53 @@ bool s11n::qt::QTransform_s11n::operator()( S11nNode const & src, QTransform & d
     return true;
 }
 
+char const * VariantS11n::variantTypeName()
+{
+    return "VariantS11n";
+}
+int VariantS11n::variantType()
+{
+    static int bob = qRegisterMetaType<VariantS11n>(variantTypeName());
+	    return bob;
+}
 
-bool s11n::qt::QVariant_s11n::canHandle( int t )
+VariantS11n::VariantS11n()
+    : proxy( new Detail::SharedS11nNode )
+{
+}
+VariantS11n::VariantS11n( S11nNode const & n)
+    : proxy( new Detail::SharedS11nNode )
+{
+    proxy->node = n;
+}
+VariantS11n & VariantS11n::operator=( VariantS11n const & src )
+{
+    this->proxy = src.proxy;
+    return *this;
+}
+VariantS11n::VariantS11n( VariantS11n const & src )
+    : proxy(src.proxy)
+{
+}
+VariantS11n::~VariantS11n()
+{}
+
+bool VariantS11n::empty() const
+{
+    return S11nNodeTraits::empty(proxy->node);
+}
+
+S11nNode & VariantS11n::node() { return this->proxy->node; }
+S11nNode const & VariantS11n::node() const { return this->proxy->node; }
+
+void VariantS11n::clear()
+{
+    S11nNodeTraits::clear( proxy->node );
+}
+
+
+
+bool QVariant_s11n::canHandle( int t )
 {
 	return 
 	    (t == QVariant::ByteArray)
@@ -994,7 +1040,6 @@ static VariantNameTypeIDMap & vNTMap()
 	MAP(Url);
 	MAP(UserType);
 #undef MAP
-	using s11n::qt::VariantS11n;
 	bob[VariantS11n::variantTypeName()] = VariantS11n::variantType();
 	bob[QString("%1").arg(VariantS11n::variantType())] = VariantS11n::variantType();
 
@@ -1063,7 +1108,7 @@ static VariantTypeIDNameMap & vTNMap()
 	MAP(ULongLong);
 	MAP(Url);
 	MAP(UserType);
-	bob[s11n::qt::VariantS11n::variantType()] = s11n::qt::VariantS11n::variantTypeName();
+	bob[VariantS11n::variantType()] = VariantS11n::variantTypeName();
 #undef MAP
  	//COUT << "vTNMap()==\n"; s11nlite::save(bob,std::cout);
     }
@@ -1075,7 +1120,7 @@ QString variantTypeName( int vt )
     return vTNMap().value( vt, "Invalid" );
 }
 
-bool s11n::qt::QVariant_s11n::operator()( S11nNode & dest, QVariant const & src ) const
+bool QVariant_s11n::operator()( S11nNode & dest, QVariant const & src ) const
 {
 	const int vt = src.userType();
 	if( ! QVariant_s11n::canHandle(vt) )
@@ -1142,7 +1187,7 @@ bool s11n::qt::QVariant_s11n::operator()( S11nNode & dest, QVariant const & src 
 	return false;
 }
 
-bool s11n::qt::QVariant_s11n::operator()( S11nNode const & src, QVariant & dest ) const
+bool QVariant_s11n::operator()( S11nNode const & src, QVariant & dest ) const
 {
 	typedef S11nNodeTraits NT;
 	std::string vtstr( NT::get( src, "type", std::string("0") ) );
@@ -1230,7 +1275,7 @@ static void QObjectProperties_s11n_clearProperties( QObject & obj )
     }
 }
 
-bool s11n::qt::QObjectProperties_s11n::operator()( S11nNode & dest, QObject const & src ) const
+bool QObjectProperties_s11n::operator()( S11nNode & dest, QObject const & src ) const
 {
 	typedef QList<QByteArray> QL;
 	QL ql( src.dynamicPropertyNames() );
@@ -1249,7 +1294,7 @@ bool s11n::qt::QObjectProperties_s11n::operator()( S11nNode & dest, QObject cons
 	return true;
 }
 
-bool s11n::qt::QObjectProperties_s11n::operator()( S11nNode const & src, QObject & dest ) const
+bool QObjectProperties_s11n::operator()( S11nNode const & src, QObject & dest ) const
 {
     QObjectProperties_s11n_clearProperties( dest );
     typedef S11nNodeTraits::child_list_type CLT;
@@ -1272,3 +1317,5 @@ bool s11n::qt::QObjectProperties_s11n::operator()( S11nNode const & src, QObject
     }
     return true;
 }
+
+}} // namespaces
