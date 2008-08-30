@@ -60,6 +60,30 @@ namespace s11n { namespace qt {
     }
 
     /**
+       Given one of the following strings, it returns the appropriate Qt::PenStyle
+       value, or NoPen if it finds no match:
+		
+       "SolidLine", "DashLine", "DotLine", "DashDotLine", "DashDotDotLine"
+    */
+    Qt::PenStyle stringToPenStyle( QString const & );
+    /**
+       The opposite of stringToPenStyle(). Returns "NoPen" if pen
+       is not a known Qt::PenStyle. 
+    */
+    QString penStyleToString( int pen );
+
+    /**
+       Like stringToPenStyle(), but works on Qt::BrushStyle names.
+    */
+    Qt::BrushStyle stringToBrushStyle( QString const & );
+    /**
+       The opposite of stringToBrushStyle(). Returns "NoBrush" if st
+       is not a known Qt::BrushStyle. 
+    */
+    QString brushStyleToString( int st );
+
+
+    /**
        Deserializes dest from src using libs11n.
        SerializableT must be a non-cv-qualified
        Serializable type. Note that deserializing
