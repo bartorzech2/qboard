@@ -26,6 +26,7 @@
 #include "PropObj.h"
 #include "S11nQt/QPointF.h"
 #include "S11nQt/QPoint.h"
+#include "S11nQt/QGraphicsItem.h"
 
 bool QGITypes::handleClickRaise( QGraphicsItem * it,
 				 QGraphicsSceneMouseEvent * ev )
