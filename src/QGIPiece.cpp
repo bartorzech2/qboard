@@ -619,6 +619,7 @@ bool QGIPiece::deserialize( S11nNode const & src )
     }
 
     {
+	// FIXME: delete any existing children
 	S11nNode const * ch = s11n::find_child_by_name(src, "children");
 	if( ch )
 	{
