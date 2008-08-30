@@ -30,6 +30,7 @@ struct QGITypes
 	LineNodeBinder,
 	QGIDie,
 	QGIDot,
+	QGIDotLine,
 	QGIHider,
 	QGIHtml,
 	QGIPiece,

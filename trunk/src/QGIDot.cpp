@@ -15,6 +15,7 @@
 #include "S11nQt.h"
 #include "utility.h"
 #include "MenuHandlerGeneric.h"
+#include "S11nQtList.h"
 #include <QGraphicsSceneMouseEvent>
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsScene>
@@ -29,6 +30,8 @@
 #include <QMenu>
 #include <QEvent>
 
+#include <cmath> // acos()
+
 struct QGIDot::Impl
 {
     bool active;
@@ -36,11 +39,13 @@ struct QGIDot::Impl
     QColor color;
     QPen pen;
     QBrush brush;
+    QGIDot::EdgeList edges;
     Impl() : active(false),
 	     radius(12),
 	     color(Qt::yellow),
 	     pen(Qt::NoPen),
-	     brush()
+	     brush(),
+	     edges()
 	{
 		
 	}
@@ -49,6 +54,30 @@ struct QGIDot::Impl
 		
 	}
 };
+
+struct QGIDotLine::Impl
+{
+    QGIDot * src;
+    QGIDot * dest;
+    QPointF pSrc;
+    QPointF pDest;
+    qreal arrowSize;
+    QBrush brush;
+    QPen pen;
+    Impl() : src(0),
+	     dest(0),
+	     pSrc(),
+	     pDest(),
+	     arrowSize(16),
+	     brush(QColor(Qt::red)),
+	     pen(brush,3)
+    {
+    }
+    ~Impl()
+    {
+    }
+};
+
 
 QGIDot::QGIDot() :
     QObject(),
@@ -66,10 +95,17 @@ QGIDot::QGIDot() :
 QGIDot::~QGIDot()
 {
     QBOARD_VERBOSE_DTOR << "~QGIDot()";
+#if 1
+    EdgeList cp( impl->edges );
+    foreach( QGIDotLine * it, cp )
+    {
+	this->removeEdge( it );
+    }
+#endif
+    emit dotDestructing(this);
     delete impl;
 }
 
-#include "utility.h"
 void QGIDot::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 {
 	impl->active = true;
@@ -226,12 +262,8 @@ QVariant QGIDot::itemChange(GraphicsItemChange change, const QVariant &value)
 {
 	switch (change) {
 		case ItemPositionHasChanged:
-			//foreach (QGILineBinder *edge, m_ed)	edge->adjust();
-// 			if( m_line )
-// 			{
-// 				m_line->adjust();
-// 				this->update();
-// 			}
+		    foreach (QGIDotLine *edge, impl->edges)
+			edge->adjust();
 		break;
 	default:
 		break;
@@ -262,6 +294,56 @@ void QGIDot::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
 #endif
 }
 
+void QGIDot::split()
+{
+    QGIDot * ch = 0;
+#if 0
+    // aaarrggg! We can't clone this way b/c that'll get our
+    // children as well.
+    ch = dynamic_cast<QGIDot*>(this->clone());
+    if( ! ch )
+    {
+	throw std::runtime_error("Serious error: QGIDot::clone() failed! Almost certainly a de/serialization error.");
+    }
+#else
+    ch = new QGIDot;
+    *ch->impl = *this->impl;
+    ch->impl->edges.clear();
+    qboard::copyProperties( this, ch );
+    ch->updatePainter();
+    QRectF r( this->boundingRect() );
+    QPointF p = this->pos() + QPointF(r.width()/2,r.height()/2);
+    ch->setPos( p );
+    QGIDotLine * li = new QGIDotLine;
+#endif
+
+#if 0
+    if( par )
+    {
+	li->setParentItem( par );
+    }
+    QGraphicsScene * sc = this->scene();
+    if( sc && !par)
+    {
+	sc->addItem(li);
+    }
+#endif
+#if 0
+    if( par )
+    {
+	li->setParentItem( par );
+	this->setParentItem(li);
+	ch->setParentItem( li );
+    }
+    QGraphicsScene * sc = this->scene();
+    if( sc && !par)
+    {
+	//sc->addItem(ch);
+	sc->addItem(li);
+    }
+#endif
+    li->setNodes( this, ch );
+}
 
 bool QGIDot::serialize( S11nNode & dest ) const
 {
@@ -280,6 +362,38 @@ bool QGIDot::serialize( S11nNode & dest ) const
 	    QObject const & constnessKludge( props );
 	    if( ! s11n::qt::QObjectProperties_s11n()( pr, constnessKludge ) ) return false;
 	}
+	QList<QGraphicsItem *> chgi( qboard::childItems(this) );
+	if( ! chgi.isEmpty() )
+	{
+	    if( -1 == s11n::qt::serializeQGIList<Serializable>( s11n::create_child(dest,"children"),
+								chgi, false ) )
+	    {
+		qDebug() << "QGIDot::serialize: serializeQGIList() failed!";
+		return false;
+	    }
+	}
+#if 0
+	if( ! impl->edges.empty() )
+	{
+	    EdgeList mine;
+	    foreach( QGIDotLine * it, impl->edges )
+	    {
+		if(0) qDebug() << "QGIDot::serialize:"
+			       << "this =="<<(void const *)this
+			       << "edge =="<<(void const *)it
+		    ;
+		if( it->impl->src != this ) continue;
+		mine.push_back( it );
+	    }
+	    if( ! mine.empty()
+		&&
+		! s11n::serialize_subnode( dest, "lines", mine ) )
+	    {
+		qDebug() << "QGIDot::serialize: serialization of impl->edges failed!";
+		return false;
+	    }
+	}
+#endif
 	return true;
 }
 
@@ -287,6 +401,8 @@ bool QGIDot::deserialize(  S11nNode const & src )
 {
     if( ! this->Serializable::deserialize( src ) ) return false;
     typedef S11nNodeTraits NT;
+    delete impl;
+    impl = new Impl;
     S11nNode const * ch = s11n::find_child_by_name( src, "pos" );
     if( ch )
     {
@@ -295,11 +411,67 @@ bool QGIDot::deserialize(  S11nNode const & src )
 	if( ! s11n::deserialize( *ch, p ) ) return false;
 	this->setPos( p );
     }
+#if 1
+    // FIXME: delete any existing children
+    ch = s11n::find_child_by_name(src, "children");
+    if( ch )
+    {
+	typedef QList<QGraphicsItem *> QGIL;
+	QGIL childs;
+	if( -1 == s11n::qt::deserializeQGIList<Serializable>( *ch,
+							      childs ) )
+	{
+	    return false;
+	}
+	foreach( QGraphicsItem * it, childs )
+	{
+	    if( it->type() != QGITypes::QGIDotLine )
+	    {
+		it->setParentItem(this);
+		continue;
+	    }
+	    QGIDotLine * d = dynamic_cast<QGIDotLine*>(it);
+	    if( ! d )
+	    {
+		it->setParentItem(this);
+		continue;
+	    }
+	    d->setSourceNode( this );
+	}
+    }
+#endif
     ch = s11n::find_child_by_name(src, "properties");
     return ch
 	? s11n::qt::QObjectProperties_s11n()( *ch, *this )
 	: true;
 }
+
+QGIDot::EdgeList QGIDot::edges() const
+{
+    return impl->edges;
+}
+
+void QGIDot::addEdge( QGIDotLine * l )
+{
+    if( ! l ) return;
+    connect( l, SIGNAL(lineDestructing(QGIDotLine*)),
+	     this,SLOT(removeEdge(QGIDotLine*)));
+    impl->edges << l;
+    //l->adjust();
+}
+
+
+void QGIDot::removeEdge( QGIDotLine * li )
+{
+    impl->edges.removeAll(li);
+    disconnect( li, SIGNAL(lineDestructing(QGIDotLine*)),
+		this,SLOT(removeEdge(QGIDotLine*)));
+}
+
+// void QGIDot::lineDestroyed( QGIDotLine * li )
+// {
+//     this->removeEdge(li);
+// }
 
 struct MenuHandlerDot::Impl
 {
@@ -371,6 +543,7 @@ void MenuHandlerDot::doMenu( QGIDot *gvi, QGraphicsSceneContextMenuEvent * ev )
     {
 	mMisc->addAction(QIcon(":/QBoard/icon/box_wrapped.png"),
 			 "Cover",gvi,SLOT(hideItems()));
+	mMisc->addAction("Create line", gvi, SLOT(split()));
     }
 
     m->addSeparator();
@@ -380,4 +553,172 @@ void MenuHandlerDot::doMenu( QGIDot *gvi, QGraphicsSceneContextMenuEvent * ev )
     m->addAction(QIcon(":/QBoard/icon/help.png"),"Help...", this, SLOT(showHelp()) );
     m->exec( ev->screenPos() );
     delete m;
+}
+
+
+
+QGIDotLine::QGIDotLine() : QObject(),
+			   QGraphicsLineItem(),
+			   Serializable("QGIDotLine"),
+			   impl(new Impl)
+{
+    this->setPen( impl->pen );
+    //this->setFlags( QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable );
+}
+
+QGIDotLine::~QGIDotLine()
+{
+    emit lineDestructing(this);
+    qDebug() << "QGIDotLine::~QGIDotLine()";
+    delete impl;
+}
+
+void QGIDotLine::destDestroyed( QGIDot * )
+{
+    impl->dest = 0;
+    this->deleteLater();
+}
+
+
+void QGIDotLine::adjust()
+{
+    if (!impl->src || !impl->dest)
+        return;
+
+    QLineF line(mapFromItem(impl->src, 0, 0), mapFromItem(impl->dest, 0, 0));
+    qreal length = line.length();
+    QPointF edgeOffset((line.dx() * 10) / length, (line.dy() * 10) / length);
+
+    impl->arrowSize = impl->dest->boundingRect().width() / 2;
+
+    this->prepareGeometryChange();
+    impl->pSrc = line.p1() + edgeOffset;
+    impl->pDest = line.p2() - edgeOffset;
+    this->setLine( QLineF( impl->pSrc, impl->pDest ) );
+}
+QRectF QGIDotLine::boundingRect() const
+{
+    if (!impl->src || !impl->dest)
+        return QRectF();
+
+    qreal penWidth = 1;
+    qreal extra = (penWidth + impl->arrowSize) / 2.0;
+
+    QSizeF d(impl->pDest.x() - impl->pSrc.x(),
+	     impl->pDest.y() - impl->pSrc.y());
+    return QRectF(impl->pSrc, d )
+        .normalized()
+        .adjusted(-extra, -extra, extra, extra);
+}
+
+void QGIDotLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QWidget *wid)
+{
+    if (!impl->src || !impl->dest)
+    {
+ 	//this->QGraphicsLineItem::paint( painter, opt, wid );
+	return;
+    }
+    static const double Pi = 3.14159265358979323846264338327950288419717;
+    this->QGraphicsLineItem::paint(painter,opt,wid);
+    QLineF line( this->line() );
+    // Draw the arrows if there's enough room
+    double angle = ::acos(line.dx() / line.length());
+    if (line.dy() >= 0)
+    {
+        angle = Pi * 2 - angle;
+    }
+    
+    QPointF start( line.p2() );
+    QRectF db( impl->dest->boundingRect() );
+    const qreal asz = impl->arrowSize;
+    QPointF ap1 = start
+	+ QPointF(::sin(angle - Pi / 3) * asz,
+		  ::cos(angle - Pi / 3) * asz);
+    QPointF ap2 = start
+	+ QPointF(::sin(angle - Pi + Pi / 3) * asz,
+		  ::cos(angle - Pi + Pi / 3) * asz);
+    painter->setBrush(impl->brush);
+    painter->drawPolygon(QPolygonF() << start << ap1 << ap2);
+    
+}
+
+
+void QGIDotLine::setSourceNode( QGIDot * d )
+{
+    if( d == impl->src ) return;
+    if( impl->src )
+    {
+	impl->src->removeEdge( this );
+    }
+    impl->src = d;
+    if( ! d ) return;
+    this->setPos( QPointF(0,0) );
+    this->setParentItem( d );
+    d->addEdge( this );
+    this->adjust();
+}
+void QGIDotLine::setDestNode( QGIDot * d )
+{
+    if( d == impl->dest ) return;
+    if( impl->dest )
+    {
+	impl->dest->removeEdge( this );
+	disconnect( impl->dest, SIGNAL(dotDestructing(QGIDot*)),
+		    this, SLOT(destDestroyed(QGIDot*)));
+    }
+    impl->dest = d;
+    if( ! d ) return;
+    d->setParentItem(this);
+    if( impl->src )
+    {
+	d->setPos( d->pos() - impl->src->pos() );
+    }
+    connect( d, SIGNAL(dotDestructing(QGIDot*)),
+	     this, SLOT(destDestroyed(QGIDot*)));
+    d->addEdge(this);
+    this->adjust();
+}
+
+void QGIDotLine::setNodes( QGIDot * src, QGIDot * dest )
+{
+    this->setSourceNode( src );
+    this->setDestNode( dest );
+}
+
+QGIDot * QGIDotLine::srcNode()
+{
+    return impl->src;
+}
+QGIDot * QGIDotLine::destNode()
+{
+    return impl->dest;
+}
+
+bool QGIDotLine::serialize( S11nNode & dest ) const
+{
+    if( ! this->Serializable::serialize( dest ) ) return false;
+    typedef S11nNodeTraits NT;
+    if(0) qDebug() <<"QGIDotLine::serialize() this =="<<(void const *)this
+	     << "impl->src =="<<(void const *)impl->src
+	     << "impl->dest =="<<(void const *)impl->dest
+	;
+    return impl->dest
+	? s11nlite::serialize_subnode( dest, "dest", *impl->dest )
+	: false;
+}
+
+bool QGIDotLine::deserialize( S11nNode const & src )
+{
+    if( ! this->Serializable::deserialize( src ) ) return false;
+    // FIXME: delete any existing children
+    typedef S11nNodeTraits NT;
+    S11nNode const * ch = 0;
+    ch = s11n::find_child_by_name(src, "dest");
+    if( ch )
+    {
+	QGIDot * d = s11nlite::deserialize<QGIDot>( *ch );
+	if( ! d ) return false;
+	this->setDestNode( d );
+    }
+    return true;
 }
