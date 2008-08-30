@@ -74,7 +74,7 @@ Here is an overview of the list of common properties (in alphabetical order), th
 || `colorAlpha` || integer or floating point || QGIPiece, QGIDot || alpha level of the piece's color. If the number is less than 1.0 is it considered to be a relative alpha level between 0.0 and 1.0, otherwise it is assumed to be an integer value between 1 (very nearly transparent) and 255 (fully opaque). ||
 || `html` || text || QGIHtml || HTML (a subset, actually) text to display. ||
 || `pixmap` || image filename, relative to QBoard Home || The picture used for an item. This determines the piece's size. || QGIPiece, the game board ||
-|| `pos` || QPoint(X,Y) || x || the position of the piece, in x/y coordinates. ||
+|| `pos` || QPoint(X,Y) || QGIPiece, QGIHtml, QGIDot || the position of the piece, in x/y coordinates. This is normally the top/left corner, but some pieces (e.g. QGIDot) are centered. ||
 || `scale` || positive floating-point number || QGIPiece, QGIHtml, QGIDot || Relative scale of the item, 1.0 being normal, 0.0 being non-existent, and 2.0 being double normal size. ||
 
 The on-board lines (QGILine) are not currently scriptable because they will be replaced at some point (their current model requires to much special-case handling of events and serialization).
