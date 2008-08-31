@@ -36,7 +36,7 @@ bool QGITypes::handleClickRaise( QGraphicsItem * it,
 	)
     {
 	bool high = (ev->buttons() & Qt::LeftButton);
-	ev->accept();
+	//ev->accept();
 	qreal zV = qboard::nextZLevel(it,high);
 	if( zV != it->zValue() )
 	{
