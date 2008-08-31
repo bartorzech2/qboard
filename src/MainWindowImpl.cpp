@@ -155,8 +155,8 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 		impl->gv, SLOT(setHandDragMode(bool)) );
 	this->actionToggleBoardDragMode->setChecked(false);
 
-	connect( this->actionCopy, SIGNAL(triggered(bool)), impl->gv, SLOT(clipCopy()) );
-	connect( this->actionCut, SIGNAL(triggered(bool)), impl->gv, SLOT(clipCut()) );
+	connect( this->actionCopy, SIGNAL(triggered(bool)), impl->gv, SLOT(clipCopySelected()) );
+	connect( this->actionCut, SIGNAL(triggered(bool)), impl->gv, SLOT(clipCutSelected()) );
 	connect( this->actionPaste, SIGNAL(triggered(bool)), impl->gv, SLOT(clipPaste()) );
 
 	connect( this->actionSelectAll, SIGNAL(triggered(bool)), impl->gv, SLOT(selectAll()) );
@@ -416,12 +416,7 @@ bool MainWindowImpl::loadPiece( QFileInfo const & fi )
 	    impl->paw->applyCurrentTemplate( pc );
 	    pc->setProperty( "pixmap", fn );
 	}
-	QPoint pos( impl->gv->placementPos() );
-	QRect bounds( pc->boundingRect().toRect() );
-	pos.setX( pos.x() - (bounds.width()/2) );
-	pos.setY( pos.y() - (bounds.height()/2) );
-	pc->setProperty( "pos", pos );
-	impl->gstate.addItem(pc);
+	impl->gstate.addItem(pc, true);
 	return true;
 }
 

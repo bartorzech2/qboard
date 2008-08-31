@@ -103,14 +103,14 @@ QBoardView::QBoardView( GameState & gs ) :
     ac->setIcon(QIcon(QString::fromUtf8(":/QBoard/icon/editcopy.png")));
     ac->setShortcut(QString("Ctrl+C"));
     ac->setShortcutContext(cx);
-    connect(ac,SIGNAL(triggered(bool)), this,SLOT(clipCopy()));
+    connect(ac,SIGNAL(triggered(bool)), this,SLOT(clipCopySelected()));
 
     ac = new QAction(acp);
     ac->setObjectName(QString::fromUtf8("actionCut"));
     ac->setIcon(QIcon(QString::fromUtf8(":/QBoard/icon/editccut.png")));
     ac->setShortcut(QString("Ctrl+X"));
     ac->setShortcutContext(cx);
-    connect(ac,SIGNAL(triggered(bool)), this,SLOT(clipCut()));
+    connect(ac,SIGNAL(triggered(bool)), this,SLOT(clipCutSelected()));
     
     ac = new QAction(acp);
     ac->setObjectName(QString::fromUtf8("actionPaste"));
@@ -216,42 +216,21 @@ static QGraphicsItem * firstSelectedQGI( QGraphicsScene * sc )
     return qgi;
 }
 
-static void clipboardQGI( QGraphicsScene * sc, bool copy )
+void QBoardView::clipCopySelected()
 {
-    QGraphicsItem * qgi = firstSelectedQGI( sc );
-    if( qgi )
-    {
-	QPoint pos;
-#if 0
-	// Works, but centering is nicer.
-	QRectF r( qboard::calculateBounds( qgi ) );
-	if(0) qDebug() << "clipboardQGI() rect ="<<r;
-	pos = r.topLeft().toPoint();
-#else
-	pos = qboard::calculateCenter( qgi ).toPoint();
-	if(0) qDebug() << "clipboardQGI() center ="<<pos;
-#endif
-	if(0) qDebug() << "clipboardQGI() pos ="<<pos;
-	qboard::clipboardScene( qgi->scene(), copy, pos );
-    }
-    return;
+    qboard::clipboardGraphicsItems( firstSelectedQGI( this->scene() ),  true );
 }
 
-void QBoardView::clipCopy()
+void QBoardView::clipCutSelected()
 {
-    clipboardQGI( impl->gs.scene(), true  );
-}
-
-void QBoardView::clipCut()
-{
-    clipboardQGI( impl->gs.scene(), false  );
+    qboard::clipboardGraphicsItems( firstSelectedQGI( this->scene() ),  false  );
 }
 
 static QPoint findBoardPastePoint( QGraphicsView * board )
 {
     QPoint ret;
     QWidget * vp = board->viewport();
-    if(1) qDebug() << "findBoardPastePoint("<<board<<") viewport ="<<vp
+    if(0) qDebug() << "findBoardPastePoint("<<board<<") viewport ="<<vp
 		   << "viewport parent ="<<vp->parent();
     QPoint glpos( QCursor::pos() );
     QWidget * wa = QApplication::widgetAt( glpos );
@@ -267,8 +246,6 @@ void QBoardView::clipPaste()
     //bool pasteGraphicsItems( impl->gs, QPoint() );
     //impl->gs.pasteClipboard( QPoint() );
     impl->gs.pasteClipboard( findBoardPastePoint(this) );
-    //impl->gs.pasteClipboard( impl->gv->placementPos() ); // too randomish
-
 }
 
 
@@ -495,14 +472,16 @@ void QBoardView::placemarkerDestroyed()
 
 void QBoardView::mouseReleaseEvent( QMouseEvent * event )
 {
+#if 0
     if( impl->inMoveMode )
     {
 	impl->inMoveMode = false;
 	this->setHandDragMode( false );
-	this->setInteractive( true );
+	//this->setInteractive( true );
 	event->accept();
 	return;
     }
+#endif
     this->QGraphicsView::mouseReleaseEvent(event);
 }
 
@@ -525,18 +504,15 @@ void QBoardView::mouseDoubleClickEvent( QMouseEvent * event )
 
 void QBoardView::mousePressEvent( QMouseEvent * event )
 {
-#if 0
-    if (QGraphicsItem *item = itemAt(event->pos())) {
-	qDebug() << "QBoardView::mousePressEvent(): You clicked on item" << item;
-    } else {
-	qDebug() << "QBoardView::mousePressEvent(): You didn't click on an item.";
+    if( itemAt(event->pos()) )
+    { // let event get passed on to item...
+	this->QGraphicsView::mousePressEvent(event);
+	return;
     }
-#endif
 #if 0
     /**
-       Weird: if i enable this Ctrl-LMB-drag-mode, all items
-       become (and stay) immobile once the drag is completed
-       (mouseReleaseEvent()).
+       Weird: if i enable handdragmode in this event handler, , all
+       items immediately become (and stay) immobile.
     */
     if( (event->button() & Qt::LeftButton)
 	&&
@@ -598,8 +574,6 @@ void QBoardView::selectAll()
 #include "MenuHandlerBoard.h"
 void QBoardView::contextMenuEvent( QContextMenuEvent * event )
 {
-    // i can't believe this is the only way to know if the menu event
-    // needs to be passed to an item!
     if( ! this->itemAt( event->pos() ) )
     {
 	MenuHandlerBoard mh;
@@ -657,6 +631,7 @@ void QBoardView::enablePlacemarker( bool en )
 	if( ! impl->placer )
 	{
 	    impl->placer = new QGIPiecePlacemarker;
+	    impl->placer->setGameState( impl->gs );
 	    connect( impl->placer, SIGNAL(destroyed(QObject*)), this, SLOT(placemarkerDestroyed()) );
 	    
 	    impl->placer->setPos(impl->placeAt);
@@ -680,9 +655,3 @@ void QBoardView::enablePlacemarker( bool en )
     impl->placer = 0;
 }
 
-QPoint QBoardView::placementPos()
-{
-    return impl->placer
-	? impl->placer->pos().toPoint()
-	: QPoint(0,0);
-}
