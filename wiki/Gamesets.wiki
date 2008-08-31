@@ -20,6 +20,21 @@ If you want the QBoard GUI to show you a custom icon for a given directory, put 
 If you want to include HTML content in your set, you may do so, but only QBoard built with
 Qt 4.4+ can use it. HTML may use IMG with paths relative to the directory containing the HTML file, and they will be displayed as expected. In this way you can, for example, create charts of the available game pieces and their descriptions. The HTML documents may also include JavaScript code, insofar as it is supported by Qt's QWebKit classes. (i have successfully used the [http://www.jquery.com jQuery JS library] with it, and it seems to work fine.)
 
+As an example, let's set up the directories for a game called !MyGame. Below i have drawn out a virtual directory structure, to show what it might look like. Remember that the top-most directory is the [HOWTOGettingStarted QBoard Home directory].
+
+{{{
+games
+  +-- MyGame
+    rules.html
+    +-- counters
+      +-- (.png files for game counters)
+    +-- maps
+      +-- (.jpg files of game maps)
+}}}
+
+Now, in QBoard one would load the gameset's data by simply double-clicking on a file from under `games/MyGame`. Very simple sets (say, a handful piece types and one board) may not need to be split into separate directories. For larger games, though, it is usually helpful to separate counters by category, each category in a separate directory.
+
+That's all there is to is.
 
 = Available sets (in alphabetical order) =
 
