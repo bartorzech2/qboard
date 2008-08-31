@@ -16,7 +16,7 @@ are at the top. Dates written extra large are release dates.
 
 - A QGIDot can now create any number of child dots with a line connecting the children to the parent. I'm not at all happy with the parent/child relationship (and its effects on moving items), but i currently have no way to properly re-build the line/dot connections during deserialization if they're not hierarchical. The line properties are not currently configurable.
 
-- Refactoring of the s11n support cut the build time by about 1/3rd. (Registration of s11n'able types takes a significant amount of compiler time/effort.)
+- Refactoring of the s11n support cut the build time by ~~about 1/3rd~~ almost 1/2. (Registration of s11n'able types takes a significant amount of compiler time/effort.)
 
 *2008 August 29:*
 
