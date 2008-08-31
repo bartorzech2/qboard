@@ -7,12 +7,16 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top. Dates written extra large are release dates.
 
 ----
+*2008 August 31:*
+
+- Improvements to board scrolling and rotating. These actions will now attempt to keep the current center of the viewport intact (i.e. rotating/scaling around that point).
+
+
 *2008 August 30:*
 
 - A QGIDot can now create any number of child dots with a line connecting the children to the parent. I'm not at all happy with the parent/child relationship (and its effects on moving items), but i currently have no way to properly re-build the line/dot connections during deserialization if they're not hierarchical. The line properties are not currently configurable.
 
 - Refactoring of the s11n support cut the build time by about 1/3rd. (Registration of s11n'able types takes a significant amount of compiler time/effort.)
-
 
 *2008 August 29:*
 
