@@ -69,8 +69,8 @@ QBoardView::QBoardView( GameState & gs ) :
     connect( &impl->board, SIGNAL(loadedBoard()), this, SLOT(updateBoardPixmap()) );
     this->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     this->setInteractive(true);
-    this->setTransformationAnchor(QGraphicsView::NoAnchor);
-    //this->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
+    //this->setTransformationAnchor(QGraphicsView::NoAnchor);
+    this->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
 #if 1
     this->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
     this->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
@@ -435,23 +435,25 @@ void QBoardView::wheelEvent(QWheelEvent *event)
 	if( x < 0 ) x = 0;
 	horizontalScrollBar()->setSliderPosition( x );
     }
-    //horizontalScrollBar()->setRange(0, vsz.width() - mysz.width());
-    //verticalScrollBar()->setPageStep(vsz.height()/3);
-    //horizontalScrollBar()->setPageStep(vsz.width()/3);
-    //verticalScrollBar()->setRange(0, vsz.height() - mysz.height());
-    //horizontalScrollBar()->setRange(0, vsz.width() - mysz.width());
 #endif
 }
-static const double BoardZoomScaleFactor = 0.25;
+static const double BoardZoomScaleFactor = 0.50;
+static const double BoardZoomScaleFactor2 = 0.25;
 void QBoardView::zoomIn()
 {
-    this->zoom( impl->scale + BoardZoomScaleFactor );
+    qreal f = (impl->scale<=0.5)
+	? BoardZoomScaleFactor
+	: BoardZoomScaleFactor2;
+    this->zoom( impl->scale + f );
 }
 
 
 void QBoardView::zoomOut()
 {
-    this->zoom( impl->scale - BoardZoomScaleFactor );
+    qreal f = (impl->scale<=0.5)
+	? BoardZoomScaleFactor2
+	: BoardZoomScaleFactor;
+    this->zoom( impl->scale - f );
 }
 
 void QBoardView::zoom( qreal z )
