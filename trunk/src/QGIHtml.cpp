@@ -129,34 +129,48 @@ bool QGIHtml::event( QEvent * e )
 
 void QGIHtml::focusInEvent( QFocusEvent * event )
 {
-    if(0) qDebug() << "QGIHtml::focusInEvent()";
-    //impl->giflags = this->flags();
-    //this->setTextInteractionFlags( Qt::TextEditorInteraction );
+    if(0) qDebug() << "QGIHtml::focusInEvent() reason =="<<event->reason();
+    /**
+       A context menu event is preceeded by a focusIn and followed by
+       a focusOut (immediately, before the menu closes). This causes
+       us a bit of grief here.
+    */
+    if( (event->reason() == Qt::PopupFocusReason)
+	|| (event->reason() == Qt::MouseFocusReason) )
+    {
+	return;
+    }
+    //impl->giflags = this->flags();//Qt4.3: If i call this, then items become immobile!!!
+    this->setTextInteractionFlags( Qt::TextEditorInteraction );
+    //event->accept();
     this->QGraphicsTextItem::focusInEvent(event);
 }
 void QGIHtml::focusOutEvent( QFocusEvent * event )
 {
-    if(0) qDebug() << "QGIHtml::focusOutEvent() blocked ="<<impl->blocked;
+    if(0) qDebug() << "QGIHtml::focusOutEvent() blocked ="<<impl->blocked<<", reason =="<<event->reason();
     if( impl->blocked )
     {
 	event->accept();
 	return;
     }
+    impl->blocked = true;
+#if (QT_VERSION < 0x040400)
     /**
        Try to work around a problem in Qt 4.3 where this object
-       becomes imobile after leaving edit mode.
+       becomes imobile after leaving edit mode. It doesn't seem
+       to work 100% of the time, and i can't for the life of me
+       figure out why it's inconsistent.
     */
-#if QT_VERSION < 0x040400
-    impl->blocked = true;
     this->setTextInteractionFlags( Qt::NoTextInteraction ); // can cause endless recursion!
-    //this->QGraphicsTextItem::focusOutEvent(event);
     this->setFlags(impl->giflags);
     event->accept();
-    impl->blocked = false;
-#else
-    this->setTextInteractionFlags( Qt::NoTextInteraction ); // can cause endless recursion!
     this->QGraphicsTextItem::focusOutEvent(event);
+#else
+    this->QGraphicsTextItem::focusOutEvent(event);
+    this->setTextInteractionFlags( Qt::NoTextInteraction ); // can cause endless recursion!
+    event->accept();
 #endif
+    impl->blocked = false;
 }
 
 
@@ -178,15 +192,29 @@ void QGIHtml::mouseDoubleClickEvent( QGraphicsSceneMouseEvent * ev )
 
 void QGIHtml::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 {
-	if( ev->buttons() & Qt::MidButton )
-	{
-		ev->accept();
-		QGIHtmlEditor ed(this);
+    if( ev->buttons() & Qt::MidButton )
+    {
+	ev->accept();
+	QGIHtmlEditor ed(this);
 		ed.exec();
 		return;
+    }
+    QGITypes::handleClickRaise( this, ev );
+#if 0
+	if( ev->buttons() & Qt::RightButton )
+	{
+	    // Weird: if we don't do this, the QGraphicsView
+	    // doesn't know how to keep us selected (if we're selected)
+	    // and also has trouble knowing whether to show a menu
+	    // or not.
+	    // qDebug() <<"QGIPiece::mousePressEvent() RMB:"<<ev;
+	    // ev->ignore(); it doesn't matter if i accept or not!
+	    // ev->accept();
+	    return;
 	}
-	QGITypes::handleClickRaise( this, ev );
-	ev->accept();
+#endif
+	//QGITypes::handleClickRaise( this, ev );
+	//ev->accept();
 	this->QGraphicsTextItem::mousePressEvent(ev);
 }
 bool QGIHtml::serialize( S11nNode & dest ) const
@@ -268,15 +296,16 @@ bool QGIHtml::deserialize(  S11nNode const & src )
 
 void QGIHtml::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
 {
-    if( this->hasFocus() )
-    {
-	QGraphicsTextItem::contextMenuEvent(event);
-    }
-    else
-    {
-	MenuHandlerQGIHtml mh;
-	mh.doMenu( this, event );
-    }
+    qDebug()<<"QGIHtml::contextMenuEvent("<<event<<")";
+//     if( this->textInteractionFlags() & Qt::TextEditorInteraction )
+//     {
+//  	QGraphicsTextItem::contextMenuEvent(event);
+//     }
+//     else
+//     {
+    MenuHandlerQGIHtml mh;
+    mh.doMenu( this, event );
+//     }
 }
 
 #include "QGIHider.h"
