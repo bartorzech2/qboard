@@ -12,6 +12,7 @@
 #include <QPainterPath>
 #include <QGraphicsEllipseItem>
 #include <QGraphicsLineItem>
+class QMenu;
 class QGIDotLine;
 /**
    QGIDot represent a simple dot with configurable colors.
@@ -116,6 +117,7 @@ public:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
 protected:
     virtual bool event( QEvent * e );
+    QMenu * createLineMenu();
 Q_SIGNALS:
     void lineDestructing( QGIDotLine * );
 private Q_SLOTS:
@@ -127,7 +129,6 @@ private Q_SLOTS:
     QGIDot * srcNode();
     QGIDot * destNode();
     void adjust();
-
 private:
     friend class QGIDot;
     struct Impl;
