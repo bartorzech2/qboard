@@ -133,15 +133,25 @@ void MenuHandlerBoard::doMenu( GameState & gs, QBoardView * pv, QContextMenuEven
 	m.addMenu(pm);
     }
 
-    if(!QBOARD_VERSION)
+    if(1)
     {
 	QMenu * mMisc = m.addMenu( "Misc." );
 
-	QString code( "function(){var p=qboard.createObject('QGIDot',{pos:QPoint(50,50)});}()");
-	QAction * ac = new qboard::JavaScriptAction( QString("Add QGIDot"),
-						     gs.jsEngine(),
-						     code );
-	mMisc->addAction( ac );
+	QStringList cl;
+	cl << "QGIDot"
+	   << "QGIHtml";
+	foreach( QString cn, cl )
+	{
+
+	    QString code =
+		QString( "qboard.createObject('%1',{pos:qboard.placementPos()});").
+		arg(cn);
+	    QAction * ac = new qboard::JavaScriptAction( QString("Add new %1").arg(cn),
+							 gs.jsEngine(),
+							 code );
+	    ac->setParent(mMisc);
+	    mMisc->addAction( ac );
+	}
     }
 
 #if QBOARD_USE_OPENGL
@@ -150,7 +160,8 @@ void MenuHandlerBoard::doMenu( GameState & gs, QBoardView * pv, QContextMenuEven
 	QObjectPropertyAction * ac =
 	    new QObjectPropertyAction( pv,
 				       "openglMode",
-				       QVariant( pv->isGLMode() ? 0 : 1 ) );
+				       QVariant( pv->isGLMode() ? 0 : 1 ),
+				       &m);
 	m.addAction( ac );
 	ac->setText( tr("Toggle OpenGL Mode") );
 	ac->setCheckable( true );
