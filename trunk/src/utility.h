@@ -170,7 +170,7 @@ namespace qboard
        used by paste operations to calculate the new position of
        pasted items, so as to keep their relative positions intact.
     */
-    bool clipboardScene( QGraphicsScene * gsc, bool copy, QPoint const & origin );
+    bool clipboardScene( QGraphicsScene * gsc, bool copy, QPointF const & origin );
     /**
        If origin is not currently selected, then if it is-a
        Serializable it is copied to the system clipboard.  If origin
