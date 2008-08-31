@@ -11,6 +11,10 @@ are at the top. Dates written extra large are release dates.
 
 - Improvements to board scrolling and rotating. These actions will now attempt to keep the current center of the viewport intact (i.e. rotating/scaling around that point).
 
+- Fixed some focus/menu bugs in QGIHtml, caused by different event handling in Qt 4.3/4.4.
+
+- The lines created when "splitting" QGIDots are now configurable. To configure a given line, right-click the dot to which the line points (where the arrow points). Multiple lines can be configured by selecting all relevant dots and then right-clicking one of them.
+
 
 *2008 August 30:*
 
