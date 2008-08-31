@@ -217,6 +217,8 @@ private:
     Impl * impl;
 };
 
+Q_DECLARE_METATYPE(GameState*);
+
 // Register GameState with s11n:
 #define S11N_TYPE GameState
 #define S11N_BASE_TYPE Serializable
@@ -226,7 +228,6 @@ private:
 #define S11N_TYPE_NAME "GameState"
 #define S11N_SERIALIZE_FUNCTOR Serializable_s11n
 #include <s11n.net/s11n/reg_s11n_traits.hpp>
-
 
 
 #endif
