@@ -53,7 +53,7 @@ public:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
   	virtual bool event( QEvent * e );
 
-//     void setGameState( GameState & gs );
+    void setGameState( GameState & gs );
 
     virtual int type() const { return QGITypes::QGIPiecePlacemarker; }
 
@@ -61,7 +61,7 @@ protected:
 	//virtual void mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event );
 	//virtual void focusOutEvent( QFocusEvent * event );
 // 	virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent * event );
-// 	QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+ 	QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);
  	void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 private:
