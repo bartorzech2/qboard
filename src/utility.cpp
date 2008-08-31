@@ -132,7 +132,12 @@ namespace qboard {
 	if( it == li.end() ) return gi->zValue();
 	qreal zmax = gi->zValue();
 	const qreal myZ = zmax;
-	const qreal stride = 0.01;
+	const qreal stride = high ? 0.01 : -0.01;
+	/**
+	   FIXME: the Qt docs state that the items returned from the
+	   various items lists are in zLevel order - highest to
+	   lowest. We can use that to short-circuit the for-loop.
+	*/
 	for( ; it != li.end(); ++it )
 	{
 	    qreal tmp = (*it)->zValue();
@@ -146,12 +151,12 @@ namespace qboard {
 	    }
 	    if( tmp == myZ )
 	    { // we can't know if we're at the same level here, so we'll advance.
-		zmax += high ? stride : -stride;
+		zmax += stride;
 	    }
 	}
 	if( myZ != zmax )
 	{
-	    zmax += high ? stride : -stride;
+	    zmax += stride;
 	}
 	return zmax;
     } // nextZLevel()
@@ -330,7 +335,7 @@ namespace qboard {
 	qgi->setTransform(QTransform().translate(x, y).rotate(angle).translate(-x, -y));
     }
 
-    bool clipboardScene( QGraphicsScene * gsc, bool copy, QPoint const & origin )
+    bool clipboardScene( QGraphicsScene * gsc, bool copy, QPointF const & origin )
     {
 	if(0) qDebug() <<"qboard::clipboardScene("<<gsc<<","<<copy<<","<<origin<<")";
 	typedef QList<QGraphicsItem *> QGIL;
@@ -409,7 +414,7 @@ namespace qboard {
 	return clipboardScene( gvi->scene(), copy, gvi->pos().toPoint() );
 #else
 	// reference point centered around gvi's bounds:
-	return clipboardScene( gvi->scene(), copy, calculateCenter(gvi).toPoint() );
+	return clipboardScene( gvi->scene(), copy, calculateCenter(gvi) );
 #endif
     }
 
