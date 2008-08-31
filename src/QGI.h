@@ -1,5 +1,5 @@
-#ifndef __QGI_H__
-#define __QGI_H__
+#ifndef QBOARD_QGI_H_INCLUDED
+#define QBOARD_QGI_H_INCLUDED
 /*
  * This file is (or was, at some point) part of the QBoard project
  * (http://code.google.com/p/qboard)
@@ -41,9 +41,14 @@ struct QGITypes
     /**
        If the event is a left click then item is moved to the top of
        the view stack via adjustment of its zLevel, based on the
-       zLevel of all items intersecting the item.
+       zLevel of all items intersecting the item. It it is a
+       middle click the item is moved to the bottom of the stack.
+
+       This routine does NOT call ev->accept().
+
+       It returns true if it modified the zlevel, otherwise false.
     */
     static bool handleClickRaise( QGraphicsItem * item,
 				  QGraphicsSceneMouseEvent * ev );
 };
-#endif // __QGI_H__
+#endif // QBOARD_QGI_H_INCLUDED
