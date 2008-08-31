@@ -27,7 +27,7 @@
 
 int do_setup()
 {
-#if (QT_VERSION < 0x040400) && QBOARD_VERSION
+#if 0 && (QT_VERSION < 0x040400) && QBOARD_VERSION
     std::ostringstream os;
     os << "Warning: your QBoard was built against Qt 4.3.x. While it will be basically functional, "
        << "some features are missing and there may be weird behaviours under Qt 4.3 "
