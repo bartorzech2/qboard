@@ -56,7 +56,8 @@ namespace qboard {
 	*/
 	ScriptPacket( QScriptEngine * e = 0,
 		      QString const & code = QString(),
-		      QString const & name = QString() );
+		      QString const & name = QString(),
+		      QObject * parent = 0 );
 	/**
 	   Copies rhs.
 	*/
@@ -126,16 +127,19 @@ namespace qboard {
     /**
        JavaScriptAction is a QAction type which evaluates JavaScript
        code when it is triggered.
+
     */
     class JavaScriptAction : public QAction
     {
 	Q_OBJECT;
     public:
 	/**
+	   Constructs a new action object with the given label, JS
+	   engine, and JS code. eng is set as this object's Qt parent.
 	*/
 	JavaScriptAction(QString const & label,
 			 QScriptEngine & eng,
-			 QString const & code );
+			 QString const & code  );
 	virtual ~JavaScriptAction();
     private Q_SLOTS:
         void evaluateJS();
