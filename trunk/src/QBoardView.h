@@ -52,8 +52,8 @@ public Q_SLOTS:
 	otherwise rubber-band-style is used. */
 	void setHandDragMode(bool handMode);
 
-    void clipCopy();
-    void clipCut();
+    void clipCopySelected();
+    void clipCutSelected();
     void clipPaste();
     /**
 
@@ -73,7 +73,6 @@ public Q_SLOTS:
     */
     void setGLMode(bool);
 
-    QPoint placementPos();
 protected:
 	virtual void drawBackground( QPainter *, const QRectF & );
 	virtual void mousePressEvent ( QMouseEvent * event );
