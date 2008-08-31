@@ -27,7 +27,7 @@ class QMoveEvent;
 
 #include "Serializable.h"
 #include "QGI.h"
-class GameState;
+// class GameState;
 
 #define QGIPiecePlacemarker_IS_SERIALIZABLE 0
 /**
@@ -53,7 +53,7 @@ public:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
   	virtual bool event( QEvent * e );
 
-    void setGameState( GameState & gs );
+//     void setGameState( GameState & gs );
 
     virtual int type() const { return QGITypes::QGIPiecePlacemarker; }
 

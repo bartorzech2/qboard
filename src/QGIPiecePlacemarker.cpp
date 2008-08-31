@@ -28,17 +28,17 @@
 
 #include <cmath>
 
-#include "GameState.h"
+// #include "GameState.h"
 #include "QGIPiecePlacemarker.h"
 #include "S11nQt.h"
 #include "utility.h"
 
 struct QGIPiecePlacemarker::Impl
 {
-    GameState * gs;
+//     GameState * gs;
     bool active;
     Impl() :
-	gs(0),
+// 	gs(0),
 	active(false)
 	{
 	}
@@ -70,10 +70,10 @@ QGIPiecePlacemarker::~QGIPiecePlacemarker()
 	QBOARD_VERBOSE_DTOR << "~QGIPiecePlacemarker()";
 	delete impl;
 }
-void QGIPiecePlacemarker::setGameState( GameState & gs )
-{
-    impl->gs = &gs;
-}
+// void QGIPiecePlacemarker::setGameState( GameState & gs )
+// {
+//     impl->gs = &gs;
+// }
 
 void QGIPiecePlacemarker::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 {
@@ -100,10 +100,12 @@ QVariant QGIPiecePlacemarker::itemChange(GraphicsItemChange change, const QVaria
 {
     if(change == ItemPositionChange)
     {
+#if 0
 	if( impl->gs )
 	{
 	    impl->gs->setPlacementPos( value.toPoint() );
 	}
+#endif
     }
     return QGraphicsItem::itemChange(change, value);
 }

@@ -32,6 +32,9 @@
 #include "S11nQt/QPoint.h"
 #include <s11n.net/s11n/s11n_debuggering_macros.hpp>
 
+#include "QGIPiecePlacemarker.h"
+
+
 struct GameState::Impl
 {
     QBoard board;
@@ -39,16 +42,20 @@ struct GameState::Impl
     QGraphicsScene * scene;
     QScriptValue jsThis;
     QScriptEngine * js;
+    QGIPiecePlacemarker * placer;
     Impl() :
 	board(),
+	placeAt(50,50),
 	scene( new QBoardScene() ),
 	jsThis(),
-	js(0)
+	js(0),
+	placer(0)
     {
 	scene->setSceneRect( QRectF(0,0,200,200) );
     }
     ~Impl()
     {
+	delete this->placer;
 	delete this->js;
 	delete this->scene;
     }
@@ -129,6 +136,10 @@ GameState::GameState() :
 
 GameState::~GameState()
 {
+    if( impl->placer )
+    {
+	QObject::disconnect( impl->placer, SIGNAL(destroyed(QObject*)), this, SLOT(placemarkerDestroyed()) );
+    }
     this->clear();
     delete impl;
 }
@@ -161,17 +172,74 @@ void GameState::setup()
 				//,QScriptEngine::AutoCreateDynamicProperties
 				);
     impl->jsThis.setProperty( "board", sval );
+
+    sval = impl->js->newQObject(impl->scene, QScriptEngine::QtOwnership );
+    impl->jsThis.setProperty( "scene", sval );
+
 }
 QPointF GameState::placementPos() const
 {
-    return impl->placeAt;
+    return impl->placer
+	? impl->placer->pos()
+	: impl->placeAt;
 }
 
 void GameState::setPlacementPos( QPointF const & p )
 {
     //qDebug() <<"GameState::setPlacementPos("<<p<<")";
+    if( impl->placer )
+    {
+	impl->placer->setPos(p);
+    }
     impl->placeAt = p;
 }
+
+void GameState::placemarkerDestroyed()
+{
+    /**
+       This bit of kludgery is to work around impl->placer being
+       destroyed when game state is cleared (destroying all
+       QGraphicsItems), as that leads to a dangling impl->placer in
+       this class. When that happens, we re-create the placemarker
+       if we had one active already.
+    */
+    if( impl->placer ) // now (or soon) a dangling pointer
+    {
+	impl->placer = 0;
+	this->enablePlacemarker(true);
+    }
+}
+
+void GameState::enablePlacemarker( bool en )
+{
+    if( en )
+    {
+	if( ! impl->placer )
+	{
+	    impl->placer = new QGIPiecePlacemarker;
+	    //impl->placer->setGameState( *this );
+	    connect( impl->placer, SIGNAL(destroyed(QObject*)), this, SLOT(placemarkerDestroyed()) );
+	    impl->placer->setPos(impl->placeAt);
+	    impl->scene->addItem( impl->placer );
+	    QStringList help;
+	    help << "<html><body>This is a \"piece placemarker\"."
+		 << "To move it, double-click the board or drag it around."
+		 << "Pieces which are loaded from individual files (as opposed to being part of a game)"
+		 << "start out at this position."
+		 << "</body></html>"
+		;
+	    impl->placer->setToolTip( help.join(" ") );
+	}
+	return;
+    }
+    if( impl->placer )
+    {
+	QObject::disconnect( impl->placer, SIGNAL(destroyed(QObject*)), this, SLOT(placemarkerDestroyed()) );
+    }
+    delete impl->placer;
+    impl->placer = 0;
+}
+
 
 
 QScriptEngine & GameState::jsEngine() const
@@ -222,7 +290,7 @@ QObject * GameState::createObject( QString const & className,
     QGraphicsItem * git = dynamic_cast<QGraphicsItem*>(s);
     if( git )
     {
-	this->addItem(git);
+	this->addItem(git, true);
     }
     QScriptValue v = impl->js->newQObject(o,
 					  QScriptEngine::AutoOwnership

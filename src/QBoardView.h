@@ -55,16 +55,7 @@ public Q_SLOTS:
     void clipCopySelected();
     void clipCutSelected();
     void clipPaste();
-    /**
 
-    */
-    void enablePlacemarker( bool );
-    /**
-       Adds the given item to the game state (transfering ownership).
-       The item's position is set to that of the placemarker if the
-       placemarker is enabled, otherwise it is not changed.
-    */
-    void addItem( QGraphicsItem * );
     void selectAll();
     /** Sets or unsets OpenGL mode, which is faster for many operations
 	but often misses important screen updates.
@@ -81,8 +72,6 @@ protected:
     virtual void contextMenuEvent( QContextMenuEvent * event );
     virtual bool event( QEvent * e );
     virtual void mouseDoubleClickEvent( QMouseEvent * e );
-private Q_SLOTS:
-    void placemarkerDestroyed();
 
 private:
     /** Handles property changes. */

@@ -93,7 +93,7 @@ public:
        Returns the current placement position. See addPiece() for
        details.
     */
-    QPointF placementPos() const;
+    Q_INVOKABLE QPointF placementPos() const;
 
     /**
        Used by the copy/paste code.
@@ -106,6 +106,10 @@ public:
     QScriptEngine & jsEngine() const;
 
 public Q_SLOTS:
+    /**
+
+    */
+    void enablePlacemarker( bool );
 
 
     /**
@@ -197,6 +201,9 @@ public Q_SLOTS:
        object.
     */
     QScriptValue evalScriptFile( QString const & filename );
+
+private Q_SLOTS:
+    void placemarkerDestroyed();
 
 private:
     GameState & operator=(GameState const &); // not implemented!
