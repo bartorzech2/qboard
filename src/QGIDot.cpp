@@ -45,18 +45,18 @@ struct QGIDot::Impl
     QPen pen;
     QBrush brush;
     QGIDot::EdgeList edges;
+    QGIDotLine * inLine;
     Impl() : active(false),
 	     radius(12),
-	     color(Qt::yellow),
+	     color(Qt::red),
 	     pen(Qt::NoPen),
 	     brush(),
-	     edges()
+	     edges(),
+	     inLine(0)
 	{
-		
 	}
 	~Impl()
 	{
-		
 	}
 };
 
@@ -75,7 +75,7 @@ struct QGIDotLine::Impl
 	     pDest(),
 	     arrowSize(16),
 	     brush(QColor(Qt::red)),
-	     pen(brush,3)
+	     pen(brush,3,Qt::SolidLine,Qt::RoundCap,Qt::RoundJoin)
     {
     }
     ~Impl()
@@ -94,7 +94,7 @@ QGIDot::QGIDot() :
 #if QT_VERSION >= 0x040400
 	this->setCacheMode(DeviceCoordinateCache);
 #endif
-	this->setProperty("color",QColor(Qt::yellow)); // forces brush to get updated
+	this->setProperty("color",QColor(Qt::red)); // forces brush to get updated
 }
 
 QGIDot::~QGIDot()
@@ -287,16 +287,76 @@ QGraphicsItem * QGIDot::hideItems()
     return this->parentItem();
 }
 
-void QGIDot::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
+void QGIDot::contextMenuEvent( QGraphicsSceneContextMenuEvent * ev )
 {
-	event->accept();
-	MenuHandlerDot mh;
-	impl->active = false;
-	mh.doMenu( this, event );
-#if 0 // don't do anything here - we might have been deleted!
-	this->edge()->update();
-	this->update();
+    ev->accept();
+    impl->active = false;
+    typedef QList<QObject *> OL;
+    OL selected;
+    if(  this->isSelected() )
+    {
+	selected = qboard::selectedItemsCast<QObject>( this->scene() );
+    }
+    else
+    {
+	selected.push_back( static_cast<QObject*>(this) );
+    }
+
+    MenuHandlerCommon proxy;
+    QMenu * m = proxy.createMenu( this );
+    QObjectPropertyMenu * mColor = QObjectPropertyMenu::makeColorMenu(selected, "color", "colorAlpha" );
+    mColor->setIcon(QIcon(":/QBoard/icon/color_fill.png"));
+    m->addMenu(mColor);
+
+    if(1)
+    {
+	m->addMenu( QObjectPropertyMenu::makeNumberListMenu(
+				    "Radius",
+				    selected,
+				    "radius",
+				    8,33,4) );
+    }
+    if(1)
+    {
+	QObjectPropertyMenu * pm =
+	    QObjectPropertyMenu::makeNumberListMenu("Scale",
+						    selected, "scale",
+						    0.5, 3.01, 0.5);
+	pm->setIcon(QIcon(":/QBoard/icon/viewmag.png"));
+	m->addMenu(pm);
+    }
+
+    QMenu * mMisc = m->addMenu("Misc.");
+    if(1)
+    {
+	mMisc->addAction(QIcon(":/QBoard/icon/box_wrapped.png"),
+			 "Cover",this,SLOT(hideItems()));
+	mMisc->addAction("Create line", this, SLOT(split()));
+    }
+
+    if( impl->inLine )
+    {
+	QMenu * mL = impl->inLine->createLineMenu();
+	m->addMenu(mL);
+	mL->setTitle("Incoming line");
+	QPixmap px(16,16);
+	px.fill( QColor(Qt::transparent) );
+	QPainter pn(&px);
+	pn.setPen( impl->inLine->pen() );
+	pn.drawLine( QLineF(0,0,16,16) );
+	mL->setIcon( QIcon(px) );
+    }
+
+
+    m->addSeparator();
+    MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( this, m );
+    clipper->addDefaultEntries( m, true, this->isSelected() );
+#if 0
+    m->addSeparator();
+    m->addAction(QIcon(":/QBoard/icon/help.png"),"Help...", this, SLOT(showHelp()) );
 #endif
+    m->exec( ev->screenPos() );
+    delete m;
 }
 
 void QGIDot::split()
@@ -317,89 +377,43 @@ void QGIDot::split()
     qboard::copyProperties( this, ch );
     ch->updatePainter();
     QRectF r( this->boundingRect() );
-    QPointF p = this->pos() + QPointF(r.width()/2,r.height()/2);
+    QPointF p = this->pos() + QPointF(r.width(),r.height());
     ch->setPos( p );
     QGIDotLine * li = new QGIDotLine;
-#endif
-
-#if 0
-    if( par )
-    {
-	li->setParentItem( par );
-    }
-    QGraphicsScene * sc = this->scene();
-    if( sc && !par)
-    {
-	sc->addItem(li);
-    }
-#endif
-#if 0
-    if( par )
-    {
-	li->setParentItem( par );
-	this->setParentItem(li);
-	ch->setParentItem( li );
-    }
-    QGraphicsScene * sc = this->scene();
-    if( sc && !par)
-    {
-	//sc->addItem(ch);
-	sc->addItem(li);
-    }
-#endif
+    li->setProperty( "color", impl->color );
     li->setNodes( this, ch );
+#endif
 }
 
 bool QGIDot::serialize( S11nNode & dest ) const
 {
-	if( ! this->Serializable::serialize( dest ) ) return false;
-	typedef S11nNodeTraits NT;
-	if( this->metaObject()->propertyCount() )
+    // FIXME: serialize the full QPen info.
+    if( ! this->Serializable::serialize( dest ) ) return false;
+    typedef S11nNodeTraits NT;
+    if( this->metaObject()->propertyCount() )
+    {
+	QObject props;
+	qboard::copyProperties( this, &props );
+	// i can't get the QColor alpha property to serialize (it's as if... well, no...)
+	// so we save the alpha properties separately.
+	props.setProperty("colorAlpha", impl->color.alpha());
+	props.setProperty("pos", this->pos() );
+	props.setProperty("zLevel", this->zValue() );
+	S11nNode & pr( s11n::create_child( dest, "properties" ) );
+	QObject const & constnessKludge( props );
+	if( ! s11n::qt::QObjectProperties_s11n()( pr, constnessKludge ) ) return false;
+    }
+    QList<QGraphicsItem *> chgi( qboard::childItems(this) );
+    if( ! chgi.isEmpty() )
+    {
+	if( -1 == s11n::qt::serializeQGIList<Serializable>( s11n::create_child(dest,"children"),
+							    chgi, false ) )
 	{
-	    QObject props;
-	    qboard::copyProperties( this, &props );
-	    // i can't get the QColor alpha property to serialize (it's as if... well, no...)
-	    // so we save the alpha properties separately.
-	    props.setProperty("colorAlpha", impl->color.alpha());
-	    props.setProperty("pos", this->pos() );
-	    props.setProperty("zLevel", this->zValue() );
-	    S11nNode & pr( s11n::create_child( dest, "properties" ) );
-	    QObject const & constnessKludge( props );
-	    if( ! s11n::qt::QObjectProperties_s11n()( pr, constnessKludge ) ) return false;
+	    qDebug() << "QGIDot::serialize: serializeQGIList() failed!";
+	    return false;
 	}
-	QList<QGraphicsItem *> chgi( qboard::childItems(this) );
-	if( ! chgi.isEmpty() )
-	{
-	    if( -1 == s11n::qt::serializeQGIList<Serializable>( s11n::create_child(dest,"children"),
-								chgi, false ) )
-	    {
-		qDebug() << "QGIDot::serialize: serializeQGIList() failed!";
-		return false;
-	    }
-	}
-#if 0
-	if( ! impl->edges.empty() )
-	{
-	    EdgeList mine;
-	    foreach( QGIDotLine * it, impl->edges )
-	    {
-		if(0) qDebug() << "QGIDot::serialize:"
-			       << "this =="<<(void const *)this
-			       << "edge =="<<(void const *)it
-		    ;
-		if( it->impl->src != this ) continue;
-		mine.push_back( it );
-	    }
-	    if( ! mine.empty()
-		&&
-		! s11n::serialize_subnode( dest, "lines", mine ) )
-	    {
-		qDebug() << "QGIDot::serialize: serialization of impl->edges failed!";
-		return false;
-	    }
-	}
-#endif
-	return true;
+    }
+    return true;
 }
 
 bool QGIDot::deserialize(  S11nNode const & src )
@@ -469,6 +483,7 @@ void QGIDot::addEdge( QGIDotLine * l )
 void QGIDot::removeEdge( QGIDotLine * li )
 {
     impl->edges.removeAll(li);
+    if( impl->inLine == li ) impl->inLine = 0;
     disconnect( li, SIGNAL(lineDestructing(QGIDotLine*)),
 		this,SLOT(removeEdge(QGIDotLine*)));
 }
@@ -667,11 +682,13 @@ void QGIDotLine::setDestNode( QGIDot * d )
     if( d == impl->dest ) return;
     if( impl->dest )
     {
+	impl->dest->impl->inLine = 0;
 	impl->dest->removeEdge( this );
 	disconnect( impl->dest, SIGNAL(dotDestructing(QGIDot*)),
 		    this, SLOT(destDestroyed(QGIDot*)));
     }
     impl->dest = d;
+    d->impl->inLine = this;
     if( ! d ) return;
     d->setParentItem(this);
     if( impl->src )
@@ -703,17 +720,38 @@ void QGIDotLine::propertySet( char const *pname,
 			      QVariant const & var )
 {
     if( ! pname ) return;
+    if(1) qDebug() << "QGIDot::propertySet("<<pname<<") val="<<var;
     QString key( pname );
-    QPen pen = impl->pen;
     if( "width" == key )
     {
-	pen.setWidth( var.toInt() );
+	impl->pen.setWidth( var.toInt() );
+    }
+    else if( "color" == key )
+    {
+	QColor newcol( var.value<QColor>() );
+	newcol.setAlphaF( impl->pen.color().alphaF() );
+	impl->pen.setColor( newcol );
+    }
+    else if( "colorAlpha" == key )
+    {
+	qreal a = var.toDouble();
+	QColor col = impl->pen.color();
+	if( a > 1.0 )
+	{ // assume it's int-encoded
+	    col.setAlpha( int(a) );
+	}
+	else
+	{
+	    col.setAlphaF( a );
+	}
+	impl->pen.setColor(col);
     }
     else if( "style" == key )
     {
-	pen.setStyle( Qt::PenStyle( s11n::qt::stringToPenStyle(var.toString()) ) );
+	impl->pen.setStyle( Qt::PenStyle( s11n::qt::stringToPenStyle(var.toString()) ) );
     }
     this->setPen(impl->pen);
+    this->update();
 }
 
 bool QGIDotLine::event( QEvent * e )
@@ -745,6 +783,7 @@ bool QGIDotLine::serialize( S11nNode & dest ) const
     if( ! s11nlite::serialize_subnode( dest, "pen", impl->pen ) )
     {
 	qDebug() << "QGIDotLine::serialize(): pen serialization failed.";
+	return false;
     }
     return s11nlite::serialize_subnode( dest, "dest", *impl->dest ); 
 }
@@ -765,4 +804,43 @@ bool QGIDotLine::deserialize( S11nNode const & src )
 	this->setDestNode( d );
     }
     return true;
+}
+
+QMenu * QGIDotLine::createLineMenu()
+{
+    if( ! impl->dest ) return 0;
+    QMenu * m = new QMenu("Line");
+
+    typedef QList<QGIDot*> QGIL;
+    QGIL selected;
+    if( impl->dest->isSelected() && impl->dest->scene() )
+    {
+	selected = qboard::graphicsItemsCast<QGIDot>( impl->dest->scene()->selectedItems() );
+    }
+    else
+    {
+	selected.push_back(impl->dest);
+    }
+    typedef QList<QObject*> QOL;
+    QOL selobj;
+    for( QGIL::iterator it = selected.begin();
+	 selected.end() != it; ++it )
+    {
+	QGIDotLine * line = (*it)->impl->inLine;
+	if( ! line ) continue;
+	selobj.push_back( line );
+    }
+
+    qDebug() << "QGIDotLine::createLineMenu(): QGIDot count:"<<selected.size();
+
+    m->addMenu( QObjectPropertyMenu::makeColorMenu(selobj,
+						   "color",
+						   "colorAlpha") );
+    m->addMenu( QObjectPropertyMenu::makePenStyleMenu(selobj, "style") );
+    m->addMenu( 
+	       QObjectPropertyMenu::makeNumberListMenu("Width",
+						       selobj, "width",
+						       0, 11, 1 )
+	       );
+    return m;
 }
