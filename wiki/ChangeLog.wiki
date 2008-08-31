@@ -9,6 +9,8 @@ are at the top. Dates written extra large are release dates.
 ----
 == *2008 August 31:* ==
 
+- Removed the annoying warning dialog when building on Qt 4.3, since (a) most of the weird bugs are in Qt 4.4 now and (b) 4.3 is my main development target for the time being.
+
 - Fixed: rotating the board no longer undoes the scaling.
 
 - The lines created when "splitting" QGIDots are now configurable. To configure a given line, right-click the dot to which the line points (where the arrow points). Multiple lines can be configured by selecting all relevant dots and then right-clicking one of them.
