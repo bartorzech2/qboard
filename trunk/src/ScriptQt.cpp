@@ -117,7 +117,7 @@ namespace qboard {
 	    {
 		col.setAlpha( context->argument(arg++).toInt32());
 	    }
-	    qDebug() <<"Creating QColor:"<<col;
+	    //qDebug() <<"Creating QColor:"<<col;
 	    return engine->toScriptValue(col);
 	}
 	return QScriptValue();
@@ -135,6 +135,7 @@ namespace qboard {
     {
 	out = dynamic_cast<QGraphicsItem*>(object.toQObject());
     }
+
 
     QScriptValue qsizeToScriptValue(QScriptEngine *engine, const QSize &s)
     {
