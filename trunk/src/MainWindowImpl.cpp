@@ -119,6 +119,8 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	connect( this->actionQuickLoad, SIGNAL(triggered(bool)), this, SLOT(quickLoad()) );
 
 
+	impl->gstate.enablePlacemarker(true);
+
 #if ! QBOARD_VERSION
 	// For "end user builds" we won't show this action.
 	connect( this->actionExperiment, SIGNAL(triggered(bool)), this, SLOT(doSomethingExperimental()) );
@@ -150,7 +152,7 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	connect( impl->tree, SIGNAL(itemActivated(QFileInfo const &)), this, SLOT(loadFile(QFileInfo const &)) );
 	connect( this->actionToggleBrowserView, SIGNAL(toggled(bool)), this, SLOT(toggleSidebarVisible(bool)) );
 	impl->gv = new QBoardView( impl->gstate );
-	impl->gv->enablePlacemarker(true);
+	//impl->gv->enablePlacemarker(true);
 	connect( this->actionToggleBoardDragMode, SIGNAL(toggled(bool)),
 		impl->gv, SLOT(setHandDragMode(bool)) );
 	this->actionToggleBoardDragMode->setChecked(false);
@@ -498,7 +500,7 @@ void MainWindowImpl::addLine()
 #endif
 	ed->setProperty("lineWidth", 2 );
 	ed->setProperty("lineStyle", Qt::DotLine );
-	impl->gstate.scene()->addItem(ed);
+	impl->gstate.addItem(ed,true);
 
 }
 
@@ -731,7 +733,7 @@ void MainWindowImpl::addQGIHtml()
 #else
 	//ti->setHtml("<html><body style='background-color:white'>Double-click to edit</body></html>");
 #endif
-	impl->gstate.scene()->addItem(ti);
+	impl->gstate.addItem(ti,true);
 	this->statusBar()->showMessage("Added text item. Double-click to edit it.");
 }
 void MainWindowImpl::rotate90()

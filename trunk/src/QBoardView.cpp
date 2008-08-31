@@ -21,6 +21,7 @@
 #include <QMouseEvent>
 #include <QDragMoveEvent>
 #include <QGraphicsScene>
+#include <QGraphicsItem>
 #include <QAction>
 
 #include "QBoardView.h"
@@ -33,7 +34,6 @@
 
 #include "QBoard.h"
 #include "utility.h"
-#include "QGIPiecePlacemarker.h"
 
 struct QBoardView::Impl
 {
@@ -41,7 +41,6 @@ struct QBoardView::Impl
     QBoard & board;
     qreal scale;
     bool glmode;
-    QGIPiecePlacemarker * placer;
     QPoint placeAt;
     bool inMoveMode;
     Impl(GameState & s)
@@ -49,14 +48,12 @@ struct QBoardView::Impl
 	  board(s.board()),
 	  scale(1.0),
 	  glmode(false),
-	  placer(0),
 	  placeAt(50,50),
 	  inMoveMode(false)
     {
     }
     ~Impl()
     {
-	delete placer;
     }
 };
 
@@ -126,10 +123,6 @@ QBoardView::QBoardView( GameState & gs ) :
 QBoardView::~QBoardView()
 {
     QBOARD_VERBOSE_DTOR << "~QBoardView()";
-    if( impl->placer )
-    {
-	QObject::disconnect( impl->placer, SIGNAL(destroyed(QObject*)), this, SLOT(placemarkerDestroyed()) );
-    }
     delete impl;
 }
 
@@ -328,24 +321,6 @@ void QBoardView::updateBoardPixmap()
 	QRectF rect( 0, 0, isz.width(),  isz.height() );
 	//qDebug() << "QBoardView::updateBoardPixmap() setting scene rect ="<<rect;
 	this->setSceneRect( rect );
-#if 0
-	/**
-	   Kludge to force the scene rect to grow (if needed). My
-	   setting of it up there apparently gets lost along the way
-	   at times.
-	*/
-	
-	if( impl->placer )
-	{
-	    QGraphicsItem * it = impl->placer;
-	    QPointF p1( it->pos() );
-	    QRectF itb( it->boundingRect() );
-	    QPointF p2( rect.right() - (itb.width() / 2),
-			rect.bottom() - (itb.height() / 2) );
-	    impl->placer->setPos( p2 );
-	    impl->placer->setPos( p1 );
-	}
-#endif
     }
     //this->setBackgroundBrush(impl->board.pixmap());
     // Kludge to get boards to keep their scale on a reload:
@@ -454,21 +429,6 @@ void QBoardView::zoomReset()
     this->zoom(1.0);
 }
 
-void QBoardView::placemarkerDestroyed()
-{
-    /**
-       This bit of kludgery is to work around impl->placer being
-       destroyed when game state is cleared (destroying all
-       QGraphicsItems), as that leads to a dangling impl->placer in
-       this class. When that happens, we re-create the placemarker
-       if we had one active already.
-    */
-    if( impl->placer ) // now (or soon) a dangling pointer
-    {
-	impl->placer = 0;
-	this->enablePlacemarker(true);
-    }
-}
 
 void QBoardView::mouseReleaseEvent( QMouseEvent * event )
 {
@@ -491,10 +451,7 @@ void QBoardView::mouseDoubleClickEvent( QMouseEvent * event )
     if( (!item) && (event->button() & Qt::LeftButton) )
     {
 	impl->placeAt = this->mapToScene(event->pos()).toPoint();
-	if( impl->placer )
-	{
- 	    impl->placer->setPos( impl->placeAt );
-	}
+	impl->gs.setPlacementPos( impl->placeAt );
 	event->accept();
 	return;
     }
@@ -588,70 +545,5 @@ void QBoardView::contextMenuEvent( QContextMenuEvent * event )
 	// on this voodoo.
 	this->QGraphicsView::contextMenuEvent(event);
     }
-}
-
-void QBoardView::addItem( QGraphicsItem * vi )
-{
-    QPoint pos;
-    if( impl->placer )
-    {
-	QPoint p(impl->placer->pos().toPoint());
-	// If the size is set, use it. Since pc is
-	// very unlikely to have a view so far, its
-	// size is not likely to be set.
-	QVariant var( vi->boundingRect().size() );
-	if( var.isValid() )
-	{
-	    QSize sz(var.toSize() );
-	    pos = p - QPoint( sz.width()/2, sz.height()/2 );
-	}
-	else
-	{
-	    pos = p;
-	}
-    }
-    else
-    {
-	pos = impl->placeAt;
-    }
-    vi->setPos( pos );
-    impl->gs.addItem(vi);
-#if 0
-    QObject * pc = dynamic_cast<QObject*>(vi);
-    if( vi )
-    {
-	pc->setProperty("pos", pos );
-    }
-#endif
-}
-void QBoardView::enablePlacemarker( bool en )
-{
-    if( en )
-    {
-	if( ! impl->placer )
-	{
-	    impl->placer = new QGIPiecePlacemarker;
-	    impl->placer->setGameState( impl->gs );
-	    connect( impl->placer, SIGNAL(destroyed(QObject*)), this, SLOT(placemarkerDestroyed()) );
-	    
-	    impl->placer->setPos(impl->placeAt);
-	    impl->gs.scene()->addItem( impl->placer );
-	    QStringList help;
-	    help << "<html><body>This is a \"piece placemarker\"."
-		 << "To move it, double-click the board or drag it around."
-		 << "Pieces which are loaded from individual files (as opposed to being part of a game)"
-		 << "start out at this position."
-		 << "</body></html>"
-		;
-	    impl->placer->setToolTip( help.join(" ") );
-	}
-	return;
-    }
-    if( impl->placer )
-    {
-	QObject::disconnect( impl->placer, SIGNAL(destroyed(QObject*)), this, SLOT(placemarkerDestroyed()) );
-    }
-    delete impl->placer;
-    impl->placer = 0;
 }
 
