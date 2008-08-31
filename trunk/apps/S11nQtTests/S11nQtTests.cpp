@@ -37,6 +37,7 @@
 #include "S11nQt/QPixmap.h"
 #include "S11nQt/QPointF.h"
 #include "S11nQt/QPoint.h"
+#include "S11nQt/QPolygon.h"
 #include "S11nQt/QRectF.h"
 #include "S11nQt/QRect.h"
 #include "S11nQt/QRegExp.h"
@@ -56,6 +57,7 @@ void try_s11n()
     // test out our s11n-qt routines...
     QString qs("Hello, world.");
     S11nNode node;
+    using namespace s11n::qt;
     typedef s11nlite::node_traits NT;
 #define THROW(MSG) throw std::runtime_error(MSG);
     if(0)
@@ -281,6 +283,7 @@ void try_s11n()
 	s11nlite::deserialize( n, tr2 );
 	s11nlite::save( tr2, std::cout );
     }
+
 }
 
 int main(int argc, char ** argv)
