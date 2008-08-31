@@ -736,7 +736,9 @@ void MainWindowImpl::addQGIHtml()
 }
 void MainWindowImpl::rotate90()
 {
-	impl->gv->rotate( 90 );
+    QVariant var( impl->gv->property("angle") );
+    qreal ang = (var.toInt() + 90) % 360;
+    impl->gv->setProperty("angle", ang );
 }
 
 void MainWindowImpl::toggleSidebarVisible(bool b)
