@@ -88,14 +88,21 @@ public:
 //     QList<Serializable*> selectedSerializables();
 
 
-//     /**
-//        Returns the current placement position. See addPiece() for
-//        details.
-//     */
-//     QPoint placementPos() const;
 
+    /**
+       Returns the current placement position. See addPiece() for
+       details.
+    */
+    QPointF placementPos() const;
+
+    /**
+       Used by the copy/paste code.
+    */
     static char const * KeyClipboard;
 
+    /**
+       Returns this object's JS engine.
+    */
     QScriptEngine & jsEngine() const;
 
 public Q_SLOTS:
@@ -108,25 +115,25 @@ public Q_SLOTS:
     */
     bool pasteClipboard( QPoint const & pos );
 
+    /**
+       Removes all game items from the game.
+    */
     void clear();
-//     /**
-//        Sets the "placement position". If addPiece(piece,true) is called,
-//        the piece is moved to this position.
-//     */
-//     void setPlacementPos( QPoint const & );
+    /**
+       Sets the "placement position". This position is optionally used
+       by addItem() to place new items in the game.
+    */
+    void setPlacementPos( QPointF const & );
+
     /**
        If it returns true, it transfers ownership of the item to this
        object's QGraphicsScene, otherwise the caller owns the item.
-    */
-    bool addItem( QGraphicsItem * item );
 
-#if 0
-    /**
-
+       If autoPlace is true then the item is moved to placementPos(),
+       offset by half of the width/height of the item.
     */
-    bool addObject( QObject * tgt );
-#endif
-    //bool addObject( QScriptValue obj );
+    bool addItem( QGraphicsItem * item, bool autoPlace = false );
+
     /**
        Creates a new object of the given type name.  On success, the
        object is returned on error, 0 is returned. The caller owns the

@@ -35,7 +35,7 @@
 struct GameState::Impl
 {
     QBoard board;
-//     QPoint placeAt;
+    QPointF placeAt;
     QGraphicsScene * scene;
     QScriptValue jsThis;
     QScriptEngine * js;
@@ -162,16 +162,16 @@ void GameState::setup()
 				);
     impl->jsThis.setProperty( "board", sval );
 }
-// QPoint GameState::placementPos() const
-// {
-//     return impl->placeAt;
-// }
+QPointF GameState::placementPos() const
+{
+    return impl->placeAt;
+}
 
-// void GameState::setPlacementPos( QPoint const & p )
-// {
-//     qDebug() <<"GameState::setPlacementPos("<<p<<")";
-//     impl->placeAt = p;
-// }
+void GameState::setPlacementPos( QPointF const & p )
+{
+    //qDebug() <<"GameState::setPlacementPos("<<p<<")";
+    impl->placeAt = p;
+}
 
 
 QScriptEngine & GameState::jsEngine() const
@@ -332,11 +332,19 @@ QGraphicsScene * GameState::scene()
     return impl->scene;
 }
 
-bool GameState::addItem( QGraphicsItem * it )
+bool GameState::addItem( QGraphicsItem * it, bool autoPlace )
 {
-    return it
-	? (impl->scene->addItem( it ),true)
-	: false;
+    if( ! it ) return false;
+    if( autoPlace )
+    {
+	QPointF pos( this->placementPos() );
+	QRectF bounds( it->boundingRect() );
+	pos.setX( pos.x() - (bounds.width()/2) );
+	pos.setY( pos.y() - (bounds.height()/2) );
+	it->setPos(pos);
+    }
+    impl->scene->addItem( it );
+    return true;
 }
 
 
