@@ -2,7 +2,7 @@
 
 #include <QItemSelectionModel>
 
-#define QBOARD_USE_FSMODEL 0 && (QT_VERSION >= 0x040400)
+#define QBOARD_USE_FSMODEL (0 && (QT_VERSION >= 0x040400))
 #if QBOARD_USE_FSMODEL
 #  include <QFileSystemModel> // would seem to be more suitable, but QFileSystemModel::setRootPath() isn't working how i'd expect
 #else
@@ -158,7 +158,8 @@ QBoardHomeView::QBoardHomeView( QWidget * parent ) :
 #else
     //impl->model->setFilter( QDir::AllEntries | QDir::Hidden );
     //impl->model->setNameFilterDisables(false);
-    impl->model->setRootPath( qboard::home().absolutePath() );
+    //impl->model->setRootPath( qboard::home().absolutePath() );
+    impl->model->setRootIndex(model->index(qboard::home().absolutePath()));
     qDebug() << "QBoardHomeView: model root =="<<impl->model->rootPath();
 #endif
     for( int i = 1; i < 4; ++i )
@@ -230,7 +231,8 @@ void QBoardHomeView::refresh()
     impl->model->refresh(h); // causes a segfault when called during ctor
     //     }
 #else
-    impl->model->setRootPath( qboard::home().absolutePath() );
+    //impl->model->setRootPath( qboard::home().absolutePath() );
+    impl->model->setRootIndex(model->index(qboard::home().absolutePath()));
 #endif
 }
 
