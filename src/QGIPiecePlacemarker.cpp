@@ -28,14 +28,17 @@
 
 #include <cmath>
 
+#include "GameState.h"
 #include "QGIPiecePlacemarker.h"
 #include "S11nQt.h"
 #include "utility.h"
 
 struct QGIPiecePlacemarker::Impl
 {
+    GameState * gs;
     bool active;
     Impl() :
+	gs(0),
 	active(false)
 	{
 	}
@@ -67,26 +70,19 @@ QGIPiecePlacemarker::~QGIPiecePlacemarker()
 	QBOARD_VERBOSE_DTOR << "~QGIPiecePlacemarker()";
 	delete impl;
 }
+void QGIPiecePlacemarker::setGameState( GameState & gs )
+{
+    impl->gs = &gs;
+}
 
-
-#include "utility.h"
 void QGIPiecePlacemarker::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 {
-	if( (ev->buttons() & Qt::LeftButton) )
-	{
-	    ev->accept();
-	    qreal zV = qboard::nextZLevel(this);
-	    if( zV > this->zValue() )
-	    {
-		this->setZValue(zV);
-	    }
-	}
-	this->QGraphicsItem::mousePressEvent(ev);
-	//this->update();
+    QGITypes::handleClickRaise( this, ev );
+    this->QGraphicsItem::mousePressEvent(ev);
 }
 void QGIPiecePlacemarker::mouseReleaseEvent(QGraphicsSceneMouseEvent *ev)
 {
-	this->QGraphicsItem::mouseReleaseEvent(ev);
+    this->QGraphicsItem::mouseReleaseEvent(ev);
 }
 
 QRectF QGIPiecePlacemarker::boundingRect() const
@@ -100,64 +96,57 @@ QRectF QGIPiecePlacemarker::boundingRect() const
 // 	path.addEllipse(-10, -10, 20, 20);
 // 	return path;
 // }
+QVariant QGIPiecePlacemarker::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    if(change == ItemPositionChange)
+    {
+	if( impl->gs )
+	{
+	    impl->gs->setPlacementPos( value.toPoint() );
+	}
+    }
+    return QGraphicsItem::itemChange(change, value);
+}
 bool QGIPiecePlacemarker::event( QEvent * e )
 {
-#if 0
-    // We don't get Move events :(
-	if( e->type() == QEvent::Move )
-	{
-		e->accept();
-		qDebug() << "QGIPiecePlacemarker::event("<<e<<")";
-		if( impl->gs )
-		{
-		    impl->gs->setPlacementPos( dynamic_cast<QMoveEvent*>(e)->pos() );
-		}
-		this->QObject::event(e);
-		//this->update();
-		return true;
-	}
-#endif
-	if( e->type() == QEvent::DynamicPropertyChange )
-	{
-		this->update();
-	}
-	return QObject::event(e);
+    if( e->type() == QEvent::DynamicPropertyChange )
+    {
+	this->update();
+    }
+    return QObject::event(e);
 }
 void QGIPiecePlacemarker::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-	QVariant var = this->property("color1");
-	QColor color = (var.isValid() ? var.value<QColor>() : Qt::yellow);
-	var = this->property("color2");
-	QColor xline = (var.isValid() ? var.value<QColor>() : Qt::red);
-	QRectF brect( this->boundingRect() );
-	int fudge = 0; // try to avoid lopped off borders
-	int w = int(brect.width()-fudge);
-	int x = int(brect.x())+(fudge/2);
-	int y = int(brect.y())+(fudge/2);
-	int step = int(w / 6);
-	int w2 = w;
-	int h2 = int(brect.height()-fudge);
-	bool which = true;
-	painter->setPen( QPen( Qt::NoPen ) );
-	while( x < 0 )
-	{
-	    QColor c( which ? xline : color );
-	    which = !which;
-#if 1
-	    QRadialGradient grad(0,0,x);
-	    grad.setFocalPoint(-(w2/3),-(h2/3));
-	    grad.setColorAt( 0, c );
-	    grad.setColorAt( 1, c.light(130) );
-	    painter->setBrush( grad );
-#else
-	    painter->setBrush( c );
-#endif
-	    painter->drawEllipse( x, y, w2, h2 );
-	    x += step;
-	    y += step;
-	    w2 -= 2*step;
-	    h2 -= 2*step;
-	}
+    // FIXME? cache these paints?
+    QVariant var = this->property("color1");
+    QColor color = (var.isValid() ? var.value<QColor>() : Qt::yellow);
+    var = this->property("color2");
+    QColor xline = (var.isValid() ? var.value<QColor>() : Qt::red);
+    QRectF brect( this->boundingRect() );
+    int fudge = 0; // try to avoid lopped off borders
+    int w = int(brect.width()-fudge);
+    int x = int(brect.x())+(fudge/2);
+    int y = int(brect.y())+(fudge/2);
+    int step = int(w / 6);
+    int w2 = w;
+    int h2 = int(brect.height()-fudge);
+    bool which = true;
+    painter->setPen( QPen( Qt::NoPen ) );
+    while( x < 0 )
+    {
+	QColor c( which ? xline : color );
+	which = !which;
+	QRadialGradient grad(0,0,x);
+	grad.setFocalPoint(-(w2/3),-(h2/3));
+	grad.setColorAt( 0, c );
+	grad.setColorAt( 1, c.light(130) );
+	painter->setBrush( grad );
+	painter->drawEllipse( x, y, w2, h2 );
+	x += step;
+	y += step;
+	w2 -= 2*step;
+	h2 -= 2*step;
+    }
 }
 
 #if QGIPiecePlacemarker_IS_SERIALIZABLE
