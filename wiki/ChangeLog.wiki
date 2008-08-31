@@ -7,6 +7,10 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top. Dates written extra large are release dates.
 
 ----
+*2008 Sept 1*
+
+- Added board menu entries to create new dots and html items.
+
 == *2008 August 31:* ==
 
 - Removed the annoying warning dialog when building on Qt 4.3, since (a) most of the weird bugs are in Qt 4.4 now and (b) 4.3 is my main development target for the time being.
