@@ -17,12 +17,57 @@
 #include <QColor>
 #include <QDebug>
 #include <QGraphicsItem>
+#include <QGraphicsScene>
 #include <QSharedData>
 #include <QIcon>
 
 namespace qboard {
 
  
+    QScriptValue qpointfToScriptValue(QScriptEngine *engine, const QPointF &s)
+    {
+	qDebug() << "qpointfToScriptValue(engine,"<<s<<")";
+	QScriptValue obj = engine->newObject();
+	obj.setProperty("x", QScriptValue(engine, s.x()));
+	obj.setProperty("y", QScriptValue(engine, s.y()));
+	return obj;
+    }
+
+    void qpointfFromScriptValue(const QScriptValue &obj, QPointF &s)
+    {
+	s.setX( obj.property("x").toNumber() );
+	s.setY( obj.property("y").toNumber() );
+	qDebug() << "qpointfFromScriptValue(engine,"<<s<<")";
+    }
+
+    QScriptValue QPointF_ctor(QScriptContext *ctx, QScriptEngine *eng)
+    {
+	int argc = ctx->argumentCount();
+	qDebug() << "QPointF_ctor(cx,engine) argc =="<<argc;
+	int x = 0;
+	int y = 0;
+	if( 1 == argc )
+	{
+	    x = y = ctx->argument(0).toInt32();
+	}
+	else if( 2 == argc )
+	{ // QPointF(x,y)
+	    x = ctx->argument(0).toInt32();
+	    y = ctx->argument(1).toInt32();
+	}
+	QScriptValue self = ctx->thisObject();
+	self.setProperty("x",QScriptValue(eng,x));
+	self.setProperty("y",QScriptValue(eng,y));
+	return self;
+	//return eng->toScriptValue(QPointF(x,y));
+	/** what's the difference between toScriptValue()
+	    and qpointToScriptValue(eng,p) ???
+
+	    The former does essentially what i want, the latter
+	    does not.
+	*/
+    }
+
     QScriptValue qpointToScriptValue(QScriptEngine *engine, const QPoint &s)
     {
 	qDebug() << "qpointToScriptValue(engine,"<<s<<")";
@@ -34,27 +79,16 @@ namespace qboard {
 
     void qpointFromScriptValue(const QScriptValue &obj, QPoint &s)
     {
-	s.setX( obj.property("x").toInt32() );
-	s.setY( obj.property("y").toInt32() );
+	s.setX( obj.property("x").toNumber() );
+	s.setY( obj.property("y").toNumber() );
 	qDebug() << "qpointFromScriptValue(engine,"<<s<<")";
     }
+
 
     QScriptValue QPoint_ctor(QScriptContext *ctx, QScriptEngine *eng)
     {
 	int argc = ctx->argumentCount();
 	qDebug() << "QPoint_ctor(cx,engine) argc =="<<argc;
-#if 0
-	QScriptValue jobj;
-	if (ctx->isCalledAsConstructor())
-	{
-	    jobj = ctx->thisObject();
-	}
-	else
-	{
-	    jobj = eng->newObject();
-	    jobj.setPrototype(ctx->callee().property("prototype"));
-	}
-#endif
 	int x = 0;
 	int y = 0;
 	if( 1 == argc )
@@ -66,11 +100,6 @@ namespace qboard {
 	    x = ctx->argument(0).toInt32();
 	    y = ctx->argument(1).toInt32();
 	}
-#if 0
-	jobj.setProperty("x",QScriptValue(eng,x));
-	jobj.setProperty("y",QScriptValue(eng,y));
-	return jobj;
-#else
 	return eng->toScriptValue(QPoint(x,y));
 	/** what's the difference between toScriptValue()
 	    and qpointToScriptValue(eng,p) ???
@@ -78,7 +107,6 @@ namespace qboard {
 	    The former does essentially what i want, the latter
 	    does not.
 	*/
-#endif
     }
 
     QScriptValue QSize_ctor(QScriptContext *context, QScriptEngine *engine)
@@ -136,6 +164,20 @@ namespace qboard {
 	out = dynamic_cast<QGraphicsItem*>(object.toQObject());
     }
 
+    QScriptValue qgsToScriptValue(QScriptEngine *engine, QGraphicsScene* const &in)
+    {
+	QObject * obj = dynamic_cast<QObject*>(in);
+	return obj
+	    ? engine->newQObject(obj)
+	    : QScriptValue();
+    }
+    
+    void qgsFromScriptValue(const QScriptValue &object, QGraphicsScene* &out)
+    {
+	out = dynamic_cast<QGraphicsScene*>(object.toQObject());
+    }
+
+
 
     QScriptValue qsizeToScriptValue(QScriptEngine *engine, const QSize &s)
     {
@@ -157,13 +199,13 @@ namespace qboard {
 	QScriptValue glob( js->globalObject() );
 
 	qScriptRegisterMetaType(js, qgiToScriptValue, qgiFromScriptValue);
+	qScriptRegisterMetaType(js, qgsToScriptValue, qgsFromScriptValue);
 
 	glob.setProperty("QSize", js->newFunction(QSize_ctor));
 // 	qScriptRegisterMetaType(js, qsizeToScriptValue, qsizeFromScriptValue);
-
 	glob.setProperty("QColor", js->newFunction(QColor_ctor));
-
 	glob.setProperty("QPoint", js->newFunction(QPoint_ctor));
+	glob.setProperty("QPointF", js->newFunction(QPointF_ctor));
  	/**
 	   Damn... if i have both a QPoint ctor and to/fromScriptValue routines
 	   then none of it works.
@@ -185,8 +227,9 @@ namespace qboard {
 
     ScriptPacket::ScriptPacket( QScriptEngine * js,
 				QString const & code,
-				QString const & name )
-	: QObject(),
+				QString const & name,
+				QObject * parent )
+	: QObject(parent),
 	impl(new Impl)
     {
 	impl->js = js;
