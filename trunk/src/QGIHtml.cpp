@@ -296,16 +296,8 @@ bool QGIHtml::deserialize(  S11nNode const & src )
 
 void QGIHtml::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
 {
-    qDebug()<<"QGIHtml::contextMenuEvent("<<event<<")";
-//     if( this->textInteractionFlags() & Qt::TextEditorInteraction )
-//     {
-//  	QGraphicsTextItem::contextMenuEvent(event);
-//     }
-//     else
-//     {
     MenuHandlerQGIHtml mh;
     mh.doMenu( this, event );
-//     }
 }
 
 #include "QGIHider.h"
