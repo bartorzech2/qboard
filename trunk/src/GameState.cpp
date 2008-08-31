@@ -52,6 +52,7 @@ struct GameState::Impl
 	placer(0)
     {
 	scene->setSceneRect( QRectF(0,0,200,200) );
+	scene->setObjectName("scene");
     }
     ~Impl()
     {
@@ -143,15 +144,19 @@ GameState::~GameState()
     this->clear();
     delete impl;
 }
-
+#include "JSGameState.h"
 void GameState::setup()
 {
     impl->js = qboard::createScriptEngine(this);
+    QScriptValue glob( impl->js->globalObject() );
+
+    JSGameState * proto = new JSGameState(this);
+    impl->js->setDefaultPrototype(qMetaTypeId<GameState*>(),
+				  impl->js->newQObject(proto));
     impl->jsThis = impl->js->newQObject( this,
 					 QScriptEngine::QtOwnership
 					 //QScriptEngine::AutoCreateDynamicProperties
 					 );
-    QScriptValue glob( impl->js->globalObject() );
     glob.setProperty( "qboard", impl->jsThis );
     if( ! impl->jsThis.isQObject() )
     {
@@ -167,6 +172,9 @@ void GameState::setup()
     impl->jsThis.setProperty( "P", sval );
     impl->jsThis.setProperty( "x", QScriptValue(impl->js,"hi") );
 #endif
+    impl->js->globalObject().setProperty("QT_VERSION",QScriptValue(impl->js,QT_VERSION));
+    impl->js->globalObject().setProperty("QBOARD_VERSION",QScriptValue(impl->js,QBOARD_VERSION));
+    impl->js->globalObject().setProperty("QBOARD_VERSION_STRING",QScriptValue(impl->js,qboard::versionString()));
     sval = impl->js->newQObject(&impl->board,
 				QScriptEngine::QtOwnership
 				//,QScriptEngine::AutoCreateDynamicProperties
