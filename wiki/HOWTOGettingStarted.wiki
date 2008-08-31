@@ -26,7 +26,7 @@ QBoard-specific application data. If you need some ideas, see the available [Gam
 == Loading Files ==
 
   * Double-clicking an image file will load it as a game board (if it is bigger than 10KB) or a game piece (if it is smaller). Pieces loaded this way will be placed on the board at the same spot where the yellow and red "placemarker" is.
-  * Double-clicking on files named .GameState, .QBoard, or .QGIPiece will load a game, a board, or a piece. The same happens when using the Open File menu/button.
+  * Double-clicking on other files will attempt to load them. What exactly happens here depends on the file type. The same happens when using the Open File menu/button.
   * Double-clicking a .txt or .html file will open it in a browser (only when compiled against Qt 4.4!).
 
 == Saving ==
