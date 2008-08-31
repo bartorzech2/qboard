@@ -41,6 +41,7 @@ That's all there is to is.
 Below are short descriptions of the gamesets released via the downloads page, in
 alphabetical order. To install a given gameset, simply unpack it to your QBoard home directory.
 
+----
 == !BattleTech(tm) and friends ==
 
 This set includes lots of pieces (but no maps) compatible with the [http://www.classicbattletech.com/ BattleTech line of games]. They can also be used for other games with mecha, of course.
@@ -51,17 +52,18 @@ You can actually find many !BattleTech maps in PDF format at:
 Search that page for "map". But you'll need to extract them from the PDFs before using them with QBoard (their license doesn't allow us to redistribute them here). Tip: you can
 use [http://www.gimp.org The Gimp] to open the PDFs and then save them as an image file.)
 
+----
 == GenericSciFiGroundCombat ==
 
 This set contains tons of good-looking counters created by Fransisco "Cisco" Cestero. Originally created as printable replacements for worn-out Ogre/GEV pieces, they are generic enough to be used with a variety of ground combat games. The counters tend to have a slightly sci-fi feel to them, though, and aren't suitable for WW2-themed games.
 
-
+----
 == Hex ==
 
 Hex is a very simple strategy game for two players with a whopping 1 paragraph
 of rules. Each player places tokens on a hexagon-based board and attempts to
 connect to the far side, blocking his opponent as he goes.
-
+----
 == CGME Joe ==
 
 *Joe* is a simple strategy combat game where little plastic army men
@@ -69,6 +71,7 @@ do combat on a chessboard. Joe is an original title, by yours truly.
 It can be learned and played in under half an hour, and should be flexible
 enough to support a variety of play styles and options.
 
+----
 == Ogre(tm) and G.E.V.(tm) ==
 
 [http://sjgames.com/ogre/ Ogre and G.E.V.] are classic sci-fi strategy games
