@@ -130,7 +130,7 @@ QObject * JSGameState::createObject( QString const & className,
     QGraphicsItem * git = dynamic_cast<QGraphicsItem*>(s);
     if( git )
     {
-	self->addItem(git, true);
+	self->addItem(git);
     }
 #if 0
     QScriptValue v = js->newQObject(o, QScriptEngine::AutoOwnership
