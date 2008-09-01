@@ -1,15 +1,27 @@
 #include <QtGui>
 #include <QLabel>
 #include <QDebug>
+#include <QTextEdit>
+#include <QGridLayout>
+#include <QFrame>
+#include <QPushButton>
+#include <QScriptEngine>
+#include <QScriptValue>
+#include <QMessageBox>
 
+#include <stdexcept>
 #include "CGMEJoe.h"
 #include "GameState.h"
 
 struct CGMEJoe::Impl
 {
     QWidget * wid;
+    QTextEdit * editor;
+    GameState * gs;
     Impl() :
-	wid(0)
+	wid(0),
+	editor(0),
+	gs(0)
     {
     }
     ~Impl()
@@ -19,18 +31,9 @@ struct CGMEJoe::Impl
     }
 };
 
-CGMEJoe::CGMEJoe() : QBoardBasePlugin(),
-		     impl(new Impl)
+CGMEJoe::CGMEJoe() : impl(new Impl)
 {
     qDebug() << "CGMEJoe()";
-
-    QBoardPluginInfo & in( this->pluginInfo() );
-    in.name = "CGME Joe Gameset";
-    in.version = __DATE__ " " __TIME__;
-    in.license = "GPLv3";
-    in.url = "http://code.google.com/p/qboard";
-    in.author = "Stephan Beal";
-    in.comments = "A dummy plugin for testing QBoard's plugin support.";
 }
 
 CGMEJoe::~CGMEJoe()
@@ -45,18 +48,67 @@ CGMEJoe::~CGMEJoe()
 
 void CGMEJoe::widgetDestroyed()
 {
-    impl->wid = 0;
+    impl->wid = impl->editor = 0;
+}
+
+
+void CGMEJoe::evalJS()
+{
+    if( ! impl->editor ) return;
+    QString code( impl->editor->toPlainText() );
+    if( code.isEmpty() ) return;
+    try
+    {
+	QScriptEngine & js( impl->gs->jsEngine() );
+	QScriptValue rv = js.evaluate(code, "CGMEJoe editor");
+#if QT_VERSION >= 0x040400
+	if( rv.isError() )
+#else
+	if( js.hasUncaughtException() ) // in Qt 4.4.1 this fails!
+#endif
+	{
+	    QStringList bt( js.uncaughtExceptionBacktrace() );
+	    QScriptValue exv = rv.isError() ? rv : js.uncaughtException();
+	    QString msg("Script threw or returned an exception:\n");
+	    msg += exv.toString()
+		+ "\nBacktrace:\n"
+		+ bt.join("\n");
+	    QMessageBox::warning( impl->editor,
+				  "JavaScript Exception",
+				  msg,
+				  QMessageBox::Ok,
+				  QMessageBox::Ok );
+	}
+    }
+    catch(std::exception const & ex)
+    {
+	qDebug() << "CGMEJoe::evalJS() got a native exception:" << ex.what();
+    }
 }
 
 QWidget * CGMEJoe::widget()
 {
     if( ! impl->wid )
     {
-	QLabel * lbl = new QLabel("Hi, world");
-	impl->wid = lbl;
-	connect( impl->wid, SIGNAL(destroyed(QObject*)), this, SLOT(widgetDestroyed()) );
+	QFrame * fr = new QFrame;
+	QGridLayout * lay = new QGridLayout(fr);
+	QPushButton * but = new QPushButton("Evaluate");
+	QTextEdit * editor = new QTextEdit;
+	editor->setPlainText("qboard.createObject('QGIHtml',{pos:qboard.placementPos()});");
+	lay->addWidget( editor, 0, 0 );
+	lay->addWidget( but, 1, 0);
+	connect( but, SIGNAL(clicked()), this,SLOT(evalJS()));
+	connect( fr, SIGNAL(destroyed(QObject*)), this, SLOT(widgetDestroyed()) );
+	impl->wid = fr;
+	impl->editor = editor;
     }
     return impl->wid;
+}
+
+
+void CGMEJoe::setGameState(GameState &s)
+{
+    impl->gs = &s;
 }
 
 Q_EXPORT_PLUGIN2(CGMEJoe, CGMEJoe)

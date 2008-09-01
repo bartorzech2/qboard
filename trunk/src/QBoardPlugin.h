@@ -39,18 +39,11 @@ public:
        of the state.
     */
     virtual void setGameState( GameState & ) = 0;
-
-    /**
-       Should return a populated QBoardPluginInfo object containing
-       plugin-specific data.
-    */
-    virtual QBoardPluginInfo pluginInfo() const = 0;
 };
 Q_DECLARE_INTERFACE(QBoardPlugin,
 		    "com.google.code/p/qboard/QBoardPlugin/1.0"
 		    //"com.google.code.p.qboard.QBoardPlugin/1.0"
 		    );
-
 
 class QBoardBasePlugin : public QObject,
 			 public QBoardPlugin
@@ -62,9 +55,7 @@ public:
     virtual ~QBoardBasePlugin();
     virtual QWidget * widget();
     virtual void setGameState(GameState &);
-    virtual QBoardPluginInfo pluginInfo() const;
 protected:
-    QBoardPluginInfo & pluginInfo();
     GameState * gameState();
 private:
     struct Impl;
