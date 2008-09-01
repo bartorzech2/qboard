@@ -1,5 +1,15 @@
 include(../../config.qmake)
 TEMPLATE = app
+unix:contains(QMAKE_CXX,g++){ # hope we're working with gcc...
+  # the qmake configure setup doesn't do this, and plugins require it!
+  # Without this, my plugins can't resolve symbols in the application.
+  QMAKE_LFLAGS += -export-dynamic
+  warning("activating explicit -export-dynamic kludge")
+}
+unix:!contains(QMAKE_CXX,g++){
+  warning("We're not under g++, which means i don't know the linker args to export your app symbols!")
+}
+
 QT += script svg
 QMAKE_CXXFLAGS = $$QBOARD_CXXFLAGS
 RESOURCES = $$RESOURCES_DIR/icons.qrc \
