@@ -191,54 +191,19 @@ bool QBoardView::event( QEvent * e )
 }
 
 
-static QGraphicsItem * firstSelectedQGI( QGraphicsScene * sc )
-{
-    if( ! sc ) return 0;
-    typedef QList<QGraphicsItem *> QGIL;
-    QGIL li = sc->selectedItems();
-    QGraphicsItem * qgi = 0;
-    for( QGIL::iterator it = li.begin();
-	 li.end() != it; ++it )
-    {
-	if( (*it)->isSelected() )
-	{
-	    qgi = *it;
-	    break;
-	}
-    }
-    return qgi;
-}
-
 void QBoardView::clipCopySelected()
 {
-    qboard::clipboardGraphicsItems( firstSelectedQGI( this->scene() ),  true );
+    impl->gs.clipCopySelected();
 }
 
 void QBoardView::clipCutSelected()
 {
-    qboard::clipboardGraphicsItems( firstSelectedQGI( this->scene() ),  false  );
-}
-
-static QPoint findBoardPastePoint( QGraphicsView * board )
-{
-    QPoint ret;
-    QWidget * vp = board->viewport();
-    if(0) qDebug() << "findBoardPastePoint("<<board<<") viewport ="<<vp
-		   << "viewport parent ="<<vp->parent();
-    QPoint glpos( QCursor::pos() );
-    QWidget * wa = QApplication::widgetAt( glpos );
-    if(0) qDebug() << "findBoardPastePoint("<<board<<") widgetAt("<<glpos<<") ="<<wa;
-    if( wa != vp ) return ret;
-    ret = board->mapToScene( board->mapFromGlobal(glpos) ).toPoint();
-    if(0) qDebug() << "findBoardPastePoint("<<board<<") ret ="<<ret;
-    return ret;
+    impl->gs.clipCutSelected();
 }
 
 void QBoardView::clipPaste()
 {
-    //bool pasteGraphicsItems( impl->gs, QPoint() );
-    //impl->gs.pasteClipboard( QPoint() );
-    impl->gs.pasteClipboard( findBoardPastePoint(this) );
+    impl->gs.pasteClipboard( qboard::findViewMousePoint(this) );
 }
 
 
