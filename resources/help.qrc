@@ -1,6 +1,6 @@
 <RCC>
   <qresource prefix="/QBoard" >
-    <file>help/classes/GamePiece.html</file>
+    <file>help/classes/QGIDot.html</file>
     <file>help/classes/QGIHtml.html</file>
     <file>help/classes/QGILine.html</file>
     <file>help/classes/QGIPiece.html</file>
