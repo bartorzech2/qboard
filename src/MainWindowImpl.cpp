@@ -186,6 +186,15 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	vsplit->setStretchFactor(0,3);
 	vsplit->setStretchFactor(1,1);
 
+	if(1)
+	{
+	    impl->gv->setObjectName("view");
+	    QScriptEngine & js( impl->gstate.jsEngine() );
+	    QScriptValue jo = js.newQObject( impl->gv, QScriptEngine::QtOwnership );
+	    QScriptValue qb = js.globalObject().property("qboard");
+	    qb.setProperty("view",jo);
+	}
+
 }
 
 MainWindowImpl::~MainWindowImpl()
@@ -518,7 +527,7 @@ void MainWindowImpl::doSomethingExperimental()
 	//impl->gstate.scene()->addItem(  );
 	//impl->gstate.scene()->addWidget( new QFrame );
 
-	if(1)
+	if(0)
 	{
 	    QString fileName("eval.js");
 	    QFile scriptFile(fileName);
@@ -639,7 +648,7 @@ void MainWindowImpl::doSomethingExperimental()
 	}
 
 #if 1
-	if(0)
+	if(1)
 	{
 	    QBoardPlugin * plug = 0;
 	    QDir pluginsDir(qApp->applicationDirPath());
@@ -660,6 +669,7 @@ void MainWindowImpl::doSomethingExperimental()
 	    qDebug() << "plugin =="<<plug;
  	    if( plug )
  	    {
+		plug->setGameState( impl->gstate );
 		QWidget * v = plug->widget();
 		qDebug() << "plugin widget =="<<v;
 		if( v )
