@@ -13,6 +13,7 @@
  *
  */
 
+#include <QList>
 #include <QGraphicsItem>
 class QGraphicsSceneMouseEvent;
 /**
@@ -50,5 +51,27 @@ struct QGITypes
     */
     static bool handleClickRaise( QGraphicsItem * item,
 				  QGraphicsSceneMouseEvent * ev );
+
+    /**
+       Randomly shuffles the positions of all items in the given
+       list. It will not introduce new positions - it randomly
+       swaps the positions of the given items.
+
+       An example use for this:
+
+       Create a set of gaming cards (e.g. using QGIHtml items), cover
+       them, select a stack of them, then use this routine to shuffle
+       the cards. It can also be used to randomize placement of starting
+       units for solitaire play of certain games.
+
+       If skipParentedItems is true (the default), any items in the
+       list which have a parent item are SKIPPED for purposes of
+       shuffling. The reason for this that when children are shuffled
+       relative to coordinates of items with other parents, the
+       results can be somewhat painful. If you know that all items in
+       list share the same parent (or are all top-level), you can
+       safely pass false.
+    */
+    static void shuffleQGIList( QList<QGraphicsItem*> list, bool skipParentedItems = true );
 };
 #endif // QBOARD_QGI_H_INCLUDED

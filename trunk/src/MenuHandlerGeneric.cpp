@@ -13,8 +13,6 @@
 
 #include "MenuHandlerGeneric.h"
 
-#include <s11n.net/s11n/serialize.hpp>
-
 #include <QDebug>
 #include <QGraphicsScene>
 #include <QGraphicsItem>
@@ -23,6 +21,7 @@
 #include <QStyleOptionGraphicsItem>
 
 #include "utility.h"
+#include "QGI.h"
 #include "S11nClipboard.h"
 #include "Serializable.h"
 #include "S11nQt/QList.h"
@@ -272,12 +271,32 @@ void SceneSelectionDestroyer::destroyItem()
 	this->destroyItem( this->gitem );
     }
 }
+
+ItemShuffleHandler::ItemShuffleHandler( QObject * p, ListType l )
+    : QObject(p),
+      list(l)
+{
+}
+ItemShuffleHandler::~ItemShuffleHandler()
+{
+}
+void ItemShuffleHandler::doShuffle()
+{
+    QGITypes::shuffleQGIList( this->list );
+}
+
 QMenu * MenuHandlerCommon::createMenu( QGraphicsItem *gi ) //, QGraphicsSceneContextMenuEvent *ev )
 {
     QString label;
     QString ico;
+    typedef QList<QGraphicsItem *> QGIL;
+    QGIL selected;
     if( gi->isSelected() )
     {
+	if( gi->scene() )
+	{
+	    selected = gi->scene()->selectedItems();
+	}
 	label = tr("Selected items...");
 	ico = ":/QBoard/icon/multiple.png";
     }
@@ -305,6 +324,14 @@ QMenu * MenuHandlerCommon::createMenu( QGraphicsItem *gi ) //, QGraphicsSceneCon
 	gi->paint( &pain, &bogus, 0 );
 	act->setIcon( QIcon( tgt.scaled(16,16) ) );
 #endif
+    }
+
+    if( 2 <= selected.size() )
+    {
+	menu->addAction("Shuffle items",
+			new ItemShuffleHandler( menu, selected ),
+			SLOT(doShuffle()));
+	menu->addSeparator();
     }
     SceneSelectionDestroyer * destroyer = new SceneSelectionDestroyer( menu, gi );
     menu->addAction(QIcon(":/QBoard/icon/button_cancel.png"),"Destroy",destroyer,SLOT(destroyItem()) );

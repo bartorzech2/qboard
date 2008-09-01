@@ -28,6 +28,10 @@
 #include "S11nQt/QPoint.h"
 #include "S11nQt/QGraphicsItem.h"
 
+#include <algorithm>
+#include <cstdlib>
+#include <ctime>
+
 bool QGITypes::handleClickRaise( QGraphicsItem * it,
 				 QGraphicsSceneMouseEvent * ev )
 {
@@ -45,6 +49,40 @@ bool QGITypes::handleClickRaise( QGraphicsItem * it,
 	return true;
     }
     return false;
+}
+static int shuffleRand(int n)
+{
+    return std::rand() % n ;
+}
+void QGITypes::shuffleQGIList( QList<QGraphicsItem*> list, bool skipParentedItems )
+{
+    if( list.isEmpty() ) return;
+    typedef QList<QGraphicsItem*> LI;
+    static unsigned int seed = 0;
+    if( 0 == seed )
+    {
+	std::srand(seed = std::time(0));
+    }
+    typedef std::vector<QGraphicsItem*> VT;
+    typedef std::vector<QPointF> VPT;
+    VT vec(list.size(), (QGraphicsItem*)0 );
+    VPT pts(list.size(), QPointF());
+    unsigned int i = 0;
+    for( LI::iterator it = list.begin();
+	 list.end() != it; ++it )
+    {
+	if( skipParentedItems && (*it)->parentItem() ) continue;
+	vec[i] = *it;
+	pts[i] = (*it)->pos();
+	++i;
+    }
+    if( ! i ) return;
+    std::random_shuffle( &vec[0], &vec[i], shuffleRand );
+    for( unsigned int x = 0; x < i; ++x )
+    {
+	vec[x]->setPos( pts[x] );
+    }
+    return;
 }
 
 #define QGIPiece_USE_PIXCACHE 1
