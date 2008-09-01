@@ -65,8 +65,11 @@ void QGITypes::shuffleQGIList( QList<QGraphicsItem*> list, bool skipParentedItem
     }
     typedef std::vector<QGraphicsItem*> VT;
     typedef std::vector<QPointF> VPT;
-    VT vec(list.size(), (QGraphicsItem*)0 );
-    VPT pts(list.size(), QPointF());
+    typedef std::vector<qreal> ZPT;
+    const int lsz = list.size();
+    VT vec(lsz, (QGraphicsItem*)0 );
+    VPT pts(lsz, QPointF());
+    ZPT zvals(lsz,0.0);
     unsigned int i = 0;
     for( LI::iterator it = list.begin();
 	 list.end() != it; ++it )
@@ -74,13 +77,16 @@ void QGITypes::shuffleQGIList( QList<QGraphicsItem*> list, bool skipParentedItem
 	if( skipParentedItems && (*it)->parentItem() ) continue;
 	vec[i] = *it;
 	pts[i] = (*it)->pos();
+	zvals[i] = (*it)->zValue();
 	++i;
     }
     if( ! i ) return;
     std::random_shuffle( &vec[0], &vec[i], shuffleRand );
     for( unsigned int x = 0; x < i; ++x )
     {
-	vec[x]->setPos( pts[x] );
+	QGraphicsItem * gi = vec[x];
+	gi->setPos( pts[x] );
+	gi->setZValue( zvals[x] );
     }
     return;
 }

@@ -55,7 +55,7 @@ struct QGITypes
     /**
        Randomly shuffles the positions of all items in the given
        list. It will not introduce new positions - it randomly
-       swaps the positions of the given items.
+       swaps the positions and z-levels of the given items.
 
        An example use for this:
 
