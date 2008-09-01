@@ -63,6 +63,8 @@ struct GameState::Impl
 
 
 };
+
+#if 0
 /**
    Requires:
 
@@ -120,7 +122,7 @@ static QScriptValue jsEtGameProperty(QScriptContext *context,
     }
     return QScriptValue();
 }
-
+#endif // jsEtGameProperty()
 
 //Q_DECLARE_METATYPE(QGraphicsItem*);
 
@@ -253,134 +255,6 @@ void GameState::enablePlacemarker( bool en )
 QScriptEngine & GameState::jsEngine() const
 {
     return *impl->js;
-}
-#if 0
-static QScriptValue getObjectPos(QScriptContext *context, QScriptEngine *engine)
- {
-     qDebug() << "GameState static getObjectPos()";
-     QGraphicsItem * gi = engine->fromScriptValue<QGraphicsItem*>( context->argument(0) );
-     return gi
-	 ? QScriptValue(engine,"this is not a point")
-	 : engine->toScriptValue<QPoint>( gi->pos().toPoint() );
-//      if (context->argumentCount() == 1) // writing?
-//          callee.setProperty("value", context->argument(0));
-//     return callee.property("value");
-}
-#endif
-
-// static QScriptValue pieceSetProp(QScriptContext *ctx,
-// 				 QScriptEngine *eng)
-// {
-//     if( ! ctx || !eng) return QScriptValue();
-//     return QScriptValue();
-// }
-
-QObject * GameState::createObject( QString const & className,
-				   QScriptValue const & props )
-{
-    Serializable * s = s11n::cl::classload<Serializable>( className.toAscii().constData() );
-    if( ! s )
-    {
-	qDebug() <<"GameState::createObject("<<className<<") classload failed.";
-	return 0;
-    }
-    QObject * o = dynamic_cast<QObject*>(s);
-    if( ! o )
-    {
-	qDebug() <<"GameState::createObject(obj) object not-a QGraphicsItem.";
-	s11n::cleanup_serializable( s );
-	return 0;
-    }
-    if( props.isObject() )
-    {
-	this->props( o, props );
-    }
-    QGraphicsItem * git = dynamic_cast<QGraphicsItem*>(s);
-    if( git )
-    {
-	this->addItem(git, true);
-    }
-    QScriptValue v = impl->js->newQObject(o,
-					  QScriptEngine::AutoOwnership
-					  //,QScriptEngine::AutoCreateDynamicProperties
-					  //| QScriptEngine::PreferExistingWrapperObject
-					  );
-    v.setProperty("x", QScriptValue(impl->js,"hi"));
-    // never being called when obj.pos called.
-    //v.setProperty("pos", impl->js->newFunction(getObjectPos), QScriptValue::PropertyGetter );
-    QScriptValue fun = impl->js->newFunction(jsEtGameProperty);
-    if( ! fun.isFunction() )
-    {
-	qDebug() <<"GameState::createObject(obj) prop function creation failed.";
-    }
-    else
-    {
-	// WTF does this end up undefined in script:
-	v.setProperty("xyz",fun);
-	//v.setProperty("xyz",QScriptValue(impl->js,"wtf"));
-    }
-
-    return o;
-}
-
-#if 0
-//bool GameState::addObject( QScriptValue vobj )
-bool GameState::addObject( QObject * obj ) //QScriptValue const & vobj )
-{
-    //if( !vobj || ! vobj->isQObject() ) return false;
-    //QObject * obj = vobj->toQObject();
-    QGraphicsItem * it = dynamic_cast<QGraphicsItem*>( obj );
-    if( ! it )
-    {
-	qDebug() <<"GameState::addObject(obj) object not-a QGraphicsItem.";
-	return 0;
-    }
-#if 0
-    QScriptValue fun = impl->js->newFunction(jsEtGameProperty);
-    if( ! fun.isFunction() )
-    {
-	qDebug() <<"GameState::addObject(obj) prop function creation failed.";
-	return 0;
-    }
-    // WTF does this end up undefined in script:
-    //vobj->.setProperty("prop",fun);
-#endif
-    this->addItem( it );
-    return true;
-}
-#endif
-bool GameState::prop( QObject * obj,
-		      QString const & name,
-		      //QVariant const & val
-		      QScriptValue const & val
-		      )
-{
-    if( ! obj || name.isEmpty() ) return false;
-    QVariant var(val.toVariant());
-    qDebug() << "GameState::prop(obj,"<<name<<","<<var<<")";
-    obj->setProperty(name.toAscii().constData(),var);
-    return val.isValid();
-}
-QScriptValue
-GameState::prop( QObject * obj,
-		 QString const & name )
-{
-    return (obj && !name.isEmpty())
-	? impl->js->newVariant( obj->property(name.toAscii().constData()) )
-	: QScriptValue();
-}
-
-bool GameState::props( QObject * tgt, QScriptValue const & props )
-{
-    qDebug() << "GameState::prop(obj,properties)";
-    if( !tgt || ! props.isObject() ) return false;
-    QScriptValueIterator it( props );
-    while( it.hasNext() )
-    {
-	it.next();
-	prop( tgt, it.name(), it.value() ); // .toVariant() );
-    }
-    return true;
 }
 
 QScriptValue GameState::evalScriptFile( QString const & fn )

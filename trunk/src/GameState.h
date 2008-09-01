@@ -139,62 +139,6 @@ public Q_SLOTS:
     bool addItem( QGraphicsItem * item, bool autoPlace = false );
 
     /**
-       Creates a new object of the given type name.  On success, the
-       object is returned on error, 0 is returned. The caller owns the
-       returned object unless: if they created item is-a QGraphicsItem then
-       addItem(theItem) is called, transfering ownership to the graphics
-       scene.
-
-       If props.isObject() is true then this->props(object,props)
-       is called to set the properties of the new object.
-    */
-    QObject * createObject( QString const & className, QScriptValue const & props = QScriptValue() );
-
-    /**
-       Calls tgt->setProperty() with the given property.
-
-       This is intended to be called from JS code.
-    */
-    bool prop( QObject * tgt, QString const &,
-	       QScriptValue const & val );
-    //QVariant const & val );
-    /**
-       Assumes that props contains a single-dimension set of
-       properties. Each property is copied to tgt via
-       tgt->setProperty().
-
-       This is intended to be called from JS code.
-
-       Example JS:
-
-       \code
-       var pc = qboard.createObject('QGIPiece');
-       qboard.props( pc, { pos:QPoint(200,200),
-           pixmap:'path/to/my.png'} );
-       qboard.addItem( pc );
-       \endcode
-
-    */
-    bool props( QObject * tgt, QScriptValue const & props );
-
-    /**
-       Returns the script-side value of tgt->property(name), or an
-       invalid value if the property is not set.
-
-       This is intended to be called from JS code.
-
-       Example JS:
-
-       \code
-       var pc = qboard.createObject('QGIPiece');
-       qboard.prop( pc, 'pos', QPoint(200,200) );
-       qboard.prop( pc, 'pixmap', 'path/to/my.png' );
-       \endcode
-    */
-    QScriptValue
-    prop( QObject * tgt, QString const & name );
-
-    /**
        Evaluates the given file as JavaScript code, in the context of
        this object's JS engine (see jsEngine()). If the file cannot
        be opened in read mode, the returned value will be an Error
