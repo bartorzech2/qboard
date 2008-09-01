@@ -410,18 +410,9 @@ void QBoardView::zoomOut()
 
 void QBoardView::zoom( qreal z )
 {
-    if( (z < 0.10) || (z>5.01) ) return; // arbitrary!
+    if( (z < 0.10) || (z>8.01) ) return; // arbitrary limits!
     if( z == impl->scale ) return;
-#if 1
     this->setProperty("scale", z);
-#else
-    impl->scale = z;
-    //qDebug() << "QBoardView::zoom()"<<impl->scale;
-    //resetTransform() undoes rotation, which is annoying. But we need it to get the behaviour i want. :/
-    this->resetTransform();
-    this->scale( impl->scale, impl->scale );
-    this->updateGeometry(); // without this, scrollbars get out of sync.
-#endif
 }
 
 void QBoardView::zoomReset()
@@ -468,18 +459,13 @@ void QBoardView::mousePressEvent( QMouseEvent * event )
     }
 #if 0
     /**
-       Weird: if i enable handdragmode in this event handler, , all
+       Weird: if i enable handdragmode in this event handler, all
        items immediately become (and stay) immobile.
     */
     if( (event->button() & Qt::LeftButton)
 	&&
 	(event->modifiers() & Qt::ControlModifier)
 	)
-// #else
-//     if( event->button() & Qt::MidButton ) // not triggering for me?
-#else
-    if(0)
-#endif
     {
 	impl->inMoveMode = true;
 	this->setInteractive( true );
@@ -488,6 +474,7 @@ void QBoardView::mousePressEvent( QMouseEvent * event )
 	event->accept();
 	return;
     }
+#endif
     if( event->button() & Qt::RightButton )
     {
 	/**
