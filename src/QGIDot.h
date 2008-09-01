@@ -65,6 +65,7 @@ private Q_SLOTS:
     //void lineDestroyed( QGIDotLine * );
     void addEdge( QGIDotLine * );
     void removeEdge( QGIDotLine * );
+    void showHelp();
 
 private:
     friend class QGIDotLine;

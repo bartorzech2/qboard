@@ -351,7 +351,7 @@ void QGIDot::contextMenuEvent( QGraphicsSceneContextMenuEvent * ev )
     m->addSeparator();
     MenuHandlerCopyCut * clipper = new MenuHandlerCopyCut( this, m );
     clipper->addDefaultEntries( m, true, this->isSelected() );
-#if 0
+#if 1
     m->addSeparator();
     m->addAction(QIcon(":/QBoard/icon/help.png"),"Help...", this, SLOT(showHelp()) );
 #endif
@@ -488,10 +488,11 @@ void QGIDot::removeEdge( QGIDotLine * li )
 		this,SLOT(removeEdge(QGIDotLine*)));
 }
 
-// void QGIDot::lineDestroyed( QGIDotLine * li )
-// {
-//     this->removeEdge(li);
-// }
+void MenuHandlerDot::showHelp()
+{
+    qboard::showHelpResource("Dots", ":/QBoard/help/classes/QGIDot.html");
+}
+
 
 struct MenuHandlerDot::Impl
 {
@@ -511,7 +512,7 @@ MenuHandlerDot::~MenuHandlerDot()
 	delete impl;
 }
 
-void MenuHandlerDot::showHelp()
+void QGIDot::showHelp()
 {
     qboard::showHelpResource("Dots", ":/QBoard/help/classes/QGIDot.html");
 }
