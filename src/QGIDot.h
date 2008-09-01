@@ -71,6 +71,7 @@ private:
     friend class QGIDotLine;
     typedef QList<QGIDotLine*> EdgeList;
     EdgeList edges() const;
+    void refreshTransformation();
 
     void updatePainter();
     struct Impl;
