@@ -60,3 +60,14 @@ if( var.canConvert<VariantS11n>() )
   ...
 }
 }}}
+
+= Serializing QObjects, QWidgets, etc. =
+
+S11nQt doesn't have routines for directly serializing QObject trees, but:
+
+  * Doing so is fairly trivial. We can easily serialize the parent/child trees.
+  * We cannot easily serialize the signal/slot connections, mainly because such connections may span across object hierarchies and s11n's pointer-following policy doesn't play well with that.
+
+It might be possible to de/serialize signal/slot connections by introducing another pass to the serialization process, where we tag all related objects, add that tag info to their serialized output, and re-build the connections from those tags during deserialization. Signals and slots are internally referred to by their stringified names, so that's not the problem. It's finding the correct object to reconnect to at deserialization time, that's the problem.
+
+That said, it is possible (and trivial) to serialize QObject trees, and QBoard does so in several places.
