@@ -21,3 +21,7 @@ The application will compile to `bin/QT_VERSION/QBoard`. To install it, simply c
 = Non-Unix systems =
 
 Instructions for building it on non-Unix environments would be appreciated, if anyone gets it working.
+
+= And now what? =
+
+Now see [HOWTOGettingStarted].
