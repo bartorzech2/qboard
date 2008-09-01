@@ -326,7 +326,7 @@ QMenu * MenuHandlerCommon::createMenu( QGraphicsItem *gi ) //, QGraphicsSceneCon
 #endif
     }
 
-    if( 2 <= selected.size() )
+    if( !gi->parentItem() && (2 <= selected.size()) )
     {
 	menu->addAction("Shuffle items",
 			new ItemShuffleHandler( menu, selected ),
