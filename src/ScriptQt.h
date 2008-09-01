@@ -251,4 +251,8 @@ namespace qboard {
 
 } // namespace
 
+#include <QList>
+#include <QGraphicsItem>
+Q_DECLARE_METATYPE(QList<QGraphicsItem*>)
+
 #endif // QBOARD_ScriptQt_H_INCLUDED
