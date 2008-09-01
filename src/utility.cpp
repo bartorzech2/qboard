@@ -330,8 +330,8 @@ namespace qboard {
     {
 	if( ! qgi ) return;
 	QRectF rec(qgi->boundingRect());
-	qreal x = rec.width()/2;
-	qreal y = rec.height()/2;
+	qreal x = rec.width()/2 + rec.left();
+	qreal y = rec.height()/2 + rec.top();
 	qgi->setTransform(QTransform().translate(x, y).rotate(angle).translate(-x, -y));
     }
 
@@ -499,8 +499,8 @@ namespace qboard {
 	if( 0 == scaleX ) scaleX = 1.0;
 	if( 0 == scaleY ) scaleY = scaleX;
 	QTransform trans;
-	qreal x = bounds.width()/2;
-	qreal y = bounds.height()/2;
+	qreal x = bounds.width()/2 + bounds.left();
+	qreal y = bounds.height()/2 + bounds.top();
 	if( center ) trans.translate(x,y);
 	trans.rotate( angle );
 	trans.scale( scaleX, scaleY );
