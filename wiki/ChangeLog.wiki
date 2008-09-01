@@ -9,9 +9,11 @@ are at the top. Dates written extra large are release dates.
 ----
 *2008 Sept 1*
 
-- Added board menu entries to create new dots and html items.
+- QGIDot objects can now be rotated. This only has a visible effect when they have children, as the children are rotated relative to the parent.
 
 - Added piece menu option to shuffle selected items. This only shows up when two or more items are selected, and randomly swaps the positions of the selected items. Parented items are not shuffled (it causes coordinate translation problems). This can be used to randomly shuffle covered pieces, shuffle cards, etc.
+
+- Added board menu entries to create new dots and html items.
 
 
 == *2008 August 31:* ==
