@@ -20,10 +20,8 @@
 struct QBoardBasePlugin::Impl
 {
     GameState * gs;
-    QBoardPluginInfo info;
     Impl() :
-	gs(0),
-	info()
+	gs(0)
     {
     }
     ~Impl()
@@ -53,16 +51,6 @@ QWidget * QBoardBasePlugin::widget()
 void QBoardBasePlugin::setGameState(GameState &s)
 {
     impl->gs = &s;
-}
-
-QBoardPluginInfo QBoardBasePlugin::pluginInfo() const
-{
-    return impl->info;
-}
-
-QBoardPluginInfo & QBoardBasePlugin::pluginInfo()
-{
-    return impl->info;
 }
 
 GameState * QBoardBasePlugin::gameState()

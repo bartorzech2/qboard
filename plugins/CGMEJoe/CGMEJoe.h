@@ -1,14 +1,11 @@
 #ifndef CGMEJOE_H_INCLUDED
 #define CGMEJOE_H_INCLUDED 1
 
-#if 0
-#  include "QBoardPlugin.h"
-#else
-// i can't get my -Includes to be passed on to moc, so we do an ugly kludge:
-#  include "../../src/QBoardPlugin.h"
-#endif
-
-class CGMEJoe : public QBoardBasePlugin
+#include <QObject>
+#include "QBoardPlugin.h"
+class CGMEJoe : public QObject,
+		public QBoardPlugin
+    
 {
 Q_OBJECT
 Q_INTERFACES(QBoardPlugin)
@@ -16,8 +13,11 @@ public:
     CGMEJoe();
     virtual ~CGMEJoe();
     virtual QWidget * widget();
+    virtual void setGameState(GameState &);
+
 private Q_SLOTS:
     void widgetDestroyed();
+    void evalJS();
 private:
     struct Impl;
     Impl * impl;
