@@ -45,7 +45,7 @@
 
 #include "highlighter.h"
 
-Highlighter::Highlighter(QTextDocument *parent)
+JSHighlighter::JSHighlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
 {
     HighlightingRule rule;
@@ -87,7 +87,7 @@ Highlighter::Highlighter(QTextDocument *parent)
     rule.format = quotationFormat;
     highlightingRules.append(rule);
 
-    functionFormat.setFontItalic(true);
+    //functionFormat.setFontItalic(true);
     functionFormat.setForeground(Qt::blue);
     rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
     rule.format = functionFormat;
@@ -97,7 +97,7 @@ Highlighter::Highlighter(QTextDocument *parent)
     commentEndExpression = QRegExp("\\*/");
 }
 
-void Highlighter::highlightBlock(const QString &text)
+void JSHighlighter::highlightBlock(const QString &text)
 {
     foreach (HighlightingRule rule, highlightingRules) {
         QRegExp expression(rule.pattern);
