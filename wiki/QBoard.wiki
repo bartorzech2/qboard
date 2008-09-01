@@ -30,6 +30,7 @@ Some things QBoard can be used for:
   * A simple interface for quickly setting up and playing a boardgame.
   * Has powerful and flexible save and load features, making it easy to add load/save support for new data types.
   * Get right to playing - there is no tedious separate setup of "gameset" and "scenario" files, as there is in, e.g., [http://cyberboard.brainiac.com/ CyberBoard] (arguably the most well-known application in this category).
+  * Has no inherent limits on how many pieces can be in play. It has been shown to easily handle more than 500 at a time.
   * As QBoard has only a fluid concept of what a "game" is, it is possible to mix and match pieces from arbitrary [Gamesets] in the same session.
   * A zoomable, rotatable playing area (game board + pieces).
   * Full control over game piece background colors, transparency, rotation, and border (color, transparency, size, line style). Finally: translucent game pieces!
