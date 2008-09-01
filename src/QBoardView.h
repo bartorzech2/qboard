@@ -43,7 +43,6 @@ public:
     bool isGLMode() const;
 
 public Q_SLOTS:
-	void updateBoardPixmap();
 	void zoomOut();
 	void zoomIn();
 	void zoom( qreal );
@@ -63,6 +62,8 @@ public Q_SLOTS:
 	nothing.
     */
     void setGLMode(bool);
+private Q_SLOTS:
+	void updateBoardPixmap();
 
 protected:
 	virtual void drawBackground( QPainter *, const QRectF & );

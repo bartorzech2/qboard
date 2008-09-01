@@ -381,6 +381,50 @@ bool GameState::deserialize(  S11nNode const & src )
     }
     return true;
 }
+static QGraphicsItem * firstSelectedQGI( QGraphicsScene * sc )
+{
+    if( ! sc ) return 0;
+    typedef QList<QGraphicsItem *> QGIL;
+    QGIL li = sc->selectedItems();
+    QGraphicsItem * qgi = 0;
+    for( QGIL::iterator it = li.begin();
+	 li.end() != it; ++it )
+    {
+	if( (*it)->isSelected() )
+	{
+	    qgi = *it;
+	    break;
+	}
+    }
+    return qgi;
+}
+
+void GameState::clipCopySelected()
+{
+    qboard::clipboardGraphicsItems( firstSelectedQGI( this->scene() ),  true );
+}
+
+void GameState::clipCutSelected()
+{
+    qboard::clipboardGraphicsItems( firstSelectedQGI( this->scene() ),  false  );
+}
+void GameState::clipPaste()
+{
+    this->pasteClipboard( QPoint(0,0) );
+}
+
+void GameState::selectAll()
+{
+    QGraphicsScene * sc = this->scene();
+    if( sc )
+    {
+	QPainterPath path;
+	path.addRect( sc->itemsBoundingRect() );
+	sc->setSelectionArea( path, Qt::IntersectsItemShape );
+    }
+
+}
+
 
 static void adjustPos( QGraphicsItem * obj, QPoint const & pos )
 {
@@ -629,4 +673,3 @@ bool GameState::pasteClipboard( QPoint const & target )
     }
     return true;
 }
-

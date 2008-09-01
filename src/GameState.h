@@ -146,6 +146,11 @@ public Q_SLOTS:
     */
     QScriptValue evalScriptFile( QString const & filename );
 
+    void clipCopySelected();
+    void clipCutSelected();
+    void clipPaste();
+    void selectAll();
+
 private Q_SLOTS:
     void placemarkerDestroyed();
 
