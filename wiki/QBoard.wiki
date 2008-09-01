@@ -38,6 +38,7 @@ Some things QBoard can be used for:
   * On-board lines, with customizable colors, line size, and transparency level. Useful for marking movement paths (or histories), firing ranges or arcs, line of sight, and such.
   * Pieces can have "child objects" which follow them around when the piece is dragged. e.g. one can add a text label, a record form, or status markers to any piece.
   * Use copy, paste, and cloning to quickly set up an army of pieces.
+  * "Shuffle" any items by selecting several items and using the Shuffle menu option. Useful for cards, simulating a cup of chits, and randomizing piece selection or placement.
   * JavaScript bindings are in the works. The basic stuff works, but this work ongoing.
 
 See also: the [TODOs] Page
@@ -45,6 +46,7 @@ See also: the [TODOs] Page
 == Requirements ==
 
   * Patience. It's beta software.
+  * An implementation of the standard C++ STL. Most compiler environments have this built in.
   * Qt 4.3.x or 4.4.x with STL support enabled and optionally with OpenGL. QBoard seems to work with Qt 4.3.0-4.3.5, but sometimes shows some significantly weird behaviours which don't show up on 4.4.
   * Platforms: it tries to be platform-independent, and it "should" work on any Qt platform which supports all the big Qt features (e.g. QWebKit, STL, etc.). i would love to hear from anyone who tries it on non-Linux platforms.
   * Some graphics which you can use as game boards and playing pieces. We've got some free gaming maps at http://wanderinghorse.net/gaming/maps and free counters (playing pieces) at http://wanderinghorse.net/gaming/counters.
