@@ -77,7 +77,10 @@ S11N_CXXFLAGS = $$S11N_INCLUDES
 S11N_OBJ_DIR = $$OBJECTS_DIR/s11n
 QBOARD_CXXFLAGS = $$S11N_CXXFLAGS -DQBOARD_VERSION=$$QBOARD_VERSION -I$$REL_SRCDIR/src
 
-QBOARD_INCLUDES = -I$$REL_SRCDIR/src -I$$MOC_DIR -I$$UI_DIR
+# QBOARD_INCLUDES = -I$$REL_SRCDIR/src -I$$MOC_DIR -I$$UI_DIR
+QMAKE_INCDIR += $$SRC_DIR
+
+DEFINES += QT_DLL
 # INCLUDES += $$QBOARD_INCLUDES
 ########################################################################
 # S11N_xxx have to do with the libs11n code.
