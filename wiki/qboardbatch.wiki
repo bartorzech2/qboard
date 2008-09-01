@@ -1,5 +1,5 @@
 #summary The qboardbatch gameset creation tool
-#labels Docs-User
+#labels Deprecated
 
 _*As of 26 August 2008 qboardbatch has been removed. It is being replaced by JavaScript bindings, which are much more powerful.*_
 
