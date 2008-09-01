@@ -30,9 +30,24 @@ The distribution contains code for de/serializing the following Qt types:
   * QTransform
   * Many forms of QVariant, including QVariants holding any SerializableType object (with a little help - see below).
 
-It also comes with proxy objects which allow QIODevices to be used via the STL i/ostream interfaces (so you can e.g. save s11n data out to a QFile instead of a std::ofile).
+That is, by including the propery header file, one can use those objects via the s11nlite API, e.g.:
 
-The code is central to QBoard's save/load features and is believed to work quite well.
+{{{
+#include "S11nQt.h"
+#include "S11Qt/QPoint.h"
+#include "S11Qt/QVariant.h"
+...
+
+QPoint p(20,30);
+s11nlite::save( p, std::cout );
+QVariant var( QRectF(23.3,34.4,27,94) );
+s11nlite::save( var, std::cout );
+}}}
+
+
+S11nQt also comes with proxy objects which allow QIODevices to be used via the STL i/ostream interfaces (so you can e.g. save s11n data out to a QFile instead of a std::ofile).
+
+This code is central to QBoard's save/load and copy/paste features and is believed to work quite well.
 
 Suggestions, fixes, etc., are of course always welcome.
 
