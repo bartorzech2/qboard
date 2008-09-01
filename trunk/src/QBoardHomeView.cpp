@@ -192,10 +192,13 @@ void QBoardHomeView::mouseDoubleClickEvent( QMouseEvent * event )
     impl->model->setReadOnly( false );
     if(0) qDebug() << "QBoardHomeView::mouseDoubleClickEvent(): "
 		   << impl->model->filePath(impl->current);
-    QFileInfo fi( impl->model->fileInfo(impl->current) );
-    if( fi.isFile() )
+    if( impl->current.isValid() )
     {
-	emit itemActivated( fi );
+	QFileInfo fi( impl->model->fileInfo(impl->current) );
+	if( fi.isFile() )
+	{
+	    emit itemActivated( fi );
+	}
     }
 }
 
