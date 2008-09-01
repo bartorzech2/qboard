@@ -13,10 +13,10 @@
  *
  */
 
-
 #include <QObject>
 #include <QScriptable>
 #include <QScriptValue>
+class QGraphicsItem;
 class GameState;
 class JSGameState : public QObject,
 		    public QScriptable
@@ -25,6 +25,8 @@ Q_OBJECT
 public:
     explicit JSGameState( QObject * parent = 0 );
     virtual ~JSGameState();
+
+    Q_INVOKABLE QList<QGraphicsItem*> items();
 
 public Q_SLOTS:
     void bogo();
@@ -92,5 +94,4 @@ private:
     Impl * impl;
     GameState * self();
 };
-
 #endif // QBOARD_JSGameState_H_INCLUDED

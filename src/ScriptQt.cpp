@@ -20,6 +20,12 @@
 #include <QGraphicsScene>
 #include <QSharedData>
 #include <QIcon>
+#include <QScriptValueIterator>
+#include <QList>
+
+#include <QMetaType>
+Q_DECLARE_METATYPE(QList<QGraphicsItem*>)
+ 
 
 namespace qboard {
 
@@ -178,6 +184,35 @@ namespace qboard {
 	out = dynamic_cast<QGraphicsScene*>(object.toQObject());
     }
 
+    typedef QList<QGraphicsItem*> QGIList;
+    QScriptValue qgilistToScriptValue(QScriptEngine *js, QGIList const &in)
+    {
+	QScriptValue ar = js->newArray();
+	unsigned int ndx = 0;
+	foreach( QGraphicsItem * gi, in )
+	{
+	    QScriptValue o = qgiToScriptValue(js,gi);
+	    if( o.isObject() )
+	    {
+		ar.setProperty( ndx++, o );
+	    }
+	}
+	return ar;
+    }
+
+    void qgilistFromScriptValue(const QScriptValue &jso, QGIList &out)
+    {
+	if( ! jso.isObject() ) return;
+	QScriptValueIterator it( jso );
+	while( it.hasNext() )
+	{
+	    it.next();
+	    QGraphicsItem * qgi = 0;
+	    qgiFromScriptValue( it.value(), qgi );
+	    if( ! qgi ) continue;
+	    out.push_back( qgi );
+	}
+    }
 
 
     QScriptValue qsizeToScriptValue(QScriptEngine *engine, const QSize &s)
@@ -201,6 +236,7 @@ namespace qboard {
 
 	qScriptRegisterMetaType(js, qgiToScriptValue, qgiFromScriptValue);
 	qScriptRegisterMetaType(js, qgsToScriptValue, qgsFromScriptValue);
+	qScriptRegisterMetaType(js, qgilistToScriptValue, qgilistFromScriptValue);
 
 	glob.setProperty("QSize", js->newFunction(QSize_ctor));
 // 	qScriptRegisterMetaType(js, qsizeToScriptValue, qsizeFromScriptValue);

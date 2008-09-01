@@ -70,6 +70,12 @@ GameState * JSGameState::self()
     return s;
 }
 
+QList<QGraphicsItem*> JSGameState::items()
+{
+    SELF(QList<QGraphicsItem*>());
+    return self->scene()->items();
+}
+
 bool JSGameState::prop( QObject * obj,
 		      QString const & name,
 		      //QVariant const & val
@@ -78,7 +84,7 @@ bool JSGameState::prop( QObject * obj,
 {
     if( ! obj || name.isEmpty() ) return false;
     QVariant var(val.toVariant());
-    qDebug() << "JSGameState::prop(obj,"<<name<<","<<var<<")";
+    if(0) qDebug() << "JSGameState::prop(obj,"<<name<<","<<var<<")";
     obj->setProperty(name.toAscii().constData(),var);
     return val.isValid();
 }
@@ -94,7 +100,7 @@ JSGameState::prop( QObject * obj,
 
 bool JSGameState::props( QObject * tgt, QScriptValue const & props )
 {
-    qDebug() << "JSGameState::prop(obj,properties)";
+    if(0) qDebug() << "JSGameState::prop(obj,properties)";
     if( !tgt || ! props.isObject() ) return false;
     QScriptValueIterator it( props );
     while( it.hasNext() )
