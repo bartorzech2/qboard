@@ -16,6 +16,7 @@
 #include <QObject>
 #include <QScriptEngine>
 #include <QScriptValue>
+class QScriptContext;
 #include <QSharedData>
 #include <QString>
 #include <QAction>
@@ -149,6 +150,104 @@ namespace qboard {
 	Impl * impl;
     };
 
+
+    /**
+       ScriptArgv is intended to simplify access to QScriptValue
+       arrays by providing ++ and [] operators. This makes
+       accessing arguments very C-like.
+
+       example:
+
+       \code
+       ScriptArgv argv(ctx);
+       if( argv.argc() == 2 )
+       {
+           int x = (argv++).toInt32(); // ctx->argument(0)
+           int y = argv().toInt32(); // ctx->argument(1)
+       }
+       \endcode
+    */
+    class ScriptArgv
+    {
+    public:
+	/**
+	   Initialized argument traversal for the given context.
+	   Does not affect ownership of cx.
+
+	   Results of this object's operators are undefined if
+	   cx->argumentCount() (or the arguments array) changes during
+	   the lifetime of this object.
+	*/
+	explicit ScriptArgv( QScriptContext * cx );
+
+	/**
+	   Returns the current value, or an invalid value if this
+	   object has been incremented out of range.
+	*/
+	QScriptValue value() const;
+
+	/**
+	   Equivalent to value().
+	*/
+	operator QScriptValue() const;
+
+	/**
+	   Equivalent to value().
+	*/
+	QScriptValue operator()() const;
+
+	/**
+	   Prefix ++. Increments the internal counter and returns that
+	   item. Returns invalid values once incremented out of
+	   bounds.
+
+	   Remember that the default starting argument position is 0,
+	   so calling (++thisObj) as the first operation would skip
+	   the first argument.
+	*/
+	QScriptValue operator++();
+	/**
+	   Postfix ++. Returns the current item and increments the
+	   internal counter. Returns invalid values once incremented
+	   out of bounds.
+	*/
+	QScriptValue operator++(int);
+
+	/**
+	   Returns the script value at the given index, or an invalid
+	   value if the index is out of bounds. Note that this index
+	   is not affected by the ++ operators, and is always relative
+	   to 0.
+	*/
+	QScriptValue operator[](int) const;
+
+	/**
+	   Equivalent to operator[].
+	*/
+	QScriptValue operator()(int) const;
+
+	/**
+	   Returns this object's argument count.
+	*/
+	int argc() const;
+
+	/**
+	   Resets the ++ operators, such that (thisObj++) will again
+	   return the first value.
+	*/
+	void reset();
+
+	/**
+	   Returns true only if this object has arguments and has not
+	   been incremented out of bounds.
+	*/
+	bool isValid() const;
+
+    private:
+	QScriptContext * m_cx;
+	int m_at;
+	int m_max;
+    };
 
 } // namespace
 

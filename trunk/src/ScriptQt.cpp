@@ -46,14 +46,15 @@ namespace qboard {
 	qDebug() << "QPointF_ctor(cx,engine) argc =="<<argc;
 	int x = 0;
 	int y = 0;
+	ScriptArgv argv(ctx);
 	if( 1 == argc )
 	{
-	    x = y = ctx->argument(0).toInt32();
+	    x = y = argv[0].toInt32();
 	}
 	else if( 2 == argc )
 	{ // QPointF(x,y)
-	    x = ctx->argument(0).toInt32();
-	    y = ctx->argument(1).toInt32();
+	    x = (argv++).toInt32();
+	    y = argv().toInt32();
 	}
 	QScriptValue self = ctx->thisObject();
 	self.setProperty("x",QScriptValue(eng,x));
@@ -84,21 +85,21 @@ namespace qboard {
 	qDebug() << "qpointFromScriptValue(engine,"<<s<<")";
     }
 
-
     QScriptValue QPoint_ctor(QScriptContext *ctx, QScriptEngine *eng)
     {
 	int argc = ctx->argumentCount();
 	qDebug() << "QPoint_ctor(cx,engine) argc =="<<argc;
 	int x = 0;
 	int y = 0;
+	ScriptArgv argv(ctx);
 	if( 1 == argc )
 	{
-	    x = y = ctx->argument(0).toInt32();
+	    x = y = argv[0].toInt32();
 	}
 	else if( 2 == argc )
 	{ // QPoint(x,y)
-	    x = ctx->argument(0).toInt32();
-	    y = ctx->argument(1).toInt32();
+	    x = (argv++).toInt32();
+	    y = (argv++).toInt32();
 	}
 	return eng->toScriptValue(QPoint(x,y));
 	/** what's the difference between toScriptValue()
@@ -169,7 +170,7 @@ namespace qboard {
 	QObject * obj = dynamic_cast<QObject*>(in);
 	return obj
 	    ? engine->newQObject(obj)
-	    : QScriptValue();
+	    : engine->nullValue();
     }
     
     void qgsFromScriptValue(const QScriptValue &object, QGraphicsScene* &out)
@@ -338,4 +339,68 @@ namespace qboard {
 			    this->objectName() );
     }
 
+    ScriptArgv::ScriptArgv( QScriptContext * cx )
+	: m_cx(cx),
+	  m_at(0),
+	  m_max(cx ? cx->argumentCount() : -1)
+    {
+
+    }
+
+    QScriptValue ScriptArgv::value() const
+    {
+	return m_cx
+	    ? m_cx->argument(m_at)
+	    : QScriptValue();
+    }
+    ScriptArgv::operator QScriptValue() const
+    {
+	return this->value();
+    }
+
+    QScriptValue ScriptArgv::operator()() const
+    {
+	return this->value();
+    }
+
+    QScriptValue ScriptArgv::operator()( int ndx ) const
+    {
+	return this->operator[]( ndx );
+    }
+
+    QScriptValue ScriptArgv::operator++()
+    {
+	return ( m_cx && (m_at < (m_max-1)) )
+	    ? m_cx->argument(++m_at)
+	    : QScriptValue();
+    }
+
+    QScriptValue ScriptArgv::operator++(int)
+    {
+	return ( m_cx && (m_at < m_max) )
+	    ? m_cx->argument(m_at++)
+	    : QScriptValue();
+    }
+
+    QScriptValue ScriptArgv::operator[](int ndx) const
+    {
+	return (m_cx && (m_max>=0) && (ndx>=0) && (ndx<=m_max) )
+	    ? m_cx->argument(ndx)
+	    : QScriptValue();
+    }
+
+    int ScriptArgv::argc() const
+    {
+	return m_max;
+    }
+
+    void ScriptArgv::reset()
+    {
+	m_at = 0;
+    }
+
+    bool ScriptArgv::isValid() const
+    {
+	return m_cx && (m_max>=0) && (m_at<=m_max);
+    }
 } //namespace
