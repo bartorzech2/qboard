@@ -18,6 +18,8 @@
 #include <QTextEdit>
 #include <QDebug>
 #include <QGraphicsView>
+#include <QCursor>
+#include <QApplication>
 
 #include <stdexcept>
 
@@ -337,6 +339,7 @@ namespace qboard {
 
     bool clipboardScene( QGraphicsScene * gsc, bool copy, QPointF const & origin )
     {
+	if( ! gsc ) return false;
 	if(0) qDebug() <<"qboard::clipboardScene("<<gsc<<","<<copy<<","<<origin<<")";
 	typedef QList<QGraphicsItem *> QGIL;
 	QGIL toCut;
@@ -417,7 +420,6 @@ namespace qboard {
 	return clipboardScene( gvi->scene(), copy, calculateCenter(gvi) );
 #endif
     }
-
 
     QRectF calculateBounds( QGraphicsItem * qgi, bool skipParented )
     {
@@ -571,4 +573,16 @@ namespace qboard {
 	    : QList<QGraphicsItem*>();
 
     }
+
+    QPoint findViewMousePoint( QGraphicsView * view )
+    {
+	if( ! view ) return QPoint();
+	QWidget * vp = view->viewport();
+	QPoint glpos( QCursor::pos() );
+	QWidget * wa = QApplication::widgetAt( glpos );
+	if( wa != vp ) return QPoint();
+	return view->mapToScene( view->mapFromGlobal(glpos) ).toPoint();
+    }
+
+
 } // namespace

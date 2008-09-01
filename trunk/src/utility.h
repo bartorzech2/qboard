@@ -345,6 +345,12 @@ namespace qboard
     */
     QList<QGraphicsItem*> childItems( QGraphicsItem const * );
 
+    /**
+       If the mouse is over the view, it returns the scene-relative
+       position of the mouse cursor, otherwise it returns (0,0).
+    */
+    QPoint findViewMousePoint( QGraphicsView * view );
+
 }
 
 #endif // QBOARD_UTILITY_H_INCLUDED
