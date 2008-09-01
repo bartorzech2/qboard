@@ -6,7 +6,7 @@ QBoard uses [http://s11n.net libs11n] for its serialization (save/load) support,
 
 = What file format(s) is(are) used? =
 
-In principal, QBoard can save and load files of any type supported by libs11n. It does not rely on a single data form - libs11n supports 6 or 7 different ones, and which one is used is a detail we don't really care about. QBoard can load any data saved by any libs11n client, but whether or not QBoard can use that data is a whole other question. Loading is inherently context-specific, and QBoard may not be able to handle data of a given type in a given context.
+In principal, QBoard can save and load files of any type supported by libs11n. It does not rely on a single data format - libs11n supports 6 or 7 different ones, and which one is used is a detail we don't really care about. QBoard can load any data saved by any libs11n client, but whether or not QBoard can use that data is a whole other question. Loading is inherently context-specific, and QBoard may not be able to handle data of a given type in a given context.
 
 libs11n uses various text formats. An example of a serialized QGIPiece (standard game piece) object is:
 
