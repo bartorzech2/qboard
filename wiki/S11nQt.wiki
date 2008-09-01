@@ -30,7 +30,7 @@ The distribution contains code for de/serializing the following Qt types:
   * QTransform
   * Many forms of QVariant, including QVariants holding any SerializableType object (with a little help - see below).
 
-That is, by including the propery header file, one can use those objects via the s11nlite API, e.g.:
+That is, after including the proper header file(s) (which register(s) a specific Qt type with libs11n), one can use those objects via the s11nlite API, e.g.:
 
 {{{
 #include "S11nQt.h"
