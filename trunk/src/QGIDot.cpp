@@ -176,6 +176,20 @@ void QGIDot::updatePainter()
     this->setRect( QRectF(-r,-r,r*2,r*2) );
 }
 
+void QGIDot::refreshTransformation()
+{
+    QVariant v( this->property("angle") );
+    qreal angle = v.canConvert<qreal>() ? v.value<qreal>() : 0.0;
+    v = this->property("scale");
+    qreal scale = v.canConvert<qreal>() ? v.value<qreal>() : 1.0;
+    if( 0 == scale ) scale = 1.0;
+    QTransform tr( qboard::rotateAndScale( this->boundingRect(), angle, scale, scale, true ) );
+    // TODO:
+    // horizontal/vertical flip
+    // shearing
+    this->setTransform( tr );
+}
+
 void QGIDot::propertySet( char const *pname, QVariant const & var )
 {
     // FIXME: treat QVariant::Invalid appropriately for each property
@@ -220,11 +234,9 @@ void QGIDot::propertySet( char const *pname, QVariant const & var )
     	this->update();
 	return;
     }
-    if( "scale" == key )
+    if( ("scale" == key) || ("angle" == key) )
     {
-	qreal scale = var.canConvert<qreal>() ? var.value<qreal>() : 1.0;
-	if( 0 == scale ) scale = 1.0;
-	qboard::rotateAndScale( this, 0, scale, scale, true);
+	this->refreshTransformation();
 	return;
     }
     if( "radius" == key )
@@ -324,6 +336,10 @@ void QGIDot::contextMenuEvent( QGraphicsSceneContextMenuEvent * ev )
 						    0.5, 3.01, 0.5);
 	pm->setIcon(QIcon(":/QBoard/icon/viewmag.png"));
 	m->addMenu(pm);
+	m->addMenu( QObjectPropertyMenu::makeNumberListMenu("Rotate",
+							    selected,
+							    "angle",
+							    0,360,15) );
     }
 
     QMenu * mMisc = m->addMenu("Misc.");
