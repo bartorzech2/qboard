@@ -1,0 +1,20 @@
+<strong>Using the QGIDot widget:</strong>
+
+<p>
+QGIDot is simply a dot. Dots can represent many things in a board game,
+from standalone playing pieces, to state change markers, to little
+glass beads (which they superficially resemble). Their color/transparency, size, and scale can all be changed from the popup menu.
+</p>
+
+
+<strong>Lines</strong>
+<p>
+Dots can be used as-is or can be "split" into a line. To do so, use the right-click popup menu. Once a dot is "split", it takes on a new child
+dot and draws a line between itself and that dot. Destroying the child will destroy the line, but not the parent. The child may, in turn, be split. At that point, destroying the first child will also destroy the second (because the second is actually a child of the first item). To destroy the whole line, remove the initial dot.
+</p>
+
+<p>
+Because of the parent/child relationship(s) a split dot has, when one drags
+a dot, all (sub)children of that dot will be moved along with it. This is
+unfortunate, but is a limitation we currently have to live with.
+</p>
