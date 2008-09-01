@@ -22,10 +22,9 @@
 #include <QIcon>
 #include <QScriptValueIterator>
 #include <QList>
-
+#include <QMessageBox>
 #include <QMetaType>
-Q_DECLARE_METATYPE(QList<QGraphicsItem*>)
- 
+
 
 namespace qboard {
 
@@ -228,7 +227,83 @@ namespace qboard {
 	s.setWidth( obj.property("width").toInt32() );
 	s.setHeight( obj.property("height").toInt32() );
     }
-   
+    /**
+       JS usage:
+
+       alert("Hi!");
+
+       Shows a dialog box with a single OK button. Returns an undefined
+       value.
+    */
+    static QScriptValue js_alert(QScriptContext *ctx, QScriptEngine *eng)
+    {
+	QMessageBox::warning( 0, "JavaScript alert()",
+			      ctx->argument(0).toString(),
+			      QMessageBox::Ok, QMessageBox::Ok );
+	return eng->undefinedValue();
+    }
+
+    /**
+       JS usage:
+
+       var x = confirm("Really do .... ???");
+
+       Shows a dialog box asking for confirmation and returns
+       true if OK is selected, else false.
+    */
+    static QScriptValue js_confirm(QScriptContext *ctx, QScriptEngine *eng)
+    {
+	return QScriptValue(eng,
+			    QMessageBox::Ok ==
+			    QMessageBox::question( 0,
+				   "JavaScript confirm()",
+				   ctx->argument(0).toString(),
+				   QMessageBox::Ok | QMessageBox::Cancel )
+			    );
+    }
+
+    /**
+       JS usage:
+
+       randomInt(n) selects a random integer in the range [0,n). e.g.
+       randomInt(6) select a number between 0 and 5.
+
+       randomInt(n,m) selects a number in the range [n,m]. e.g.
+       randomInt(1,6) selects a number between 1 and 6.
+    */
+    static QScriptValue js_randomInt(QScriptContext *ctx, QScriptEngine *eng)
+    {
+	ScriptArgv av(ctx);
+	int low = 0;
+	int high = 0;
+	if( 1 == av.argc() )
+	{
+	    high = av().toInt32()-1;
+	}
+	else if( 2 == av.argc() )
+	{
+	    low = av[0].toInt32();
+	    high = av[1].toInt32();
+	}
+	if( low == high ) return QScriptValue(eng,low);
+	if( high < low )
+	{
+	    int x = high;
+	    high = low;
+	    low = x;
+	}
+	static bool seeded;
+	if( ! seeded )
+	{
+	    seeded = true;
+	    qsrand( uint(static_cast<void*>(ctx)) );
+	}
+
+	int rc = ( qrand() % (high - low + 1) ) + low;
+	return QScriptValue(eng, rc);
+    }
+
+
     QScriptEngine * createScriptEngine( QObject * parent )
     {
 	QScriptEngine * js = new QScriptEngine( parent );
@@ -243,6 +318,15 @@ namespace qboard {
 	glob.setProperty("QColor", js->newFunction(QColor_ctor));
 	glob.setProperty("QPoint", js->newFunction(QPoint_ctor));
 	glob.setProperty("QPointF", js->newFunction(QPointF_ctor));
+	glob.setProperty("alert",
+			 js->newFunction(js_alert),
+			 QScriptValue::ReadOnly | QScriptValue::Undeletable );
+	glob.setProperty("confirm",
+			 js->newFunction(js_confirm),
+			 QScriptValue::ReadOnly | QScriptValue::Undeletable );
+	glob.setProperty("randomInt",
+			 js->newFunction(js_randomInt),
+			 QScriptValue::ReadOnly | QScriptValue::Undeletable );
  	/**
 	   Damn... if i have both a QPoint ctor and to/fromScriptValue routines
 	   then none of it works.
