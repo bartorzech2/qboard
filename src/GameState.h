@@ -37,8 +37,6 @@ class QScriptEngine;
 
    - a single QBoard object (the game board)
 
-   - a single QBoardView object (the visual representation of the board).
-
    - a QScriptEngine with some QBoard-specific functionality added to
    it.
 
@@ -55,7 +53,6 @@ Q_OBJECT
 public:
     GameState();
     virtual ~GameState();
-
 
     /**
        This object's game board.
@@ -107,7 +104,13 @@ public:
 
 public Q_SLOTS:
     /**
+       Enables a specially-treated "placemarker" item. It can be moved
+       around by calling setPlacementPos() or via drag/drop. Calling
+       placementPos() will return the position of the placemarker.
 
+       The placemarker is disabled (the default), setPlacementPos()
+       and placementPos() will still have an effect, but there will be
+       no GUI component for it.
     */
     void enablePlacemarker( bool );
 
