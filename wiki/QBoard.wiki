@@ -3,12 +3,13 @@
 
 = Welcome to QBoard =
 
-
 QBoard is a UI for playing near-arbitrary board games. It is mainly intended as
 a prototyping platform for testing/playing my own boardgame designs.
 
 QBoard is a "re-imagining" of a much older project of mine called
 [http://qub.sourceforge.net|QUB, the Q Universal Boardgame]. QUB was quite monolithic, and its sheer size eventually caused its downfall. While QBoard originally aimed to be a fairly minimalistic application, Qt makes it pretty easy to just keep adding features, so QBoard already does a lot more than was originally planned.
+
+For information on getting started with QBoard, see [HOWTOGettingStarted].
 
 == Screenshots ==
 
@@ -50,7 +51,7 @@ See also: the [TODOs] Page
   * Qt 4.3.x or 4.4.x with STL support enabled and optionally with OpenGL. QBoard seems to work with Qt 4.3.0-4.3.5, but sometimes shows some significantly weird behaviours which don't show up on 4.4.
   * Platforms: it tries to be platform-independent, and it "should" work on any Qt platform which supports all the big Qt features (e.g. QWebKit, STL, etc.). i would love to hear from anyone who tries it on non-Linux platforms.
   * Some graphics which you can use as game boards and playing pieces. We've got some free gaming maps at http://wanderinghorse.net/gaming/maps and free counters (playing pieces) at http://wanderinghorse.net/gaming/counters.
-  * [http://s11n.net libs11n] 1.2.7+. It comes with a standalone copy of s11n, so you don't need to download it. (A copy is used because libs11n can't work as a DLL on Windows due to broken linking conventions on those platforms, so we have to compile it directly in.) s11n requires a fairly recent C++ compiler - gcc 4.1+ are believed to be okay, as are newer MS compilers.
+  * [http://s11n.net libs11n] 1.2.7+. It comes with a standalone copy of s11n, so you don't need to download it. s11n requires a fairly recent C++ compiler - gcc 4.1+ are believed to be okay, as are newer MS compilers.
 
 
 == Development Status ==
