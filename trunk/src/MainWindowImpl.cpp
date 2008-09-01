@@ -652,7 +652,7 @@ void MainWindowImpl::doSomethingExperimental()
 	{
 	    QBoardPlugin * plug = 0;
 	    QDir pluginsDir(qApp->applicationDirPath());
-	    QString fname = pluginsDir.absoluteFilePath("plugins/libCGMEJoe.so");
+	    QString fname = pluginsDir.absoluteFilePath("plugins/libJSEditor.so");
 	    qDebug() << "fname =="<<fname;
 #if QT_VERSION >= 0x040400
 	    qDebug() << "pluginsDir =="<<pluginsDir;
