@@ -39,6 +39,22 @@ private:
 	QGraphicsItem * gitem;
 };
 
+class ItemShuffleHandler : public QObject
+{
+Q_OBJECT
+public:
+    typedef QList<QGraphicsItem *> ListType;
+    /**
+       This object's ownership is transfered to parent.
+    */
+    explicit ItemShuffleHandler( QObject * parent, ListType list );
+    virtual ~ItemShuffleHandler();
+public Q_SLOTS:
+    void doShuffle();
+private:
+    ListType list;
+};
+
 /**
 	Implements some menu behaviours common to most
 	QBoard-related QGraphicsItems
