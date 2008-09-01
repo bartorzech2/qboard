@@ -82,6 +82,8 @@ void QGITypes::shuffleQGIList( QList<QGraphicsItem*> list, bool skipParentedItem
     }
     if( ! i ) return;
     std::random_shuffle( &vec[0], &vec[i], shuffleRand );
+    //std::random_shuffle( &pts[0], &pts[i], shuffleRand );
+    std::random_shuffle( &zvals[0], &zvals[i], shuffleRand );
     for( unsigned int x = 0; x < i; ++x )
     {
 	QGraphicsItem * gi = vec[x];
