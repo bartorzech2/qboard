@@ -51,12 +51,12 @@
 
 class QTextDocument;
 
-class Highlighter : public QSyntaxHighlighter
+class JSHighlighter : public QSyntaxHighlighter
 {
     Q_OBJECT
 
 public:
-    Highlighter(QTextDocument *parent = 0);
+    JSHighlighter(QTextDocument *parent = 0);
 
 protected:
     void highlightBlock(const QString &text);

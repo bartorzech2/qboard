@@ -96,7 +96,7 @@ QWidget * JSEditor::widget()
 	QGridLayout * lay = new QGridLayout(fr);
 	QPushButton * but = new QPushButton("Evaluate");
 	QTextEdit * editor = new QTextEdit;
-	Highlighter * h = new Highlighter(editor->document());
+	new JSHighlighter(editor->document());
 	editor->setPlainText(srccode);
 	lay->addWidget( editor, 0, 0 );
 	lay->addWidget( but, 1, 0);
