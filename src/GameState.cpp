@@ -164,6 +164,8 @@ void GameState::setup()
     {
 	throw std::runtime_error("GameState::setup(): jsThis is not a QObject.");
     }
+    impl->jsThis.setProperty( "client", impl->js->newObject() );
+
     QScriptValue sval;
 #if 0
     sval = impl->js->newFunction(jsEtGameProperty);
