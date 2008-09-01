@@ -47,14 +47,12 @@ Here are some example of things which currently work:
 qboard.clear(); // clears the board of all items
 qboard.board.loadPixmap( "maps/myMap.jpg" );
 var pc = qboard.createObject('QGIHtml'); // create new piece
-qboard.addItem( pc ); // add piece to the board
 qboard.props( pc,{ // set a few properties:
   html:"<body bgcolor='#ffffff'>This is my text</body>",
   pos:QPoint(30,50)
 });
 // Create a new piece:
 pc = qboard.createObject('QGIPiece');
-qboard.addItem(pc);
 qboard.props(pc,{
   pixmap:'counters/sample/003-mage.png',
   pos:QPoint(50,50),
