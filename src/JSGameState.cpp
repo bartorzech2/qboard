@@ -112,7 +112,7 @@ JSGameState::prop( QObject * obj,
     if( obj && !name.isEmpty() )
     { // my setDefaultPrototype() is not working for QVariant, so i'll hack in a prototype here...
 	QVariant var( obj->property(name.toAscii().constData()) );
-	qDebug() << "JSGameState::prop(["<<obj<<"],["<<name<<"]) variant =="<<var;
+	if(0) qDebug() << "JSGameState::prop(["<<obj<<"],["<<name<<"]) variant =="<<var;
 	ret = js->newVariant( var );
 	ret.setPrototype( impl->qvprotoj );
     }
@@ -163,25 +163,6 @@ QObject * JSGameState::createObject( QString const & className,
     {
 	self->addItem(git);
     }
-#if 0
-    QScriptValue v = js->newQObject(o, QScriptEngine::AutoOwnership
-				    //,QScriptEngine::AutoCreateDynamicProperties
-				    //| QScriptEngine::PreferExistingWrapperObject
-				    );
-    // never being called when obj.pos called.
-    //v.setProperty("pos", impl->js->newFunction(getObjectPos), QScriptValue::PropertyGetter );
-    QScriptValue fun = impl->js->newFunction(jsEtGameProperty);
-    if( ! fun.isFunction() )
-    {
-	qDebug() <<"JSGameState::createObject(obj) prop function creation failed.";
-    }
-    else
-    {
-	// WTF does this end up undefined in script:
-	v.setProperty("xyz",fun);
-	//v.setProperty("xyz",QScriptValue(impl->js,"wtf"));
-    }
-#endif
     return o;
 }
 
