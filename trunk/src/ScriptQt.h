@@ -186,6 +186,15 @@ namespace qboard {
            int y = argv().toInt32(); // ctx->argument(1)
        }
        \endcode
+
+       or:
+
+       \code
+       for( ScriptArgv argv(ctx); argv.isValid(); ++argv )
+       {
+           qDebug() << argv.value().toString();
+       }
+       \endcode
     */
     class ScriptArgv
     {
@@ -269,12 +278,54 @@ namespace qboard {
 	int m_max;
     };
 
+
+    /**
+       JSVariantPrototype is intended to be used as a JS prototype
+       object for JS-side QVariant values. My initial attempts at
+       setting it as the default prototype for all QVariants failed,
+       so here's how to do it:
+
+       First, set up a prototype object somewhere in your app (you only
+       need one instance):
+
+       \code
+	QScriptValue proto = engine->newQObject(new JSVariantPrototype(engine));
+	\endcode
+
+	Then you can apply that prototype object to all QVariants of your
+	choosing:
+
+       \code
+       QVariant var( ... );
+       QScriptValue val( engine->newVariant( var ) );
+       val.setPrototype( proto );
+       \endcode
+
+       Now val will have the additional script-side API provided by
+       this type.
+
+       In theory one can call:
+
+       \code
+       engine->setDefaultPrototype(
+           qMetaTypeId<QVariant>(),
+           engine->newQObject(proto));
+       \endcode
+
+       to set the prototype engine-wide, but this isn't working for
+       me. Dunno why.
+
+    */
     class JSVariantPrototype :
 	public QObject,
 	public QScriptable
     {
 	Q_OBJECT
     public:
+	/**
+	   Sets this object's QObject parent to parent, transfering
+	   ownership if parent is not 0.
+	*/
 	explicit JSVariantPrototype( QObject * parent = 0 );
 	virtual ~JSVariantPrototype();
 
@@ -284,13 +335,16 @@ namespace qboard {
 	/**
 	   Returns a stringified form of this object's
 	   QVariant. String string will be the same as it is when a
-	   QVariant is passed to qDebug().
+	   QVariant is passed to qDebug(), so it cannot be eval'd
+	   or anything like that.
 	*/
 	QString toString();
+
 	/**
 	   Returns this object's QVariant's userType() value.
 	*/
 	int variantType();
+
 	/**
 	   Tries to convert this object's QVariant to
 	   a generic JS object. Null is returned if no
@@ -305,22 +359,21 @@ namespace qboard {
 
 	   - QVariant::Color, returns a string value
 
-	   - QVariant::DateTime, a new JS Date object.
+	   - QVariant::DateTime, returns a new JS Date object
 
-	   - QVariant::Point/PointF, JS properties = x, y
+	   - QVariant::Point/PointF, JS object: {x:XXX,y:YYY}
 
-	   - QVariant::RegExp, a new JS RegExp
+	   - QVariant::RegExp, returns a new JS RegExp object
 
-	   - QVariant::Size, JS properties = width, height
+	   - QVariant::Size, JS object: {width:WWW,height:HHH}
 
-	   Note that objects created this way cannot simply
-	   be passed back to routines which expect those
-	   native types. e.g. you cannot pass {x:1,y:2}
-	   to a routine which expects a QPoint, even though
-	   this routine will convert a QPoint to an object
+	   Note that objects created this way cannot simply be passed
+	   back to routines which expect those native types. e.g. you
+	   cannot pass {x:1,y:2} to a routine which expects a QPoint,
+	   even though this routine will convert a QPoint to an object
 	   with x/y properties.
 	*/
-	QScriptValue value();
+	QScriptValue jsValue();
 
 	/**
 	   see qboard::toSource<QVariant>().
