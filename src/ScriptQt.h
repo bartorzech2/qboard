@@ -87,7 +87,10 @@ namespace qboard {
     template <typename PT>
     struct convert_script_value_point
     {
-	QScriptValue operator()( QScriptEngine *, const PT & ) const;
+	/**
+	   Creates {x:pt.x(),y:pt.y()}
+	*/
+	QScriptValue operator()( QScriptEngine *, const PT & pt) const;
 	/**
 	   If args has a length property then it is assumed to contain
 	   at least two values, the first two of which are used as
@@ -104,10 +107,22 @@ namespace qboard {
     struct convert_script_value<QPointF> : convert_script_value_point<QPointF> {};
 
 
+    /**
+       Converts QRect/QRectF to/from QScriptValue.
+    */
     template <typename RT>
     struct convert_script_value_rect
     {
-	QScriptValue operator()( QScriptEngine *, const RT & ) const;
+	/**
+	   Creates {left:r.left(),top:r.top(),width:r.width(),height:r.height()}
+	*/
+	QScriptValue operator()( QScriptEngine *, const RT & r) const;
+	/**
+	   If args is an array or special arguments object, it is assumed to
+	   contain 4 numeric values, otherwise it is assumed to be an
+	   object containing these numeric properties: top, left, width, height.
+	   Returns a rectangle with those bounds.
+	*/
 	RT operator()( QScriptEngine *, const QScriptValue & args) const;
     };
 
@@ -118,11 +133,25 @@ namespace qboard {
     struct convert_script_value<QRectF> : convert_script_value_rect<QRectF> {};
 
 
-    template <typename RT>
+    /**
+       Converts QSize/QSizeF to/from QScriptValue.
+    */
+    template <typename ST>
     struct convert_script_value_size
     {
-	QScriptValue operator()( QScriptEngine *, const RT & ) const;
-	RT operator()( QScriptEngine *, const QScriptValue & args) const;
+	/**
+	   Creates object {width:sz.width(),height:sz.height()}
+	*/
+	QScriptValue operator()( QScriptEngine *, const ST & sz ) const;
+
+	/**
+	   If args is an array or has a .length property then it is
+	   assumed to contain at least 2 numeric values (width and
+	   height), otherwise it is assumed to contain the numeric
+	   properties 'width' and 'height'. Returns a size object of
+	   the given width and height.
+	*/
+	ST operator()( QScriptEngine *, const QScriptValue & args) const;
     };
 
     template <>
@@ -131,29 +160,40 @@ namespace qboard {
     template <>
     struct convert_script_value<QSizeF> : convert_script_value_size<QSizeF> {};
 
+    /**
+       Converts QColor to/from QScriptObjects.
+    */
     template <>
     struct convert_script_value<QColor>
     {
-	QScriptValue operator()( QScriptEngine *, const QColor & ) const;
+	/**
+	   Creates JS object {red:c.red(),green:c.green(),blue:c.blue(),alpha:c.alpha()}
+	*/
+	QScriptValue operator()( QScriptEngine *, const QColor & c ) const;
+	/**
+	   If args is an array or has a .length property then it must
+	   contain one of:
+
+	   - a single string (a color name)
+
+	   - 0 to 4 numeric values, in the order (red,green,blue,alpha).
+	   Any missing values get a default (0 for rgb and 255 for alpha).
+	   alpha may be either integer 0-255 or floating point 0.0-1.0.
+
+	   Otherwise it must contain the properties ('red','green','blue'),
+	   and optionally 'alpha', with the same values as described above
+	   (except that there are no defaults - a missing property is interpreted
+	   as a value of 0).
+
+	   Returns a QColor object matching the given parameters.
+	*/
 	QColor operator()( QScriptEngine *, const QScriptValue & args) const;
     };
 
 
     /**
        Creates a new QScriptEngine (which the caller owns).  It is
-       preconfigured with qboard-specific functionality.
-
-       The following Qt types can be created in script code,
-       but see the major caveat below:
-
-       QColor(int r, int g, int b [, int alpha])
-
-       QPoint( int x, int y )
-
-       QSize( int x, int y )
-
-       Such types can be used as parameters to native code,
-       but cannot currently be manipulated directly in JS code.
+       preconfigured with some custom functions and type conversions.
     */
     QScriptEngine * createScriptEngine( QObject * parent = 0 );
 
