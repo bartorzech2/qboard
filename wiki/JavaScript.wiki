@@ -62,7 +62,9 @@ qboard.props(pc,{
 
 Aside from creating objects and setting properties, there's not much it can currently do. That said, using properties one can control almost all aspects of a piece which can be customized via the popup menus.
 
-Here is an overview of the list of common properties (in alphabetical order), their expected data types, and the piece types which support this property. The piece types are listed by their class name, and is the name which can be passed to `qboard.createObject("ClassName")` to create a new object.
+= Common piece properties =
+
+Here is an overview of the list of common properties (in alphabetical order), their expected data types, and the piece types which support this property. The piece types are listed by their class name, and is the name which can be passed to `qboard.createObject("ClassName")` to create a new object. Note that it is not recommended to use standard JavaScript notation when getting/setting these properties, as there are synchronization and type conversion issues which can't currently be addressed via that syntax. Use `qboard.prop()` and `qboard.props()` to get/set the properties instead.
 
 || *Property* || *JS data type* || *Piece types* || *Description* ||
 || `angle` || integer or floating point || QGIHtml, QGIPiece || rotation angle ||
@@ -76,3 +78,22 @@ Here is an overview of the list of common properties (in alphabetical order), th
 || `scale` || positive floating-point number || QGIPiece, QGIHtml, QGIDot || Relative scale of the item, 1.0 being normal, 0.0 being non-existent, and 2.0 being double normal size. ||
 
 The on-board lines (QGILine) are not currently scriptable because they will be replaced at some point (their current model requires to much special-case handling of events and serialization).
+
+= The qboard object =
+
+The JS engine includes a global object called qboard. That object is essentially the same as the C++-side GameState object, with some additions for purposes of scripting.
+
+Here is an overview of the public member functions and properties of the qboard object.
+(Note, however, that this work is ongoing, and the above list will change.)
+
+|| *Property/Function* || *Description* ||
+|| board || The game state's QBoard (game board) object. ||
+|| QObject createObject(ClassName[,Object props]) || Creates a new QGraphicsItem/QObject object of the given _type name_ (e.g. 'QGIDot' or 'QGIHtml'). If props is non-null, it sets the object's properties as per props(). The exact type and API of the return object depends on the class name passed to it. ||
+|| Array items() || Returns an array of all selected items. Each item will be some sort of QObject-derived native type. ||
+|| prop(item,key,value) || Sets the given property in the given item. ||
+|| props(item,Object} || For each key/value pair in the given Object, it copies that property to the given item ||
+|| scene || The underlying QBoardScene object. ||
+|| value prop(item,key) || Returns the given property value from the given object. Not all types are currently usable from script code (e.g. QPoint and QColor), but they can be passed around as arguments. ||
+|| view || A QBoardView object. This is only available running a script from the QBoard main window, in the context of the main GameState instance. ||
+
+
