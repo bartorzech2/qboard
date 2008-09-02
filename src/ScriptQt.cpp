@@ -154,7 +154,7 @@ namespace qboard {
 
     QScriptValue qpointfToScriptValue(QScriptEngine *engine, const QPointF &s)
     {
-	qDebug() << "qpointfToScriptValue(engine,"<<s<<")";
+	if(0) qDebug() << "qpointfToScriptValue(engine,"<<s<<")";
 	QScriptValue obj = engine->newObject();
 	obj.setProperty("x", QScriptValue(engine, s.x()));
 	obj.setProperty("y", QScriptValue(engine, s.y()));
@@ -165,13 +165,13 @@ namespace qboard {
     {
 	s.setX( obj.property("x").toNumber() );
 	s.setY( obj.property("y").toNumber() );
-	qDebug() << "qpointfFromScriptValue(engine,"<<s<<")";
+	if(0) qDebug() << "qpointfFromScriptValue(engine,"<<s<<")";
     }
 
     QScriptValue QPointF_ctor(QScriptContext *ctx, QScriptEngine *eng)
     {
 	int argc = ctx->argumentCount();
-	qDebug() << "QPointF_ctor(cx,engine) argc =="<<argc;
+	if(0) qDebug() << "QPointF_ctor(cx,engine) argc =="<<argc;
 	int x = 0;
 	int y = 0;
 	ScriptArgv argv(ctx);
@@ -199,7 +199,7 @@ namespace qboard {
 
     QScriptValue qpointToScriptValue(QScriptEngine *engine, const QPoint &s)
     {
-	qDebug() << "qpointToScriptValue(engine,"<<s<<")";
+	if(0) qDebug() << "qpointToScriptValue(engine,"<<s<<")";
 	QScriptValue obj = engine->newObject();
 	obj.setProperty("x", QScriptValue(engine, s.x()));
 	obj.setProperty("y", QScriptValue(engine, s.y()));
@@ -210,13 +210,13 @@ namespace qboard {
     {
 	s.setX( obj.property("x").toNumber() );
 	s.setY( obj.property("y").toNumber() );
-	qDebug() << "qpointFromScriptValue(engine,"<<s<<")";
+	if(0) qDebug() << "qpointFromScriptValue(engine,"<<s<<")";
     }
 
     QScriptValue QPoint_ctor(QScriptContext *ctx, QScriptEngine *eng)
     {
 	int argc = ctx->argumentCount();
-	qDebug() << "QPoint_ctor(cx,engine) argc =="<<argc;
+	if(0) qDebug() << "QPoint_ctor(cx,engine) argc =="<<argc;
 	int x = 0;
 	int y = 0;
 	ScriptArgv argv(ctx);
@@ -355,7 +355,7 @@ namespace qboard {
     QScriptValue qvariantToScriptValue(QScriptEngine *engine,
 				       const QVariant &v)
     {
-	qDebug() << "qvariantToScriptValue(engine,"<<v<<")";
+	if(0) qDebug() << "qvariantToScriptValue(engine,"<<v<<")";
 	if( ! v.isValid() ) return engine->nullValue();
 #define CONV(T) if( v.canConvert<T>() ) return engine->toScriptValue<T>(v.value<T>());
 	CONV(QPointF);
@@ -373,7 +373,7 @@ namespace qboard {
 
     void qvariantFromScriptValue(const QScriptValue &obj, QVariant &v)
     {
-	qDebug() << "qvariantFromScriptValue(engine,"<<v<<")";
+	if(0) qDebug() << "qvariantFromScriptValue(engine,"<<v<<")";
 	if( obj.isUndefined() || obj.isNull() ) v = QVariant();
 	else if( obj.isVariant() ) v = obj.toVariant();
 	else if( obj.isString() ) v = QVariant(obj.toString());
@@ -721,7 +721,7 @@ namespace qboard {
     JSVariantPrototype::JSVariantPrototype( QObject * parent )
 	: QObject(parent),
 	  QScriptable(),
-	  impl(new Impl)
+	  impl(0)
     {
     }
 
@@ -733,7 +733,7 @@ namespace qboard {
     void JSVariantPrototype::foo()
     {
 	SELF();
-	qDebug() << "JSVariantPrototype::foo() val="<<self;
+	if(0) qDebug() << "JSVariantPrototype::foo() val="<<self;
     }
 
     QString JSVariantPrototype::toSource()
@@ -766,7 +766,7 @@ namespace qboard {
 	SELF(QVariant::Invalid);
 	return self.userType();
     }
-    QScriptValue JSVariantPrototype::value()
+    QScriptValue JSVariantPrototype::jsValue()
     {
 	SELF(QScriptValue());
 	if( ! self.isValid() ) return js->nullValue();
