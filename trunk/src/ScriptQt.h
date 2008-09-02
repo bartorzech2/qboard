@@ -36,13 +36,109 @@ namespace qboard {
 #define QTSCRIPT_CONV(PRE,T) \
     QScriptValue PRE ## ToScriptValue(QScriptEngine *, const T &); \
 	void PRE ## FromScriptValue(const QScriptValue &, T &)
-    QTSCRIPT_CONV(qpoint,QPoint);
-    QTSCRIPT_CONV(qpointf,QPointF);
-    QTSCRIPT_CONV(qsize,QSize);
     QTSCRIPT_CONV(qgi,QGraphicsItem*);
     QTSCRIPT_CONV(qgs,QGraphicsScene*);
     QTSCRIPT_CONV(qgilist,QList<QGraphicsItem*>);
 #undef QTSCRIPT_CONV
+
+    /**
+       Used by toScriptValue() and fromScriptValue() to do conversions.
+       Specialize this to provide custom behaviour.
+    */
+    template <typename T>
+    struct convert_script_value
+    {
+	/**
+	   Default implementation returns eng->toScriptValue(t).
+	*/
+	QScriptValue operator()( QScriptEngine * eng,const T & t ) const
+	{
+	    return eng->toScriptValue(t);
+	}
+	/**
+	   Default implementation returns qscriptvalue_cast<T>(obj);
+	*/
+	T operator()( QScriptEngine * eng,const QScriptValue & obj ) const
+	{
+	    return qscriptvalue_cast<T>( obj );
+	}
+    };
+
+    /**
+       Front-end for converting types to QScriptValues.
+    */
+    template <typename T>
+    QScriptValue toScriptValue( QScriptEngine * e, T const & t )
+    {
+	return convert_script_value<T>()( e, t );
+    }
+    /**
+       Front-end for converting QScriptValues to other types.
+    */
+    template <typename T>
+    T fromScriptValue( QScriptEngine * e, QScriptValue const & v )
+    {
+	return convert_script_value<T>()( e, v );
+    }
+
+    /**
+       Converts a QScriptValue to/from a QPoint or QPointF.
+    */
+    template <typename PT>
+    struct convert_script_value_point
+    {
+	QScriptValue operator()( QScriptEngine *, const PT & ) const;
+	/**
+	   If args has a length property then it is assumed to contain
+	   at least two values, the first two of which are used as
+	   this object's x/y coordinates, otherwise it must contain
+	   numeric x and y properties.
+	*/
+	PT operator()( QScriptEngine *, const QScriptValue & args) const;
+    };
+
+    template <>
+    struct convert_script_value<QPoint> : convert_script_value_point<QPoint> {};
+
+    template <>
+    struct convert_script_value<QPointF> : convert_script_value_point<QPointF> {};
+
+
+    template <typename RT>
+    struct convert_script_value_rect
+    {
+	QScriptValue operator()( QScriptEngine *, const RT & ) const;
+	RT operator()( QScriptEngine *, const QScriptValue & args) const;
+    };
+
+    template <>
+    struct convert_script_value<QRect> : convert_script_value_rect<QRect> {};
+
+    template <>
+    struct convert_script_value<QRectF> : convert_script_value_rect<QRectF> {};
+
+
+    template <typename RT>
+    struct convert_script_value_size
+    {
+	QScriptValue operator()( QScriptEngine *, const RT & ) const;
+	RT operator()( QScriptEngine *, const QScriptValue & args) const;
+    };
+
+    template <>
+    struct convert_script_value<QSize> : convert_script_value_size<QSize> {};
+
+    template <>
+    struct convert_script_value<QSizeF> : convert_script_value_size<QSizeF> {};
+
+    template <>
+    struct convert_script_value<QColor>
+    {
+	QScriptValue operator()( QScriptEngine *, const QColor & ) const;
+	QColor operator()( QScriptEngine *, const QScriptValue & args) const;
+    };
+
+
     /**
        Creates a new QScriptEngine (which the caller owns).  It is
        preconfigured with qboard-specific functionality.
@@ -361,11 +457,13 @@ namespace qboard {
 
 	   - QVariant::DateTime, returns a new JS Date object
 
-	   - QVariant::Point/PointF, JS object: {x:XXX,y:YYY}
+	   - QVariant::Point/PointF, JS object: {x:X,y:Y}
+
+	   - QVariant::Rect/RectF, JS object: {top:X,left:Y,width:W,height:H}
 
 	   - QVariant::RegExp, returns a new JS RegExp object
 
-	   - QVariant::Size, JS object: {width:WWW,height:HHH}
+	   - QVariant::Size/SizeF, JS object: {width:W,height:H}
 
 	   Note that objects created this way cannot simply be passed
 	   back to routines which expect those native types. e.g. you
@@ -442,6 +540,47 @@ namespace qboard {
     {
 	QString operator()( QPointF const &  ) const;
     };
+
+    /**
+       to_source_f specialization for QRectF.
+    */
+    template <>
+    struct to_source_f<QRect>
+    {
+	QString operator()( QRect const & ) const;
+    };
+    /**
+       to_source_f specialization for QRectF.
+    */
+    template <>
+    struct to_source_f<QRectF>
+    {
+	QString operator()( QRectF const & ) const;
+    };
+
+    /**
+       to_source_f specialization for QScriptValue.
+    */
+    template <>
+    struct to_source_f<QScriptValue>
+    {
+	QString operator()( QScriptValue const & ) const;
+    };
+
+    /**
+       to_source_f specialization for QSize.
+    */
+    template <>
+    struct to_source_f<QSize>
+    {
+	QString operator()( QSize const & ) const;
+    };
+    template <>
+    struct to_source_f<QSizeF>
+    {
+	QString operator()( QSizeF const & ) const;
+    };
+
     /**
        to_source_f specialization for QString.
        Takes special care to quote the string.
@@ -451,22 +590,7 @@ namespace qboard {
     {
 	QString operator()( QString const &  ) const;
     };
-    /**
-       to_source_f specialization for QSize.
-    */
-    template <>
-    struct to_source_f<QSize>
-    {
-	QString operator()( QSize const & ) const;
-    };
-    /**
-       to_source_f specialization for QScriptValue.
-    */
-    template <>
-    struct to_source_f<QScriptValue>
-    {
-	QString operator()( QScriptValue const & ) const;
-    };
+
     /**
        to_source_f specialization for QVariant.
     */
@@ -482,8 +606,9 @@ namespace qboard {
 	   - Color (returned as a simple string, not full color info)
 	   - Double
 	   - Point/PointF
-	   - Size
+	   - Size/SizeF
 	   - String
+	   - Rect/RectF
 
 	   All others will result in the value "undefined"
 	   being returned.

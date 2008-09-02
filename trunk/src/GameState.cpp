@@ -142,8 +142,7 @@ QScriptValue getsetPlacementPos(QScriptContext *ctx, QScriptEngine *eng)
     }
     else if( 1 == argv.argc() )
     {
-	QPointF p;
-	qboard::qpointfFromScriptValue( argv.value(), p );
+	QPointF p = qboard::fromScriptValue<QPointF>( eng, argv.value() );
 	if(0) qDebug() << "Got QPointF pos: " << p;
 	s->setPlacementPos( p );
 	return argv.value();

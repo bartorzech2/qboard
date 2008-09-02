@@ -49,6 +49,29 @@ namespace qboard {
     {
 	return QString("QSize(%1,%2)").arg(x.width()).arg(x.height());
     }
+    QString to_source_f<QSizeF>::operator()( QSizeF const & x ) const
+    {
+	return QString("QSizeF(%1,%2)").arg(x.width()).arg(x.height());
+    }
+
+
+    QString to_source_f<QRectF>::operator()( QRectF const & x ) const
+    {
+	return QString("QRectF(%1,%2,%3,%4)").
+	    arg(x.left()).
+	    arg(x.top()).
+	    arg(x.width()).
+	    arg(x.height());
+    }
+
+    QString to_source_f<QRect>::operator()( QRect const & x ) const
+    {
+	return QString("QRect(%1,%2,%3,%4)").
+	    arg(x.left()).
+	    arg(x.top()).
+	    arg(x.width()).
+	    arg(x.height());
+    }
 
     QString to_source_f<QString>::operator()( QString const & x ) const
     {
@@ -74,7 +97,10 @@ namespace qboard {
 	    DO(String,QString);
 	    DO(Point,QPoint);
 	    DO(PointF,QPointF);
+	    DO(Rect,QRect);
+	    DO(RectF,QRectF);
 	    DO(Size,QSize);
+	    DO(SizeF,QSizeF);
 	    case QVariant::Color:
 		return qboard::toSource( x.value<QString>() ); break;
 	  default:
@@ -152,132 +178,232 @@ namespace qboard {
     }
 
 
-    QScriptValue qpointfToScriptValue(QScriptEngine *engine, const QPointF &s)
+    template <typename PT>
+    QScriptValue convert_script_value_point<PT>::operator()(QScriptEngine*eng,
+							   const PT & src) const
     {
-	if(0) qDebug() << "qpointfToScriptValue(engine,"<<s<<")";
-	QScriptValue obj = engine->newObject();
-	obj.setProperty("x", QScriptValue(engine, s.x()));
-	obj.setProperty("y", QScriptValue(engine, s.y()));
+	QScriptValue obj = eng->newObject();
+	obj.setProperty("x", QScriptValue(eng, src.x()));
+	obj.setProperty("y", QScriptValue(eng, src.y()));
 	return obj;
     }
 
-    void qpointfFromScriptValue(const QScriptValue &obj, QPointF &s)
+    template <typename PT>
+    PT convert_script_value_point<PT>::operator()( QScriptEngine *,
+						  const QScriptValue & args ) const
     {
-	s.setX( obj.property("x").toNumber() );
-	s.setY( obj.property("y").toNumber() );
-	if(0) qDebug() << "qpointfFromScriptValue(engine,"<<s<<")";
-    }
-
-    QScriptValue QPointF_ctor(QScriptContext *ctx, QScriptEngine *eng)
-    {
-	int argc = ctx->argumentCount();
-	if(0) qDebug() << "QPointF_ctor(cx,engine) argc =="<<argc;
-	int x = 0;
-	int y = 0;
-	ScriptArgv argv(ctx);
-	if( 1 == argc )
+	qreal x = 0;
+	qreal y = 0;
+	if( args.isArray() ||
+	    ! args.property("length").isUndefined() )
 	{
-	    x = y = argv[0].toInt32();
+	    if(0) qDebug() << "qpointFromScriptValue(): args smells like an array";
+	    x = args.property(0).toNumber();
+	    y = args.property(1).toNumber();
 	}
-	else if( 2 == argc )
-	{ // QPointF(x,y)
-	    x = (argv++).toInt32();
-	    y = argv().toInt32();
+	else
+	{
+	    if(0) qDebug() << "qpointFromScriptValue(): args doesn't smell like an array";
+	    x = args.property("x").toNumber();
+	    y = args.property("y").toNumber();
 	}
-	QScriptValue self = ctx->thisObject();
-	self.setProperty("x",QScriptValue(eng,x));
-	self.setProperty("y",QScriptValue(eng,y));
-	return self;
-	//return eng->toScriptValue(QPointF(x,y));
-	/** what's the difference between toScriptValue()
-	    and qpointToScriptValue(eng,p) ???
-
-	    The former does essentially what i want, the latter
-	    does not.
-	*/
+	return PT(x,y);
     }
 
-    QScriptValue qpointToScriptValue(QScriptEngine *engine, const QPoint &s)
-    {
-	if(0) qDebug() << "qpointToScriptValue(engine,"<<s<<")";
-	QScriptValue obj = engine->newObject();
-	obj.setProperty("x", QScriptValue(engine, s.x()));
-	obj.setProperty("y", QScriptValue(engine, s.y()));
-	return obj;
-    }
+//     template <typename PT>
+//     QScriptValue qpointToScriptValue(QScriptEngine *engine, const PT &s)
+//     {
+// 	if(0) qDebug() << "qpointfToScriptValue(engine,"<<s<<")";
+// 	QScriptValue obj = engine->newObject();
+// 	obj.setProperty("x", QScriptValue(engine, s.x()));
+// 	obj.setProperty("y", QScriptValue(engine, s.y()));
+// 	return obj;
+//     }
 
-    void qpointFromScriptValue(const QScriptValue &obj, QPoint &s)
-    {
-	s.setX( obj.property("x").toNumber() );
-	s.setY( obj.property("y").toNumber() );
-	if(0) qDebug() << "qpointFromScriptValue(engine,"<<s<<")";
-    }
+//     template <typename PT>
+//     void qpointFromScriptValue(const QScriptValue &args, PT &s)
+//     {
+// 	if(0) qDebug() << "qpointFromScriptValue(): args count: " << args.property("length").toInt32()
+// 		 << ", tosource="<<toSource(args);
+// 	qreal x = 0;
+// 	qreal y = 0;
+// 	if( args.isArray() ||
+// 	    ! args.property("length").isUndefined() )
+// 	{
+// 	    if(0) qDebug() << "qpointFromScriptValue(): args smells like an array";
+// 	    x = args.property(0).toNumber();
+// 	    y = args.property(1).toNumber();
+// 	}
+// 	else
+// 	{
+// 	    if(0) qDebug() << "qpointFromScriptValue(): args doesn't smell like an array";
+// 	    x = args.property("x").toNumber();
+// 	    y = args.property("y").toNumber();
+// 	}
+// 	s = PT(x,y);
+// 	if(0) qDebug() << "qpointFromScriptValue("<<toSource( args )<<") ="<<s;
+//     }
 
+    template <typename PT>
     QScriptValue QPoint_ctor(QScriptContext *ctx, QScriptEngine *eng)
     {
-	int argc = ctx->argumentCount();
-	if(0) qDebug() << "QPoint_ctor(cx,engine) argc =="<<argc;
-	int x = 0;
-	int y = 0;
-	ScriptArgv argv(ctx);
-	if( 1 == argc )
-	{
-	    x = y = argv[0].toInt32();
-	}
-	else if( 2 == argc )
-	{ // QPoint(x,y)
-	    x = (argv++).toInt32();
-	    y = (argv++).toInt32();
-	}
-	return eng->toScriptValue(QPoint(x,y));
-	/** what's the difference between toScriptValue()
-	    and qpointToScriptValue(eng,p) ???
-
-	    The former does essentially what i want, the latter
-	    does not.
-	*/
+	PT pt = fromScriptValue<PT>( eng, ctx->argumentsObject() );
+	return eng->toScriptValue( pt );
     }
 
+
+    template <typename RT>
+    QScriptValue convert_script_value_rect<RT>::operator()(QScriptEngine*eng,
+							   const RT & s) const
+    {
+	QScriptValue obj = eng->newObject();
+	obj.setProperty("top", QScriptValue(eng, s.left()));
+	obj.setProperty("left", QScriptValue(eng, s.top()));
+	obj.setProperty("width", QScriptValue(eng, s.width()));
+	obj.setProperty("height", QScriptValue(eng, s.height()));
+	return obj;
+    }
+
+    template <typename RT>
+    RT convert_script_value_rect<RT>::operator()( QScriptEngine *,
+						  const QScriptValue & args ) const
+    {
+	qreal l = 0;
+	qreal t = 0;
+	qreal w = 0;
+	qreal h = 0;
+#define ARG(X) args.property(X).toNumber()
+	if( args.isArray() ||
+	    ! args.property("length").isUndefined() )
+	{
+	    l = ARG(0);
+	    t = ARG(1);
+	    w = ARG(2);
+	    h = ARG(3);
+	}
+	else
+	{
+	    l = ARG("left");
+	    t = ARG("top");
+	    w = ARG("width");
+	    h = ARG("height");
+	}
+#undef ARG
+	return RT( l,t,w,h);
+    }
+
+    template <typename RT>
+    QScriptValue QRect_ctor(QScriptContext *context, QScriptEngine *engine)
+    {
+	RT r = fromScriptValue<RT>( engine, context->argumentsObject() );
+	return engine->toScriptValue( r );
+    }
+
+    template <typename ST>
+    QScriptValue convert_script_value_size<ST>::operator()(QScriptEngine*eng,
+							   const ST & s) const
+    {
+	QScriptValue obj = eng->newObject();
+	obj.setProperty("width", QScriptValue(eng, s.width()));
+	obj.setProperty("height", QScriptValue(eng, s.height()));
+	return obj;
+    }
+
+    template <typename ST>
+    ST convert_script_value_size<ST>::operator()( QScriptEngine *,
+						  const QScriptValue & args ) const
+    {
+	qreal w = 0;
+	qreal h = 0;
+#define ARG(X) args.property(X).toNumber()
+	if( args.isArray() ||
+	    ! args.property("length").isUndefined() )
+	{
+	    w = ARG(0);
+	    h = ARG(1);
+	}
+	else
+	{
+	    w = ARG("width");
+	    h = ARG("height");
+	}
+#undef ARG
+	return ST(w,h);
+    }
+
+    template <typename ST>
     QScriptValue QSize_ctor(QScriptContext *context, QScriptEngine *engine)
     {
-	int argc = context->argumentCount();
-	int x = (argc>0) ? context->argument(0).toInt32() : 0;
-	int y = (argc>1) ? context->argument(1).toInt32() : x;
-	return engine->toScriptValue(QSize(x, y));
+	ScriptArgv av(context);
+	int argc = av.argc();
+	int x = (argc>0) ? av[0].toInt32() : 0;
+	int y = (argc>1) ? av[1].toInt32() : x;
+	return engine->toScriptValue( ST(x,y) );
+    }
+
+
+    QScriptValue convert_script_value<QColor>::operator()(QScriptEngine*eng,
+							  const QColor & col) const
+    {
+	QScriptValue obj = eng->newObject();
+	obj.setProperty("red", QScriptValue(eng, col.red()));
+	obj.setProperty("green", QScriptValue(eng, col.green()));
+	obj.setProperty("blue", QScriptValue(eng, col.blue()));
+	obj.setProperty("alpha", QScriptValue(eng, col.alpha()));
+	return obj;
+    }
+
+    QColor convert_script_value<QColor>::operator()( QScriptEngine *,
+						     const QScriptValue & args ) const
+    {
+	int r = 0;
+	int g = 0;
+	int b = 0;
+	qreal a = 255;
+#define ARG(X) args.property(X).toInt32()
+	if( args.isArray() ||
+	    ! args.property("length").isUndefined() )
+	{
+	    int argc = args.property("length").toInt32();
+	    if( 1 == argc )
+	    {
+		QScriptValue arg = args.property(0);
+		return arg.isString()
+		    ? QColor( arg.toString() )
+		    : QColor( arg.toInt32() );
+	    }
+	    r = (argc > 0) ? ARG(0) : 0;
+	    g = (argc > 1) ? ARG(1) : 0;
+	    b = (argc > 2) ? ARG(2) : 0;
+	    a = (argc > 3)
+		? args.property(3).toNumber()
+		: 255.0;
+	}
+	else
+	{
+	    r = ARG("red");
+	    g = ARG("green");
+	    b = ARG("blue");
+	    QScriptValue av( args.property("alpha") );
+	    if( ! av.isUndefined() )
+	    {
+		a = av.toNumber();
+	    }
+	}
+#undef ARG
+	QColor c( r, g, b );
+	if( a < 1.0 ) c.setAlphaF(a);
+	else c.setAlpha( int(a) );
+	return c;
     }
 
     QScriptValue QColor_ctor(QScriptContext *context, QScriptEngine *engine)
     {
-	int argc = context->argumentCount();
+	ScriptArgv av(context);
+	int argc = av.argc();
 	if( ! argc ) return engine->toScriptValue(QColor());
-	if( 1 == argc )
-	{
-	    QScriptValue arg = context->argument(0);
-	    if( arg.isNumber() )
-	    {
-		return engine->toScriptValue(QColor(arg.toInt32()));
-	    }
-	    else if( arg.isString() )
-	    {
-		return engine->toScriptValue(QColor(arg.toString()));
-	    }
-	    return QScriptValue();
-	}
-	else if( (3 == argc) || (4 == argc) )
-	{
-	    int arg = 0;
-	    int r = context->argument(arg++).toInt32();
-	    int g = context->argument(arg++).toInt32();
-	    int b = context->argument(arg++).toInt32();
-	    QColor col(r,g,b);
-	    if( argc == 4 )
-	    {
-		col.setAlpha( context->argument(arg++).toInt32());
-	    }
-	    //qDebug() <<"Creating QColor:"<<col;
-	    return engine->toScriptValue(col);
-	}
-	return QScriptValue();
+	QColor col = fromScriptValue<QColor>(engine, context->argumentsObject() );
+	return engine->toScriptValue( col );
     }
 
     QScriptValue qgiToScriptValue(QScriptEngine *engine, QGraphicsItem* const &in)
@@ -337,19 +463,6 @@ namespace qboard {
     }
 
 
-    QScriptValue qsizeToScriptValue(QScriptEngine *engine, const QSize &s)
-    {
-	QScriptValue obj = engine->newObject();
-	obj.setProperty("width", QScriptValue(engine, s.width()));
-	obj.setProperty("height", QScriptValue(engine, s.height()));
-	return obj;
-    }
-
-    void qsizeFromScriptValue(const QScriptValue &obj, QSize &s)
-    {
-	s.setWidth( obj.property("width").toInt32() );
-	s.setHeight( obj.property("height").toInt32() );
-    }
 
 #if 0
     QScriptValue qvariantToScriptValue(QScriptEngine *engine,
@@ -477,22 +590,22 @@ namespace qboard {
 	qScriptRegisterMetaType(js, qgsToScriptValue, qgsFromScriptValue);
 	qScriptRegisterMetaType(js, qgilistToScriptValue, qgilistFromScriptValue);
 
-	if(1)
+	if(0)
 	{
+	    // can't seem to tap in to the core QVariant prototypes... :(
 	    JSVariantPrototype * proto = new JSVariantPrototype(js);
 	    js->setDefaultPrototype(qMetaTypeId<QVariant>(),
 				    js->newQObject(proto));
-// 	    qScriptRegisterMetaType(js, qvariantToScriptValue, qvariantFromScriptValue);
-// 	    QVariant var(QPoint(-3,-9));
-// 	    QScriptValue val( var );
 	}
 
-
-	glob.setProperty("QSize", js->newFunction(QSize_ctor));
-// 	qScriptRegisterMetaType(js, qsizeToScriptValue, qsizeFromScriptValue);
 	glob.setProperty("QColor", js->newFunction(QColor_ctor));
-	glob.setProperty("QPoint", js->newFunction(QPoint_ctor));
-	glob.setProperty("QPointF", js->newFunction(QPointF_ctor));
+	glob.setProperty("QRect", js->newFunction(QRect_ctor<QRect>));
+	glob.setProperty("QRectF", js->newFunction(QRect_ctor<QRectF>));
+	glob.setProperty("QSize", js->newFunction(QSize_ctor<QSize>));
+	glob.setProperty("QSizeF", js->newFunction(QSize_ctor<QSizeF>));
+	glob.setProperty("QPoint", js->newFunction(QPoint_ctor<QPoint>));
+	glob.setProperty("QPointF", js->newFunction(QPoint_ctor<QPointF>));
+
 	glob.setProperty("alert",
 			 js->newFunction(js_alert),
 			 QScriptValue::ReadOnly | QScriptValue::Undeletable );
@@ -505,11 +618,6 @@ namespace qboard {
 	glob.setProperty("toSource",
 			 js->newFunction(js_toSource),
 			 QScriptValue::ReadOnly | QScriptValue::Undeletable );
- 	/**
-	   Damn... if i have both a QPoint ctor and to/fromScriptValue routines
-	   then none of it works.
-	*/
-	//qScriptRegisterMetaType(js, qpointToScriptValue, qpointFromScriptValue);
 	return js;
     }
 
@@ -733,7 +841,7 @@ namespace qboard {
     void JSVariantPrototype::foo()
     {
 	SELF();
-	if(0) qDebug() << "JSVariantPrototype::foo() val="<<self;
+	if(1) qDebug() << "JSVariantPrototype::foo() val="<<self;
     }
 
     QString JSVariantPrototype::toSource()
@@ -783,16 +891,25 @@ namespace qboard {
 	      obj = js->newDate( self.value<QDateTime>() );
 	      break;
 	  case QVariant::Point:
-	      obj = qpointToScriptValue( js, self.value<QPoint>() );
+	      obj = qboard::toScriptValue( js, self.value<QPoint>() );
 	      break;
 	  case QVariant::PointF:
-	      obj = qpointfToScriptValue( js, self.value<QPointF>() );
+	      obj = qboard::toScriptValue( js, self.value<QPointF>() );
+	      break;
+	  case QVariant::Rect:
+	      obj = qboard::toScriptValue( js, self.value<QRect>() );
+	      break;
+	  case QVariant::RectF:
+	      obj = qboard::toScriptValue( js, self.value<QRectF>() );
 	      break;
 	  case QVariant::RegExp:
 	      obj = js->newRegExp( self.value<QRegExp>() );
 	      break;
 	  case QVariant::Size:
-	      obj = qsizeToScriptValue( js, self.value<QSize>() );
+	      obj = qboard::toScriptValue( js, self.value<QSize>() );
+	      break;
+	  case QVariant::SizeF:
+	      obj = qboard::toScriptValue( js, self.value<QSizeF>() );
 	      break;
 	  default:
 	      break;
