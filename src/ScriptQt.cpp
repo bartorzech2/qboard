@@ -24,11 +24,18 @@
 #include <QList>
 #include <QMessageBox>
 #include <QMetaType>
+#include <QVariant>
 
+#include <QByteArray>
+#include <QBuffer>
+#include <QDateTime>
+
+Q_DECLARE_METATYPE(QList<QGraphicsItem*>)
+Q_DECLARE_METATYPE(QVariant)
 
 namespace qboard {
 
- 
+
     QScriptValue qpointfToScriptValue(QScriptEngine *engine, const QPointF &s)
     {
 	qDebug() << "qpointfToScriptValue(engine,"<<s<<")";
@@ -227,6 +234,39 @@ namespace qboard {
 	s.setWidth( obj.property("width").toInt32() );
 	s.setHeight( obj.property("height").toInt32() );
     }
+
+#if 0
+    QScriptValue qvariantToScriptValue(QScriptEngine *engine,
+				       const QVariant &v)
+    {
+	qDebug() << "qvariantToScriptValue(engine,"<<v<<")";
+	if( ! v.isValid() ) return engine->nullValue();
+#define CONV(T) if( v.canConvert<T>() ) return engine->toScriptValue<T>(v.value<T>());
+	CONV(QPointF);
+	CONV(QPoint);
+	CONV(QSize);
+	CONV(QGraphicsItem*);
+	CONV(QGraphicsScene*);
+#undef CONV
+#define CONV(T,X) if( v.canConvert<T>() ) return QScriptValue(engine,X);
+	CONV(qreal,v.toDouble());
+	CONV(int,v.toInt());
+#undef CONV
+	return QScriptValue(engine,v.toString());
+    }
+
+    void qvariantFromScriptValue(const QScriptValue &obj, QVariant &v)
+    {
+	qDebug() << "qvariantFromScriptValue(engine,"<<v<<")";
+	if( obj.isUndefined() || obj.isNull() ) v = QVariant();
+	else if( obj.isVariant() ) v = obj.toVariant();
+	else if( obj.isString() ) v = QVariant(obj.toString());
+	else if( obj.isBoolean() ) v = QVariant(1);
+	else if( obj.isNumber() ) v = QVariant(obj.toNumber());
+	else if( obj.isRegExp() ) v = QVariant(obj.toRegExp());
+	return;
+    }
+#endif
     /**
        JS usage:
 
@@ -312,6 +352,17 @@ namespace qboard {
 	qScriptRegisterMetaType(js, qgiToScriptValue, qgiFromScriptValue);
 	qScriptRegisterMetaType(js, qgsToScriptValue, qgsFromScriptValue);
 	qScriptRegisterMetaType(js, qgilistToScriptValue, qgilistFromScriptValue);
+
+	if(1)
+	{
+	    JSVariantPrototype * proto = new JSVariantPrototype(js);
+	    js->setDefaultPrototype(qMetaTypeId<QVariant>(),
+				    js->newQObject(proto));
+// 	    qScriptRegisterMetaType(js, qvariantToScriptValue, qvariantFromScriptValue);
+// 	    QVariant var(QPoint(-3,-9));
+// 	    QScriptValue val( var );
+	}
+
 
 	glob.setProperty("QSize", js->newFunction(QSize_ctor));
 // 	qScriptRegisterMetaType(js, qsizeToScriptValue, qsizeFromScriptValue);
@@ -523,4 +574,99 @@ namespace qboard {
     {
 	return m_cx && (m_max>=0) && (m_at<=m_max);
     }
+
+
+#define SELF(RV) \
+    QVariant self( qscriptvalue_cast<QVariant>(thisObject()));	\
+	QScriptEngine * js = this->engine();			\
+	if( !js) return RV;
+
+    struct JSVariantPrototype::Impl
+    {
+	Impl()
+	{
+	}
+	~Impl()
+	{
+	}
+    };
+
+    JSVariantPrototype::JSVariantPrototype( QObject * parent )
+	: QObject(parent),
+	  QScriptable(),
+	  impl(new Impl)
+    {
+    }
+
+    JSVariantPrototype::~JSVariantPrototype()
+    {
+	delete impl;
+    }
+
+    void JSVariantPrototype::foo()
+    {
+	SELF();
+	qDebug() << "JSVariantPrototype::foo() val="<<self;
+    }
+
+    QString JSVariantPrototype::toString()
+    {
+	SELF(QString("[invalid object]"));
+	QString ret;
+#if 1
+	QByteArray ba;
+	QBuffer buf(&ba);
+	buf.open(QBuffer::WriteOnly);
+	QDebug out(&buf);
+	out << self;
+	buf.close();
+	ret = ba.data() ? ba.data() : "??WTF??";
+#else
+  	ret = QString("QVariant(Type=%1)").
+  	    arg(self.type());
+#endif
+	return ret;
+    }
+
+    int JSVariantPrototype::variantType()
+    {
+	SELF(QVariant::Invalid);
+	return self.userType();
+    }
+    QScriptValue JSVariantPrototype::value()
+    {
+	SELF(QScriptValue());
+	if( ! self.isValid() ) return js->nullValue();
+	QScriptValue obj( js->nullValue() );
+	switch( self.type() )
+	{
+#define POD(T,F) case QVariant::T: obj = QScriptValue(js,self.F() ); break
+	    POD(Bool,toBool);
+	    POD(Color,toString);
+	    POD(Double,toDouble);
+	    POD(Int,toInt);
+	    POD(String,toString);
+	  case QVariant::DateTime:
+	      obj = js->newDate( self.value<QDateTime>() );
+	      break;
+	  case QVariant::Point:
+	      obj = qpointToScriptValue( js, self.value<QPoint>() );
+	      break;
+	  case QVariant::PointF:
+	      obj = qpointfToScriptValue( js, self.value<QPointF>() );
+	      break;
+	  case QVariant::RegExp:
+	      obj = js->newRegExp( self.value<QRegExp>() );
+	      break;
+	  case QVariant::Size:
+	      obj = qsizeToScriptValue( js, self.value<QSize>() );
+	      break;
+	  default:
+	      break;
+	};
+	return obj;
+    }
+
+#undef SELF
+
 } //namespace

@@ -18,6 +18,10 @@
 #include <QScriptValue>
 class QGraphicsItem;
 class GameState;
+/**
+   JSGameState is a JS-side prototype for use as
+   a script-side base type of GameState objects.
+*/
 class JSGameState : public QObject,
 		    public QScriptable
 {
@@ -31,14 +35,28 @@ public:
 public Q_SLOTS:
     void bogo();
 
+    /**
+       See Serializable::s11nSave(). This operates on
+       this object's native GameState.
+    */
     bool save( QString const & fn, bool autoAddExt = true );
+
+    /**
+       See Serializable::s11nLoad(). This operates on
+       this object's native GameState.
+    */
     bool load( QString const & fn );
     /**
        Calls tgt->setProperty() with the given property.
 
        This is intended to be called from JS code.
+
+       As a special case, if key starts with a '_' character then this
+       function does nothing and returns false. This is intended
+       to avoid the accidental injection of "hidden" properties
+       into the native property list.
     */
-    bool prop( QObject * tgt, QString const &,
+    bool prop( QObject * tgt, QString const & key,
 	       QScriptValue const & val );
 
     /**

@@ -19,13 +19,19 @@
 #include <QGraphicsItem>
 #include <QScriptValueIterator>
 
+#include "ScriptQt.h"
+
 #define SELF(RV) GameState *self = this->self(); \
     QScriptEngine * js = this->engine(); \
     if(!self || !js) return RV;
 
 struct JSGameState::Impl
 {
-    Impl()
+    qboard::JSVariantPrototype * qvproto;
+    QScriptValue qvprotoj;
+    Impl() :
+	qvproto(0),
+	qvprotoj()
     {
     }
     ~Impl()
@@ -62,6 +68,12 @@ bool JSGameState::load( QString const & fn )
 
 GameState * JSGameState::self()
 {
+    if( (!impl->qvproto) || (!this->engine()) )
+    {
+	impl->qvproto = new qboard::JSVariantPrototype(this);
+	impl->qvprotoj = this->engine()->newQObject(impl->qvproto);
+	// not working for me for QVariant: this->engine()->setDefaultPrototype(qMetaTypeId<QVariant>(), impl->qvprotoj);
+    }
     GameState * s = qscriptvalue_cast<GameState*>(thisObject());
     if( ! s )
     {
@@ -82,7 +94,10 @@ bool JSGameState::prop( QObject * obj,
 		      QScriptValue const & val
 		      )
 {
-    if( ! obj || name.isEmpty() ) return false;
+    if( ! obj
+	|| name.isEmpty()
+	|| name.startsWith("_")
+	) return false;
     QVariant var(val.toVariant());
     if(0) qDebug() << "JSGameState::prop(obj,"<<name<<","<<var<<")";
     obj->setProperty(name.toAscii().constData(),var);
@@ -90,12 +105,22 @@ bool JSGameState::prop( QObject * obj,
 }
 QScriptValue
 JSGameState::prop( QObject * obj,
-		 QString const & name )
+		   QString const & name )
 {
-    SELF(this->engine()->nullValue());
-    return (obj && !name.isEmpty())
-	? js->newVariant( obj->property(name.toAscii().constData()) )
-	: js->nullValue();
+    SELF(QScriptValue())
+    QScriptValue ret( js->nullValue() );
+    if( obj && !name.isEmpty() )
+    { // my setDefaultPrototype() is not working for QVariant, so i'll hack in a prototype here...
+	QVariant var( obj->property(name.toAscii().constData()) );
+	qDebug() << "JSGameState::prop(["<<obj<<"],["<<name<<"]) variant =="<<var;
+	ret = js->newVariant( var );
+	ret.setPrototype( impl->qvprotoj );
+    }
+    else
+    {
+	qDebug() << "warning: JSGameState::prop(["<<obj<<"],["<<name<<"]) object and/or name are/is null.";
+    }
+    return ret;
 }
 
 bool JSGameState::props( QObject * tgt, QScriptValue const & props )

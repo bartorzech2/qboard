@@ -20,9 +20,27 @@ class QScriptContext;
 #include <QSharedData>
 #include <QString>
 #include <QAction>
+#include <QScriptable>
+
+#include <QPoint>
+#include <QPointF>
+#include <QSize>
+#include <QList>
+#include <QGraphicsItem>
+#include <QGraphicsScene>
 
 namespace qboard {
 
+#define QTSCRIPT_CONV(PRE,T) \
+    QScriptValue PRE ## ToScriptValue(QScriptEngine *, const T &); \
+	void PRE ## FromScriptValue(const QScriptValue &, T &)
+    QTSCRIPT_CONV(qpoint,QPoint);
+    QTSCRIPT_CONV(qpointf,QPointF);
+    QTSCRIPT_CONV(qsize,QSize);
+    QTSCRIPT_CONV(qgi,QGraphicsItem*);
+    QTSCRIPT_CONV(qgs,QGraphicsScene*);
+    QTSCRIPT_CONV(qgilist,QList<QGraphicsItem*>);
+#undef QTSCRIPT_CONV
     /**
        Creates a new QScriptEngine (which the caller owns).  It is
        preconfigured with qboard-specific functionality.
@@ -249,10 +267,64 @@ namespace qboard {
 	int m_max;
     };
 
+    class JSVariantPrototype :
+	public QObject,
+	public QScriptable
+    {
+	Q_OBJECT
+    public:
+	explicit JSVariantPrototype( QObject * parent = 0 );
+	virtual ~JSVariantPrototype();
+
+    public Q_SLOTS:
+        /** A text/experiment function. */
+	void foo();
+	/**
+	   Returns a stringified form of this object's
+	   QVariant. String string will be the same as it is when a
+	   QVariant is passed to qDebug().
+	*/
+	QString toString();
+	/**
+	   Returns this object's QVariant's userType() value.
+	*/
+	int variantType();
+	/**
+	   Tries to convert this object's QVariant to
+	   a generic JS object. Null is returned if no
+	   conversion is possible. On success, a conversion
+	   of the variant is returned. For simple PODs
+	   (int, double, string, bool) this is a value.
+	   For objects, the exact properties depend on
+	   this->variantType().
+
+	   Current supported types, aside from the basic
+	   PODs:
+
+	   - QVariant::Color, returns a string value
+
+	   - QVariant::DateTime, a new JS Date object.
+
+	   - QVariant::Point/PointF, JS properties = x, y
+
+	   - QVariant::RegExp, a new JS RegExp
+
+	   - QVariant::Size, JS properties = width, height
+
+	   Note that objects created this way cannot simply
+	   be passed back to routines which expect those
+	   native types. e.g. you cannot pass {x:1,y:2}
+	   to a routine which expects a QPoint, even though
+	   this routine will convert a QPoint to an object
+	   with x/y properties.
+	*/
+	QScriptValue value();
+    private:
+	struct Impl;
+	Impl * impl;
+    };
+
 } // namespace
 
-#include <QList>
-#include <QGraphicsItem>
-Q_DECLARE_METATYPE(QList<QGraphicsItem*>)
 
 #endif // QBOARD_ScriptQt_H_INCLUDED
