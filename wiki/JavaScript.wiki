@@ -1,6 +1,8 @@
 #summary Scripting QBoard with JavaScript
 #labels Docs-User,Featured
 
+See also: [JSSnippets]
+
 = Introduction =
 
 Starting with version 20080827, QBoard is getting JavaScript support. This document gives an overview of what's possible with the current code.
@@ -95,5 +97,3 @@ Here is an overview of the public member functions and properties of the qboard 
 || scene || The underlying QBoardScene object. ||
 || value prop(item,key) || Returns the given property value from the given object. Not all types are currently usable from script code (e.g. QPoint and QColor), but they can be passed around as arguments. ||
 || view || A QBoardView object. This is only available running a script from the QBoard main window, in the context of the main GameState instance. ||
-
-
