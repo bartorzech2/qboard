@@ -18,10 +18,6 @@ var pc = qboard.createObject('QGIDot',{
     pos:qboard.placementPos(),
     color:'red'
 });
-// Setting properties later:
-qboard.prop( pc, 'scale', 1.5 );
-// or several properties at once:
-qboard.props( pc, {angle:90,scale:1.0} );
 // QGIDot has a custom function which can "split" the
 // dot into two, connected by a line:
 pc.split();
@@ -45,6 +41,17 @@ qboard.createObject('QGIPiece',{
 });
 }}}
 
+== Setting properties after creation ==
+
+{{{
+// Set a single property:
+qboard.prop( pc, 'scale', 1.5 );
+// or several properties at once:
+qboard.props( pc, {angle:90,scale:1.0} );
+}}}
+
+For the list of properties supported by each piece type, and
+their required types, see [JavaScript the JavaScript page].
 
 = Destroying items =
 
