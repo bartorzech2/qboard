@@ -365,12 +365,10 @@ namespace qboard {
 	    ! args.property("length").isUndefined() )
 	{
 	    int argc = args.property("length").toInt32();
-	    if( 1 == argc )
+	    QScriptValue arg = args.property(0);
+	    if( (1 == argc) && arg.isString() )
 	    {
-		QScriptValue arg = args.property(0);
-		return arg.isString()
-		    ? QColor( arg.toString() )
-		    : QColor( arg.toInt32() );
+		return QColor( arg.toString() );
 	    }
 	    r = (argc > 0) ? ARG(0) : 0;
 	    g = (argc > 1) ? ARG(1) : 0;
@@ -531,6 +529,21 @@ namespace qboard {
 			    );
     }
 
+    /**
+       JS usage:
+
+       toSource(value)
+
+       will attempt to create JS source code for the given value. This
+       currently has some significant limitations:
+
+       - functions cannot be toSourced
+
+       - Circular references in an object tree may cause this routine
+       to loop forever. It should write object references, but it
+       doesn't yet (and i'm not sure if QtScript supports them). And
+       i've forgotten the JS syntax for them, anyway.
+    */
     static QScriptValue js_toSource(QScriptContext *ctx, QScriptEngine *eng)
     {
 	return ctx->argumentCount()
