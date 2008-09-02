@@ -9,9 +9,11 @@ are at the top. Dates written extra large are release dates.
 ----
 *2008 Sept 1*
 
-- QGIDot objects can now be rotated. This only has a visible effect when they have children, as the children are rotated relative to the parent.
+- Improvements in the JS-side interface. It's now possible to create new pieces, change them via setting properties, and delete them. _Querying_ certain types of piece properties is still problematic, and will be for the forseeable future.
 
-- Added piece menu option to shuffle selected items. This only shows up when two or more items are selected, and randomly swaps the positions of the selected items. Parented items are not shuffled (it causes coordinate translation problems). This can be used to randomly shuffle covered pieces, shuffle cards, etc.
+- QGIDot objects can now be rotated. While rotating a circle might not have much visual effect, any children of the dot are rotated relative to the dot, so the rotation will be visible when a dot has been split or otherwise had children added to it.
+
+- Added piece menu option to shuffle selected items. This only shows up when two or more items are selected, and randomly swaps the positions of the selected items. Parented items are not shuffled (it causes coordinate translation problems). This can be used, e.g., to randomly shuffle covered pieces or cards.
 
 - Added board menu entries to create new dots and html items.
 
