@@ -27,6 +27,7 @@
 #include <QVariant>
 
 #include <QByteArray>
+#include <QDataStream>
 #include <QBuffer>
 #include <QDateTime>
 
@@ -34,6 +35,121 @@ Q_DECLARE_METATYPE(QList<QGraphicsItem*>)
 Q_DECLARE_METATYPE(QVariant)
 
 namespace qboard {
+
+    QString to_source_f<QPoint>::operator()( QPoint const & x ) const
+    {
+	return QString("QPoint(%1,%2)").arg(x.x()).arg(x.y());
+    }
+
+    QString to_source_f<QPointF>::operator()( QPointF const & x ) const
+    {
+	return QString("QPointF(%1,%2)").arg(x.x()).arg(x.y());
+    }
+    QString to_source_f<QSize>::operator()( QSize const & x ) const
+    {
+	return QString("QSize(%1,%2)").arg(x.width()).arg(x.height());
+    }
+
+    QString to_source_f<QString>::operator()( QString const & x ) const
+    {
+	bool hasSQ = x.contains('\'');
+	if( ! hasSQ ) return QString("'%1'").arg(x);
+	bool hasDQ = x.contains('"');
+	if( ! hasDQ ) return QString("\"%1\"").arg(x);
+	QString y(x);
+	return QString("\"%1\"").arg(
+				     y.replace('"',"\\\"") );
+    }
+
+    QString to_source_f<QVariant>::operator()( QVariant const & x ) const
+    {
+	switch( x.userType() )
+	{
+#define DO(VT,T) \
+	    case QVariant::VT: \
+		return qboard::toSource( x.value<T>() ); break;
+
+	    DO(Int,int);
+	    DO(Double,int);
+	    DO(String,QString);
+	    DO(Point,QPoint);
+	    DO(PointF,QPointF);
+	    DO(Size,QSize);
+	    case QVariant::Color:
+		return qboard::toSource( x.value<QString>() ); break;
+	  default:
+	      break;
+#undef DO
+	};
+	return QString("undefined");
+    }
+
+    struct to_source_f_object
+    {
+	QString operator()( QScriptValue const & x ) const
+	{
+	    if( ! x.isObject() ) return QString("undefined"); // should we return an empty string?
+	    QScriptValueIterator it( x );
+	    QByteArray ba;
+ 	    QBuffer buf(&ba);
+	    buf.open(QIODevice::WriteOnly);
+	    bool isAr = x.isArray();
+	    char const * opener = (isAr ? "[" : "{");
+	    char const * closer = (isAr ? "]" : "}");
+	    char const * sep = ",";
+	    //str << opener;
+	    buf.write(opener);
+	    while( it.hasNext() )
+	    {
+		it.next();
+		if(0) qDebug() << "to_source_object_f: child:"<<it.name();
+		QString sub;
+		if( isAr )
+		{
+		    sub = toSource( it.value() );
+		}
+		else
+		{
+		    sub = QString("%1:%2").
+			arg(it.name()).
+			arg( toSource( it.value() ) );
+		}
+		buf.write( sub.toAscii().constData(), sub.size() );
+		if( it.hasNext() ) buf.write(sep);
+	    }
+	    buf.write(closer);
+	    buf.close();
+	    QString ret(ba);
+	    if(0) qDebug() << "to_source_f_object() returning:"<<ret
+			   << "\nbytecount="<<ba.count();
+	    return ret;
+	}
+    };
+
+
+    QString to_source_f<QScriptValue>::operator()( QScriptValue const & x ) const
+    {
+	if( x.isUndefined() ) return "undefined";
+	if( x.isNull() ) return "null";
+
+#define TODO(A,B,C)
+#define DO(IS,T,TO) \
+	if( x.IS() ) return toSource<T>( x.TO() );
+
+	DO(isVariant,QVariant,toVariant); // must come before the others!
+	DO(isBoolean,bool,toBoolean);
+	DO(isNumber,qreal,toNumber);
+	DO(isString,QString,toString);
+	TODO(isRegExp,QRegExp,toRegExp);
+	if( x.isArray() || x.isObject() )
+	{
+	    return to_source_f_object()( x );
+	}
+
+#undef DO
+#undef TODO
+	return QString("undefined");
+    }
 
 
     QScriptValue qpointfToScriptValue(QScriptEngine *engine, const QPointF &s)
@@ -302,6 +418,14 @@ namespace qboard {
 			    );
     }
 
+    static QScriptValue js_toSource(QScriptContext *ctx, QScriptEngine *eng)
+    {
+	return ctx->argumentCount()
+	    ? QScriptValue(eng, toSource( ctx->argument(0) ) )
+	    : eng->nullValue();
+    }
+
+
     /**
        JS usage:
 
@@ -377,6 +501,9 @@ namespace qboard {
 			 QScriptValue::ReadOnly | QScriptValue::Undeletable );
 	glob.setProperty("randomInt",
 			 js->newFunction(js_randomInt),
+			 QScriptValue::ReadOnly | QScriptValue::Undeletable );
+	glob.setProperty("toSource",
+			 js->newFunction(js_toSource),
 			 QScriptValue::ReadOnly | QScriptValue::Undeletable );
  	/**
 	   Damn... if i have both a QPoint ctor and to/fromScriptValue routines
@@ -609,6 +736,12 @@ namespace qboard {
 	qDebug() << "JSVariantPrototype::foo() val="<<self;
     }
 
+    QString JSVariantPrototype::toSource()
+    {
+	SELF(QString("undefined"));
+	return qboard::toSource<QVariant>( self );
+    }
+
     QString JSVariantPrototype::toString()
     {
 	SELF(QString("[invalid object]"));
@@ -616,11 +749,11 @@ namespace qboard {
 #if 1
 	QByteArray ba;
 	QBuffer buf(&ba);
-	buf.open(QBuffer::WriteOnly);
+	buf.open(QIODevice::WriteOnly);
 	QDebug out(&buf);
 	out << self;
 	buf.close();
-	ret = ba.data() ? ba.data() : "??WTF??";
+	ret = QString(ba); // ba.data() ? ba.data() : "??WTF??";
 #else
   	ret = QString("QVariant(Type=%1)").
   	    arg(self.type());
@@ -638,7 +771,7 @@ namespace qboard {
 	SELF(QScriptValue());
 	if( ! self.isValid() ) return js->nullValue();
 	QScriptValue obj( js->nullValue() );
-	switch( self.type() )
+	switch( self.userType() )
 	{
 #define POD(T,F) case QVariant::T: obj = QScriptValue(js,self.F() ); break
 	    POD(Bool,toBool);

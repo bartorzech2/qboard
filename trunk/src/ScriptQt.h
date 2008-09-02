@@ -13,6 +13,7 @@
  *
  */
 
+#include <QString>
 #include <QObject>
 #include <QScriptEngine>
 #include <QScriptValue>
@@ -26,8 +27,9 @@ class QScriptContext;
 #include <QPointF>
 #include <QSize>
 #include <QList>
-#include <QGraphicsItem>
-#include <QGraphicsScene>
+class QGraphicsItem;
+class QGraphicsScene;
+
 
 namespace qboard {
 
@@ -319,12 +321,170 @@ namespace qboard {
 	   with x/y properties.
 	*/
 	QScriptValue value();
+
+	/**
+	   see qboard::toSource<QVariant>().
+	*/
+	QString toSource();
     private:
 	struct Impl;
 	Impl * impl;
     };
 
-} // namespace
 
+    /**
+       to_source_f is a helper to implement classical JavaScript
+       toSource() features for native types.
+    */
+    template <typename T>
+    struct to_source_f
+    {
+	/**
+	   Default implementation returns a string which is only
+	   useful for debuggering.
+	*/
+	QString operator()( T const & ) const
+	{
+	    return QString("'UNSPECIALIZED to_source_f<T>'");
+	}
+    };
+    /**
+       A specialization for pointer types which can handle null
+       values. For non-null pointers it is equivalent to
+       to_source_f<T>.
+    */
+    template <typename T>
+    struct to_source_f<T*>
+    {
+	QString operator()( T const * & x ) const
+	{
+	    return x
+		? to_source_f<T>()( *x )
+		: QString("null");
+	}
+    };
+
+    /**
+       Returns to_source_f<T>()( x ).
+    */
+    template <typename T>
+    QString toSource( T const & x )
+    {
+	return to_source_f<T>()( x );
+    }
+
+    /**
+       to_source_f specialization for QPoint.
+    */
+    template <>
+    struct to_source_f<QPoint>
+    {
+	QString operator()( QPoint const & ) const;
+    };
+    /**
+       to_source_f specialization for QPointF.
+    */
+    template <>
+    struct to_source_f<QPointF>
+    {
+	QString operator()( QPointF const &  ) const;
+    };
+    /**
+       to_source_f specialization for QString.
+       Takes special care to quote the string.
+    */
+    template <>
+    struct to_source_f<QString>
+    {
+	QString operator()( QString const &  ) const;
+    };
+    /**
+       to_source_f specialization for QSize.
+    */
+    template <>
+    struct to_source_f<QSize>
+    {
+	QString operator()( QSize const & ) const;
+    };
+    /**
+       to_source_f specialization for QScriptValue.
+    */
+    template <>
+    struct to_source_f<QScriptValue>
+    {
+	QString operator()( QScriptValue const & ) const;
+    };
+    /**
+       to_source_f specialization for QVariant.
+    */
+    template <>
+    struct to_source_f<QVariant>
+    {
+	/**
+	   Returns the JS source code form of v's value.
+       
+	   Only the following QVariant::Type types are support:
+       
+	   - Int
+	   - Color (returned as a simple string, not full color info)
+	   - Double
+	   - Point/PointF
+	   - Size
+	   - String
+
+	   All others will result in the value "undefined"
+	   being returned.
+	*/
+	QString operator()( QVariant const & v) const;
+    };
+
+    /**
+       A helper for to_source_f which can to-source
+       any type supported by QString::arg(). DO NOT
+       use this for QString types, as this will not
+       quote them properly.
+    */
+    struct to_source_pod_f
+    {
+	template <typename T>
+	QString operator()( T const x ) const
+	{
+	    return QString("%1").arg(x);
+	}
+	QString operator()( QString const x ) const
+	{
+	    return to_source_f<QString>()(x);
+	}
+    };
+
+    /**
+       to_source_f specialization for int.
+    */
+    template <>
+    struct to_source_f<int> : to_source_pod_f {};
+    /**
+       to_source_f specialization for long.
+    */
+    template <>
+    struct to_source_f<long> : to_source_pod_f {};
+    /**
+       to_source_f specialization for size_t.
+    */
+    template <>
+    struct to_source_f<size_t> : to_source_pod_f {};
+    /**
+       to_source_f specialization for qreal.
+    */
+    template <>
+    struct to_source_f<qreal> : to_source_pod_f {};
+    /**
+       to_source_f specialization for bool.
+    */
+    template <>
+    struct to_source_f<bool> : to_source_pod_f {};
+
+
+
+} // namespace
 
 #endif // QBOARD_ScriptQt_H_INCLUDED
