@@ -1,6 +1,8 @@
 #summary JavaScript snippets for use in QBoard
 #labels Docs-User
 
+See also: [JavaScript]
+
 = Introduction =
 
 Here is a collection of JavaScript snippets which can be used with QBoard.
