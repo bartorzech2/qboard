@@ -125,6 +125,31 @@ static QScriptValue jsEtGameProperty(QScriptContext *context,
 }
 #endif // jsEtGameProperty()
 
+
+QScriptValue getsetPlacementPos(QScriptContext *ctx, QScriptEngine *eng)
+{
+    QScriptValue obj = ctx->thisObject();
+    GameState * s = qscriptvalue_cast<GameState*>(obj);
+    if( ! s )
+    {
+	return eng->evaluate( QString("new Error('%1:%2: Internal error: (GameState*) is missing.')").
+			      arg(__FILE__).arg(__LINE__) );
+    }
+    qboard::ScriptArgv argv(ctx);
+    if( 0 == argv.argc() )
+    {
+	return eng->toScriptValue( s->placementPos() );
+    }
+    else if( 1 == argv.argc() )
+    {
+	QPointF p;
+	qboard::qpointfFromScriptValue( argv.value(), p );
+	if(0) qDebug() << "Got QPointF pos: " << p;
+	s->setPlacementPos( p );
+	return argv.value();
+    }
+    return eng->evaluate("new Error('Incorrect argument count. Usage: (pos = QPoint(x,y)) or (var x = pos)')","error message");
+}
 //Q_DECLARE_METATYPE(QGraphicsItem*);
 
 
@@ -185,6 +210,9 @@ void GameState::setup()
 				);
     impl->jsThis.setProperty( "board", sval );
 
+    impl->jsThis.setProperty("pos",
+			     impl->js->newFunction(getsetPlacementPos),
+			     QScriptValue::PropertyGetter|QScriptValue::PropertySetter);
     sval = impl->js->newQObject(impl->scene, QScriptEngine::QtOwnership );
     impl->jsThis.setProperty( "scene", sval );
 
