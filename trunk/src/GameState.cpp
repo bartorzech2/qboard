@@ -33,6 +33,7 @@
 #include <s11n.net/s11n/s11n_debuggering_macros.hpp>
 
 #include "QGIPiecePlacemarker.h"
+#include "JSGameState.h"
 
 
 struct GameState::Impl
@@ -146,7 +147,6 @@ GameState::~GameState()
     this->clear();
     delete impl;
 }
-#include "JSGameState.h"
 void GameState::setup()
 {
     impl->js = qboard::createScriptEngine(this);
