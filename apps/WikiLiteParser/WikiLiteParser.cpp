@@ -82,6 +82,12 @@ namespace qboard {
 		state.out->write("</ul>\n",6);
 		return;
 	    }
+	    if( state.flags & state_t::OList )
+	    {
+		state.flags -= state_t::OList;
+		state.out->write("</ol>\n",6);
+		return;
+	    }
 	    if( state.nlCount >= 2 )
 	    {
 		state.out->write("</br>\n",6);
@@ -211,7 +217,19 @@ namespace qboard {
 	    {
 		accum = accum.substr( 0, accum.size() - 3 );
 	    }
-	    state.out->write("<pre>",5);
+	    if(true)
+	    {
+		QString tag("<pre style='");
+		tag.append( "margin-left: 2em;" );
+		tag.append( "padding: 0.5em;" );
+		tag.append( "border-left: 3px solid #ccc;" );
+		tag.append( "'>" );
+		state.out->write( tag.toAscii() );
+	    }
+	    else
+	    {
+		state.out->write("<pre>",5);
+	    }
 	    char const * str = accum.c_str();
 	    for( ; str && *str; ++str )
 	    {
@@ -245,6 +263,7 @@ namespace qboard {
 	}
     };
 
+    template <bool Numbered>
     struct a_bullet_open
     {
 	static void matched( parser_state &,
@@ -255,10 +274,13 @@ namespace qboard {
 	    {
 		state.flags += state_t::Bullet;
 	    }
-	    if( ! (state.flags & state_t::UList) )
+	    int flag = Numbered ? state_t::OList : state_t::UList;
+	    if( ! (state.flags & flag) )
 	    {
-		state.flags += state_t::UList;
-		state.out->write("<ul>", 4);
+		state.flags += flag;
+		QString tag;
+		tag.sprintf( "<%cl>", Numbered ? 'o' : 'u' );
+		state.out->write( tag.toAscii() );
 	    }
 	    state.out->write( "<li>", 4 );
 	}
@@ -293,12 +315,16 @@ namespace qboard {
     struct r_toeol : r_star< r_notch<'\n'> >
     {};
 
-    struct r_bullet
+    template <bool Numbered>
+    struct r_bullet_x
 	: r_action< r_and< RL< r_opt< r_ch<'\n'> >,
 			       r_plus< r_repeat<r_blank,2> >,
-			       r_ch<'*'>,
+			       r_ch<Numbered ? '#' : '*'>,
 			       r_star<r_blank> > >,
-		    a_bullet_open >
+		    a_bullet_open<Numbered> >
+    {};
+
+    struct r_bullet : r_or< RL< r_bullet_x<true>, r_bullet_x<false> > >
     {};
 
     struct r_marker

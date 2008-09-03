@@ -9,7 +9,7 @@
 
 int main( int, char ** )
 {
-    COUT << "main()\n";
+    CERR << "main()\n";
     QFile inf("/dev/stdin");
     inf.open(QIODevice::ReadOnly);
     QByteArray src( inf.readAll() );
@@ -26,7 +26,7 @@ int main( int, char ** )
     out.close();
     CERR << ":::END PARSING\n";
     CERR << "Worked? == "<<worked<<'\n';
-    COUT << "bye!\n";
+    CERR << "bye!\n";
     return 0;
 }
 
