@@ -110,47 +110,47 @@ namespace qboard {
 	return QString("undefined");
     }
 
-    struct to_source_f_object
+    QString to_source_f_object::operator()( QScriptValue const & x ) const
     {
-	QString operator()( QScriptValue const & x ) const
+	if( ! x.isObject() ) return QString("undefined"); // should we return an empty string?
+	if( ! x.isNull() ) return QString("null");
+	QScriptValueIterator it( x );
+	QByteArray ba;
+	QBuffer buf(&ba);
+	// Note that we use QBuffer, instead of QDataStream because
+	// writing to a QDataStream serializes in a custom binary format. :(
+	buf.open(QIODevice::WriteOnly);
+	bool isAr = x.isArray();
+	char const * opener = (isAr ? "[" : "{");
+	char const * closer = (isAr ? "]" : "}");
+	char const * sep = ",";
+	//str << opener;
+	buf.write(opener);
+	while( it.hasNext() )
 	{
-	    if( ! x.isObject() ) return QString("undefined"); // should we return an empty string?
-	    QScriptValueIterator it( x );
-	    QByteArray ba;
- 	    QBuffer buf(&ba);
-	    buf.open(QIODevice::WriteOnly);
-	    bool isAr = x.isArray();
-	    char const * opener = (isAr ? "[" : "{");
-	    char const * closer = (isAr ? "]" : "}");
-	    char const * sep = ",";
-	    //str << opener;
-	    buf.write(opener);
-	    while( it.hasNext() )
+	    it.next();
+	    if(0) qDebug() << "to_source_object_f: child:"<<it.name();
+	    QString sub;
+	    if( isAr )
 	    {
-		it.next();
-		if(0) qDebug() << "to_source_object_f: child:"<<it.name();
-		QString sub;
-		if( isAr )
-		{
-		    sub = toSource( it.value() );
-		}
-		else
-		{
-		    sub = QString("%1:%2").
-			arg(it.name()).
-			arg( toSource( it.value() ) );
-		}
-		buf.write( sub.toAscii().constData(), sub.size() );
-		if( it.hasNext() ) buf.write(sep);
+		sub = toSource( it.value() );
 	    }
-	    buf.write(closer);
-	    buf.close();
-	    QString ret(ba);
-	    if(0) qDebug() << "to_source_f_object() returning:"<<ret
-			   << "\nbytecount="<<ba.count();
-	    return ret;
+	    else
+	    {
+		sub = QString("%1:%2").
+		    arg(it.name()).
+		    arg( toSource( it.value() ) );
+	    }
+	    buf.write( sub.toAscii().constData(), sub.size() );
+	    if( it.hasNext() ) buf.write(sep);
 	}
-    };
+	buf.write(closer);
+	buf.close();
+	QString ret(ba);
+	if(0) qDebug() << "to_source_f_object() returning:"<<ret
+		       << "\nbytecount="<<ba.count();
+	return ret;
+    }
 
 
     QString to_source_f<QScriptValue>::operator()( QScriptValue const & x ) const
@@ -179,7 +179,7 @@ namespace qboard {
 
 
     template <typename PT>
-    QScriptValue convert_script_value_point<PT>::operator()(QScriptEngine*eng,
+    QScriptValue convert_script_value_f_point<PT>::operator()(QScriptEngine*eng,
 							   const PT & src) const
     {
 	QScriptValue obj = eng->newObject();
@@ -189,7 +189,7 @@ namespace qboard {
     }
 
     template <typename PT>
-    PT convert_script_value_point<PT>::operator()( QScriptEngine *,
+    PT convert_script_value_f_point<PT>::operator()( QScriptEngine *,
 						  const QScriptValue & args ) const
     {
 	qreal x = 0;
@@ -253,7 +253,7 @@ namespace qboard {
 
 
     template <typename RT>
-    QScriptValue convert_script_value_rect<RT>::operator()(QScriptEngine*eng,
+    QScriptValue convert_script_value_f_rect<RT>::operator()(QScriptEngine*eng,
 							   const RT & s) const
     {
 	QScriptValue obj = eng->newObject();
@@ -265,7 +265,7 @@ namespace qboard {
     }
 
     template <typename RT>
-    RT convert_script_value_rect<RT>::operator()( QScriptEngine *,
+    RT convert_script_value_f_rect<RT>::operator()( QScriptEngine *,
 						  const QScriptValue & args ) const
     {
 	qreal l = 0;
@@ -300,7 +300,7 @@ namespace qboard {
     }
 
     template <typename ST>
-    QScriptValue convert_script_value_size<ST>::operator()(QScriptEngine*eng,
+    QScriptValue convert_script_value_f_size<ST>::operator()(QScriptEngine*eng,
 							   const ST & s) const
     {
 	QScriptValue obj = eng->newObject();
@@ -310,7 +310,7 @@ namespace qboard {
     }
 
     template <typename ST>
-    ST convert_script_value_size<ST>::operator()( QScriptEngine *,
+    ST convert_script_value_f_size<ST>::operator()( QScriptEngine *,
 						  const QScriptValue & args ) const
     {
 	qreal w = 0;
@@ -342,7 +342,7 @@ namespace qboard {
     }
 
 
-    QScriptValue convert_script_value<QColor>::operator()(QScriptEngine*eng,
+    QScriptValue convert_script_value_f<QColor>::operator()(QScriptEngine*eng,
 							  const QColor & col) const
     {
 	QScriptValue obj = eng->newObject();
@@ -353,7 +353,7 @@ namespace qboard {
 	return obj;
     }
 
-    QColor convert_script_value<QColor>::operator()( QScriptEngine *,
+    QColor convert_script_value_f<QColor>::operator()( QScriptEngine *,
 						     const QScriptValue & args ) const
     {
 	int r = 0;
@@ -405,7 +405,7 @@ namespace qboard {
     }
 
 
-    QScriptValue convert_script_value<QGraphicsItem*>::operator()(QScriptEngine *eng,
+    QScriptValue convert_script_value_f<QGraphicsItem*>::operator()(QScriptEngine *eng,
 								  QGraphicsItem * const & in) const
     {
 	QObject * obj = dynamic_cast<QObject*>(in);
@@ -414,13 +414,13 @@ namespace qboard {
 	    : QScriptValue();
     }
 
-    QGraphicsItem* convert_script_value<QGraphicsItem*>::operator()( QScriptEngine *,
+    QGraphicsItem* convert_script_value_f<QGraphicsItem*>::operator()( QScriptEngine *,
 								     const QScriptValue & args ) const
     {
 	return dynamic_cast<QGraphicsItem*>(args.toQObject());
     }
 
-    QScriptValue convert_script_value<QGraphicsScene*>::operator()(QScriptEngine *eng,
+    QScriptValue convert_script_value_f<QGraphicsScene*>::operator()(QScriptEngine *eng,
 								  QGraphicsScene * const & in) const
     {
 	QObject * obj = dynamic_cast<QObject*>(in);
@@ -429,14 +429,14 @@ namespace qboard {
 	    : QScriptValue();
     }
 
-    QGraphicsScene* convert_script_value<QGraphicsScene*>::operator()( QScriptEngine *,
+    QGraphicsScene* convert_script_value_f<QGraphicsScene*>::operator()( QScriptEngine *,
 								     const QScriptValue & args ) const
     {
 	return dynamic_cast<QGraphicsScene*>(args.toQObject());
     }
     
 
-    QScriptValue convert_script_value<QList<QGraphicsItem*> >::
+    QScriptValue convert_script_value_f<QList<QGraphicsItem*> >::
     operator()(QScriptEngine *eng,
 	       QList<QGraphicsItem *> const & in) const
     {
@@ -453,7 +453,7 @@ namespace qboard {
 	return ar;
     }
 
-    QList<QGraphicsItem*> convert_script_value<QList<QGraphicsItem*> >::
+    QList<QGraphicsItem*> convert_script_value_f<QList<QGraphicsItem*> >::
     operator()( QScriptEngine *,
 		const QScriptValue & args ) const
     {

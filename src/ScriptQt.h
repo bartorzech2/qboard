@@ -38,7 +38,7 @@ namespace qboard {
        Specialize this to provide custom behaviour.
     */
     template <typename T>
-    struct convert_script_value
+    struct convert_script_value_f
     {
 	/**
 	   Default implementation returns eng->toScriptValue(t).
@@ -65,7 +65,7 @@ namespace qboard {
     template <typename T>
     QScriptValue toScriptValue( QScriptEngine * e, T const & t )
     {
-	return convert_script_value<T>()( e, t );
+	return convert_script_value_f<T>()( e, t );
     }
     /**
        Front-end for converting QScriptValues to other types.
@@ -73,7 +73,7 @@ namespace qboard {
     template <typename T>
     T fromScriptValue( QScriptEngine * e, QScriptValue const & v )
     {
-	return convert_script_value<T>()( e, v );
+	return convert_script_value_f<T>()( e, v );
     }
 
     /**
@@ -91,7 +91,7 @@ namespace qboard {
        Converts a QScriptValue to/from a QPoint or QPointF.
     */
     template <typename PT>
-    struct convert_script_value_point
+    struct convert_script_value_f_point
     {
 	/**
 	   Creates {x:pt.x(),y:pt.y()}
@@ -107,17 +107,17 @@ namespace qboard {
     };
 
     template <>
-    struct convert_script_value<QPoint> : convert_script_value_point<QPoint> {};
+    struct convert_script_value_f<QPoint> : convert_script_value_f_point<QPoint> {};
 
     template <>
-    struct convert_script_value<QPointF> : convert_script_value_point<QPointF> {};
+    struct convert_script_value_f<QPointF> : convert_script_value_f_point<QPointF> {};
 
 
     /**
        Converts QRect/QRectF to/from QScriptValue.
     */
     template <typename RT>
-    struct convert_script_value_rect
+    struct convert_script_value_f_rect
     {
 	/**
 	   Creates {left:r.left(),top:r.top(),width:r.width(),height:r.height()}
@@ -133,26 +133,26 @@ namespace qboard {
     };
 
     template <>
-    struct convert_script_value<QRect> : convert_script_value_rect<QRect> {};
+    struct convert_script_value_f<QRect> : convert_script_value_f_rect<QRect> {};
 
     template <>
-    struct convert_script_value<QRectF> : convert_script_value_rect<QRectF> {};
+    struct convert_script_value_f<QRectF> : convert_script_value_f_rect<QRectF> {};
 
     template <>
-    struct convert_script_value<QGraphicsItem*>
+    struct convert_script_value_f<QGraphicsItem*>
     {
 	QScriptValue operator()( QScriptEngine *, QGraphicsItem * const & r) const;
 	QGraphicsItem * operator()( QScriptEngine *, const QScriptValue & args) const;
     };
     template <>
-    struct convert_script_value<QGraphicsScene*>
+    struct convert_script_value_f<QGraphicsScene*>
     {
 	QScriptValue operator()( QScriptEngine *, QGraphicsScene * const & r) const;
 	QGraphicsScene * operator()( QScriptEngine *, const QScriptValue & args) const;
     };
 
     template <>
-    struct convert_script_value<QList<QGraphicsItem*> >
+    struct convert_script_value_f<QList<QGraphicsItem*> >
     {
 	QScriptValue operator()( QScriptEngine *, QList<QGraphicsItem *> const & r) const;
 	QList<QGraphicsItem *> operator()( QScriptEngine *, const QScriptValue & args) const;
@@ -163,7 +163,7 @@ namespace qboard {
        Converts QSize/QSizeF to/from QScriptValue.
     */
     template <typename ST>
-    struct convert_script_value_size
+    struct convert_script_value_f_size
     {
 	/**
 	   Creates object {width:sz.width(),height:sz.height()}
@@ -181,16 +181,16 @@ namespace qboard {
     };
 
     template <>
-    struct convert_script_value<QSize> : convert_script_value_size<QSize> {};
+    struct convert_script_value_f<QSize> : convert_script_value_f_size<QSize> {};
 
     template <>
-    struct convert_script_value<QSizeF> : convert_script_value_size<QSizeF> {};
+    struct convert_script_value_f<QSizeF> : convert_script_value_f_size<QSizeF> {};
 
     /**
        Converts QColor to/from QScriptObjects.
     */
     template <>
-    struct convert_script_value<QColor>
+    struct convert_script_value_f<QColor>
     {
 	/**
 	   Creates JS object {red:c.red(),green:c.green(),blue:c.blue(),alpha:c.alpha()}
@@ -216,6 +216,13 @@ namespace qboard {
 	QColor operator()( QScriptEngine *, const QScriptValue & args) const;
     };
 
+    static const convert_script_value_f<QPointF> jsConvertQPointF = convert_script_value_f<QPointF>();
+    static const convert_script_value_f<QPoint> jsConvertQPoint = convert_script_value_f<QPoint>();
+    static const convert_script_value_f<QSizeF> jsConvertQSizeF = convert_script_value_f<QSizeF>();
+    static const convert_script_value_f<QSize> jsConvertQSize = convert_script_value_f<QSize>();
+    static const convert_script_value_f<QRectF> jsConvertQRectF = convert_script_value_f<QRectF>();
+    static const convert_script_value_f<QRect> jsConvertQRect = convert_script_value_f<QRect>();
+    static const convert_script_value_f<QColor> jsConvertQColor = convert_script_value_f<QColor>();
 
     /**
        Creates a new QScriptEngine (which the caller owns).  It is
@@ -362,8 +369,8 @@ namespace qboard {
     {
     public:
 	/**
-	   Initialized argument traversal for the given context.
-	   Does not affect ownership of cx.
+	   Initializes argument traversal for the given context's
+	   arguments. Does not affect ownership of cx.
 
 	   Results of this object's operators are undefined if
 	   cx->argumentCount() (or the arguments array) changes during
@@ -475,8 +482,8 @@ namespace qboard {
        \endcode
 
        to set the prototype engine-wide, but this isn't working for
-       me. Dunno why.
-
+       me. Dunno why. i'm assuming that Qt installs its own explicit
+       handlers for QVariant and mine can't override them.
     */
     class JSVariantPrototype :
 	public QObject,
@@ -583,6 +590,16 @@ namespace qboard {
 
     /**
        Returns to_source_f<T>()( x ).
+
+       Note that object-to-source conversions are quite imperfect.
+       Basic values, objects, and arrays are handled, but
+       some cases are currently problematic (notably the lack
+       of correct handling for circular object references
+       and functions of any type).
+
+       Given the limitations, this support is best reserved for
+       debugging purposes, and not data serialization or object
+       cloning (e.g. by eval()ing the result).
     */
     template <typename T>
     QString toSource( T const & x )
@@ -596,7 +613,10 @@ namespace qboard {
     template <>
     struct to_source_f<QPoint>
     {
-	QString operator()( QPoint const & ) const;
+	/**
+	   Result = {x:p.x(),y:p.y()}
+	*/
+	QString operator()( QPoint const & p ) const;
     };
     /**
        to_source_f specialization for QPointF.
@@ -604,7 +624,10 @@ namespace qboard {
     template <>
     struct to_source_f<QPointF>
     {
-	QString operator()( QPointF const &  ) const;
+	/**
+	   Result = {x:p.x(),y:p.y()}
+	*/
+	QString operator()( QPointF const & p ) const;
     };
 
     /**
@@ -613,7 +636,10 @@ namespace qboard {
     template <>
     struct to_source_f<QRect>
     {
-	QString operator()( QRect const & ) const;
+	/**
+	   Result = {left:r.left(),top:r.top(),width:r.width(),height:r.height()}
+	*/
+	QString operator()( QRect const & r ) const;
     };
     /**
        to_source_f specialization for QRectF.
@@ -621,7 +647,10 @@ namespace qboard {
     template <>
     struct to_source_f<QRectF>
     {
-	QString operator()( QRectF const & ) const;
+	/**
+	   Result = {left:r.left(),top:r.top(),width:r.width(),height:r.height()}
+	*/
+	QString operator()( QRectF const & r ) const;
     };
 
     /**
@@ -630,7 +659,18 @@ namespace qboard {
     template <>
     struct to_source_f<QScriptValue>
     {
-	QString operator()( QScriptValue const & ) const;
+	/**
+	   Result depends on the type of v. If it is a simple type
+	   (number or bool) then the string form is identical to the
+	   native form. Otherwise:
+
+	   - String: same as to_source_f<QString>
+
+	   - RegExp: same as to_source_f<QRegExp>
+
+	   - Array or Object: same as to_source_f_object.
+	*/
+	QString operator()( QScriptValue const & v ) const;
     };
 
     /**
@@ -654,6 +694,12 @@ namespace qboard {
     template <>
     struct to_source_f<QString>
     {
+	/**
+	   The result is a quoted string. Whether it is single- or
+	   double-quoted is unspecified, and actually depends on
+	   whether the input string has any quotes and what kind they
+	   are (we take the "path of least escaping").
+	*/
 	QString operator()( QString const &  ) const;
     };
 
@@ -688,7 +734,7 @@ namespace qboard {
        use this for QString types, as this will not
        quote them properly.
     */
-    struct to_source_pod_f
+    struct to_source_f_pod
     {
 	template <typename T>
 	QString operator()( T const x ) const
@@ -702,31 +748,70 @@ namespace qboard {
     };
 
     /**
+       A helper to create stringified source code from
+       JS-side objects and arrays.
+    */
+    struct to_source_f_object
+    {
+	/**
+	   Attempts (imperfectly) to build JS source code for the
+	   given JS Object or Array.
+
+	   It can handle:
+
+	   - Basic Object properties.
+
+	   - Arrays
+
+	   - Null or Undefined values.
+
+
+	   It CANNOT handle:
+
+	   - Functions of any type.
+
+	   - Circular references. That will cause an endless loop.
+	   e.g.:
+
+	   \code
+	   var x = {};
+           var y = {myX:x};
+	   x.myY = y;
+	   \endcode
+
+	   Additionally, this code has very little in the way
+	   of error handling (e.g. it does not know that it
+	   cannot handle Functions and circular references).
+	*/
+	QString operator()( QScriptValue const & x ) const;
+    };
+
+
+    /**
        to_source_f specialization for int.
     */
     template <>
-    struct to_source_f<int> : to_source_pod_f {};
+    struct to_source_f<int> : to_source_f_pod {};
     /**
        to_source_f specialization for long.
     */
     template <>
-    struct to_source_f<long> : to_source_pod_f {};
+    struct to_source_f<long> : to_source_f_pod {};
     /**
        to_source_f specialization for size_t.
     */
     template <>
-    struct to_source_f<size_t> : to_source_pod_f {};
+    struct to_source_f<size_t> : to_source_f_pod {};
     /**
        to_source_f specialization for qreal.
     */
     template <>
-    struct to_source_f<qreal> : to_source_pod_f {};
+    struct to_source_f<qreal> : to_source_f_pod {};
     /**
        to_source_f specialization for bool.
     */
     template <>
-    struct to_source_f<bool> : to_source_pod_f {};
-
+    struct to_source_f<bool> : to_source_f_pod {};
 
 
 } // namespace
