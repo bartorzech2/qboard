@@ -258,6 +258,7 @@ void GameState::enablePlacemarker( bool en )
 	    impl->placer = new QGIPiecePlacemarker;
 	    //impl->placer->setGameState( *this );
 	    connect( impl->placer, SIGNAL(destroyed(QObject*)), this, SLOT(placemarkerDestroyed()) );
+	    impl->placer->setZValue(-11111.11111);
 	    impl->placer->setPos(impl->placeAt);
 	    impl->scene->addItem( impl->placer );
 	    QStringList help;
