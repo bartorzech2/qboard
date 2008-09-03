@@ -33,14 +33,6 @@ class QGraphicsScene;
 
 namespace qboard {
 
-#define QTSCRIPT_CONV(PRE,T) \
-    QScriptValue PRE ## ToScriptValue(QScriptEngine *, const T &); \
-	void PRE ## FromScriptValue(const QScriptValue &, T &)
-    QTSCRIPT_CONV(qgi,QGraphicsItem*);
-    QTSCRIPT_CONV(qgs,QGraphicsScene*);
-    QTSCRIPT_CONV(qgilist,QList<QGraphicsItem*>);
-#undef QTSCRIPT_CONV
-
     /**
        Used by toScriptValue() and fromScriptValue() to do conversions.
        Specialize this to provide custom behaviour.
@@ -57,8 +49,9 @@ namespace qboard {
 	}
 	/**
 	   Default implementation returns qscriptvalue_cast<T>(obj);
+	   Many conversions don't need the QScriptEngine parameter.
 	*/
-	T operator()( QScriptEngine * eng,const QScriptValue & obj ) const
+	T operator()( QScriptEngine *,const QScriptValue & obj ) const
 	{
 	    return qscriptvalue_cast<T>( obj );
 	}
@@ -66,6 +59,8 @@ namespace qboard {
 
     /**
        Front-end for converting types to QScriptValues.
+
+       Can be used as the 2nd parameter to qScriptRegisterMetaType().
     */
     template <typename T>
     QScriptValue toScriptValue( QScriptEngine * e, T const & t )
@@ -79,6 +74,17 @@ namespace qboard {
     T fromScriptValue( QScriptEngine * e, QScriptValue const & v )
     {
 	return convert_script_value<T>()( e, v );
+    }
+
+    /**
+       Assigns t to the converted value of obj.
+
+       Can be used as the 3rd parameter to qScriptRegisterMetaType().
+    */
+    template <typename T>
+    void fromScriptValue( const QScriptValue & obj, T & t)
+    {
+	t = fromScriptValue<T>( obj.engine(), obj );
     }
 
     /**
@@ -131,6 +137,26 @@ namespace qboard {
 
     template <>
     struct convert_script_value<QRectF> : convert_script_value_rect<QRectF> {};
+
+    template <>
+    struct convert_script_value<QGraphicsItem*>
+    {
+	QScriptValue operator()( QScriptEngine *, QGraphicsItem * const & r) const;
+	QGraphicsItem * operator()( QScriptEngine *, const QScriptValue & args) const;
+    };
+    template <>
+    struct convert_script_value<QGraphicsScene*>
+    {
+	QScriptValue operator()( QScriptEngine *, QGraphicsScene * const & r) const;
+	QGraphicsScene * operator()( QScriptEngine *, const QScriptValue & args) const;
+    };
+
+    template <>
+    struct convert_script_value<QList<QGraphicsItem*> >
+    {
+	QScriptValue operator()( QScriptEngine *, QList<QGraphicsItem *> const & r) const;
+	QList<QGraphicsItem *> operator()( QScriptEngine *, const QScriptValue & args) const;
+    };
 
 
     /**

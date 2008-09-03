@@ -404,40 +404,47 @@ namespace qboard {
 	return engine->toScriptValue( col );
     }
 
-    QScriptValue qgiToScriptValue(QScriptEngine *engine, QGraphicsItem* const &in)
+
+    QScriptValue convert_script_value<QGraphicsItem*>::operator()(QScriptEngine *eng,
+								  QGraphicsItem * const & in) const
     {
 	QObject * obj = dynamic_cast<QObject*>(in);
 	return obj
-	    ? engine->newQObject(obj)
+	    ? eng->newQObject(obj)
 	    : QScriptValue();
     }
-    
-    void qgiFromScriptValue(const QScriptValue &object, QGraphicsItem* &out)
+
+    QGraphicsItem* convert_script_value<QGraphicsItem*>::operator()( QScriptEngine *,
+								     const QScriptValue & args ) const
     {
-	out = dynamic_cast<QGraphicsItem*>(object.toQObject());
+	return dynamic_cast<QGraphicsItem*>(args.toQObject());
     }
 
-    QScriptValue qgsToScriptValue(QScriptEngine *engine, QGraphicsScene* const &in)
+    QScriptValue convert_script_value<QGraphicsScene*>::operator()(QScriptEngine *eng,
+								  QGraphicsScene * const & in) const
     {
 	QObject * obj = dynamic_cast<QObject*>(in);
 	return obj
-	    ? engine->newQObject(obj)
-	    : engine->nullValue();
-    }
-    
-    void qgsFromScriptValue(const QScriptValue &object, QGraphicsScene* &out)
-    {
-	out = dynamic_cast<QGraphicsScene*>(object.toQObject());
+	    ? eng->newQObject(obj)
+	    : QScriptValue();
     }
 
-    typedef QList<QGraphicsItem*> QGIList;
-    QScriptValue qgilistToScriptValue(QScriptEngine *js, QGIList const &in)
+    QGraphicsScene* convert_script_value<QGraphicsScene*>::operator()( QScriptEngine *,
+								     const QScriptValue & args ) const
     {
-	QScriptValue ar = js->newArray();
+	return dynamic_cast<QGraphicsScene*>(args.toQObject());
+    }
+    
+
+    QScriptValue convert_script_value<QList<QGraphicsItem*> >::
+    operator()(QScriptEngine *eng,
+	       QList<QGraphicsItem *> const & in) const
+    {
+	QScriptValue ar = eng->newArray();
 	unsigned int ndx = 0;
 	foreach( QGraphicsItem * gi, in )
 	{
-	    QScriptValue o = qgiToScriptValue(js,gi);
+	    QScriptValue o = toScriptValue(eng,gi);
 	    if( o.isObject() )
 	    {
 		ar.setProperty( ndx++, o );
@@ -446,18 +453,22 @@ namespace qboard {
 	return ar;
     }
 
-    void qgilistFromScriptValue(const QScriptValue &jso, QGIList &out)
+    QList<QGraphicsItem*> convert_script_value<QList<QGraphicsItem*> >::
+    operator()( QScriptEngine *,
+		const QScriptValue & args ) const
     {
-	if( ! jso.isObject() ) return;
-	QScriptValueIterator it( jso );
+	QList<QGraphicsItem*> out;
+	if( ! args.isObject() ) return out;
+	QScriptValueIterator it( args );
 	while( it.hasNext() )
 	{
 	    it.next();
-	    QGraphicsItem * qgi = 0;
-	    qgiFromScriptValue( it.value(), qgi );
+	    QGraphicsItem * qgi =
+		fromScriptValue<QGraphicsItem*>(args.engine(),it.value());
 	    if( ! qgi ) continue;
 	    out.push_back( qgi );
 	}
+	return out;
     }
 
 
@@ -599,9 +610,15 @@ namespace qboard {
 	QScriptEngine * js = new QScriptEngine( parent );
 	QScriptValue glob( js->globalObject() );
 
-	qScriptRegisterMetaType(js, qgiToScriptValue, qgiFromScriptValue);
-	qScriptRegisterMetaType(js, qgsToScriptValue, qgsFromScriptValue);
-	qScriptRegisterMetaType(js, qgilistToScriptValue, qgilistFromScriptValue);
+	qScriptRegisterMetaType<QGraphicsItem*>(js,
+						qboard::toScriptValue<QGraphicsItem*>,
+						qboard::fromScriptValue<QGraphicsItem*> );
+	qScriptRegisterMetaType(js,
+				qboard::toScriptValue<QGraphicsScene*>,
+				qboard::fromScriptValue<QGraphicsScene*> );
+	qScriptRegisterMetaType(js, 
+				qboard::toScriptValue<QList<QGraphicsItem*> >,
+				qboard::fromScriptValue<QList<QGraphicsItem*> > );
 
 	if(0)
 	{
