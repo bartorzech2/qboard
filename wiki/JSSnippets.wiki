@@ -73,7 +73,9 @@ is NOT the same. That only deletes the script-side representation of the object,
 
 A simple message box:
 
-{{{alert("Hi, world!");}}}
+{{{
+alert("Hi, world!");
+}}}
 
 A confirmation dialog:
 {{{
