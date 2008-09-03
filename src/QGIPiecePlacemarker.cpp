@@ -77,7 +77,7 @@ QGIPiecePlacemarker::~QGIPiecePlacemarker()
 
 void QGIPiecePlacemarker::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 {
-    QGITypes::handleClickRaise( this, ev );
+    //QGITypes::handleClickRaise( this, ev );
     this->QGraphicsItem::mousePressEvent(ev);
 }
 void QGIPiecePlacemarker::mouseReleaseEvent(QGraphicsSceneMouseEvent *ev)
