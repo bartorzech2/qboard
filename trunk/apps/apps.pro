@@ -1,4 +1,4 @@
 TEMPLATE = subdirs
 # CONFIG += ordered
-SUBDIRS = S11nQtTests QBoard
+SUBDIRS = S11nQtTests QBoard WikiLiteParser
 # qboardbatch
