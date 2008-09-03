@@ -514,7 +514,7 @@ namespace Ps {
 	/**
 	   Returns the after-the-end iterator.
 	*/
-	parse_iterator const & end() const { return m_head; }
+	//parse_iterator const & end() const { return m_head; }
 
 	/**
 	   Sets current position and returns
@@ -1261,6 +1261,7 @@ namespace Ps {
     template< typename Rule, unsigned int Min, unsigned int Max = Min >
     struct r_repeat
     {
+	typedef r_repeat type;
 	template <typename ClientState>
 	static bool matches( parser_state & in, ClientState & st )
 	{
@@ -1398,10 +1399,11 @@ namespace Ps {
 	    }
 	    else
 	    {
+		int ch = *in;
 		assert( (((CH>='a')&&(CH<='z'))
 			 || ((CH>='A')&&(CH<='Z')))
 			&& "r_ch_base<false,char> CH value is not alphabetic." );
-		return ( (*in==CH) || (*in == ((CH>='a') ? (CH-32) : (CH+32))) )
+		return ( (ch==CH) || (ch == ((CH>='a') ? (CH-32) : (CH+32))) )
 		    ? (++in,true)
 		    : false;
 	    }
