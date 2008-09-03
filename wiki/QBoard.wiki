@@ -41,7 +41,7 @@ Some things QBoard can be used for:
   * Pieces can have "child objects" which follow them around when the piece is dragged. e.g. one can add a text label, a record form, or status markers to any piece.
   * Use copy, paste, and cloning to quickly set up an army of pieces.
   * "Shuffle" any items by selecting several items and using the Shuffle menu option. Useful for cards, simulating a cup of chits, and randomizing piece selection or placement.
-  * JavaScript bindings are in the works. The basic stuff works, but this work ongoing.
+  * JavaScript bindings are under developement. [JavaScript The basic stuff works], but this work is ongoing.
 
 See also: the [TODOs] Page
 
