@@ -64,6 +64,10 @@ namespace qboard {
        [WikiLinks with optional label text], but note that non-URLs
        linked this way are always relative to the current URL.
 
+       [url://... with optional label text]
+
+       [url://link url://link_to_image.{gif,jpg,png}] for inlined images.
+
 
        Most HTML tags creates by this class have a CSS class of 'WLP'
        (as in Wiki-Lite-Parser), so one may customize their appearance
@@ -72,21 +76,17 @@ namespace qboard {
 
        NOTABLE TODOs:
 
-       [link_to_image.{jpg,png} optional label text]
-
-       Allow client to set a base URL which will be added to
+       - Allow client to set a base URL which will be added to
        generated links.
 
-       Allow client to set per-element type style settings.
+       - Allow client to set per-element type style settings.
 
-       There are no plans to support non-bracketed WikiWords. Nor
+       - There are no plans to support non-bracketed WikiWords. Nor
        are there plans to automatically link URL-looking strings.
 
+       KNOWN ANNOYANCES:
 
-       EXTENSIONS beyond what Google Code Wiki supports:
-
-       Use [[ to get a single [ in your output.
-
+       - H# tags should only be triggered at the beginning of a line.
 
 
        OTHER NOTES:
@@ -103,10 +103,8 @@ namespace qboard {
     class WikiLiteParser
     {
     public:
-	WikiLiteParser()
-	{}
-	~WikiLiteParser()
-	{}
+	WikiLiteParser();
+	~WikiLiteParser();
 
 	/**
 	   Parses the wiki-formated input text and sends the output
@@ -132,6 +130,26 @@ namespace qboard {
 	*/
 	QString parseFile( QString const & fileName );
 
+	/**
+	   Metatags are a feature of google code wiki
+	   which look like this:
+
+	   #key some arbitrary value
+
+	   which appear at the beginning of a wiki document.
+
+	   Such keys are filtered out of parsed output but can be
+	   fetched using this function. The value applies to the most
+	   recently parse()'d document.
+
+	   On error, or if no such metatag exists.
+	*/
+	QString metaTag( QString const & key ) const;
+
+// 	QString setMetaInfo( QString const & key, QString const & value );
+    private:
+	struct Impl;
+	Impl * impl;
     };
 
 }

@@ -18,8 +18,9 @@
 #include <QByteArray>
 #include <QFile>
 #include <QDebug>
-
-#include <cctype>
+#include <QMap>
+#include <QRegExp>
+// #include <cctype>
 
 #include "parsepp.hpp"
 #include "WikiLiteParser.h"
@@ -58,11 +59,15 @@ namespace qboard {
 	long flags;
 	int brCount;
 	int listDepth;
-	std::vector<int> listTypes;
+	typedef std::vector<int> IntVec;
+	IntVec listTypes;
 	QString wikiWord;
 	QString wikiLabel;
 	int tableCol;
 	int tableRow;
+	typedef QMap<QString,QString> MetaMap;
+	MetaMap meta;
+	QString metaKey;
 	state_t() : out(0),
 		    flags(None),
 		    brCount(0),
@@ -71,12 +76,29 @@ namespace qboard {
 		    wikiWord(),
 		    wikiLabel(),
 		    tableCol(0),
-		    tableRow(0)
+		    tableRow(0),
+		    meta(),
+		    metaKey()
 	{
 	}
 
 	~state_t()
 	{
+	}
+
+	void clear()
+	{
+	    out = 0;
+	    flags = None;
+	    brCount = 0;
+	    listDepth = 0;
+	    listTypes = IntVec(10,0);
+	    wikiWord = "";
+	    wikiLabel = "";
+	    tableCol = 0;
+	    tableRow = 0;
+	    meta.clear();
+	    metaKey = "";
 	}
 
 	void output( QString const & t )
@@ -142,89 +164,6 @@ namespace qboard {
 			     state_t & state )
 	{
 	    state.out->write( m.c_str(), m.size() );
-	}
-    };
-
-
-    struct a_newline
-    {
-	static void matched( parser_state & ps,
-			     const std::string &,
-			     state_t & state )
-	{
-	    if( state.flags & state_t::Bullet )
-	    {
-		state.flags -= state_t::Bullet;
-		state.output( "</li>" );
-	    }
-	    if( state.listDepth )
-	    { // close list
-		int type = state.listTypes[state.listDepth];
-		state.listTypes[state.listDepth--] = 0;
-		QString tag;
-		if( state_t::UList == type ) tag = "</ul>\n";
-		else if( state_t::OList == type ) tag = "</ol>\n";
-		else
-		{
-		    //throw new Ps::parse_error(ps,"Wiki parser: invalid list depth state.");
-		    QString msg =
-			QString("(WIKI PARSER ERROR: : invalid list depth state for tag '%s'.)").
-			arg(tag);
-		    throw new Ps::parse_error(ps,msg.toAscii().constData());
-		    //state.output(msg);
-		    return;
-		}
-		--state.brCount;
-		state.output(tag);
-		return;
-	    }
-
-	    ++state.brCount;
-	    if( (state.brCount >= 1) )
- 	    {
-		state.output("<br>\n");
-		state.brCount = 0;
- 	    }
- 	    else
- 	    {
- 		state.output("\n");
- 	    }
-	}
-    };
-
-    struct a_header_tag
-    {
-	static void matched( parser_state &,
-			     const std::string &m,
-			     state_t & state )
-	{
-	    int level = int(m.size());
-	    QString tag;
-	    --state.brCount;
-	    if( ! (state.flags & state_t::Header) )
-	    {
-		state.flags += state_t::Header;
-		tag.sprintf("\n<h%d class='WLP'>",level);
-	    }
-	    else
-	    {
-		state.flags -= state_t::Header;
-		tag.sprintf("</h%d>",level);
-	    }
-	    state.output( tag );
-	}
-    };
-
-    struct a_char
-    {
-	static void matched( parser_state &,
-			     const std::string &m,
-			     state_t & state )
-	{
-	    if( 1 == m.size() )
-	    {
-		state.output_char( m[0] );
-	    }
 	}
     };
 
@@ -311,6 +250,102 @@ namespace qboard {
 	}
     };
 
+    struct a_newline
+    {
+	static void matched( parser_state & ps,
+			     const std::string &m,
+			     state_t & state )
+	{
+	    // Make sure certain formatting doesn't bleed...
+#define DO(F) \
+	    if( state.flags & state_t::F )\
+		a_tag<state_t::F>::matched(ps,m,state);
+	    DO(Bold);
+	    DO(Italics);
+	    DO(Strike);
+	    DO(Subscript);
+	    DO(Superscript);
+	    DO(FixedFont);
+#undef DO
+
+	    if( state.flags & state_t::Bullet )
+	    {
+		state.flags -= state_t::Bullet;
+		state.output( "</li>" );
+	    }
+	    if( state.listDepth )
+	    { // close list
+		int type = state.listTypes[state.listDepth];
+		state.listTypes[state.listDepth--] = 0;
+		QString tag;
+		if( state_t::UList == type ) tag = "</ul>\n";
+		else if( state_t::OList == type ) tag = "</ol>\n";
+		else
+		{
+		    //throw new Ps::parse_error(ps,"Wiki parser: invalid list depth state.");
+		    QString msg =
+			QString("(WIKI PARSER ERROR: : invalid list depth state for tag '%s'.)").
+			arg(tag);
+		    throw new Ps::parse_error(ps,msg.toAscii().constData());
+		    //state.output(msg);
+		    return;
+		}
+		--state.brCount;
+		state.output(tag);
+		return;
+	    }
+
+	    ++state.brCount;
+	    if( (state.brCount >= 1) )
+ 	    {
+		state.output("<br>\n");
+		state.brCount = 0;
+ 	    }
+ 	    else
+ 	    {
+ 		state.output("\n");
+ 	    }
+	}
+    };
+
+    struct a_header_tag
+    {
+	static void matched( parser_state &,
+			     const std::string &m,
+			     state_t & state )
+	{
+	    int level = int(m.size());
+	    QString tag;
+	    --state.brCount;
+	    if( ! (state.flags & state_t::Header) )
+	    {
+		state.flags += state_t::Header;
+		tag.sprintf("\n<h%d class='WLP'>",level);
+	    }
+	    else
+	    {
+		state.flags -= state_t::Header;
+		tag.sprintf("</h%d>",level);
+	    }
+	    state.output( tag );
+	}
+    };
+
+    struct a_char
+    {
+	static void matched( parser_state &,
+			     const std::string &m,
+			     state_t & state )
+	{
+	    if( 1 == m.size() )
+	    {
+		state.output_char( m[0] );
+	    }
+	}
+    };
+
+
+
     struct r_space : r_action< r_plus<Ps::r_space>, a_space >
     {};
 
@@ -353,10 +388,14 @@ namespace qboard {
 	    if(true)
 	    {
 		QString tag("<pre class='WLP'");
+#if 1
 		tag.append( " style='margin-left: 2em;" );
 		tag.append( "padding: 0.5em;" );
 		tag.append( "border-left: 3px solid #ccc;" );
-		tag.append( "'>" );
+		tag.append( "font-family:normal;font-style:normal;" ); // Qt defaults to italic/bold. Ugly.
+		tag.append("'");
+#endif
+		tag.append( ">" );
 		state.output( tag );
 	    }
 	    else
@@ -368,7 +407,7 @@ namespace qboard {
 	    {
 		state.output_char( *str );
 	    }
-	    state.output("</pre>");
+	    state.output("</pre>\n");
 	    --state.brCount;
 	    ps.pos( pit );
 	    return true;
@@ -458,6 +497,7 @@ namespace qboard {
     struct r_header
 	: r_and< RL<
 	r_opt< r_repeat< r_ch<'\n'>, 1, 2 > >,
+        r_star< r_blank >,
 	r_action< r_plus< r_ch<'='> >, a_header_tag >
 	> >
     {};
@@ -523,22 +563,60 @@ namespace qboard {
 		state.wikiLabel = m.c_str();
 		return;
 	    }
-	    QString link = QString("<a href=\"%1\" class='WLP'>%2</a>").
-		arg(state.wikiWord).
-		arg( state.wikiLabel.isEmpty()
-		     ? state.wikiWord
-		     : state.wikiLabel );
-	    state.output( link );
+	    if ( state.wikiLabel.isEmpty() ) state.wikiLabel = state.wikiWord;
+	    state.output( QString("<a href=\"%1\" class='WLP'>").
+			  arg(state.wikiWord) );
+
+	    if( QRegExp( "\\.(png|jpg|gif)$", Qt::CaseInsensitive).
+		indexIn(state.wikiLabel.right(4)) == 0 )
+	    {
+		state.output(
+			     QString("<img src=\"%1\" class='WLP' title=\"%2\"/>").
+			     arg(state.wikiLabel).
+			     arg( state.wikiLabel )
+			     );
+	    }
+	    else
+	    {
+		state.output( state.wikiLabel );
+	    }
+	    state.output( QString("</a>") );
 	}
     };
+
+    struct r_wikinoun : r_and< RL<
+	r_upper,
+	r_plus< r_alpha >
+    > >
+// 	r_and< RL<
+// 	    r_and<RL< r_notat<r_blank>, r_notat< r_ch<']'> > > >,
+// 	    r_advance<1>
+// 	> >
+// 	>
+// 	> >
+    {};
+
+    struct r_wikiurl : r_and<RL<
+	r_plus<r_alnum>,
+	r_chseq<CL< ':','/','/'> >,
+	r_plus<
+	    r_and<RL<
+		r_notat<r_blank>,
+		r_notat<r_ch<']'> >,
+		r_advance<1>
+	    > >
+	>
+	> >
+    {};
+
+    struct r_wikiword :
+	r_or< RL< r_wikinoun, r_wikiurl > >
+    {};
 
     struct r_wikilink
 	: r_and< RL<
 	    r_ch<'['>,
-	    r_action< r_plus<
-		r_and< RL< r_and<RL< r_notat<r_blank>, r_notat< r_ch<']'> > > >, r_advance<1> > >
-		>,
-	      a_wikilink<0> >,
+	    r_action< r_wikiword, a_wikilink<0> >,
 	    r_star< r_blank >,
 	    r_action< r_star< r_notch<']'> >, a_wikilink<1> >,
 	    r_action< r_ch<']'>, a_wikilink<2> >
@@ -561,9 +639,10 @@ namespace qboard {
     {};
 
     struct r_inlinable
-	: r_or< RL< r_escaped,
+	: r_or< RL< //r_escaped,
 		    r_wikilink,
-		    r_fontmod
+		    r_fontmod,
+		    r_verbatim
 		    > >
     {};
 
@@ -662,8 +741,6 @@ namespace qboard {
     struct r_markup
 	: r_or< RL< r_table_part,
 		    r_inlinable,
-		    r_verbatim,
-		    //r_td,
 		    r_bullet,
 		    r_unclosed,
 		    r_newline		    
@@ -675,22 +752,89 @@ namespace qboard {
 		    r_rest > >
     {};
 
-    struct start : r_star< r_step >
+    template <bool IsKey>
+    struct a_metadata
+    {
+	static void matched( parser_state &,
+			     const std::string & m,
+			     state_t & state )
+	{
+	    if( IsKey )
+	    {
+		state.metaKey = QString(m.c_str());
+	    }
+	    else
+	    {
+		state.meta[state.metaKey] = QString(m.c_str());
+		state.metaKey = QString();
+	    }
+	}
+    };
+
+    /**
+       A line like:
+
+       #key some arbitrary value until eol
+
+    */
+    struct r_metatag : r_and<RL<
+	r_ch<'#'>,
+	r_action< r_identifier, a_metadata<true> >,
+	r_plus<r_blank>,
+	r_action< r_star< r_and< RL<
+	    r_notat< r_crnl >, r_advance<1> > > >, a_metadata<false> >,
+	r_plus<r_crnl>
+	> >
+    {};
+
+    struct r_metatags : r_pad<r_star< r_metatag >, r_space, r_success>
+    {};
+
+    struct start : r_and<RL<
+	r_metatags, 
+	r_star< r_step >
+    > >
     {
     };
+
+    struct WikiLiteParser::Impl
+    {
+	state_t state;
+	Impl() : state()
+	{}
+	~Impl()
+	{
+	}
+	void clear()
+	{
+	    this->state.clear();
+	}
+    };
+
+    WikiLiteParser::WikiLiteParser()
+	: impl(new Impl)
+    {
+    }
+    WikiLiteParser::~WikiLiteParser()
+    {
+	delete impl;
+    }
 
     bool WikiLiteParser::parse( QString const & code,
 				QIODevice * out )
     {
-	state_t st;
-	st.out = out;
+	impl->clear();
+	impl->state.out = out;
 	std::string str( code.toAscii().constData() );
 	try
 	{
-	    return Ps::parse< start >( str, st );
+	    bool ret = Ps::parse< start >( str, impl->state );
+	    impl->state.out = 0;
+	    return ret;
 	}
 	catch( std::exception const & ex )
 	{
+	    impl->state.out = 0;
 	    char const * w = ex.what();
 	    QString msg =
 		QString("(ERROR: WikiLiteParser::parse() exception: %1)").
@@ -706,7 +850,7 @@ namespace qboard {
 	buf.open(QIODevice::WriteOnly);
 	this->parse( code, &buf );
 	buf.close();
-	if(1) qDebug() << "WikiLiteParser::parse(code) output:[[[\n"
+	if(0) qDebug() << "WikiLiteParser::parse(code) output:[[[\n"
 		   << ba
 		   << "\n]]]";
 	return QString(ba);
@@ -719,6 +863,14 @@ namespace qboard {
 	QString code( inf.readAll() );
 	return this->parse( code );
     }
+
+    QString WikiLiteParser::metaTag( QString const & key ) const
+    {
+	return impl->state.meta.value( key, QString() );
+    }
+//     QString WikiLiteParser::setMetaInfo( QString const & key, QString const & value )
+//     {
+//     }
 
 #undef RL
 #undef CL
