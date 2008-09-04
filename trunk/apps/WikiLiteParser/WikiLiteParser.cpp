@@ -217,7 +217,6 @@ namespace qboard {
 			     const std::string &m,
 			     state_t & state )
 	{
-	    //state.brCount = 0;
 	    if( 1 == m.size() )
 	    {
 		state.output_char( m[0] );
@@ -301,8 +300,8 @@ namespace qboard {
 	    }
 	    if(true)
 	    {
-		QString tag("<pre class='WLP' style='");
-		tag.append( "margin-left: 2em;" );
+		QString tag("<pre class='WLP'");
+		tag.append( " style='margin-left: 2em;" );
 		tag.append( "padding: 0.5em;" );
 		tag.append( "border-left: 3px solid #ccc;" );
 		tag.append( "'>" );
@@ -318,6 +317,7 @@ namespace qboard {
 		state.output_char( *str );
 	    }
 	    state.output("</pre>");
+	    --state.brCount;
 	    ps.pos( pit );
 	    return true;
 	}
@@ -333,13 +333,6 @@ namespace qboard {
 	{
 	    int flag = Numbered ? state_t::OList : state_t::UList;
 	    int type = state.listTypes[state.listDepth];
-	    if( type != flag )
-	    {
-		state.listTypes[++state.listDepth] = flag;
-		QString tag( QString("<%1 class='WLP'>").
-			     arg( Numbered ? "ol" : "ul" ) );
-		state.output( tag );
-	    }
 	    if( state.flags & state_t::Bullet )
 	    {
 		state.output( "</li>" );
@@ -347,6 +340,13 @@ namespace qboard {
 	    else
 	    {
 		state.flags += state_t::Bullet;
+	    }
+	    if( type != flag )
+	    {
+		state.listTypes[++state.listDepth] = flag;
+		QString tag( QString("<%1 class='WLP'>").
+			     arg( Numbered ? "ol" : "ul" ) );
+		state.output( tag );
 	    }
 	    state.output( "<li class='WLP'>" );
 	}
@@ -492,9 +492,25 @@ namespace qboard {
 	    r_action< r_ch<']'>, a_wikilink<2> >
 	> >
     {};
+    template <int CH>
+    struct a_unescaped
+    {
+	static void matched( parser_state &,
+			     const std::string &,
+			     state_t & state )
+	{
+	    state.output_char( CH );
+	}
+    };
+    struct r_escaped :
+	r_or< RL< 
+	    r_action< r_repeat<r_ch<'['>,2>, a_unescaped<'['> >
+	> >
+    {};
 
     struct r_markup
-	: r_or< RL< r_wikilink,
+	: r_or< RL< r_escaped,
+		    r_wikilink,
 		    r_verbatim,
 		    r_bullet,
 		    r_fontmod,
