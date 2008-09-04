@@ -327,6 +327,7 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 	    win->setWidget( v );
 	    this->addDockWidget(Qt::RightDockWidgetArea, win );
 	    v->parseFile(fn);
+	    win->setWindowTitle( v->windowTitle() );
 	}
 	else if( QRegExp("\\.js$",Qt::CaseInsensitive).indexIn(fn) > 0 )
 	{
