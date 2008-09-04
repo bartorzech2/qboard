@@ -81,12 +81,13 @@ Here is an overview of the list of common properties (in alphabetical order), th
 
 The on-board lines (QGILine) are not currently scriptable because they will be replaced at some point (their current model requires to much special-case handling of events and serialization).
 
+(Note, however, that this work is ongoing, and the above list will change.)
+
 = The qboard object =
 
 The JS engine includes a global object called qboard. That object is essentially the same as the C++-side GameState object, with some additions for purposes of scripting.
 
 Here is an overview of the public member functions and properties of the qboard object.
-(Note, however, that this work is ongoing, and the above list will change.)
 
 || *Property/Function* || *Description* ||
 || board || The game state's QBoard (game board) object. ||
