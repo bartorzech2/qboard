@@ -6,5 +6,4 @@ HEADERS = \
 
 SOURCES = \
  WikiLiteParser.cpp \
- main.cpp
-
+ wiki-main.cpp
