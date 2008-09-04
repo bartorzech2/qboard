@@ -48,8 +48,10 @@ namespace qboard {
 	Superscript = 0x0100,
 	Subscript = 0x0200,
 	Strike = 0x0400,
-	Header = 0x0100,
-	END = 0xEFFF
+	Header = 0x0800,
+	TD = 0x1000,
+	Table = 0x2000,
+	END = 0xFFFF
 	};
 	long flags;
 	int brCount;
@@ -57,14 +59,17 @@ namespace qboard {
 	std::vector<int> listTypes;
 	QString wikiWord;
 	QString wikiLabel;
+	int tableCol;
+	int tableRow;
 	state_t() : out(0),
 		    flags(None),
 		    brCount(0),
 		    listDepth(0),
 		    listTypes(10,0),
 		    wikiWord(),
-		    wikiLabel()
-
+		    wikiLabel(),
+		    tableCol(0),
+		    tableRow(0)
 	{
 	}
 
@@ -172,14 +177,11 @@ namespace qboard {
 		return;
 	    }
 
- 	    if( (++state.brCount >= 1) )
+	    ++state.brCount;
+	    if( (state.brCount > 1) )
  	    {
-// 		if( ! state.closePara() )
-// 		{
- 		state.output("<br/>\n");
- 		state.brCount = 0;
-// 		}
- 		return;
+		state.output("<br/>\n");
+		state.brCount = 0;
  	    }
  	    else
  	    {
@@ -233,6 +235,9 @@ namespace qboard {
 			     state_t & state )
 	{
 	    char const * tag = 0;
+	    bool doclose = (state.flags & tagFlag);
+	    bool doopen = !doclose;
+	    QString style(" class='WLP'" );
 	    switch( tagFlag )
 	    {
 	      case state_t::Bold: tag = "strong"; break;
@@ -241,21 +246,66 @@ namespace qboard {
 	      case state_t::Superscript: tag = "sup"; break;
 	      case state_t::Subscript: tag = "sub"; break;
 	      case state_t::Strike: tag = "strike"; break;
+	      case state_t::TD:
+#if 0
+ 		  tag =( 1 == state.tableRow )
+		      ? "th"
+		      : "td";
+#else
+		  tag = "td";
+#endif
+		  style = "";
+ 		  if( doopen )
+ 		  {
+ 		      ++state.tableCol;
+ 		  }
+  		  if( doopen && (1 == state.tableCol) )
+  		  {
+		      ++state.tableRow;
+  		      state.output("<tr>");
+  		  }
+// 		  if( !doclose ) state.output("<tr>");
+  		  doopen = true;
+		  break;
 	      default:
 		  tag = "UNKNOWN";
 		  break;
 	    };
-	    if( state.flags & tagFlag )
+	    if(1) CERR << "a_tag<"<<std::hex<<tagFlag<<"["<<tag<<"]> state.flags="
+		       <<std::hex<<state.flags
+		       << ", doopen="<<doopen<<" doclose="<<doclose
+		       << ", tableCol"<<state.tableCol
+		       <<'\n';
+	    if( doclose )
 	    {
 		state.output( QString("</%1>").arg(tag) );
-		state.flags -= tagFlag;
+		state.flags &= ~tagFlag;
 	    }
-	    else
+	    if( doopen )
 	    {
-		state.output( QString("<%1 class='WLP'>").
-			      arg(tag) );
-		state.flags += tagFlag;
+		state.output( QString("<%1%2>").
+			      arg(tag).
+			      arg(style) );
+		state.flags |= tagFlag;
 	    }
+#if 0
+	    static bool bogo = false;
+	    if( !bogo)
+	    {
+		bogo =true;
+#define SHOW(F) CERR << # F << " == " << std::hex << (F) << '\n';
+		int fl = 0x0020;
+		int mask = 0x0010;
+		SHOW(fl);
+		SHOW(mask);
+		SHOW(fl ^ mask);
+		SHOW(fl | mask);
+		SHOW(fl & mask);
+		SHOW(~mask);
+		SHOW(fl & ~mask);
+#undef SHOW
+	    }
+#endif
 	}
     };
 
@@ -434,8 +484,8 @@ namespace qboard {
 // 			       a_break >
 //     {};
 
-    struct r_toeol : r_star< r_notch<'\n'> >
-    {};
+//     struct r_toeol : r_star< r_notch<'\n'> >
+//     {};
 
     template <bool Numbered>
     struct r_bullet_x
@@ -508,12 +558,103 @@ namespace qboard {
 	> >
     {};
 
-    struct r_markup
+    struct r_inlinable
 	: r_or< RL< r_escaped,
 		    r_wikilink,
+		    r_fontmod
+		    > >
+    {};
+
+    struct a_table_open
+    {
+	static void matched( parser_state &,
+			     const std::string &,
+			     state_t & state )
+	{
+	    state.output( "<table border='1' style='border-collapse: separate;' class='WLP'><tbody>\n<tr><td>" );
+	    state.tableRow = 1;
+	    state.flags |= (state_t::TD | state_t::Table);
+	}
+    };
+    struct a_table_eol
+    {
+	static void matched( parser_state &,
+			     const std::string &,
+			     state_t & state )
+	{
+	    state.output( "</td></tr>\n" );
+	    state.tableCol = 0;
+	    state.flags &= ~state_t::TD;
+	}
+    };
+    struct a_table_close
+    {
+	static void matched( parser_state &,
+			     const std::string &,
+			     state_t & state )
+	{
+	    state.output( "</td></tr>\n</tbody></table>\n" );
+	    state.tableCol = 0;
+	    state.tableRow = 0;
+	    state.flags &= ~state_t::TD;
+	    state.flags &= ~state_t::Table;
+	}
+    };
+
+    struct r_tbar : r_pad< r_repeat<r_ch<'|'>,2>, r_blank >
+    {};
+
+    struct r_crnl : 
+	r_and< RL<
+	    r_opt< r_ch<'\r'> >,
+	    r_ch<'\n'>
+	    > >
+    {};
+
+    /** \r?\n\s*|| */
+    struct r_table_open :
+	r_and< RL<
+	    r_crnl,
+	    r_star<r_blank>,
+	    r_tbar
+	    > >
+    {};
+
+
+    struct r_table_eol :
+	r_and< RL<
+	    r_pad<r_tbar, r_blank>,
+	    r_crnl
+	    > >
+    {};
+
+    struct r_table_close :
+	r_and< RL<
+	    r_table_eol,
+	    r_crnl
+	    > >
+    {};
+
+//     struct r_td :
+// 	r_action< r_tbar, a_tag<state_t::TD> >
+//     {};
+
+    struct r_table_part : r_or< RL<
+	r_action<r_table_close, a_table_close >,
+	r_action<r_table_eol, a_table_eol >,
+	r_action< r_table_open, a_table_open >,
+	r_action< r_tbar, a_tag<state_t::TD> >
+    > >
+    {};
+
+
+
+    struct r_markup
+	: r_or< RL< r_table_part,
+		    r_inlinable,
 		    r_verbatim,
+		    //r_td,
 		    r_bullet,
-		    r_fontmod,
 		    r_unclosed,
 		    r_newline		    
 		    > >
