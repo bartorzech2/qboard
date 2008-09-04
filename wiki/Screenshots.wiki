@@ -3,5 +3,7 @@
 
 = The obligatory screenshots... =
 
+[http://picasaweb.google.com/sgbeal/ScreenshotsQBoard#5237793101482996962&x=foo.jpg]
+
 Googlecode unfortunately doesn't let us upload images for use in the project wiki. But they do host an excellent image management service, so you can find the screenshots over
 at [http://picasaweb.google.com/sgbeal/ScreenshotsQBoard Google Picasa].
