@@ -119,6 +119,7 @@ namespace qboard {
 	QBuffer buf(&ba);
 	// Note that we use QBuffer, instead of QDataStream because
 	// writing to a QDataStream serializes in a custom binary format. :(
+	// FIXME: replace this with QTextStream.
 	buf.open(QIODevice::WriteOnly);
 	bool isAr = x.isArray();
 	char const * opener = (isAr ? "[" : "{");
