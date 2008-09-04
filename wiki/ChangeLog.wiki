@@ -7,6 +7,13 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top. Dates written extra large are release dates.
 
 ----
+*2008 Sept 4*
+
+- Added a file viewer capable of reading Wiki files, following the Google Code Wiki
+syntax (the same one used by this site). It supports the basic markup featurs,
+including bold, italics, headings, bullet/number lists (not nested!) and tables. Double-clicking a .wiki file will open it in a docked window. This will eventually allow us to ship the current website wiki pages as documentation files for QBoard itself.
+
+
 *2008 Sept 1*
 
 - Improvements in the JS-side interface. It's now possible to create new pieces, change them via setting properties, and delete them. _Querying_ certain types of piece properties is still problematic, and will be for the forseeable future.
