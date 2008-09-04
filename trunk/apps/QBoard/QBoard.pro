@@ -1,12 +1,29 @@
 include(../../config.qmake)
 TEMPLATE = app
-unix:contains(QMAKE_CXX,g++){ # hope we're working with gcc...
-  # the qmake configure setup doesn't do this, and plugins require it!
-  # Without this, my plugins can't resolve symbols in the application.
-  QMAKE_LFLAGS += -export-dynamic
+unix:contains(QMAKE_CXX,g++){
+  # Let's hope we're working with the ld linker...
+  #
+  # The qmake configure setup doesn't set up apps to export their
+  # symbols, yet plugins which use the app's symbols require it.
+  # Without this, plugins can't resolve symbols in the application:
+  #
+  # QMAKE_LFLAGS += -export-dynamic
+  #
+  # Suggestion from Qt tech support:
+  QMAKE_LFLAGS += -Wl,-E
+  # but they also admit that qmake doesn't have a built-in way to do this
+  # because (and i quote):
+  #
+  # "The situation where the library needs to access symbols from the
+  # application is not that common in our experience so there's no option
+  # in qmake to do this."
+  #
+  # Which means that, per their model, plugins are only supposed to be
+  # providers, and not users of the application's API. Bummer. One-way
+  # plugins.
   warning("activating explicit -export-dynamic kludge")
 }
-unix:!contains(QMAKE_CXX,g++){
+!contains(QMAKE_CXX,g++){
   warning("We're not under g++, which means i don't know the linker args to export your app symbols!")
 }
 
