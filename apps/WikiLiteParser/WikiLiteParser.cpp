@@ -14,6 +14,8 @@
 
 #include <QString>
 #include <QIODevice>
+#include <QBuffer>
+#include <QByteArray>
 
 #include <cctype>
 
@@ -21,6 +23,7 @@
 #include "WikiLiteParser.h"
 
 #include <iostream>
+#include <vector>
 #define CERR std::cerr << __FILE__ << ":" << std::dec << __LINE__ << " : "
 #define COUT std::cout << __FILE__ << ":" << std::dec << __LINE__ << " : "
 
@@ -41,15 +44,82 @@ namespace qboard {
 	Bullet = 0x0010,
 	UList = 0x0020,
 	OList = 0x0040,
+	Para = 0x0080,
+	Superscript = 0x0100,
+	Subscript = 0x0200,
+	Strike = 0x0400,
 	Header = 0x0100,
 	END = 0xEFFF
 	};
 	long flags;
-	int nlCount;
+	int brCount;
+	int listDepth;
+	std::vector<int> listTypes;
 	state_t() : out(0),
 		    flags(None),
-		    nlCount(0)
-	{}
+		    brCount(0),
+		    listDepth(0),
+		    listTypes(10,0)
+	{
+	}
+
+	~state_t()
+	{
+	}
+
+	void output( QString const & t )
+	{
+	    this->out->write( t.toAscii() );
+	}
+	void output_char( int ch )
+	{
+	    if( std::isspace( ch ) )
+	    {
+		this->out->putChar( ch );
+		return;
+	    }
+	    if( ( ch < 32) || (ch>127) )
+	    {
+		QString exp;
+		exp.sprintf("&#x%02x;", ch);
+		this->output( exp );
+
+	    }
+	    else switch( ch )
+	    {
+	      case '&':
+	      case '<':
+	      case '\'': // We translate quotes because google code wiki does.
+	      case '"':  // Maybe it's a security thing? Or an i18n thing?
+		  {
+		      QString exp;
+		      exp.sprintf("&#x%02x;", ch);
+		      this->output( exp );
+		  } break;
+	      default:
+		  this->out->putChar(ch);
+		  return;
+		  break;
+	    }
+	}
+	void openPara()
+	{
+	    if( !(this->flags & Para) )
+	    {
+		this->output( "<p class='WLP'>" );
+		this->flags += Para;
+	    }
+	}
+	bool closePara()
+	{
+	    if( this->flags & Para )
+	    {
+		this->output( "</p>" );
+		this->flags -= Para;
+		return true;
+	    }
+	    return false;
+	}
     };
 
 
@@ -63,72 +133,78 @@ namespace qboard {
 	}
     };
 
+
     struct a_newline
     {
-	static void matched( parser_state &,
+	static void matched( parser_state & ps,
 			     const std::string &,
 			     state_t & state )
 	{
-	    ++state.nlCount;
 	    if( state.flags & state_t::Bullet )
 	    {
 		state.flags -= state_t::Bullet;
-		state.out->write("</li>\n",6);
+		state.output( "</li>" );
+	    }
+	    if( state.listDepth )
+	    { // close list
+		int type = state.listTypes[state.listDepth];
+		state.listTypes[state.listDepth--] = 0;
+		QString tag;
+		if( state_t::UList == type ) tag = "</ul>\n";
+		else if( state_t::OList == type ) tag = "</ol>\n";
+		else
+		{
+		    //throw new Ps::parse_error(ps,"Wiki parser: invalid list depth state.");
+		    QString msg =
+			QString("(WIKI PARSER ERROR: : invalid list depth state for tag '%s'.)").
+			arg(tag);
+		    throw new Ps::parse_error(ps,msg.toAscii().constData());
+		    //state.output(msg);
+		    return;
+		}
+		--state.brCount;
+		state.output(tag);
 		return;
 	    }
-	    if( state.flags & state_t::UList )
-	    {
-		state.flags -= state_t::UList;
-		state.out->write("</ul>\n",6);
-		return;
-	    }
-	    if( state.flags & state_t::OList )
-	    {
-		state.flags -= state_t::OList;
-		state.out->write("</ol>\n",6);
-		return;
-	    }
-	    if( state.nlCount >= 2 )
-	    {
-		state.out->write("</br>\n",6);
-		return;
-	    }
-	    else
-	    {
-		state.out->putChar('\n');
-	    }
+
+ 	    if( (++state.brCount >= 1) )
+ 	    {
+// 		if( ! state.closePara() )
+// 		{
+ 		state.output("<br/>\n");
+ 		state.brCount = 0;
+// 		}
+ 		return;
+ 	    }
+ 	    else
+ 	    {
+ 		state.output("\n");
+ 	    }
 	}
     };
 
-    static void output_char( int ch, state_t & state )
+    struct a_header_tag
     {
-	if( std::isspace( ch ) )
+	static void matched( parser_state &,
+			     const std::string &m,
+			     state_t & state )
 	{
-	    state.out->putChar( ch );
-	    return;
+	    int level = int(m.size());
+	    QString tag;
+	    --state.brCount;
+	    if( ! (state.flags & state_t::Header) )
+	    {
+		state.flags += state_t::Header;
+		tag.sprintf("\n<h%d class='WLP'>",level);
+	    }
+	    else
+	    {
+		state.flags -= state_t::Header;
+		tag.sprintf("</h%d>",level);
+	    }
+	    state.output( tag );
 	}
-	if( ( ch < 32) || (ch>127) )
-	{
-	    QString exp;
-	    exp.sprintf("&#x%02x;", ch);
-	}
-	else switch( ch )
-	{
-	  case '&':
-	  case '<':
-	  case '\'':
-	  case '"':
-	  {
-	      QString exp;
-	      exp.sprintf("&#x%02x;", ch);
-	      state.out->write( exp.toAscii() );
-	  } break;
-	  default:
-	      state.out->putChar(ch);
-	      return;
-	      break;
-	};
-    }
+    };
 
     struct a_char
     {
@@ -136,10 +212,10 @@ namespace qboard {
 			     const std::string &m,
 			     state_t & state )
 	{
-	    state.nlCount = 0;
+	    //state.brCount = 0;
 	    if( 1 == m.size() )
 	    {
-		output_char( m[0], state );
+		state.output_char( m[0] );
 	    }
 	}
     };
@@ -158,23 +234,24 @@ namespace qboard {
 	      case state_t::Bold: tag = "strong"; break;
 	      case state_t::Italics: tag = "em"; break;
 	      case state_t::FixedFont: tag = "tt"; break;
+	      case state_t::Superscript: tag = "sup"; break;
+	      case state_t::Subscript: tag = "sub"; break;
+	      case state_t::Strike: tag = "strike"; break;
 	      default:
 		  tag = "UNKNOWN";
 		  break;
 	    };
-	    state.out->putChar('<');
 	    if( state.flags & tagFlag )
 	    {
-		state.out->putChar('/');
+		state.output( QString("</%1>").arg(tag) );
 		state.flags -= tagFlag;
 	    }
 	    else
 	    {
+		state.output( QString("<%1 class='WLP'>").
+			      arg(tag) );
 		state.flags += tagFlag;
 	    }
-	    unsigned int tlen = qstrnlen( tag, 20 );
-	    state.out->write( tag, tlen );
-	    state.out->putChar('>');
 	}
     };
 
@@ -219,49 +296,28 @@ namespace qboard {
 	    }
 	    if(true)
 	    {
-		QString tag("<pre style='");
+		QString tag("<pre class='WLP' style='");
 		tag.append( "margin-left: 2em;" );
 		tag.append( "padding: 0.5em;" );
 		tag.append( "border-left: 3px solid #ccc;" );
 		tag.append( "'>" );
-		state.out->write( tag.toAscii() );
+		state.output( tag );
 	    }
 	    else
 	    {
-		state.out->write("<pre>",5);
+		state.output("<pre class='WLP'>");
 	    }
 	    char const * str = accum.c_str();
 	    for( ; str && *str; ++str )
 	    {
-		output_char( *str, state );
+		state.output_char( *str );
 	    }
-	    state.out->write("</pre>",11);
+	    state.output("</pre>");
 	    ps.pos( pit );
 	    return true;
 	}
     };
 
-    struct a_header_tag
-    {
-	static void matched( parser_state &,
-			     const std::string &m,
-			     state_t & state )
-	{
-	    int level = int(m.size());
-	    QString tag;
-	    if( ! (state.flags & state_t::Header) )
-	    {
-		state.flags += state_t::Header;
-		tag.sprintf("<h%d>",level);
-	    }
-	    else
-	    {
-		state.flags -= state_t::Header;
-		tag.sprintf("</h%d>",level);
-	    }
-	    state.out->write( tag.toAscii() );
-	}
-    };
 
     template <bool Numbered>
     struct a_bullet_open
@@ -270,19 +326,47 @@ namespace qboard {
 			     const std::string &,
 			     state_t & state )
 	{
-	    if( ! (state.flags & state_t::Bullet) )
+	    int flag = Numbered ? state_t::OList : state_t::UList;
+	    int type = state.listTypes[state.listDepth];
+	    if( type != flag )
+	    {
+		state.listTypes[++state.listDepth] = flag;
+		QString tag( QString("<%1 class='WLP'>").
+			     arg( Numbered ? "ol" : "ul" ) );
+		state.output( tag );
+	    }
+	    if( state.flags & state_t::Bullet )
+	    {
+		state.output( "</li>" );
+	    }
+	    else
 	    {
 		state.flags += state_t::Bullet;
 	    }
-	    int flag = Numbered ? state_t::OList : state_t::UList;
-	    if( ! (state.flags & flag) )
-	    {
-		state.flags += flag;
-		QString tag;
-		tag.sprintf( "<%cl>", Numbered ? 'o' : 'u' );
-		state.out->write( tag.toAscii() );
-	    }
-	    state.out->write( "<li>", 4 );
+	    state.output( "<li class='WLP'>" );
+	}
+    };
+#if 0
+    template <bool Numbered>
+    struct a_list_level
+    {
+	static void matched( parser_state &,
+			     const std::string & m,
+			     state_t & state )
+	{
+	    size_t d =  (m.size() + 1) / 2;
+	    state.listDepth = d;
+	    state.listTypes[d] = Numbered ? state_t::OList : state_t::UList;
+	}
+    };
+#endif
+    struct a_hr
+    {
+	static void matched( parser_state &,
+			     const std::string &,
+			     state_t & state )
+	{
+	    state.output("<hr class='WLP'/>");
 	}
     };
 
@@ -304,8 +388,41 @@ namespace qboard {
 	: r_action< r_ch<96>, a_tag<state_t::FixedFont> >
     {};
 
+    struct r_superscript :
+	r_action< r_ch<'^'>, a_tag<state_t::Superscript> >
+    {};
+    struct r_subscript
+	: r_action< r_repeat<r_ch<','>,2>, a_tag<state_t::Subscript> >
+    {};
+    struct r_strike
+	: r_action< r_repeat<r_ch<'~'>,2>, a_tag<state_t::Strike> >
+    {};
+
     struct r_header
-	: r_action< r_plus< r_ch<'='> >, a_header_tag >
+	: r_and< RL<
+	r_opt< r_repeat< r_ch<'\n'>, 1, 2 > >,
+	r_action< r_plus< r_ch<'='> >, a_header_tag >
+	> >
+    {};
+
+    struct r_fontmod :
+	r_or< RL< r_header,
+		  r_bold,
+		  r_italics,
+		  r_fixed,
+		  r_superscript,
+		  r_subscript,
+		  r_strike > >
+    {};
+
+    struct r_hr : r_action< r_repeat< r_ch<'-'>, 4>,
+			    a_hr >
+    {};
+
+    struct r_unclosed :
+	r_or< RL<
+	r_hr
+	> >
     {};
 
 //     struct r_break : r_action< r_repeat<r_ch<'\n'>,2>,
@@ -318,7 +435,12 @@ namespace qboard {
     template <bool Numbered>
     struct r_bullet_x
 	: r_action< r_and< RL< r_opt< r_ch<'\n'> >,
+#if 0
+			       r_action< r_plus< r_repeat<r_blank,2> >,
+					 a_list_level<Numbered> >,
+#else
 			       r_plus< r_repeat<r_blank,2> >,
+#endif
 			       r_ch<Numbered ? '#' : '*'>,
 			       r_star<r_blank> > >,
 		    a_bullet_open<Numbered> >
@@ -327,19 +449,17 @@ namespace qboard {
     struct r_bullet : r_or< RL< r_bullet_x<true>, r_bullet_x<false> > >
     {};
 
-    struct r_marker
+    struct r_markup
 	: r_or< RL< r_bullet,
 		    r_verbatim,
-		    r_italics,
-		    r_bold,
-		    r_fixed,
-		    r_header
+		    r_fontmod,
+		    r_unclosed,
+		    r_newline		    
 		    > >
     {};
 
     struct r_step
-	: r_or< RL< r_newline,
-		    r_marker,
+	: r_or< RL< r_markup,
 		    r_rest > >
     {};
 
@@ -353,10 +473,29 @@ namespace qboard {
 	state_t st;
 	st.out = out;
 	std::string str( code.toAscii().constData() );
-	parser_state ps( str );
-	return Ps::parse< start >( ps, st );
+	try
+	{
+	    return Ps::parse< start >( str, st );
+	}
+	catch( std::exception const & ex )
+	{
+	    char const * w = ex.what();
+	    QString msg =
+		QString("(ERROR: WikiLiteParser::parse() exception: %1)").
+		arg(w ? w : "no error info!");
+	    out->write( msg.toAscii() );
+	}
+	return false;
     }
-
+    QString WikiLiteParser::parse( QString const & code )
+    {
+	QByteArray ba;
+	QBuffer buf(&ba);
+	buf.open(QIODevice::WriteOnly);
+	this->parse( code, &buf );
+	buf.close();
+	return QString(ba);
+    }
 #undef RL
 #undef CL
 }
