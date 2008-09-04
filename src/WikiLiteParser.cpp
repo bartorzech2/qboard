@@ -392,7 +392,8 @@ namespace qboard {
 		tag.append( " style='margin-left: 2em;" );
 		tag.append( "padding: 0.5em;" );
 		tag.append( "border-left: 3px solid #ccc;" );
-		tag.append( "font-family:normal;font-style:normal;" ); // Qt defaults to italic/bold. Ugly.
+		tag.append( "font-weight:normal;font-style:normal;" ); // Qt defaults to italic/bold. Ugly.
+		tag.append( "font-family:monospace;" );
 		tag.append("'");
 #endif
 		tag.append( ">" );
@@ -409,6 +410,12 @@ namespace qboard {
 	    }
 	    state.output("</pre>\n");
 	    --state.brCount;
+	    /** ^^^^^ the Qt html widget doesn't like this, but other
+		browsers do.
+
+		Qt appears to disable line wrapping for text *following*
+		a PRE, up until the next BR.
+	    */
 	    ps.pos( pit );
 	    return true;
 	}
