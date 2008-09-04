@@ -15,11 +15,11 @@
 
 
 #include <QObject>
-#include <QWidget>
+#include <QFrame>
 #include "Serializable.h"
 
 namespace qboard {
-class WikiLiteView : public QWidget
+class WikiLiteView : public QFrame
 {
 Q_OBJECT
 public:

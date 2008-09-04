@@ -17,6 +17,8 @@
 #include <QTextDocument>
 #include <QGridLayout>
 #include <QScrollBar>
+#include <QLabel>
+#include <QFileInfo>
 
 namespace qboard {
 
@@ -24,6 +26,7 @@ namespace qboard {
     {
 	WikiLiteParser * p;
 	QTextEdit * edit;
+	QLabel * label;
 	Impl() : p(new WikiLiteParser),
 		 edit(0)
 	{
@@ -34,13 +37,24 @@ namespace qboard {
 	}
     };
 
-    WikiLiteView::WikiLiteView( QWidget * parent ) : QWidget(parent),
+    WikiLiteView::WikiLiteView( QWidget * parent ) : QFrame(parent),
 						     impl(new Impl)
     {
+	this->setFrameStyle( QFrame::Panel | QFrame::Sunken );
+
+
+	impl->label = new QLabel("Wiki viewer");
+	impl->label->setWordWrap(true);
+
 	impl->edit = new QTextEdit;
-	QGridLayout * lay = new QGridLayout( this );
-	lay->addWidget( impl->edit );
 	impl->edit->setReadOnly(true);
+
+	QGridLayout * lay = new QGridLayout( this );
+	lay->addWidget( impl->label );
+	lay->addWidget( impl->edit );
+
+	this->setWindowTitle(QString("Wiki Viewer"));
+
     }
 
     WikiLiteView::~WikiLiteView()
@@ -52,6 +66,11 @@ namespace qboard {
     {
 	QString code( impl->p->parseFile(fn) );
 	impl->edit->setHtml( code );
+	QString lbl( impl->p->metaTag( "summary" ) );
+	if( lbl.isEmpty() ) lbl = QFileInfo(fn).fileName();
+	impl->label->setText(lbl);
+	this->setWindowTitle(QString("Wiki Viewer: %1").
+			     arg(QFileInfo(fn).fileName()));
 	this->updateScrollbars();
     }
 
