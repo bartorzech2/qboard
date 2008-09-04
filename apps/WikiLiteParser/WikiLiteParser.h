@@ -78,7 +78,13 @@ namespace qboard {
        are there plans to automatically link URL-looking strings.
 
 
-       Other notes:
+       EXTENSIONS beyond what Google Code Wiki supports:
+
+       Use [[ to get a single [ in your output.
+
+
+
+       OTHER NOTES:
 
        Keep in mind that wiki parsing is fragile by nature, so don't
        expect this to gracefully handle wildly invalid input.
