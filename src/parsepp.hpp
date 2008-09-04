@@ -896,7 +896,7 @@ namespace Ps {
 	    // recreate exception without the state,
 	    // which won't be valid once this function returns.
 	    std::string msg( ex.what() );
-	    msg += "\n Near "+ex.where();
+	    msg += "\n near "+ex.where();
 	    throw std::runtime_error( msg );
 	}
 	return false;
