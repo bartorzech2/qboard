@@ -55,11 +55,16 @@ namespace qboard {
 	int brCount;
 	int listDepth;
 	std::vector<int> listTypes;
+	QString wikiWord;
+	QString wikiLabel;
 	state_t() : out(0),
 		    flags(None),
 		    brCount(0),
 		    listDepth(0),
-		    listTypes(10,0)
+		    listTypes(10,0),
+		    wikiWord(),
+		    wikiLabel()
+
 	{
 	}
 
@@ -449,9 +454,49 @@ namespace qboard {
     struct r_bullet : r_or< RL< r_bullet_x<true>, r_bullet_x<false> > >
     {};
 
+    template <int Phase> // 0 = wikiword/url, 1=description, 2 = finalize
+    struct a_wikilink
+    {
+	static void matched( parser_state &,
+			     const std::string &m,
+			     state_t & state )
+	{
+	    if( 0 == Phase )
+	    {
+		state.wikiWord = m.c_str();
+		return;
+	    }
+	    else if( 1 == Phase )
+	    {
+		state.wikiLabel = m.c_str();
+		return;
+	    }
+	    QString link = QString("<a href=\"%1\" class='WLP'>%2</a>").
+		arg(state.wikiWord).
+		arg( state.wikiLabel.isEmpty()
+		     ? state.wikiWord
+		     : state.wikiLabel );
+	    state.output( link );
+	}
+    };
+
+    struct r_wikilink
+	: r_and< RL<
+	    r_ch<'['>,
+	    r_action< r_plus<
+		r_and< RL< r_notat<r_blank>, r_advance<1> > >
+		>,
+	      a_wikilink<0> >,
+	    r_star< r_blank >,
+	    r_action< r_star< r_notch<']'> >, a_wikilink<1> >,
+	    r_action< r_ch<']'>, a_wikilink<2> >
+	> >
+    {};
+
     struct r_markup
-	: r_or< RL< r_bullet,
+	: r_or< RL< r_wikilink,
 		    r_verbatim,
+		    r_bullet,
 		    r_fontmod,
 		    r_unclosed,
 		    r_newline		    

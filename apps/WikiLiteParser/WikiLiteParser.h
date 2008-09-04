@@ -56,6 +56,10 @@ namespace qboard {
        }}}
 
 
+       [WikiLinks with optional label text], but note that non-URLs
+       linked this way are always relative to the current URL.
+
+
        All HTML tags creates by this class have a CSS class of 'WLP'
        (as in Wiki-Lite-Parser), so one may customize their appearance
        by configuring that class via CSS.
@@ -65,11 +69,13 @@ namespace qboard {
 
        || Tables ||
 
-       [WikiLinks with optional label text]
-
        [link_to_image.{jpg,png} optional label text]
 
-       There are no plans to support non-bracketed WikiWords.
+       Allow client to set a base URL which will be added to
+       generated links.
+
+       There are no plans to support non-bracketed WikiWords. Nor
+       are there plans to automatically link URL-looking strings.
 
 
        Other notes:
