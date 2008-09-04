@@ -46,6 +46,15 @@ And here's that same data in another format:
 </S11nClipboardData>
 }}}
 
+And that same data in yet another format:
+{{{
+51191011
+f111S11nClipboardData08QGIPiecee108QGIFlags00013<SNIP>
+f0
+f104SNIP0aNoClassYetf10bborderColor08QVariante<SNIP>
+51190000
+}}}
+
 The point is, the format doesn't interest us. QBoard only cares about the structure of the data, and uses that structure to determine whether it can or cannot handle a given set of data. The structure represents various objects, and whether or not QBoard can do anything with those objects is context dependent.
 
 = What exactly can QBoard save and load? =
