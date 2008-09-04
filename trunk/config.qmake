@@ -56,7 +56,8 @@ REL_SRCDIR=$$replace(REL_SRCDIR,[^/]+,..)
 
 CONFIG += warn_on debug
 QT += script
-# CONFIG +=  ordered debug_and_release
+CONFIG +=  ordered
+# debug_and_release
 
 VERSION = $$QBOARD_VERSION
 message(QBoard version $$QBOARD_VERSION)
@@ -176,7 +177,9 @@ QBOARD_HEADERS_LIB = \
  $$SRC_DIR/QGIPiecePlacemarker.h \
  $$SRC_DIR/SetupQBoard.h \
  $$SRC_DIR/reg_qt_s11n.h \
- $$SRC_DIR/utility.h
+ $$SRC_DIR/utility.h \
+ $$SRC_DIR/WikiLiteParser.h \
+ $$SRC_DIR/WikiLiteView.h
 
 QBOARD_SOURCES_LIB = \
  $$S11NQT_SOURCES \
@@ -201,8 +204,9 @@ QBOARD_SOURCES_LIB = \
  $$SRC_DIR/QGIPiece.cpp \
  $$SRC_DIR/QGIPiecePlacemarker.cpp \
  $$SRC_DIR/SetupQBoard.cpp \
- $$SRC_DIR/utility.cpp
-
+ $$SRC_DIR/utility.cpp \
+ $$SRC_DIR/WikiLiteParser.cpp \
+ $$SRC_DIR/WikiLiteView.cpp
 
 #QBOARD_SOURCES_GAMESETS = 
 #QBOARD_HEADERS_GAMESETS = 
