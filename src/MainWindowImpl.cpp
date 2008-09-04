@@ -320,11 +320,14 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 	else if( fn.endsWith(".wiki") )
 	{
 	    worked = true;
-	    qboard::WikiLiteView * v = new qboard::WikiLiteView;
 	    QString lbl = QString("Wiki: %1").arg(fi.fileName());
 	    QDockWidget * win = new QDockWidget( lbl, this );
+	    qboard::WikiLiteView * v = new qboard::WikiLiteView;
 	    win->setAttribute(Qt::WA_DeleteOnClose);
 	    win->setWidget( v );
+	    win->move( impl->gv->viewport()->mapToGlobal(QPoint(0,0)) );
+	    win->resize( impl->gv->viewport()->size() );
+	    win->setFloating(true);
 	    this->addDockWidget(Qt::RightDockWidgetArea, win );
 	    v->parseFile(fn);
 	    win->setWindowTitle( v->windowTitle() );
