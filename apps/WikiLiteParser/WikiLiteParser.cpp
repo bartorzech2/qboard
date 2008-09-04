@@ -247,13 +247,6 @@ namespace qboard {
 	      case state_t::Subscript: tag = "sub"; break;
 	      case state_t::Strike: tag = "strike"; break;
 	      case state_t::TD:
-#if 0
- 		  tag =( 1 == state.tableRow )
-		      ? "th"
-		      : "td";
-#else
-		  tag = "td";
-#endif
 		  style = "";
  		  if( doopen )
  		  {
@@ -264,6 +257,13 @@ namespace qboard {
 		      ++state.tableRow;
   		      state.output("<tr>");
   		  }
+#if 1
+ 		  tag =( 1 == state.tableRow )
+		      ? "th"
+		      : "td";
+#else
+		  tag = "td";
+#endif
 // 		  if( !doclose ) state.output("<tr>");
   		  doopen = true;
 		  break;
@@ -571,7 +571,7 @@ namespace qboard {
 			     const std::string &,
 			     state_t & state )
 	{
-	    state.output( "<table border='1' style='border-collapse: separate;' class='WLP'><tbody>\n<tr><td>" );
+	    state.output( "<table border='1' style='border-collapse: separate;' class='WLP'><tbody>\n<tr><th>" );
 	    state.tableRow = 1;
 	    state.flags |= (state_t::TD | state_t::Table);
 	}
@@ -582,7 +582,15 @@ namespace qboard {
 			     const std::string &,
 			     state_t & state )
 	{
-	    state.output( "</td></tr>\n" );
+	    if( 1 == state.tableRow )
+	    {
+		state.output( "</th>" );
+	    }
+	    else
+	    {
+		state.output( "</td>" );
+	    }
+	    state.output( "</tr>\n" );
 	    state.tableCol = 0;
 	    state.flags &= ~state_t::TD;
 	}
