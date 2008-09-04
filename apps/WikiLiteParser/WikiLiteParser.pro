@@ -2,8 +2,8 @@ include(../../config.qmake)
 TEMPLATE = app
 QMAKE_CXXFLAGS += $$QBOARD_CXXFLAGS
 HEADERS = \
- WikiLiteParser.h
+ $$SRC_DIR/WikiLiteParser.h
 
 SOURCES = \
- WikiLiteParser.cpp \
+ $$SRC_DIR/WikiLiteParser.cpp \
  wiki-main.cpp

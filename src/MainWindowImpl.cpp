@@ -44,6 +44,7 @@
 #include "QBoard.h"
 #include "PieceAppearanceWidget.h"
 #include "AboutQBoardImpl.h"
+#include "WikiLiteView.h"
 
 #if QT_VERSION >= 0x040400
 #include "QBoardDocsBrowser.h"
@@ -315,6 +316,17 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 	else if( impl->gstate.fileNameMatches(fn) )
 	{
 		worked = this->loadGame(fn);
+	}
+	else if( fn.endsWith(".wiki") )
+	{
+	    worked = true;
+	    qboard::WikiLiteView * v = new qboard::WikiLiteView;
+	    QString lbl = QString("Wiki: %1").arg(fi.fileName());
+	    QDockWidget * win = new QDockWidget( lbl, this );
+	    win->setAttribute(Qt::WA_DeleteOnClose);
+	    win->setWidget( v );
+	    this->addDockWidget(Qt::RightDockWidgetArea, win );
+	    v->parseFile(fn);
 	}
 	else if( QRegExp("\\.js$",Qt::CaseInsensitive).indexIn(fn) > 0 )
 	{
