@@ -33,21 +33,21 @@
 #include <cmath>
 #include <s11n.net/s11n/s11nlite.hpp>
 
-#include "QBoardView.h"
+#include <qboard/QBoardView.h>
 #include <qboard/QGIPiece.h>
 #include <qboard/QGIHtml.h>
-#include "GameState.h"
-#include "QBoardHomeView.h"
+#include <qboard/GameState.h>
+#include <qboard/QBoardHomeView.h>
 #include <qboard/QGILine.h>
-#include "utility.h"
+#include <qboard/utility.h>
 #include <qboard/S11nClipboard.h>
-#include "QBoard.h"
-#include "PieceAppearanceWidget.h"
+#include <qboard/QBoard.h>
+#include <qboard/PieceAppearanceWidget.h>
 #include "AboutQBoardImpl.h"
 #include <qboard/WikiLiteView.h>
 
 #if QT_VERSION >= 0x040400
-#include "QBoardDocsBrowser.h"
+#include <qboard/QBoardDocsBrowser.h>
 #endif
 
 #define QBOARD_MAINWINDOW_PERSISTENCE_CLASS "MainWindow"
@@ -529,7 +529,7 @@ void MainWindowImpl::addLine()
 
 }
 
-#include "QBoardPlugin.h"
+#include <qboard/QBoardPlugin.h>
 #include <qboard/QGIDot.h>
 #include <QPluginLoader>
 #include <QGraphicsLineItem>
