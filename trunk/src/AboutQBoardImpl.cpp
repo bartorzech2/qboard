@@ -12,7 +12,7 @@
  */
 
 #include "AboutQBoardImpl.h"
-#include "utility.h"
+#include <qboard/utility.h>
 AboutQBoardImpl::AboutQBoardImpl( QWidget * parent ) 
 	: QDialog(parent), Ui::AboutQBoard()
 {
