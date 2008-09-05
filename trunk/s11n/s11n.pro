@@ -12,11 +12,9 @@ TARGET = s11nconvert
 QT =
 CONFIG = debug
 OBJECTS_DIR = $$S11N_OBJ_DIR
+unix: QMAKE_LFLAGS += -lstdc++
+
 QMAKE_CXXFLAGS = $$S11N_CXXFLAGS
-unix:{
-	QMAKE_LFLAGS += -lstdc++
-	QMAKE_LFLAGS += -lz
-}
 
 HEADERS = \
  $$S11N_HEADERS \

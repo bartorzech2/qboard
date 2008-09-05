@@ -36,9 +36,9 @@
 # working once and qdevelop hosed the quoting when it re-saved the
 # .pro file.
 QBOARD_VERSION = 0
-!$$QBOARD_VERSION {
-#  QMAKE_CXX = colorgcc
-}
+#!$$QBOARD_VERSION {
+#  QMAKE_CXX = colorgcc # xemacs doesn't like the escape codes
+#}
 QBOARD_CONF = config.qmake # THIS file
 TOP_SRCDIR=$$PWD
 !exists($$TOP_SRCDIR/$$QBOARD_CONF) {
@@ -75,14 +75,14 @@ SRC_DIR = $$REL_SRCDIR/src
 S11N_DIR = $$REL_SRCDIR/s11n
 # S11N_INCLUDES = -I$$S11N_DIR/include
 MAIN_INCLUDES_DIR = $$REL_SRCDIR/include
+QBOARD_INCLUDES_DIR = $$MAIN_INCLUDES_DIR/qboard
 S11N_CXXFLAGS = -I$$MAIN_INCLUDES_DIR
 S11N_OBJ_DIR = $$OBJECTS_DIR/s11n
-QBOARD_CXXFLAGS = $$S11N_CXXFLAGS -DQBOARD_VERSION=$$QBOARD_VERSION -I$$REL_SRCDIR/src
 
 # QBOARD_INCLUDES = -I$$REL_SRCDIR/src -I$$MOC_DIR -I$$UI_DIR
 QMAKE_INCDIR += $$SRC_DIR
 
-DEFINES += QT_DLL
+# DEFINES += QT_DLL
 # INCLUDES += $$QBOARD_INCLUDES
 ########################################################################
 # S11N_xxx have to do with the libs11n code.
@@ -102,7 +102,12 @@ S11N_SOURCES = $$S11N_DIR/data_node_io.cpp \
  $$S11N_DIR/s11n_node.cpp \
  $$S11N_DIR/s11nlite.cpp \
  $$S11N_DIR/strtool.cpp \
- $$S11N_DIR/zfstream.cpp $$S11N_DIR/gzstream.cpp
+ $$S11N_DIR/zfstream.cpp
+unix:{
+	S11N_SOURCES += $$S11N_DIR/gzstream.cpp
+	QMAKE_LFLAGS += -lz
+	S11N_CXXFLAGS += -DHAVE_ZLIB=1
+}
 
 S11N_DIR=
 S11N_OBJECTS=
@@ -137,9 +142,9 @@ contains(QT,opengl){
 ########################################################################
 # S11nQt stuff...
 S11NQT_HEADERS = \
- $$SRC_DIR/S11n.h \
- $$SRC_DIR/S11nClipboard.h \
- $$SRC_DIR/S11nQt.h
+ $$QBOARD_INCLUDES_DIR/S11n.h \
+ $$QBOARD_INCLUDES_DIR/S11nClipboard.h \
+ $$QBOARD_INCLUDES_DIR/S11nQt.h
 
 S11NQT_SOURCES = \
  $$SRC_DIR/S11nClipboard.cpp \
@@ -150,6 +155,7 @@ S11NQT_SOURCES = \
 ########################################################################
 # If/when we ever refactor QBoard into lib+app, these headers belong
 # in the lib:
+H=$$QBOARD_INCLUDES_DIR
 QBOARD_HEADERS_LIB = \
  $$S11NQT_HEADERS \
  $$SRC_DIR/Dice.h \
@@ -158,31 +164,32 @@ QBOARD_HEADERS_LIB = \
  $$SRC_DIR/JSGameState.h \
  $$SRC_DIR/MenuHandlerBoard.h \
  $$SRC_DIR/MenuHandlerGeneric.h \
- $$SRC_DIR/parsepp.hpp \
- $$SRC_DIR/parsepp_strings.hpp \
- $$SRC_DIR/parsepp_typelist_10.hpp \
- $$SRC_DIR/parsepp_typelist.hpp \
+ $$H/parsepp.hpp \
+ $$H/parsepp_strings.hpp \
+ $$H/parsepp_typelist_10.hpp \
+ $$H/parsepp_typelist.hpp \
  $$SRC_DIR/PieceAppearanceWidget.h \
  $$SRC_DIR/PropObj.h \
  $$SRC_DIR/ScriptQt.h \
- $$SRC_DIR/Serializable.h \
+ $$H/Serializable.h \
  $$SRC_DIR/QBoard.h \
  $$SRC_DIR/QBoardHomeView.h \
  $$SRC_DIR/QBoardPlugin.h \
  $$SRC_DIR/QBoardScene.h \
  $$SRC_DIR/QBoardView.h \
- $$SRC_DIR/QGI.h \
- $$SRC_DIR/QGIDot.h \
- $$SRC_DIR/QGIHider.h \
- $$SRC_DIR/QGIHtml.h \
- $$SRC_DIR/QGILine.h \
- $$SRC_DIR/QGIPiece.h \
- $$SRC_DIR/QGIPiecePlacemarker.h \
+ $$H/QGI.h \
+ $$H/QGIDot.h \
+ $$H/QGIHider.h \
+ $$H/QGIHtml.h \
+ $$H/QGILine.h \
+ $$H/QGIPiece.h \
+ $$H/QGIPiecePlacemarker.h \
  $$SRC_DIR/SetupQBoard.h \
  $$SRC_DIR/reg_qt_s11n.h \
  $$SRC_DIR/utility.h \
- $$SRC_DIR/WikiLiteParser.h \
- $$SRC_DIR/WikiLiteView.h
+ $$H/WikiLiteParser.h \
+ $$H/WikiLiteView.h
+H=
 
 QBOARD_SOURCES_LIB = \
  $$S11NQT_SOURCES \
@@ -234,3 +241,4 @@ QBOARD_HEADERS_WINDOW = \
 QBOARD_SOURCES_MAINAPP = \
  $$SRC_DIR/main.cpp
 
+QBOARD_CXXFLAGS = $$S11N_CXXFLAGS -DQBOARD_VERSION=$$QBOARD_VERSION -I$$REL_SRCDIR/src

@@ -21,7 +21,6 @@
 // #include <list>
 // #include <iterator> // insert_iterator
 #include <algorithm> // for_each()
-#include "S11nQt.h"
 #include <s11n.net/s11n/abstract_creator.hpp> // abstract_creator class
 #include <s11n.net/s11n/proxy/listish.hpp>
 

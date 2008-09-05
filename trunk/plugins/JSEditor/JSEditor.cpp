@@ -11,7 +11,7 @@
 
 #include <stdexcept>
 #include "JSEditor.h"
-#include "GameState.h"
+#include <qboard/GameState.h>
 #include "highlighter.h"
 
 struct JSEditor::Impl

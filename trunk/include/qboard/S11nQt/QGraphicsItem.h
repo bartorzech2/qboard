@@ -2,7 +2,7 @@
 #define S11NQT_QGRAPHICSITEM_H_INCLUDED 1
 
 #include <QGraphicsItem>
-#include "S11nQt/QList.h"
+#include "QList.h"
 
 namespace s11n { namespace qt {
     /**

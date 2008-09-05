@@ -1,4 +1,4 @@
-#include "QGIHider.h"
+#include <qboard/QGIHider.h>
 
 #include <QGraphicsSceneMouseEvent>
 #include <QStyleOptionGraphicsItem>
@@ -8,10 +8,10 @@
 #include <QWidget>
 #include <QMenu>
 
-#include "S11nQt.h"
+#include <qboard/S11nQt.h>
 #include "utility.h"
 #include "MenuHandlerGeneric.h"
-#include "S11nQt/QPointF.h"
+#include <qboard/S11nQt/QPointF.h>
 
 struct QGIHider::Impl
 {

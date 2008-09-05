@@ -28,7 +28,7 @@
 
 #include "PropObj.h"
 #include "utility.h"
-#include "S11nQt.h"
+#include <qboard/S11nQt.h>
 
 PropObj::PropObj() : QObject(),
 		     Serializable("PropObj")

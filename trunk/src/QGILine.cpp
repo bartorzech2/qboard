@@ -11,8 +11,8 @@
  *
  */
 
-#include "QGILine.h"
-#include "S11nQt.h"
+#include <qboard/QGILine.h>
+#include <qboard/S11nQt.h>
 #include "utility.h"
 #include "MenuHandlerGeneric.h"
 #include <QGraphicsSceneMouseEvent>
@@ -30,8 +30,8 @@
 #include <QEvent>
 #include <cmath>
 
-#include "S11nQt/QMap.h"
-#include "S11nQt/QPointF.h"
+#include <qboard/S11nQt/QMap.h>
+#include <qboard/S11nQt/QPointF.h>
 
 // If QGILineBinder_do_arrow is true then code is added for QGILineBinder to draw
 // arrows at its endpoints.

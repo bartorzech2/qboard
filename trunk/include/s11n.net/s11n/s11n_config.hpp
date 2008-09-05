@@ -36,7 +36,7 @@
 #  define s11n_CONFIG_ENABLE_PLUGINS (1)
 #else
 #  define s11n_CONFIG_HAVE_LIBEXPAT 0
-#  define s11n_CONFIG_HAVE_ZFSTREAM 0
+#  define s11n_CONFIG_HAVE_ZFSTREAM (1)
 #  define s11n_CONFIG_ENABLE_PLUGINS (1)
 #endif
 

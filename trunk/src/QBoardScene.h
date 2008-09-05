@@ -8,7 +8,7 @@ class QWidget;
 #include <QGraphicsItem>
 #include <QStyleOptionGraphicsItem>
 
-#include "Serializable.h"
+#include <qboard/Serializable.h>
 
 class QBoardScene : public QGraphicsScene,
 		    public Serializable

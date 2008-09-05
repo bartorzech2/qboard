@@ -21,18 +21,18 @@
 
 #include <stdexcept>
 
-#include "S11nQt.h"
-#include "S11nQt/QList.h"
-#include "QGIPiece.h"
+#include <qboard/S11nQt.h>
+#include <qboard/S11nQt/QList.h>
+#include <qboard/QGIPiece.h>
 #include "utility.h"
 #include "QBoard.h"
 #include "QBoardScene.h"
-#include "S11nClipboard.h"
+#include <qboard/S11nClipboard.h>
 #include "ScriptQt.h"
-#include "S11nQt/QPoint.h"
+#include <qboard/S11nQt/QPoint.h>
 #include <s11n.net/s11n/s11n_debuggering_macros.hpp>
 
-#include "QGIPiecePlacemarker.h"
+#include <qboard/QGIPiecePlacemarker.h>
 #include "JSGameState.h"
 
 

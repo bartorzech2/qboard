@@ -1,3 +1,5 @@
+#ifndef S11NQT_QString_H_INCLUDED
+#define S11NQT_QString_H_INCLUDED 1
 #include <QString>
 namespace s11n { namespace qt {
 /**
@@ -33,3 +35,4 @@ struct QString_s11n
 #define S11N_TYPE_NAME "QString"
 #define S11N_SERIALIZE_FUNCTOR s11n::qt::QString_s11n
 #include <s11n.net/s11n/reg_s11n_traits.hpp>
+#endif // S11NQT_QString_H_INCLUDED

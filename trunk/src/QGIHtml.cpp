@@ -11,17 +11,17 @@
  *
  */
 
-#include "QGIHtml.h"
-#include "S11nQt.h"
-#include "S11nQt/QList.h"
-#include "S11nQt/QByteArray.h"
-#include "S11nQt/QGraphicsItem.h"
-#include "S11nQt/QPointF.h"
-#include "S11nQt/QPoint.h"
-#include "S11nQt/QString.h"
+#include <qboard/QGIHtml.h>
+#include <qboard/S11nQt.h>
+#include <qboard/S11nQt/QList.h>
+#include <qboard/S11nQt/QByteArray.h>
+#include <qboard/S11nQt/QGraphicsItem.h>
+#include <qboard/S11nQt/QPointF.h>
+#include <qboard/S11nQt/QPoint.h>
+#include <qboard/S11nQt/QString.h>
 #include "utility.h"
 #include "MenuHandlerGeneric.h"
-#include "S11nClipboard.h"
+#include <qboard/S11nClipboard.h>
 
 #include <QGraphicsSceneMouseEvent>
 #include <QFocusEvent>
@@ -300,7 +300,7 @@ void QGIHtml::contextMenuEvent( QGraphicsSceneContextMenuEvent * event )
     mh.doMenu( this, event );
 }
 
-#include "QGIHider.h"
+#include <qboard/QGIHider.h>
 QGraphicsItem * QGIHtml::hideItems()
 {
     QGIHider::hideItems( this );

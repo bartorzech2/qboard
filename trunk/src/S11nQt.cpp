@@ -16,36 +16,36 @@
 #include <QDebug>
 #include <QMap>
 
-#include "S11nQt.h"
+#include <qboard/S11nQt.h>
 #include <s11n.net/s11n/functional.hpp>
 
-#include "S11nQt/QBrush.h"
-#include "S11nQt/QByteArray.h"
-#include "S11nQt/QColor.h"
-#include "S11nQt/QDate.h"
-#include "S11nQt/QDateTime.h"
-#include "S11nQt/QFont.h"
-#include "S11nQt/QLine.h"
-#include "S11nQt/QLineF.h"
-#include "S11nQt/QList.h"
-#include "S11nQt/QMap.h"
-#include "S11nQt/QMatrix.h"
-#include "S11nQt/QPair.h"
-#include "S11nQt/QPen.h"
-#include "S11nQt/QPixmap.h"
-#include "S11nQt/QPixmap.h"
-#include "S11nQt/QPoint.h"
-#include "S11nQt/QPointF.h"
-#include "S11nQt/QRect.h"
-#include "S11nQt/QRectF.h"
-#include "S11nQt/QRegExp.h"
-#include "S11nQt/QSize.h"
-#include "S11nQt/QSizeF.h"
-#include "S11nQt/QString.h"
-#include "S11nQt/QStringList.h"
-#include "S11nQt/QTime.h"
-#include "S11nQt/QTransform.h"
-#include "S11nQt/QVariant.h"
+#include <qboard/S11nQt/QBrush.h>
+#include <qboard/S11nQt/QByteArray.h>
+#include <qboard/S11nQt/QColor.h>
+#include <qboard/S11nQt/QDate.h>
+#include <qboard/S11nQt/QDateTime.h>
+#include <qboard/S11nQt/QFont.h>
+#include <qboard/S11nQt/QLine.h>
+#include <qboard/S11nQt/QLineF.h>
+#include <qboard/S11nQt/QList.h>
+#include <qboard/S11nQt/QMap.h>
+#include <qboard/S11nQt/QMatrix.h>
+#include <qboard/S11nQt/QPair.h>
+#include <qboard/S11nQt/QPen.h>
+#include <qboard/S11nQt/QPixmap.h>
+#include <qboard/S11nQt/QPixmap.h>
+#include <qboard/S11nQt/QPoint.h>
+#include <qboard/S11nQt/QPointF.h>
+#include <qboard/S11nQt/QRect.h>
+#include <qboard/S11nQt/QRectF.h>
+#include <qboard/S11nQt/QRegExp.h>
+#include <qboard/S11nQt/QSize.h>
+#include <qboard/S11nQt/QSizeF.h>
+#include <qboard/S11nQt/QString.h>
+#include <qboard/S11nQt/QStringList.h>
+#include <qboard/S11nQt/QTime.h>
+#include <qboard/S11nQt/QTransform.h>
+#include <qboard/S11nQt/QVariant.h>
 
 namespace s11n { namespace qt {
 

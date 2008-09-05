@@ -1,4 +1,5 @@
-#include "S11nQt/Stream.h"
+#include <qboard/S11nQt.h>
+#include <qboard/S11nQt/Stream.h>
 #include <stdexcept>
 
 /*

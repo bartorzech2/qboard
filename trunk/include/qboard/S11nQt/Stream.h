@@ -15,7 +15,6 @@
 
 #include <iostream>
 #include <QIODevice>
-#include "S11nQt.h"
 
 namespace s11n { namespace qt {
     /**

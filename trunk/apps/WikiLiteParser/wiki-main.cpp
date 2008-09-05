@@ -2,7 +2,7 @@
 #define CERR std::cerr << __FILE__ << ":" << std::dec << __LINE__ << " : "
 #define COUT std::cout << __FILE__ << ":" << std::dec << __LINE__ << " : "
 
-#include "WikiLiteParser.h"
+#include <qboard/WikiLiteParser.h>
 
 #include <QFile>
 #include <QByteArray>

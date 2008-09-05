@@ -26,7 +26,7 @@
 #include <s11n.net/s11n/s11n_debuggering_macros.hpp> // tracing macros
 #include <s11n.net/s11n/proxy/mapish.hpp>
 #include <QMap>
-#include "S11nQt/QPair.h"
+#include "QPair.h"
 
 namespace s11n { namespace qt {
     using namespace s11n;

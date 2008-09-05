@@ -1,3 +1,5 @@
+#ifndef S11NQT_QSizeF_H_INCLUDED
+#define S11NQT_QSizeF_H_INCLUDED 1
 #include <QSizeF>
 namespace s11n { namespace qt {
 /* s11n proxy for QSizeF.*/
@@ -14,3 +16,4 @@ struct QSizeF_s11n
 #define S11N_TYPE_NAME "QSizeF"
 #define S11N_SERIALIZE_FUNCTOR s11n::qt::QSizeF_s11n
 #include <s11n.net/s11n/reg_s11n_traits.hpp>
+#endif // S11NQT_QSizeF_H_INCLUDED

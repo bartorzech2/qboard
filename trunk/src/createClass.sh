@@ -36,7 +36,7 @@ cat <<EOF > $hpp
 
 
 #include <QObject>
-#include "Serializable.h"
+#include <qboard/Serializable.h>
 
 class ${cl} : public QObject,
     public Serializable

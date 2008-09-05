@@ -1,7 +1,7 @@
 include(../../config.qmake)
 TEMPLATE = app
 QT += script svg
-QMAKE_CXXFLAGS = $$QBOARD_CXXFLAGS
+QMAKE_CXXFLAGS = -I$$MAIN_INCLUDES_DIR/qboard $$QBOARD_CXXFLAGS
 
 HEADERS = \
  $$S11NQT_HEADERS

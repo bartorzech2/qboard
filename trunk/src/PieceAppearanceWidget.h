@@ -2,7 +2,7 @@
 #define QBOARD_PIECEAPPEARANCECHOOSER_H_INCLUDED 1
 
 #include <QWidget>
-#include "Serializable.h"
+#include <qboard/Serializable.h>
 #include "GameState.h"
 class QGraphicsView;
 class PieceAppearanceWidget : public QWidget, public Serializable
