@@ -16,10 +16,8 @@
 
 #include <QString>
 #include <QIODevice>
-#include "parsepp.hpp"
 
 namespace qboard {
-    using namespace Ps;
 
     /**
        This class implements a basic Wiki-like parser, the goal
