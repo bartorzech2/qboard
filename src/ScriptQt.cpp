@@ -11,7 +11,7 @@
  *
  */
 
-#include "ScriptQt.h"
+#include <qboard/ScriptQt.h>
 #include <QPoint>
 #include <QSize>
 #include <QColor>

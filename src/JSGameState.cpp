@@ -11,15 +11,15 @@
  *
  */
 
-#include "JSGameState.h"
-#include "GameState.h"
+#include <qboard/JSGameState.h>
+#include <qboard/GameState.h>
 #include <QDebug>
 #include <QScriptValue>
 #include <QScriptEngine>
 #include <QGraphicsItem>
 #include <QScriptValueIterator>
 
-#include "ScriptQt.h"
+#include <qboard/ScriptQt.h>
 
 #define SELF(RV) GameState *self = this->self(); \
     QScriptEngine * js = this->engine(); \

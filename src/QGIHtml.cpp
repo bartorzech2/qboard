@@ -19,8 +19,8 @@
 #include <qboard/S11nQt/QPointF.h>
 #include <qboard/S11nQt/QPoint.h>
 #include <qboard/S11nQt/QString.h>
-#include "utility.h"
-#include "MenuHandlerGeneric.h"
+#include <qboard/utility.h>
+#include <qboard/MenuHandlerGeneric.h>
 #include <qboard/S11nClipboard.h>
 
 #include <QGraphicsSceneMouseEvent>
@@ -346,7 +346,7 @@ MenuHandlerQGIHtml::~MenuHandlerQGIHtml()
 }
 // #include <QMessageBox>
 // #include <QUrl>
-#include "utility.h"
+#include <qboard/utility.h>
 void MenuHandlerQGIHtml::showHelp()
 {
     qboard::showHelpResource("QGIHtml widget", ":/QBoard/help/classes/QGIHtml.html");

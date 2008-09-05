@@ -13,8 +13,8 @@
 
 #include <QtGui>
 #include <QDebug>
-#include "QBoardPlugin.h"
-#include "GameState.h"
+#include <qboard/QBoardPlugin.h>
+#include <qboard/GameState.h>
 
 
 struct QBoardBasePlugin::Impl

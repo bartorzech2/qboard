@@ -56,7 +56,6 @@ REL_SRCDIR=$$replace(REL_SRCDIR,[^/]+,..)
 
 CONFIG += warn_on debug
 QT += script
-CONFIG +=  ordered
 # debug_and_release
 
 VERSION = $$QBOARD_VERSION
@@ -87,27 +86,34 @@ QMAKE_INCDIR += $$SRC_DIR
 ########################################################################
 # S11N_xxx have to do with the libs11n code.
 S11N_DIR = $$REL_SRCDIR/s11n
-S11N_SOURCES = $$S11N_DIR/data_node_io.cpp \
- $$S11N_DIR/exception.cpp \
+S11N_SOURCES_CORE = \
+  $$S11N_DIR/data_node_io.cpp \
+  $$S11N_DIR/exception.cpp \
+  $$S11N_DIR/path_finder.cpp \
+  $$S11N_DIR/plugin.cpp \
+  $$S11N_DIR/s11n.cpp \
+  $$S11N_DIR/s11n_node.cpp \
+  $$S11N_DIR/s11nlite.cpp \
+  $$S11N_DIR/strtool.cpp \
+  $$S11N_DIR/zfstream.cpp
+
+
+S11N_SOURCES_SERIALIZERS = \
  $$S11N_DIR/funtxt.flex.cpp \
  $$S11N_DIR/funtxt_serializer.cpp \
  $$S11N_DIR/funxml.flex.cpp \
  $$S11N_DIR/funxml_serializer.cpp \
  $$S11N_DIR/js_serializer.cpp \
  $$S11N_DIR/parens.flex.cpp \
- $$S11N_DIR/parens_serializer.cpp \
- $$S11N_DIR/path_finder.cpp \
- $$S11N_DIR/plugin.cpp \
- $$S11N_DIR/s11n.cpp \
- $$S11N_DIR/s11n_node.cpp \
- $$S11N_DIR/s11nlite.cpp \
- $$S11N_DIR/strtool.cpp \
- $$S11N_DIR/zfstream.cpp
+ $$S11N_DIR/parens_serializer.cpp
+
 unix:{
-	S11N_SOURCES += $$S11N_DIR/gzstream.cpp
+	S11N_SOURCES_CORE += $$S11N_DIR/gzstream.cpp
 	QMAKE_LFLAGS += -lz
 	S11N_CXXFLAGS += -DHAVE_ZLIB=1
 }
+S11N_SOURCES = $$S11N_SOURCES_CORE  \
+  $$S11N_SOURCES_SERIALIZERS
 
 S11N_DIR=
 S11N_OBJECTS=
@@ -158,25 +164,22 @@ S11NQT_SOURCES = \
 H=$$QBOARD_INCLUDES_DIR
 QBOARD_HEADERS_LIB = \
  $$S11NQT_HEADERS \
- $$SRC_DIR/Dice.h \
- $$SRC_DIR/GameState.h \
- $$SRC_DIR/GL.h \
- $$SRC_DIR/JSGameState.h \
- $$SRC_DIR/MenuHandlerBoard.h \
- $$SRC_DIR/MenuHandlerGeneric.h \
- $$H/parsepp.hpp \
- $$H/parsepp_strings.hpp \
- $$H/parsepp_typelist_10.hpp \
- $$H/parsepp_typelist.hpp \
- $$SRC_DIR/PieceAppearanceWidget.h \
- $$SRC_DIR/PropObj.h \
- $$SRC_DIR/ScriptQt.h \
+ $$QBOARD_HEADERS_LIB_PRIVATE \
+ $$H/Dice.h \
+ $$H/GameState.h \
+ $$H/GL.h \
+ $$H/JSGameState.h \
+ $$H/MenuHandlerBoard.h \
+ $$H/MenuHandlerGeneric.h \
+ $$H/PieceAppearanceWidget.h \
+ $$H/PropObj.h \
+ $$H/ScriptQt.h \
  $$H/Serializable.h \
- $$SRC_DIR/QBoard.h \
- $$SRC_DIR/QBoardHomeView.h \
- $$SRC_DIR/QBoardPlugin.h \
- $$SRC_DIR/QBoardScene.h \
- $$SRC_DIR/QBoardView.h \
+ $$H/QBoard.h \
+ $$H/QBoardHomeView.h \
+ $$H/QBoardPlugin.h \
+ $$H/QBoardScene.h \
+ $$H/QBoardView.h \
  $$H/QGI.h \
  $$H/QGIDot.h \
  $$H/QGIHider.h \
@@ -184,9 +187,7 @@ QBOARD_HEADERS_LIB = \
  $$H/QGILine.h \
  $$H/QGIPiece.h \
  $$H/QGIPiecePlacemarker.h \
- $$SRC_DIR/SetupQBoard.h \
- $$SRC_DIR/reg_qt_s11n.h \
- $$SRC_DIR/utility.h \
+ $$H/utility.h \
  $$H/WikiLiteParser.h \
  $$H/WikiLiteView.h
 H=
@@ -213,7 +214,6 @@ QBOARD_SOURCES_LIB = \
  $$SRC_DIR/QGILine.cpp \
  $$SRC_DIR/QGIPiece.cpp \
  $$SRC_DIR/QGIPiecePlacemarker.cpp \
- $$SRC_DIR/SetupQBoard.cpp \
  $$SRC_DIR/utility.cpp \
  $$SRC_DIR/WikiLiteParser.cpp \
  $$SRC_DIR/WikiLiteView.cpp
@@ -221,24 +221,6 @@ QBOARD_SOURCES_LIB = \
 #QBOARD_SOURCES_GAMESETS = 
 #QBOARD_HEADERS_GAMESETS = 
 
-########################################################################
-# Sources related to the main GUI.
-QBOARD_SOURCES_WINDOW = \
- $$SRC_DIR/AboutQBoardImpl.cpp \
- $$SRC_DIR/MainWindowImpl.cpp \
- $$QBOARD_SOURCES_GAMESETS \
- $$QBOARD_SOURCES_QT44
-
-QBOARD_HEADERS_WINDOW = \
- $$SRC_DIR/AboutQBoardImpl.h \
- $$SRC_DIR/MainWindowImpl.h \
- $$QBOARD_HEADERS_GAMESETS \
- $$QBOARD_HEADERS_QT44
-
-
-########################################################################
-# The main() code for QBoard (not for other apps, e.g. qboardbatch)
-QBOARD_SOURCES_MAINAPP = \
- $$SRC_DIR/main.cpp
-
-QBOARD_CXXFLAGS = $$S11N_CXXFLAGS -DQBOARD_VERSION=$$QBOARD_VERSION -I$$REL_SRCDIR/src
+INCLUDEPATH += $$MAIN_INCLUDES_DIR
+# QBOARD_INCLUDES = -I$$MAIN_INCLUDES_DIR
+QBOARD_CXXFLAGS = $$S11N_CXXFLAGS -DQBOARD_VERSION=$$QBOARD_VERSION

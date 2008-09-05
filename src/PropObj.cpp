@@ -26,8 +26,8 @@
 #include <iterator>
 #include <algorithm>
 
-#include "PropObj.h"
-#include "utility.h"
+#include <qboard/PropObj.h>
+#include <qboard/utility.h>
 #include <qboard/S11nQt.h>
 
 PropObj::PropObj() : QObject(),

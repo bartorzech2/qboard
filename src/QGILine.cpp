@@ -13,8 +13,8 @@
 
 #include <qboard/QGILine.h>
 #include <qboard/S11nQt.h>
-#include "utility.h"
-#include "MenuHandlerGeneric.h"
+#include <qboard/utility.h>
+#include <qboard/MenuHandlerGeneric.h>
 #include <QGraphicsSceneMouseEvent>
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsScene>
@@ -385,7 +385,7 @@ void QGILineNode::setLine( QGILineBinder * ed )
 	ed->adjust();
 }
 
-#include "utility.h"
+#include <qboard/utility.h>
 void QGILineNode::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 {
 	this->m_active = true;

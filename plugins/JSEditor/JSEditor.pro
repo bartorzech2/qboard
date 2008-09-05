@@ -2,8 +2,9 @@ include(../../config.qmake)
 TEMPLATE = lib
 CONFIG += plugin
 QT += script
+DEFINES += QT_DLL
 DESTDIR = $$QBOARD_PLUGINS_DESTDIR
-QMAKE_CXXFLAGS += $$QBOARD_CXXFLAGS
+QMAKE_CXXFLAGS = $$QBOARD_CXXFLAGS
 TARGET = $$qtLibraryTarget(JSEditor)
 HEADERS = \
   JSEditor.h \

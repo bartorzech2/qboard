@@ -3,8 +3,8 @@
 #include <QGraphicsItem>
 #include <QDebug>
 #include <QEvent>
-#include "QBoardScene.h"
-#include "utility.h"
+#include <qboard/QBoardScene.h>
+#include <qboard/utility.h>
 
 struct QBoardScene::Impl
 {

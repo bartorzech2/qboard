@@ -23,12 +23,12 @@
 
 #include <stdexcept>
 
-#include "utility.h"
+#include <qboard/utility.h>
 #include <qboard/Serializable.h>
 #include <qboard/S11nClipboard.h> // another horrible dep!
 #include <qboard/S11nQt.h>
 #include <qboard/S11nQt/QList.h>
-#include "GameState.h"
+#include <qboard/GameState.h>
 
 #include <qboard/S11nQt/QPointF.h>
 #include <qboard/S11nQt/QPoint.h>

@@ -11,7 +11,7 @@
  *
  */
 
-#include "MenuHandlerGeneric.h"
+#include <qboard/MenuHandlerGeneric.h>
 
 #include <QDebug>
 #include <QGraphicsScene>
@@ -20,7 +20,7 @@
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
 
-#include "utility.h"
+#include <qboard/utility.h>
 #include <qboard/QGI.h>
 #include <qboard/S11nClipboard.h>
 #include <qboard/Serializable.h>
@@ -36,7 +36,7 @@ MenuHandlerCopyCut::~MenuHandlerCopyCut()
 	
 }
 
-#include "utility.h"
+#include <qboard/utility.h>
 void MenuHandlerCopyCut::clipboard( QGraphicsItem * gvi, bool copy )
 {
     if( ! gvi ) return;

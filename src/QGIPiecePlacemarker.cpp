@@ -28,10 +28,10 @@
 
 #include <cmath>
 
-// #include "GameState.h"
+// #include <qboard/GameState.h>
 #include <qboard/QGIPiecePlacemarker.h>
 #include <qboard/S11nQt.h>
-#include "utility.h"
+#include <qboard/utility.h>
 
 struct QGIPiecePlacemarker::Impl
 {

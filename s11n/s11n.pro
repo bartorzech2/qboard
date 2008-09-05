@@ -18,9 +18,10 @@ QMAKE_CXXFLAGS = $$S11N_CXXFLAGS
 
 HEADERS = \
  $$S11N_HEADERS \
- argv_parser.hpp \
+ argv_parser.hpp
 
 SOURCES = \
- $$S11N_SOURCES \
+ $$S11N_SOURCES_CORE \
+ $$S11N_SOURCES_SERIALIZERS \
  argv_parser.cpp \
  main.cpp

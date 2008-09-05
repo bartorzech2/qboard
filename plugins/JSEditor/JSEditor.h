@@ -2,7 +2,8 @@
 #define CGMEJOE_H_INCLUDED 1
 
 #include <QObject>
-#include "QBoardPlugin.h"
+//#include "../../include/qboard/QBoardPlugin.h"
+#include <qboard/QBoardPlugin.h>
 class JSEditor : public QObject,
 		public QBoardPlugin
     
