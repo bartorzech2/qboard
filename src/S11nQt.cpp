@@ -1141,7 +1141,7 @@ bool QVariant_s11n::operator()( S11nNode & dest, QVariant const & src ) const
 	return true;
 #define CASE_OBJ(T,X) \
 	case QVariant::T: \
-	return s11n::serialize_subnode( dest, "val", X ); \
+	return s11n::serialize_subnode( dest, "val", X );
 
 	switch( vt )
 	{
