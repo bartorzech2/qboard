@@ -13,8 +13,8 @@
 
 #include <qboard/QGIDot.h>
 #include <qboard/S11nQt.h>
-#include "utility.h"
-#include "MenuHandlerGeneric.h"
+#include <qboard/utility.h>
+#include <qboard/MenuHandlerGeneric.h>
 #include <qboard/S11nQt/QList.h>
 #include <QGraphicsSceneMouseEvent>
 #include <QStyleOptionGraphicsItem>

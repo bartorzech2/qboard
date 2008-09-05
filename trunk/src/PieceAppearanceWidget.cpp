@@ -11,14 +11,14 @@
  *
  */
 
-#include "PieceAppearanceWidget.h"
+#include <qboard/PieceAppearanceWidget.h>
 
 #include <s11n.net/s11n/s11nlite.hpp>
 #include <QDebug>
 #include <QGridLayout>
 #include <QGraphicsView>
 #include <qboard/S11nQt.h>
-#include "QBoardView.h"
+#include <qboard/QBoardView.h>
 #include <qboard/QGIPiece.h>
 
 struct PieceAppearanceWidget::Impl

@@ -11,8 +11,8 @@
  *
  */
 
-#include "QBoardDocsBrowser.h"
-#include "utility.h"
+#include <qboard/QBoardDocsBrowser.h>
+#include <qboard/utility.h>
 #include <QDebug>
 
 QBoardDocsBrowser::QBoardDocsBrowser(QString const & home)

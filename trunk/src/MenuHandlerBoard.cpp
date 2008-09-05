@@ -10,7 +10,7 @@
  * included in the packaging of this file.
  *
  */
-#include "MenuHandlerBoard.h"
+#include <qboard/MenuHandlerBoard.h>
 
 #include <QContextMenuEvent>
 #include <QAction>
@@ -22,15 +22,15 @@
 
 #include <stdexcept>
 
-//#include "MenuHandlerGeneric.h"
-#include "GameState.h"
-#include "utility.h"
+//#include <qboard/MenuHandlerGeneric.h>
+#include <qboard/GameState.h>
+#include <qboard/utility.h>
 #include <qboard/S11nClipboard.h>
-#include "QBoard.h"
-#include "QBoardView.h"
-#include "GL.h"
-#include "MenuHandlerGeneric.h"
-#include "ScriptQt.h"
+#include <qboard/QBoard.h>
+#include <qboard/QBoardView.h>
+#include <qboard/GL.h>
+#include <qboard/MenuHandlerGeneric.h>
+#include <qboard/ScriptQt.h>
 
 struct MenuHandlerBoard::Impl
 {

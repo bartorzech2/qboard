@@ -24,16 +24,16 @@
 #include <QGraphicsItem>
 #include <QAction>
 
-#include "QBoardView.h"
-#include "GameState.h"
-#include "GL.h"
+#include <qboard/QBoardView.h>
+#include <qboard/GameState.h>
+#include <qboard/GL.h>
 #if QBOARD_USE_OPENGL
 #include <QGLWidget>
 #endif
 
 
-#include "QBoard.h"
-#include "utility.h"
+#include <qboard/QBoard.h>
+#include <qboard/utility.h>
 
 struct QBoardView::Impl
 {
@@ -480,7 +480,7 @@ void QBoardView::selectAll()
 }
 
 #include <QContextMenuEvent>
-#include "MenuHandlerBoard.h"
+#include <qboard/MenuHandlerBoard.h>
 void QBoardView::contextMenuEvent( QContextMenuEvent * event )
 {
     if( ! this->itemAt( event->pos() ) )

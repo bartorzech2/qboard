@@ -33,6 +33,22 @@ RESOURCES = $$RESOURCES_DIR/icons.qrc \
 	$$RESOURCES_DIR/help.qrc \
 	$$RESOURCES_DIR/javascript.qrc
 
+
+########################################################################
+# Sources related to the main GUI.
+QBOARD_SOURCES_MAINAPP = \
+ AboutQBoardImpl.cpp \
+ MainWindowImpl.cpp \
+ main.cpp \
+ SetupQBoard.cpp
+
+QBOARD_HEADERS_MAINAPP = \
+ AboutQBoardImpl.h \
+ MainWindowImpl.h \
+ SetupQBoard.h \
+ $$QBOARD_HEADERS_QT44
+
+
 FORMS = \
  $$UI_SRCDIR/AboutQBoard.ui \
  $$UI_SRCDIR/MainWindow.ui \
@@ -42,11 +58,10 @@ FORMS = \
 
 HEADERS = \
  $$QBOARD_HEADERS_LIB \
- $$QBOARD_HEADERS_WINDOW
+ $$QBOARD_HEADERS_MAINAPP
 
 SOURCES = \
  $$QBOARD_SOURCES_LIB \
- $$QBOARD_SOURCES_WINDOW \
- $$QBOARD_SOURCES_MAINAPP 
+ $$QBOARD_SOURCES_MAINAPP
 
 OBJECTS += $$S11N_OBJECTS

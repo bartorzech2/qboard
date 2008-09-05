@@ -22,12 +22,12 @@
 
 #include <qboard/S11nQt.h>
 #include <qboard/S11nQt/QList.h>
-#include "utility.h"
-#include "MenuHandlerGeneric.h"
+#include <qboard/utility.h>
+#include <qboard/MenuHandlerGeneric.h>
 #include <qboard/S11nClipboard.h>
 #include <qboard/S11nQt/QPointF.h>
 
-#include "Dice.h"
+#include <qboard/Dice.h>
 
 namespace qboard {
 

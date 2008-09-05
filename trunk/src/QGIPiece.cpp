@@ -18,12 +18,12 @@
 #include <cmath>
 
 #include <qboard/QGIPiece.h>
-#include "utility.h"
+#include <qboard/utility.h>
 #include <qboard/S11nQt.h>
 #include <qboard/S11nQt/QList.h>
 #include <qboard/S11nClipboard.h>
-#include "MenuHandlerGeneric.h"
-#include "PropObj.h"
+#include <qboard/MenuHandlerGeneric.h>
+#include <qboard/PropObj.h>
 #include <qboard/S11nQt/QPointF.h>
 #include <qboard/S11nQt/QPoint.h>
 #include <qboard/S11nQt/QGraphicsItem.h>
