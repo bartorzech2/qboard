@@ -27,7 +27,7 @@ SetupQBoard::~SetupQBoard()
 #include <QString>
 #include <QDir>
 #include <QDebug>
-#include "utility.h"
+#include <qboard/utility.h>
 
 void SetupQBoard::accept()
 {
