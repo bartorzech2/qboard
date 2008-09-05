@@ -7,10 +7,15 @@
 #include <QFile>
 #include <QByteArray>
 
-int main( int, char ** )
+int main( int argc, char ** argv )
 {
     CERR << "main()\n";
-    QFile inf("/dev/stdin");
+    QString fn("/dev/stdin");
+    if( argc > 1 )
+    {
+	fn = argv[1];
+    }
+    QFile inf(fn);
     inf.open(QIODevice::ReadOnly);
     QByteArray src( inf.readAll() );
     if( ! src.size() )
@@ -18,7 +23,15 @@ int main( int, char ** )
 	CERR << "Source empty!";
 	return 1;
     }
-    QFile out("/dev/stdout");
+    if( argc > 2 )
+    {
+	fn = argv[2];
+    }
+    else
+    {
+	fn = "/dev/stdout";
+    }
+    QFile out(fn);
     out.open(QIODevice::WriteOnly);
     CERR << "START PARSING:::\n";
     qboard::WikiLiteParser gp;
