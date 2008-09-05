@@ -974,6 +974,7 @@ bool QVariant_s11n::canHandle( int t )
 	    || (t == QVariant::String)
 	    || (t == QVariant::StringList)
 	    || (t == QVariant::Time)
+	    || (t == QVariant::Transform)
 	    || (t == QVariant::ULongLong)
 	    || (t == QVariant::UInt)
 	    || (t == QVariant::UserType) // Only certain ones
@@ -1035,6 +1036,7 @@ static VariantNameTypeIDMap & vNTMap()
 	MAP(TextFormat);
 	MAP(TextLength);
 	MAP(Time);
+	MAP(Transform);
 	MAP(UInt);
 	MAP(ULongLong);
 	MAP(Url);
@@ -1104,6 +1106,7 @@ static VariantTypeIDNameMap & vTNMap()
 	MAP(TextFormat);
 	MAP(TextLength);
 	MAP(Time);
+	MAP(Transform);
 	MAP(UInt);
 	MAP(ULongLong);
 	MAP(Url);
@@ -1170,6 +1173,7 @@ bool QVariant_s11n::operator()( S11nNode & dest, QVariant const & src ) const
 	    CASE_OBJ(String, src.toString() );
 	    CASE_OBJ(StringList, src.toStringList() );
 	    CASE_OBJ(Time, src.toTime() );
+	    CASE_OBJ(Transform, src.value<QTransform>() );
 	    CASE_PROP(ULongLong,toULongLong());
 	  default:
 	      break;
@@ -1236,6 +1240,7 @@ bool QVariant_s11n::operator()( S11nNode const & src, QVariant & dest ) const
 	    CASE_OBJ(String,QString);
 	    CASE_OBJ(StringList,QStringList);
 	    CASE_OBJ(Time,QTime);
+	    CASE_OBJ(Transform,QTransform);
 	    CASE_PROP(UInt,uint,uint(0));
 	    CASE_PROP(ULongLong,qulonglong,qulonglong(0));
 	  default:
