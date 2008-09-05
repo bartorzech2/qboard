@@ -42,6 +42,7 @@ Some things QBoard can be used for:
   * Use copy, paste, and cloning to quickly set up an army of pieces.
   * "Shuffle" any items by selecting several items and using the Shuffle menu option. Useful for cards, simulating a cup of chits, and randomizing piece selection or placement.
   * JavaScript bindings are under developement. [JavaScript The basic stuff works], but this work is ongoing.
+  * Built-in wiki viewer which supports most of the wiki syntax provided by Google Code Wiki (e.g. this page).
 
 See also: the [TODOs] Page
 
