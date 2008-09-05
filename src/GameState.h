@@ -14,7 +14,7 @@
  */
 
 
-#include "Serializable.h"
+#include <qboard/Serializable.h>
 class QBoard;
 #include <QGraphicsScene>
 #include <QPoint>

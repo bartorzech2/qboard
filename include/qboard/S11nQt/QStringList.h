@@ -1,5 +1,7 @@
+#ifndef S11NQT_QStringList_H_INCLUDED
+#define S11NQT_QStringList_H_INCLUDED 1
 #include <QStringList>
-#include "S11nQt/QList.h"
+#include "QList.h"
 namespace s11n { namespace qt {
 /* s11n proxy for QStringList.*/
 struct QStringList_s11n
@@ -15,3 +17,4 @@ struct QStringList_s11n
 #define S11N_TYPE_NAME "QStringList"
 #define S11N_SERIALIZE_FUNCTOR s11n::qt::QStringList_s11n
 #include <s11n.net/s11n/reg_s11n_traits.hpp>
+#endif // S11NQT_QStringList_H_INCLUDED

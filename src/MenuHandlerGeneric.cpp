@@ -21,10 +21,11 @@
 #include <QStyleOptionGraphicsItem>
 
 #include "utility.h"
-#include "QGI.h"
-#include "S11nClipboard.h"
-#include "Serializable.h"
-#include "S11nQt/QList.h"
+#include <qboard/QGI.h>
+#include <qboard/S11nClipboard.h>
+#include <qboard/Serializable.h>
+#include <qboard/S11nQt.h>
+#include <qboard/S11nQt/QList.h>
 MenuHandlerCopyCut::MenuHandlerCopyCut(QGraphicsItem * gi,QObject * parent)
     : QObject(parent),
       m_gi(gi)

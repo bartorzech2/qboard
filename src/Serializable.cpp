@@ -11,7 +11,7 @@
  *
  */
 
-#include "Serializable.h"
+#include <qboard/Serializable.h>
 #include <sstream>
 #include <iterator>
 #include <algorithm>

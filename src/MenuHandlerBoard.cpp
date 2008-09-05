@@ -25,7 +25,7 @@
 //#include "MenuHandlerGeneric.h"
 #include "GameState.h"
 #include "utility.h"
-#include "S11nClipboard.h"
+#include <qboard/S11nClipboard.h>
 #include "QBoard.h"
 #include "QBoardView.h"
 #include "GL.h"

@@ -17,7 +17,7 @@
 #include <QObject>
 #include <QRectF>
 #include <QSize>
-#include "Serializable.h"
+#include <qboard/Serializable.h>
 
 /**
 	QBoard is the basic game board type for the QBoard app.

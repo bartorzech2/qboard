@@ -12,8 +12,8 @@
  * included in the packaging of this file.
  *
  */
-#include "Serializable.h"
-#include "QGI.h"
+#include <qboard/Serializable.h>
+#include <qboard/QGI.h>
 #include <QGraphicsTextItem>
 #include <QObject>
 

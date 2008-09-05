@@ -17,9 +17,9 @@
 #include <QDebug>
 #include <QGridLayout>
 #include <QGraphicsView>
-#include "S11nQt.h"
+#include <qboard/S11nQt.h>
 #include "QBoardView.h"
-#include "QGIPiece.h"
+#include <qboard/QGIPiece.h>
 
 struct PieceAppearanceWidget::Impl
 {

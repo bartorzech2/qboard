@@ -11,11 +11,11 @@
  *
  */
 
-#include "QGIDot.h"
-#include "S11nQt.h"
+#include <qboard/QGIDot.h>
+#include <qboard/S11nQt.h>
 #include "utility.h"
 #include "MenuHandlerGeneric.h"
-#include "S11nQt/QList.h"
+#include <qboard/S11nQt/QList.h>
 #include <QGraphicsSceneMouseEvent>
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsScene>
@@ -32,10 +32,10 @@
 
 #include <cmath> // acos()
 
-#include "S11nQt/QBrush.h"
-#include "S11nQt/QPen.h"
-#include "S11nQt/QPointF.h"
-#include "S11nQt/QGraphicsItem.h"
+#include <qboard/S11nQt/QBrush.h>
+#include <qboard/S11nQt/QPen.h>
+#include <qboard/S11nQt/QPointF.h>
+#include <qboard/S11nQt/QGraphicsItem.h>
 
 struct QGIDot::Impl
 {
@@ -292,7 +292,7 @@ void QGIDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QWidg
     this->QGraphicsEllipseItem::paint(painter,opt,wid); // draws our selection box
 }
 
-#include "QGIHider.h"
+#include <qboard/QGIHider.h>
 QGraphicsItem * QGIDot::hideItems()
 {
     QGIHider::hideItems( this );

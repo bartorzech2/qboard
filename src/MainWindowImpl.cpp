@@ -34,13 +34,13 @@
 #include <s11n.net/s11n/s11nlite.hpp>
 
 #include "QBoardView.h"
-#include "QGIPiece.h"
-#include "QGIHtml.h"
+#include <qboard/QGIPiece.h>
+#include <qboard/QGIHtml.h>
 #include "GameState.h"
 #include "QBoardHomeView.h"
-#include "QGILine.h"
+#include <qboard/QGILine.h>
 #include "utility.h"
-#include "S11nClipboard.h"
+#include <qboard/S11nClipboard.h>
 #include "QBoard.h"
 #include "PieceAppearanceWidget.h"
 #include "AboutQBoardImpl.h"
@@ -530,7 +530,7 @@ void MainWindowImpl::addLine()
 }
 
 #include "QBoardPlugin.h"
-#include "QGIDot.h"
+#include <qboard/QGIDot.h>
 #include <QPluginLoader>
 #include <QGraphicsLineItem>
 #include <QGraphicsSimpleTextItem>

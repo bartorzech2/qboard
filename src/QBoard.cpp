@@ -13,8 +13,8 @@
 
 #include "QBoard.h"
 
-#include "S11nQt.h"
-#include "S11nQt/QString.h"
+#include <qboard/S11nQt.h>
+#include <qboard/S11nQt/QString.h>
 #include <QDebug>
 #include <QVariant>
 

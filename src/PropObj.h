@@ -22,7 +22,7 @@
 #include <QSize>
 #include <QString>
 
-#include "Serializable.h"
+#include <qboard/Serializable.h>
 
 /**
  */

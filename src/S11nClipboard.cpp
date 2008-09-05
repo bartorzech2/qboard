@@ -11,7 +11,7 @@
  *
  */
 
-#include "S11nClipboard.h"
+#include <qboard/S11nClipboard.h>
 #include <sstream>
 #include <QClipboard>
 #include <QApplication>

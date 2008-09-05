@@ -17,16 +17,16 @@
 #include <QStringList>
 #include <cmath>
 
-#include "QGIPiece.h"
+#include <qboard/QGIPiece.h>
 #include "utility.h"
-#include "S11nQt.h"
-#include "S11nQt/QList.h"
-#include "S11nClipboard.h"
+#include <qboard/S11nQt.h>
+#include <qboard/S11nQt/QList.h>
+#include <qboard/S11nClipboard.h>
 #include "MenuHandlerGeneric.h"
 #include "PropObj.h"
-#include "S11nQt/QPointF.h"
-#include "S11nQt/QPoint.h"
-#include "S11nQt/QGraphicsItem.h"
+#include <qboard/S11nQt/QPointF.h>
+#include <qboard/S11nQt/QPoint.h>
+#include <qboard/S11nQt/QGraphicsItem.h>
 
 #include <algorithm>
 #include <cstdlib>
@@ -664,7 +664,7 @@ bool QGIPiece::deserialize( S11nNode const & src )
     return true;
 }
 
-#include "QGIHider.h"
+#include <qboard/QGIHider.h>
 QGraphicsItem * QGIPiece::hideItems()
 {
     QGIHider::hideItems( this );
