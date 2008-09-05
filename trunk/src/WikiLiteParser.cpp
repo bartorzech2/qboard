@@ -22,8 +22,8 @@
 #include <QRegExp>
 // #include <cctype>
 
-#include "parsepp.hpp"
-#include "WikiLiteParser.h"
+#include <parsepp/parsepp.hpp>
+#include <qboard/WikiLiteParser.h>
 
 #include <iostream>
 #include <vector>

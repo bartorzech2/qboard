@@ -25,6 +25,7 @@
 #include <QMessageBox>
 #include <QMetaType>
 #include <QVariant>
+#include <QFile>
 
 #include <QByteArray>
 #include <QDataStream>
@@ -649,6 +650,18 @@ namespace qboard {
 	glob.setProperty("toSource",
 			 js->newFunction(js_toSource),
 			 QScriptValue::ReadOnly | QScriptValue::Undeletable );
+
+	if(0)
+	{
+	    QString res( ":/QBoard/javascript/ClassicalInheritance.inc.js" );
+	    QFile inf(res);
+	    if( inf.open(QIODevice::ReadOnly) )
+	    {
+		js->evaluate( inf.readAll(), res );
+	    }
+	    inf.close();
+	}
+
 	return js;
     }
 

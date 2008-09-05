@@ -11,8 +11,8 @@
  *
  */
 
-#include "WikiLiteView.h"
-#include "WikiLiteParser.h"
+#include <qboard/WikiLiteView.h>
+#include <qboard/WikiLiteParser.h>
 #include <QTextEdit>
 #include <QTextDocument>
 #include <QGridLayout>
