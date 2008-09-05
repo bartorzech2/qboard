@@ -44,7 +44,7 @@
 #include "QBoard.h"
 #include "PieceAppearanceWidget.h"
 #include "AboutQBoardImpl.h"
-#include "WikiLiteView.h"
+#include <qboard/WikiLiteView.h>
 
 #if QT_VERSION >= 0x040400
 #include "QBoardDocsBrowser.h"
