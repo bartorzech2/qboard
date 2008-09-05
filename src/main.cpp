@@ -23,7 +23,7 @@
 
 #include "MainWindowImpl.h"
 #include "SetupQBoard.h"
-#include "utility.h"
+#include <qboard/utility.h>
 
 int do_setup()
 {
