@@ -16,7 +16,6 @@
 #include <QObject>
 #include <QMenu>
 
-//#include "MenuHandlerGeneric.h"
 class QBoardView;
 class QGraphicsScene;
 class QContextMenuEvent;
