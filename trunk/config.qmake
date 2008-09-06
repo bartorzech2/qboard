@@ -147,15 +147,19 @@ contains(QT,opengl){
 }
 ########################################################################
 # S11nQt stuff...
+H=$$QBOARD_INCLUDES_DIR
 S11NQT_HEADERS = \
- $$QBOARD_INCLUDES_DIR/S11n.h \
- $$QBOARD_INCLUDES_DIR/S11nClipboard.h \
- $$QBOARD_INCLUDES_DIR/S11nQt.h
-
+ $$H/Serializable.h \
+ $$H/S11n.h \
+ $$H/S11nClipboard.h \
+ $$H/S11nQt.h
+H=
 S11NQT_SOURCES = \
  $$SRC_DIR/S11nClipboard.cpp \
  $$SRC_DIR/S11nQt.cpp \
- $$SRC_DIR/S11nQtStream.cpp
+ $$SRC_DIR/S11nQtStream.cpp \
+ $$SRC_DIR/Serializable.cpp
+
 
 
 ########################################################################
@@ -164,7 +168,6 @@ S11NQT_SOURCES = \
 H=$$QBOARD_INCLUDES_DIR
 QBOARD_HEADERS_LIB = \
  $$S11NQT_HEADERS \
- $$QBOARD_HEADERS_LIB_PRIVATE \
  $$H/Dice.h \
  $$H/GameState.h \
  $$H/GL.h \
@@ -174,7 +177,6 @@ QBOARD_HEADERS_LIB = \
  $$H/PieceAppearanceWidget.h \
  $$H/PropObj.h \
  $$H/ScriptQt.h \
- $$H/Serializable.h \
  $$H/QBoard.h \
  $$H/QBoardHomeView.h \
  $$H/QBoardPlugin.h \
@@ -202,7 +204,6 @@ QBOARD_SOURCES_LIB = \
  $$SRC_DIR/PieceAppearanceWidget.cpp \
  $$SRC_DIR/PropObj.cpp \
  $$SRC_DIR/ScriptQt.cpp \
- $$SRC_DIR/Serializable.cpp \
  $$SRC_DIR/QBoard.cpp \
  $$SRC_DIR/QBoardHomeView.cpp \
  $$SRC_DIR/QBoardPlugin.cpp \
@@ -217,6 +218,11 @@ QBOARD_SOURCES_LIB = \
  $$SRC_DIR/utility.cpp \
  $$SRC_DIR/WikiLiteParser.cpp \
  $$SRC_DIR/WikiLiteView.cpp
+QBOARD_OBJECTS_LIB =
+for(CPP, QBOARD_SOURCES_LIB){
+  BASENAME = $$basename(CPP)
+  QBOARD_OBJECTS_LIB += $$OBJECTS_DIR/$$replace(BASENAME,.cpp,$$DOT_OBJ)
+}
 
 #QBOARD_SOURCES_GAMESETS = 
 #QBOARD_HEADERS_GAMESETS = 
