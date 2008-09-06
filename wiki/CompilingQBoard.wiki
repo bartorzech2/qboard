@@ -4,7 +4,7 @@
 
 QBoard uses Qt's qmake tool for its build process, the goal being to have a single build process which can, in theory, run on any system supported by Qt.
 
-QBoard needs Qt version 4.3.x or 4.4.x, and you will need to have Qt's development files (headers/libs) in a suitable place on your system (where your compiler and linker can find them).
+QBoard needs Qt version 4.3.x or 4.4.x, and you will need to have Qt's development files (headers/libs) in a suitable place on your system (where your compiler and linker can find them). It also requires some implementation of the C++ STL, but most C++ environments have that built in. It will not compile using "older" compilers (e.g. gcc 3.x or MSVC6), because it uses newer C++ features not provided by pre-standards compilers. gcc 4.1+ and newer MS compilers (2005+?) are believed to be OK.
 
 = Unix systems =
 
@@ -32,6 +32,8 @@ Instructions for building it on non-Unix environments would be appreciated, if a
 It "should" work as-is on OS/X, but to be honest i wouldn't touch a Mac with a 3 meter pole, so i don't know for sure if it works.
 
 == Windows ==
+
+While the source is essentially platform-independent...
 
 There are known problems when trying to link libs11n as a DLL on Windows. The libs will build, but loading s11n files won't. (It's a long, sad story involving exportation of DLL symbols.) The only known workaround on Windows platforms is to link the s11n object files (from `s11n/*.cpp`) into the application directly, without using a DLL. If i can get access to a Windows machine with Cygwin (or similar) on it, i'll work on fixing the build to accommodate this.
 
