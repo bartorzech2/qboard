@@ -29,9 +29,9 @@ unix:contains(QMAKE_CXX,g++){
 
 QT += script svg
 QMAKE_CXXFLAGS = $$QBOARD_CXXFLAGS
-RESOURCES = $$RESOURCES_DIR/icons.qrc \
-	$$RESOURCES_DIR/help.qrc \
-	$$RESOURCES_DIR/javascript.qrc
+#RESOURCES = $$RESOURCES_DIR/icons.qrc \
+#	$$RESOURCES_DIR/help.qrc \
+#	$$RESOURCES_DIR/javascript.qrc
 
 
 ########################################################################
@@ -48,20 +48,45 @@ QBOARD_HEADERS_MAINAPP = \
  SetupQBoard.h \
  $$QBOARD_HEADERS_QT44
 
+RESOURCES = $$RESOURCES_DIR/icons.qrc \
+	$$RESOURCES_DIR/help.qrc \
+	$$RESOURCES_DIR/javascript.qrc
+
 
 FORMS = \
  $$UI_SRCDIR/AboutQBoard.ui \
  $$UI_SRCDIR/MainWindow.ui \
- $$UI_SRCDIR/QGIHtmlEditor.ui \
  $$UI_SRCDIR/SetupQBoard.ui \
  $$QBOARD_FORMS_QT44
+# $$UI_SRCDIR/QGIHtmlEditor.ui \
 
 HEADERS = \
- $$QBOARD_HEADERS_LIB \
+ $$QBOARD_HEADERS_LIB \  # without this, mocs aren't linked
  $$QBOARD_HEADERS_MAINAPP
 
+# $$QBOARD_HEADERS_LIB \
+# $$QBOARD_SOURCES_LIB \
+
 SOURCES = \
- $$QBOARD_SOURCES_LIB \
  $$QBOARD_SOURCES_MAINAPP
 
-OBJECTS += $$S11N_OBJECTS
+
+unix:{
+  # On unix platforms (at least under gcc/ld) we don't have a problem using s11n as a library.
+  # On Windows platforms the s11n classloader can't work because of impossible-to-meet
+  # symbol export requirements on those platforms.
+  #LIBS += -L$$DESTDIR -lQBoard
+  #OBJECTS += $$QBOARD_OBJECTS_LIB
+  #LIBS += -L$$DESTDIR -lQBoardS11n
+  #OBJECTS += $$S11N_OBJECTS
+  QMAKE_LIBS += $$S11N_OBJECTS # We add these to QMAKE_LIBS instead of OBJECTS to keep this tree from cleaning them!
+  QMAKE_LIBS += $$QBOARD_OBJECTS_LIB
+  #LIBS += -L$$(HOME)/lib  -ls11n
+}
+win32:{
+  #OBJECTS += $$QBOARD_OBJECTS_LIB
+  #OBJECTS += $$S11N_OBJECTS
+  QMAKE_LIBS += $$S11N_OBJECTS # We add these to QMAKE_LIBS instead of OBJECTS to keep this tree from cleaning them!
+  QMAKE_LIBS += $$QBOARD_OBJECTS_LIB
+
+}
