@@ -64,6 +64,32 @@ qboard.props(pc,{
 
 Aside from creating objects and setting properties, there's not much it can currently do. That said, using properties one can control almost all aspects of a piece which can be customized via the popup menus.
 
+= Native vs. JS properties =
+
+The "native" (C++) objects use a completely different properties system than JS-side code does. This means it isn't feasible for us to provide a 100% JS-natural syntax for setting properties of objects.
+
+Native properties can be set using `qboard.prop()` or `qboard.props()`. JS properties are access via normal JS syntax (`myObject.myProperty`).
+
+Do not use JS syntax for the properties which are used by a piece to control its behaviour (see below). Doing so may cause weird or broken behaviour. Also, do not try to pass JS-side objects as values to the native property setters. Doing so will, again, result in weird or broken behaviour.
+
+= The qboard object =
+
+The JS engine includes a global object called qboard. That object is essentially the same as the C++-side GameState object, with some additions for purposes of scripting.
+
+Here is an overview of the public member functions and properties of the qboard object.
+
+|| *Property/Function* || *Description* ||
+|| board || The game state's QBoard (game board) object. ||
+|| QObject createObject(ClassName[,Object props]) || Creates a new QGraphicsItem/QObject object of the given _type name_ (e.g. 'QGIDot' or 'QGIHtml'). If props is non-null, it sets the object's properties as per props(). The exact type and API of the return object depends on the class name passed to it. ||
+|| Array items() || Returns an array of all selected items. Each item will be some sort of QObject-derived native type. ||
+|| prop(item,key,value) || Sets the given property in the given item. ||
+|| props(item,Object} || For each key/value pair in the given Object, it copies that property to the given item ||
+|| scene || The underlying QBoardScene object. ||
+|| value prop(item,key) || Returns the given property value from the given object. Not all types are currently usable from script code (e.g. QPoint and QColor), but they can be passed around as arguments. ||
+|| view || A QBoardView object. This is only available running a script from the QBoard main window, in the context of the main GameState instance. ||
+
+
+
 = Common piece properties =
 
 Here is an overview of the list of common properties (in alphabetical order), their expected data types, and the piece types which support this property. The piece types are listed by their class name, and is the name which can be passed to `qboard.createObject("ClassName")` to create a new object. Note that it is not recommended to use standard JavaScript notation when getting/setting these properties, as there are synchronization and type conversion issues which can't currently be addressed via that syntax. Use `qboard.prop()` and `qboard.props()` to get/set the properties instead.
@@ -83,18 +109,14 @@ The on-board lines (QGILine) are not currently scriptable because they will be r
 
 (Note, however, that this work is ongoing, and the above list will change.)
 
-= The qboard object =
+= Common piece member functions =
 
-The JS engine includes a global object called qboard. That object is essentially the same as the C++-side GameState object, with some additions for purposes of scripting.
+Versions 20080906 and higher have the following member functions for pieces of all types, but _only for pieces created via script_ (not for pieces created via C++ code).
 
-Here is an overview of the public member functions and properties of the qboard object.
-
-|| *Property/Function* || *Description* ||
-|| board || The game state's QBoard (game board) object. ||
-|| QObject createObject(ClassName[,Object props]) || Creates a new QGraphicsItem/QObject object of the given _type name_ (e.g. 'QGIDot' or 'QGIHtml'). If props is non-null, it sets the object's properties as per props(). The exact type and API of the return object depends on the class name passed to it. ||
-|| Array items() || Returns an array of all selected items. Each item will be some sort of QObject-derived native type. ||
-|| prop(item,key,value) || Sets the given property in the given item. ||
-|| props(item,Object} || For each key/value pair in the given Object, it copies that property to the given item ||
-|| scene || The underlying QBoardScene object. ||
-|| value prop(item,key) || Returns the given property value from the given object. Not all types are currently usable from script code (e.g. QPoint and QColor), but they can be passed around as arguments. ||
-|| view || A QBoardView object. This is only available running a script from the QBoard main window, in the context of the main GameState instance. ||
+|| *Function* || Description ||
+|| move(number x, number y) || Move the piece to the given position ||
+|| move(QPointF(x,y) ) || Same as move(x,y) ||
+|| Array childItems() || Returns an array of all child items (an empty array if there are no children) ||
+|| prop(key,value) || Sets the given _native_ property. ||
+|| QVariant prop(key) || Returns the given _native_ property as a QVariant. ||
+|| number posX(), number posY() || Returns the object's X or Y position. (This is a workaround, actually) ||
