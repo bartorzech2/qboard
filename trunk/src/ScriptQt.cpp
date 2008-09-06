@@ -622,12 +622,12 @@ namespace qboard {
 				qboard::toScriptValue<QList<QGraphicsItem*> >,
 				qboard::fromScriptValue<QList<QGraphicsItem*> > );
 
-	if(0)
+	if(1)
 	{
-	    // can't seem to tap in to the core QVariant prototypes... :(
 	    JSVariantPrototype * proto = new JSVariantPrototype(js);
-	    js->setDefaultPrototype(qMetaTypeId<QVariant>(),
-				    js->newQObject(proto));
+	    // can't seem to tap in to the core QVariant prototypes... :(
+	    // js->setDefaultPrototype(qMetaTypeId<QVariant>(), js->newQObject(proto));
+	    glob.setProperty("JSVariantPrototype",js->newQObject(proto));
 	}
 
 	glob.setProperty("QColor", js->newFunction(QColor_ctor));
