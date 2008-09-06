@@ -6,9 +6,9 @@
 # file exists only to create the .o files, and we ignore
 # the generated .so/.dll altogether.
 include(../config.qmake)
-VERSION = QBoardDummy
-TEMPLATE = app
-TARGET = s11nconvert
+VERSION = 1.2.7
+TEMPLATE = lib
+TARGET = QBoardS11n
 QT =
 CONFIG = debug
 OBJECTS_DIR = $$S11N_OBJ_DIR
@@ -17,11 +17,11 @@ unix: QMAKE_LFLAGS += -lstdc++
 QMAKE_CXXFLAGS = $$S11N_CXXFLAGS
 
 HEADERS = \
- $$S11N_HEADERS \
- argv_parser.hpp
+ $$S11N_HEADERS
+# argv_parser.hpp
 
 SOURCES = \
  $$S11N_SOURCES_CORE \
- $$S11N_SOURCES_SERIALIZERS \
- argv_parser.cpp \
- main.cpp
+ $$S11N_SOURCES_SERIALIZERS
+ # argv_parser.cpp \
+ # main.cpp
