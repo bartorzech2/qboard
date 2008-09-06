@@ -24,3 +24,9 @@ SOURCES = \
  $$QBOARD_SOURCES_LIB
 # OBJECTS = $$QBOARD_OBJECTS_LIB
 # OBJECTS += $$S11N_OBJECTS
+unix:{
+  LIBS += -L$$DESTDIR #  -lQBoardS11n
+}
+#win32:{
+#  QMAKE_LIBS += $$S11N_OBJECTS # We add these to QMAKE_LIBS instead of OBJECTS to keep this tree from cleaning them!
+#}

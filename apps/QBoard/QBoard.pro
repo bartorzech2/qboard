@@ -72,8 +72,8 @@ unix:{
   # On unix platforms (at least under gcc/ld) we don't have a problem using s11n as a library.
   # On Windows platforms the s11n classloader can't work because of impossible-to-meet
   # symbol export requirements on those platforms.
-  LIBS += -L$$DESTDIR -lQBoard
-  LIBS += -L$$DESTDIR -lQBoardS11n
+  LIBS += -L$$DESTDIR -lQBoard -lQBoardS11n
+  #LIBS += -L$$DESTDIR -lQBoardS11n
   #OBJECTS += $$QBOARD_OBJECTS_LIB
   #OBJECTS += $$S11N_OBJECTS
   #QMAKE_LIBS += $$S11N_OBJECTS # We add these to QMAKE_LIBS instead of OBJECTS to keep this tree from cleaning them!
