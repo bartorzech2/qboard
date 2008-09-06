@@ -178,6 +178,7 @@ QBOARD_HEADERS_LIB = \
  $$H/GameState.h \
  $$H/GL.h \
  $$H/JSGameState.h \
+ $$H/JSQGI.h \
  $$H/MenuHandlerBoard.h \
  $$H/MenuHandlerGeneric.h \
  $$H/PieceAppearanceWidget.h \
@@ -206,6 +207,7 @@ QBOARD_SOURCES_LIB = \
  $$SRC_DIR/Dice.cpp \
  $$SRC_DIR/GameState.cpp \
  $$SRC_DIR/JSGameState.cpp \
+ $$SRC_DIR/JSQGI.cpp \
  $$SRC_DIR/MenuHandlerBoard.cpp \
  $$SRC_DIR/MenuHandlerGeneric.cpp \
  $$SRC_DIR/PieceAppearanceWidget.cpp \
