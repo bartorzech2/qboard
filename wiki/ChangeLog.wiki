@@ -9,6 +9,8 @@ are at the top. Dates written extra large are release dates.
 ----
 *2008 Sept 5/6*
 
+- Improvements in JavaScript scriptability. It's now possible to add new children to pieces, to set properties on them via a member function, and to query and set their position.
+
 - Renamed some properties. Older data is still usable, but new saves will use the newer property names.
 
 - The color selection menus now include an option to pick a custom color.
