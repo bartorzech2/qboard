@@ -33,9 +33,11 @@ It "should" work as-is on OS/X, but to be honest i wouldn't touch a Mac with a 3
 
 == Windows ==
 
+The build tree "might" work on Windows platforms, but it's untested.
+
 While the source is essentially platform-independent...
 
-There are known problems when trying to link libs11n as a DLL on Windows. The libs will build, but loading s11n files won't. (It's a long, sad story involving exportation of DLL symbols.) The only known workaround on Windows platforms is to link the s11n object files (from `s11n/*.cpp`) into the application directly, without using a DLL. If i can get access to a Windows machine with Cygwin (or similar) on it, i'll work on fixing the build to accommodate this.
+There are known problems when trying to link libs11n as a DLL on Windows. The libs will build, but loading s11n files won't work. (It's a long, sad story involving exportation of DLL symbols.) The only known workaround on Windows platforms is to link the s11n object files (from `s11n/*.cpp`) into the application directly, without using a DLL. If i can get access to a Windows machine with Cygwin (or similar) on it, i'll work on testing/fixing the build to accommodate this.
 
 = And now what? =
 
