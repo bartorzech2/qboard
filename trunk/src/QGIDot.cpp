@@ -46,6 +46,18 @@ struct QGIDot::Impl
     QBrush brush;
     QGIDot::EdgeList edges;
     QGIDotLine * inLine;
+    enum PropIDs {
+    PropUnknown = 0,
+    PropAlpha,
+    PropAngle,
+    PropColor,
+    PropDragDisabled,
+    PropPos,
+    PropRadius,
+    PropScale,
+    PropZLevel,
+    PropEND
+    };
     Impl() : active(false),
 	     radius(12),
 	     color(Qt::red),
@@ -69,6 +81,14 @@ struct QGIDotLine::Impl
     qreal arrowSize;
     QBrush brush;
     QPen pen;
+    enum PropIDs {
+    PropUnknown = 0,
+    PropAlpha,
+    PropColor,
+    PropStyle,
+    PropWidth,
+    PropEND
+    };
     Impl() : src(0),
 	     dest(0),
 	     pSrc(),
@@ -192,22 +212,41 @@ void QGIDot::refreshTransformation()
 
 void QGIDot::propertySet( char const *pname, QVariant const & var )
 {
+    typedef QMap<QString,int> PMAP;
+    static PMAP pmap;
+    if( pmap.isEmpty() )
+    {
+#define MAP(S,V) pmap[S] = Impl::V;
+	MAP("color",PropColor);
+	MAP("alpha",PropAlpha);
+	MAP("colorAlpha",PropAlpha);
+	MAP("zLevel",PropZLevel);
+	MAP("pos",PropPos);
+	MAP("scale",PropScale);
+	MAP("angle",PropAngle);
+	MAP("radius",PropRadius);
+	MAP("dragDisabled",PropDragDisabled);
+
+#undef MAP
+    }
+    int kid = pmap.value( QString(pname?pname:""), Impl::PropUnknown );
+    if( Impl::PropUnknown == kid ) return;
+
     // FIXME: treat QVariant::Invalid appropriately for each property
     if(0) qDebug() << "QGIDot::propertySet("<<pname<<") val="<<var;
-    std::string key( pname );
-    if( "zLevel" == key )
+    if( Impl::PropZLevel == kid )
     {
 	this->setZValue(var.toDouble());
 	this->update();
 	return;
     }
-    if( "pos" == key )
+    if( Impl::PropPos == kid )
     {
 	this->setPos( var.value<QPointF>() );
 	this->update();
 	return;
     }
-    if( "color" == key )
+    if( Impl::PropColor == kid )
     {
 	QColor old( impl->color );
 	impl->color = var.value<QColor>();
@@ -219,7 +258,7 @@ void QGIDot::propertySet( char const *pname, QVariant const & var )
 	this->update();
 	return;
     }
-    if( "colorAlpha" == key )
+    if( Impl::PropAlpha == kid )
     {
 	qreal a = var.toDouble();
 	if( a > 1 )
@@ -234,12 +273,12 @@ void QGIDot::propertySet( char const *pname, QVariant const & var )
     	this->update();
 	return;
     }
-    if( ("scale" == key) || ("angle" == key) )
+    if( (Impl::PropScale == kid) || (Impl::PropAngle == kid) )
     {
 	this->refreshTransformation();
 	return;
     }
-    if( "radius" == key )
+    if( Impl::PropRadius == kid )
     {
 	impl->radius = var.value<qreal>();
 	this->prepareGeometryChange();
@@ -247,7 +286,7 @@ void QGIDot::propertySet( char const *pname, QVariant const & var )
 	this->update();
 	return;
     }
-    if( "dragDisabled" == key )
+    if( Impl::PropDragDisabled == kid )
     {
 	if( var.isValid() )
 	{
@@ -316,7 +355,7 @@ void QGIDot::contextMenuEvent( QGraphicsSceneContextMenuEvent * ev )
 
     MenuHandlerCommon proxy;
     QMenu * m = proxy.createMenu( this );
-    QObjectPropertyMenu * mColor = QObjectPropertyMenu::makeColorMenu(selected, "color", "colorAlpha" );
+    QObjectPropertyMenu * mColor = QObjectPropertyMenu::makeColorMenu(selected, "color", "alpha" );
     mColor->setIcon(QIcon(":/QBoard/icon/color_fill.png"));
     m->addMenu(mColor);
 
@@ -412,7 +451,7 @@ bool QGIDot::serialize( S11nNode & dest ) const
 	qboard::copyProperties( this, &props );
 	// i can't get the QColor alpha property to serialize (it's as if... well, no...)
 	// so we save the alpha properties separately.
-	props.setProperty("colorAlpha", impl->color.alpha());
+	props.setProperty("alpha", impl->color.alpha());
 	props.setProperty("pos", this->pos() );
 	props.setProperty("zLevel", this->zValue() );
 	S11nNode & pr( s11n::create_child( dest, "properties" ) );
@@ -553,7 +592,7 @@ void MenuHandlerDot::doMenu( QGIDot *gvi, QGraphicsSceneContextMenuEvent * ev )
     QString label("Dot...");
     MenuHandlerCommon proxy;
     QMenu * m = proxy.createMenu( gvi );
-    QObjectPropertyMenu * mColor = QObjectPropertyMenu::makeColorMenu(selected, "color", "colorAlpha" );
+    QObjectPropertyMenu * mColor = QObjectPropertyMenu::makeColorMenu(selected, "color", "alpha" );
     mColor->setIcon(QIcon(":/QBoard/icon/color_fill.png"));
     m->addMenu(mColor);
 
@@ -737,19 +776,33 @@ void QGIDotLine::propertySet( char const *pname,
 			      QVariant const & var )
 {
     if( ! pname ) return;
-    if(1) qDebug() << "QGIDot::propertySet("<<pname<<") val="<<var;
+    typedef QMap<QString,int> PMAP;
+    static PMAP pmap;
+    if( pmap.isEmpty() )
+    {
+#define MAP(S,V) pmap[S] = Impl::V;
+	MAP("alpha",PropAlpha);
+	MAP("colorAlpha",PropAlpha);
+	MAP("color",PropColor);
+	MAP("style",PropStyle);
+#undef MAP
+    }
+    int kid = pmap.value( QString(pname?pname:""), Impl::PropUnknown );
+    if( Impl::PropUnknown == kid ) return;
+
+    if(0) qDebug() << "QGIDotLine::propertySet("<<pname<<") val="<<var;
     QString key( pname );
-    if( "width" == key )
+    if( Impl::PropWidth == kid )
     {
 	impl->pen.setWidth( var.toInt() );
     }
-    else if( "color" == key )
+    else if( Impl::PropColor == kid )
     {
 	QColor newcol( var.value<QColor>() );
 	newcol.setAlphaF( impl->pen.color().alphaF() );
 	impl->pen.setColor( newcol );
     }
-    else if( "colorAlpha" == key )
+    else if( Impl::PropAlpha == kid )
     {
 	qreal a = var.toDouble();
 	QColor col = impl->pen.color();
@@ -763,7 +816,7 @@ void QGIDotLine::propertySet( char const *pname,
 	}
 	impl->pen.setColor(col);
     }
-    else if( "style" == key )
+    else if( Impl::PropStyle == kid )
     {
 	impl->pen.setStyle( Qt::PenStyle( s11n::qt::stringToPenStyle(var.toString()) ) );
     }
@@ -844,15 +897,12 @@ QMenu * QGIDotLine::createLineMenu()
 	 selected.end() != it; ++it )
     {
 	QGIDotLine * line = (*it)->impl->inLine;
-	if( ! line ) continue;
-	selobj.push_back( line );
+	if( line ) selobj.push_back( line );
     }
-
-    qDebug() << "QGIDotLine::createLineMenu(): QGIDot count:"<<selected.size();
 
     m->addMenu( QObjectPropertyMenu::makeColorMenu(selobj,
 						   "color",
-						   "colorAlpha") );
+						   "alpha") );
     m->addMenu( QObjectPropertyMenu::makePenStyleMenu(selobj, "style") );
     m->addMenu( 
 	       QObjectPropertyMenu::makeNumberListMenu("Width",

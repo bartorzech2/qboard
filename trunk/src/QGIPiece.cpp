@@ -114,6 +114,22 @@ struct QGIPiece::Impl
     size_t countPaintCache;
     size_t countRepaint;
     qreal alpha;
+    enum PropIDs {
+    PropUnknown = 0,
+    PropAlpha,
+    PropAngle,
+    PropBorderAlpha,
+    PropBorderColor,
+    PropBorderSize,
+    PropBorderStyle,
+    PropColor,
+    PropDragDisabled,
+    PropPixmap,
+    PropPos,
+    PropScale,
+    PropZLevel,
+    PropEND
+    };
     Impl()
     {
 	borderSize = 1;
@@ -190,27 +206,47 @@ bool QGIPiece::event( QEvent * e )
 
 void QGIPiece::propertySet( char const *pname, QVariant const & var )
 {
+    if( impl->block ) return;
     // FIXME: treat QVariant::Invalid appropriately for each property
 
-    // FIXME: instead of doing string comparisons on pname, use a
-    // lookup map with Impl member funcs as implementations. Make Impl
-    // a friend class.
+    typedef QMap<QString,int> PMAP;
+    static PMAP pmap;
+    if( pmap.isEmpty() )
+    {
+#define MAP(S,V) pmap[S] = Impl::V;
+	MAP("color",PropColor);
+	MAP("alpha",PropAlpha);
+	MAP("colorAlpha",PropAlpha);
+	MAP("borderColor",PropBorderColor);
+	MAP("borderSize",PropBorderSize);
+	MAP("borderStyle",PropBorderStyle);
+	MAP("zLevel",PropZLevel);
+	MAP("pos",PropPos);
+	MAP("scale",PropScale);
+	MAP("angle",PropAngle);
+	MAP("dragDisabled",PropDragDisabled);
+	MAP("pixmap",PropPixmap);
+#undef MAP
+    }
+
+    const QString key(pname?pname:"");
+    int kid = pmap.value( key, Impl::PropUnknown );
+    if( Impl::PropUnknown == kid ) return;
     if(0) qDebug() << "QGIPiece::propertySet("<<pname<<")[block="<<impl->block<<"] val="<<var;
-    if( impl->block ) return;
-    std::string key( pname );
-    if( "zLevel" == key )
+
+    if( Impl::PropZLevel == kid )
     {
 	this->setZValue(var.toDouble());
 	this->update();
 	return;
     }
-    if( "pos" == key )
+    if( Impl::PropPos == kid )
     {
 	this->setPos( var.value<QPointF>() );
 	this->update();
 	return;
     }
-    if( "color" == key )
+    if( Impl::PropColor == kid )
     {
  	QColor col = var.value<QColor>();
  	if( 255 == col.alpha() )
@@ -231,7 +267,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	this->update();
 	return;
     }
-    if( "colorAlpha" == key )
+    if( Impl::PropAlpha == kid )
     {
 	qreal a = impl->alpha = var.toDouble();
 	if( a > 1.0 )
@@ -246,7 +282,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     	this->update();
 	return;
     }
-    if( "borderColor" == key )
+    if( Impl::PropBorderColor == kid )
     {
 // 	QColor old = impl->borderColor;
 	QColor col = var.value<QColor>();
@@ -263,7 +299,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	this->update();
 	return;
     }
-    if( "borderAlpha" == key )
+    if( Impl::PropBorderAlpha == kid )
     {
 	qreal a = var.toDouble();
 	if( a > 1.0 )
@@ -278,7 +314,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	this->update();
 	return;
     }
-    if( "borderSize" == key )
+    if( Impl::PropBorderSize == kid )
     {
 	double bs = var.toDouble();;
 	impl->borderSize = (bs >= 0) ? bs : 0;
@@ -286,19 +322,20 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	this->update();
 	return;
     }
-    if( "borderStyle" == key )
+    if( Impl::PropBorderStyle == kid )
     {
 	impl->clearCache();
 	impl->borderLineStyle = s11n::qt::stringToPenStyle(var.toString());
 	this->update();
 	return;
     }
-    if( ("scale" == key) || ("angle" == key) )
+    if( (Impl::PropScale == kid) || (Impl::PropAngle == kid) )
     {
 	this->refreshTransformation();
 	return;
     }
-    if( "size" == key )
+#if 0
+    if( Impl::PropSize == kid )
     {
 	impl->clearCache();
 	if( impl->pixmap.isNull() )
@@ -311,7 +348,8 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	}
 	return;
     }
-    if( "dragDisabled" == key )
+#endif
+    if( Impl::PropDragDisabled == kid )
     {
 	if( var.isValid() )
 	{
@@ -323,7 +361,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	}
 	return;
     }
-    if( "pixmap" == key )
+    if( Impl::PropPixmap == kid )
     {
 	this->prepareGeometryChange();
 	impl->clearCache();
@@ -613,7 +651,7 @@ bool QGIPiece::serialize( S11nNode & dest ) const
     qboard::copyProperties( this, &props );
 #if 0
     QStringList no;
-    no << "colorAlpha"
+    no << "alpha"
        << "borderAlpha"
 	;
     foreach( QString k, no )
@@ -623,7 +661,7 @@ bool QGIPiece::serialize( S11nNode & dest ) const
 #endif
     // i can't get the QColor alpha property to serialize (it's as if... well, no...)
     // so we save the alpha properties separately.
-    props.setProperty("colorAlpha", impl->bgColor.alpha());
+    props.setProperty("alpha", impl->bgColor.alpha());
     props.setProperty("borderAlpha", impl->borderColor.alpha());
     props.setProperty("pos", this->pos() );
     props.setProperty("zLevel", this->zValue() );
@@ -800,7 +838,7 @@ void QGIPieceMenuHandler::doMenu( QGIPiece * pv, QGraphicsSceneContextMenuEvent 
     MenuHandlerCommon proxy;
     ev->accept();
     QMenu * m = proxy.createMenu( pv );
-    QObjectPropertyMenu * mColor = QObjectPropertyMenu::makeColorMenu(selected, "color", "colorAlpha" );
+    QObjectPropertyMenu * mColor = QObjectPropertyMenu::makeColorMenu(selected, "color", "alpha" );
     mColor->setIcon(QIcon(":/QBoard/icon/color_fill.png"));
     m->addMenu(mColor);
     if(1)
