@@ -15,7 +15,7 @@ are at the top. Dates written extra large are release dates.
 
 - Restructured the menus and toolbar, to group related functionality better.
 
-- Restructured the build tree considerably. It is now built as a couple of libraries and a main app which links those libraries. This won't work on Win32 platforms (for long, boring reason), but until i hear from someone trying to use QBoard on Windows, i won't worry about it.
+- Restructured the build tree considerably. It is now built as a couple of libraries and a main app which links those libraries. This won't work on Win32 platforms (for long, boring reason), but until i hear from someone trying to use QBoard on Windows, i won't worry about it. See [CompilingQBoard] for details.
 
 - For Unix platforms, added ability to read/write gzip-compressed s11n files. Should work (with the appropriate linker args) on any platform with zlib (which is everywhere).
 
