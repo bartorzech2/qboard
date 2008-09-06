@@ -7,27 +7,20 @@
 
 include(../config.qmake)
 TEMPLATE = lib
-TARGET = dummy
-VERSION = QBoardDummy
-
+TARGET = QBoard
+VERSION = $$QBOARD_VERSION
 
 QT += script svg
 QMAKE_CXXFLAGS = $$QBOARD_CXXFLAGS
 # RESOURCES = $$RESOURCES_DIR/icons.qrc $$RESOURCES_DIR/help.qrc
 FORMS = \
- $$UI_SRCDIR/AboutQBoard.ui \
- $$UI_SRCDIR/MainWindow.ui \
- $$UI_SRCDIR/QGIHtmlEditor.ui \
- $$UI_SRCDIR/SetupQBoard.ui \
- $$QBOARD_FORMS_QT44
+ $$UI_SRCDIR/QGIHtmlEditor.ui
 
 
 HEADERS = \
- $$QBOARD_HEADERS_LIB \
- $$QBOARD_HEADERS_LIB_PRIVATE \
- $$QBOARD_HEADERS_WINDOW
+ $$QBOARD_HEADERS_LIB
 
 SOURCES = \
  $$QBOARD_SOURCES_LIB
 
-OBJECTS += $$S11N_OBJECTS
+# OBJECTS += $$S11N_OBJECTS
