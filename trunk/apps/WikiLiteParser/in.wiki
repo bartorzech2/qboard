@@ -1,0 +1,59 @@
+#summary This is a demo wiki page.
+
+=Demo=
+
+This is a _test_ of the *WikiLiteParser*.
+
+[[an escaped set of braces]
+
+==Demo==
+
+Section 1.2
+
+Paragraph 2.
+
+===Demo===
+
+Another line of `wiki stuff`. My ampersand: &amp;
+
+  # item one
+  # item two
+  # item three
+
+  * abc,,subscript,,
+  * def ~~strike through~~
+  * hij^superscript^
+
+Don't mix list types:
+
+{{{
+  * one
+  # another one
+  * two
+  # another two
+}}}
+
+The code:
+{{{
+if( this->doSomething( &that ) < ape() )
+{
+	...;
+}
+}}}
+
+*bold* _italics more *bold italics* more italics_
+
+== Table ==
+|| cell 1 || cell 2 ||
+|| _cell 3_ || ,,cell 4,, ||
+|| _cell 5_ || x ||
+
+something else.
+
+== WikiLinks ==
+
+  * [WikiLink this is a link]
+  * [http://s11n.net and another one]
+  * [non wiki braces]
+  * [http://foo.png an image]
+  * [http://wanderinghorse.net/gaming/maps/gfx/page-01/10x13_veg_1.png http://wanderinghorse.net/gaming/maps/gfx/page-01/thumbs/10x13_veg_1.png.jpg]
