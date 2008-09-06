@@ -180,6 +180,29 @@ namespace qboard {
     }
 
 
+
+    template <typename PT>
+    struct point_valtype
+    {
+	typedef qreal value_type;
+    };
+
+    template <>
+    struct point_valtype<QPoint>
+    {
+	typedef int value_type;
+    };
+    template <>
+    struct point_valtype<QSize>
+    {
+	typedef int value_type;
+    };
+    template <>
+    struct point_valtype<QRect>
+    {
+	typedef int value_type;
+    };
+
     template <typename PT>
     QScriptValue convert_script_value_f_point<PT>::operator()(QScriptEngine*eng,
 							   const PT & src) const
@@ -194,20 +217,21 @@ namespace qboard {
     PT convert_script_value_f_point<PT>::operator()( QScriptEngine *,
 						  const QScriptValue & args ) const
     {
-	qreal x = 0;
-	qreal y = 0;
+	typedef typename point_valtype<PT>::value_type value_type;
+	value_type x = 0;
+	value_type y = 0;
 	if( args.isArray() ||
 	    ! args.property("length").isUndefined() )
 	{
 	    if(0) qDebug() << "qpointFromScriptValue(): args smells like an array";
-	    x = args.property(0).toNumber();
-	    y = args.property(1).toNumber();
+	    x = value_type(args.property(0).toNumber());
+	    y = value_type(args.property(1).toNumber());
 	}
 	else
 	{
 	    if(0) qDebug() << "qpointFromScriptValue(): args doesn't smell like an array";
-	    x = args.property("x").toNumber();
-	    y = args.property("y").toNumber();
+	    x = value_type(args.property("x").toNumber());
+	    y = value_type(args.property("y").toNumber());
 	}
 	return PT(x,y);
     }
@@ -270,25 +294,26 @@ namespace qboard {
     RT convert_script_value_f_rect<RT>::operator()( QScriptEngine *,
 						  const QScriptValue & args ) const
     {
-	qreal l = 0;
-	qreal t = 0;
-	qreal w = 0;
-	qreal h = 0;
+	typedef typename point_valtype<RT>::value_type value_type;
+	value_type l = 0;
+	value_type t = 0;
+	value_type w = 0;
+	value_type h = 0;
 #define ARG(X) args.property(X).toNumber()
 	if( args.isArray() ||
 	    ! args.property("length").isUndefined() )
 	{
-	    l = ARG(0);
-	    t = ARG(1);
-	    w = ARG(2);
-	    h = ARG(3);
+	    l = value_type(ARG(0));
+	    t = value_type(ARG(1));
+	    w = value_type(ARG(2));
+	    h = value_type(ARG(3));
 	}
 	else
 	{
-	    l = ARG("left");
-	    t = ARG("top");
-	    w = ARG("width");
-	    h = ARG("height");
+	    l = value_type(ARG("left"));
+	    t = value_type(ARG("top"));
+	    w = value_type(ARG("width"));
+	    h = value_type(ARG("height"));
 	}
 #undef ARG
 	return RT( l,t,w,h);
@@ -315,8 +340,9 @@ namespace qboard {
     ST convert_script_value_f_size<ST>::operator()( QScriptEngine *,
 						  const QScriptValue & args ) const
     {
-	qreal w = 0;
-	qreal h = 0;
+	typedef typename point_valtype<ST>::value_type value_type;
+	value_type w = 0;
+	value_type h = 0;
 #define ARG(X) args.property(X).toNumber()
 	if( args.isArray() ||
 	    ! args.property("length").isUndefined() )
