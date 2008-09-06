@@ -17,6 +17,7 @@
 #include <QObject>
 #include <QPointF>
 #include <QScriptable>
+#include <QScriptValue>
 class QGraphicsItem;
 
 namespace qboard {
@@ -28,14 +29,21 @@ public:
     JSQGI( QObject * parent = 0 );
     virtual ~JSQGI();
 
+    Q_INVOKABLE QList<QGraphicsItem*> childItems();
+
 
 public Q_SLOTS:
     QPointF pos(); // why is this not seen script-side?
+    /**
+       Moves this object to the given coords.
+    */
     void move( qreal x, qreal y );
     void move( QPointF const & p );
     qreal posX();
     qreal posY();
     //QPointF pos();
+    QScriptValue prop(QString const & key);
+    bool prop(QString const & key, QScriptValue const & val );
 private:
     QGraphicsItem * self();
     struct Impl;

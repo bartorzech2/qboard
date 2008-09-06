@@ -122,7 +122,7 @@ JSGameState::prop( QObject * obj,
 	QVariant var( obj->property(name.toAscii().constData()) );
 	if(0) qDebug() << "JSGameState::prop(["<<obj<<"],["<<name<<"]) variant =="<<var;
 	ret = js->newVariant( var );
-	ret.setPrototype( impl->qvprotoj );
+	ret.setPrototype( js->globalObject().property("JSVariantPrototype" ) );
     }
     else
     {
@@ -170,7 +170,7 @@ JSGameState::createObject( QString const & className,
     {
 	this->props( o, props );
     }
-    QScriptValue jo = js->newQObject(o,QScriptEngine::AutoOwnership);
+    QScriptValue jo = js->newQObject(o); //,QScriptEngine::AutoOwnership);
     QGraphicsItem * git = dynamic_cast<QGraphicsItem*>(s);
     if( git )
     {
