@@ -20,6 +20,7 @@
 #include <QScriptValueIterator>
 
 #include <qboard/ScriptQt.h>
+#include <qboard/JSQGI.h>
 
 #define SELF(RV) GameState *self = this->self(); \
     QScriptEngine * js = this->engine(); \
@@ -29,9 +30,13 @@ struct JSGameState::Impl
 {
     qboard::JSVariantPrototype * qvproto;
     QScriptValue qvprotoj;
+    qboard::JSQGI * qgiproto;
+    QScriptValue qgiprotoj;
     Impl() :
 	qvproto(0),
-	qvprotoj()
+	qvprotoj(),
+	qgiproto(0),
+	qgiprotoj()
     {
     }
     ~Impl()
@@ -73,6 +78,9 @@ GameState * JSGameState::self()
 	impl->qvproto = new qboard::JSVariantPrototype(this);
 	impl->qvprotoj = this->engine()->newQObject(impl->qvproto);
 	// not working for me for QVariant: this->engine()->setDefaultPrototype(qMetaTypeId<QVariant>(), impl->qvprotoj);
+
+	impl->qgiproto = new qboard::JSQGI(this);
+	impl->qgiprotoj = this->engine()->newQObject(impl->qgiproto);
     }
     GameState * s = qscriptvalue_cast<GameState*>(thisObject());
     if( ! s )
@@ -136,34 +144,41 @@ bool JSGameState::props( QObject * tgt, QScriptValue const & props )
     return true;
 }
 
-QObject * JSGameState::createObject( QString const & className,
+//QObject *
+QScriptValue
+JSGameState::createObject( QString const & className,
 				     QScriptValue const & props )
 {
-    SELF(0);
+    //QObject * dflt;
+    QScriptValue dflt;
+    SELF(dflt);
     // FIXME: try loading via Qt's metatype system if s11n::cl fails.
     Serializable * s = s11n::cl::classload<Serializable>( className.toAscii().constData() );
     if( ! s )
     {
 	qDebug() <<"JSGameState::createObject("<<className<<") classload failed.";
-	return 0;
+	return dflt;
     }
     QObject * o = dynamic_cast<QObject*>(s);
     if( ! o )
     {
 	qDebug() <<"JSGameState::createObject("<<className<<") object is-not-a QObject.";
 	s11n::cleanup_serializable( s );
-	return 0;
+	return dflt;
     }
     if( props.isObject() )
     {
 	this->props( o, props );
     }
+    QScriptValue jo = js->newQObject(o,QScriptEngine::AutoOwnership);
     QGraphicsItem * git = dynamic_cast<QGraphicsItem*>(s);
     if( git )
     {
 	self->addItem(git);
+	qDebug() << "JSGameState::createObject("<<className<<"): setting prototype to JSQGI.";
+	jo.setPrototype( impl->qgiprotoj );
     }
-    return o;
+    return jo;
 }
 
 
