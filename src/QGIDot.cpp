@@ -811,6 +811,7 @@ void QGIDotLine::propertySet( char const *pname,
 	MAP("colorAlpha",PropAlpha);
 	MAP("color",PropColor);
 	MAP("style",PropStyle);
+	MAP("width",PropWidth);
 #undef MAP
     }
     int kid = pmap.value( QString(pname?pname:""), Impl::PropUnknown );
