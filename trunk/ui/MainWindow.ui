@@ -55,19 +55,6 @@
     <addaction name="separator" />
     <addaction name="actionQuit" />
    </widget>
-   <widget class="QMenu" name="menuEdit" >
-    <property name="enabled" >
-     <bool>true</bool>
-    </property>
-    <property name="title" >
-     <string>&amp;Edit</string>
-    </property>
-    <addaction name="actionSelectAll" />
-    <addaction name="actionCopy" />
-    <addaction name="actionCut" />
-    <addaction name="actionPaste" />
-    <addaction name="actionClearClipboard" />
-   </widget>
    <widget class="QMenu" name="menu_Help" >
     <property name="title" >
      <string>&amp;Help</string>
@@ -82,6 +69,11 @@
     </property>
     <addaction name="actionToggleBoardDragMode" />
     <addaction name="actionNewBoardView" />
+    <addaction name="separator" />
+    <addaction name="actionCopy" />
+    <addaction name="actionCut" />
+    <addaction name="actionPaste" />
+    <addaction name="actionClearClipboard" />
     <addaction name="separator" />
     <addaction name="actionZoomIn" />
     <addaction name="actionZoomOut" />
@@ -100,13 +92,12 @@
     <addaction name="actionClearBoard" />
    </widget>
    <addaction name="menuFile" />
-   <addaction name="menuEdit" />
    <addaction name="menu_Board" />
    <addaction name="menuPieces" />
    <addaction name="menu_Help" />
   </widget>
   <widget class="QStatusBar" name="statusbar" />
-  <widget class="QToolBar" name="toolBar" >
+  <widget class="QToolBar" name="toolBarFile" >
    <property name="windowTitle" >
     <string>Main toolbar</string>
    </property>
@@ -116,27 +107,51 @@
    <attribute name="toolBarBreak" >
     <bool>false</bool>
    </attribute>
-   <addaction name="actionToggleBrowserView" />
-   <addaction name="actionRefreshFileList" />
-   <addaction name="separator" />
    <addaction name="actionLoad" />
    <addaction name="actionSave" />
    <addaction name="actionPrint" />
    <addaction name="separator" />
-   <addaction name="actionToggleBoardDragMode" />
-   <addaction name="actionAddQGIHtml" />
-   <addaction name="actionAddLine" />
+   <addaction name="actionExperiment" />
+  </widget>
+  <widget class="QToolBar" name="toolBarFileBrowser" >
+   <property name="windowTitle" >
+    <string>File browser toolbar</string>
+   </property>
+   <attribute name="toolBarArea" >
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionToggleBrowserView" />
+   <addaction name="actionRefreshFileList" />
+  </widget>
+  <widget class="QToolBar" name="toolBarBoard" >
+   <property name="windowTitle" >
+    <string>Board Toolar</string>
+   </property>
+   <attribute name="toolBarArea" >
+    <enum>RightToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionCopy" />
+   <addaction name="actionCut" />
+   <addaction name="actionPaste" />
+   <addaction name="separator" />
    <addaction name="actionNewBoardView" />
+   <addaction name="actionToggleBoardDragMode" />
+   <addaction name="separator" />
    <addaction name="actionZoomOut" />
    <addaction name="actionZoomIn" />
    <addaction name="actionZoomReset" />
    <addaction name="actionRotate90" />
-   <addaction name="actionCopy" />
-   <addaction name="actionCut" />
-   <addaction name="actionPaste" />
-   <addaction name="actionClearBoard" />
    <addaction name="separator" />
-   <addaction name="actionExperiment" />
+   <addaction name="actionAddQGIHtml" />
+   <addaction name="actionAddLine" />
+   <addaction name="separator" />
+   <addaction name="actionClearBoard" />
   </widget>
   <action name="actionSave" >
    <property name="icon" >
