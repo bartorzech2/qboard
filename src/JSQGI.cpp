@@ -53,6 +53,13 @@ QPointF JSQGI::pos()
     return self->pos();
 }
 
+bool JSQGI::setParentItem( QGraphicsItem * p )
+{
+    if( ! p ) return false;
+    SELF(false);
+    self->setParentItem(p);
+    return true;
+}
 
 void JSQGI::move( QPointF const & p )
 {

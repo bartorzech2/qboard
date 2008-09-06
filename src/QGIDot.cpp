@@ -338,6 +338,12 @@ QGraphicsItem * QGIDot::hideItems()
     return this->parentItem();
 }
 
+void QGIDot::mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event )
+{
+    this->QGraphicsEllipseItem::mouseDoubleClickEvent(event);
+    emit doubleClicked(this);
+}
+
 void QGIDot::contextMenuEvent( QGraphicsSceneContextMenuEvent * ev )
 {
     ev->accept();
@@ -438,6 +444,26 @@ void QGIDot::split()
     li->setProperty( "color", impl->color );
     li->setNodes( this, ch );
 #endif
+}
+
+Serializable * QGIDot::clone() const
+{
+    Serializable * s = this->Serializable::clone();
+//     if( ! s ) return 0;
+//     QGIDot * cl = static_cast<QGIDot*>(s);
+//     if( ! cl )
+//     {
+// 	delete s;
+// 	s = 0;
+//     }
+//     while(s)
+//     {
+// 	QGraphicsItem * parent = this->parentItem();
+// 	if( ! parent ) break;
+// 	if( parent->type() != QGIType::QGIDotLine ) break;
+// 	QGIDotLine
+//     }
+    return s;
 }
 
 bool QGIDot::serialize( S11nNode & dest ) const
