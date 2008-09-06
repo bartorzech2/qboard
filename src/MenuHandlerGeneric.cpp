@@ -19,6 +19,7 @@
 #include <QIcon>
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
+#include <QColorDialog>
 
 #include <qboard/utility.h>
 #include <qboard/QGI.h>
@@ -597,6 +598,11 @@ QObjectPropertyMenu * QObjectPropertyMenu::makeColorMenu(
 	QColor hint( pv->property(propertyName).value<QColor>() );
 	mc->addMenu( QObjectPropertyMenu::makeAlphaMenu(list,alphaName, hint) );
     }
+    if(1)
+    {
+	CustomColorPropertyAction * ac = new CustomColorPropertyAction(list, propertyName, mc);
+	mc->addAction( ac );
+    }
     typedef QList<QColor> QL; 
     QL colors( qboard::colorList() ); 
     QL::iterator it = colors.begin();
@@ -617,4 +623,67 @@ QObjectPropertyMenu * QObjectPropertyMenu::makeColorMenu(
     QList<QObject*> li;
     li.push_back(pv);
     return makeColorMenu(li, propertyName, alphaName);
+}
+
+struct CustomColorPropertyAction::Impl
+{
+    typedef QList<QObject *> ListType;
+    ListType list;
+    QString key;
+    QColor color;
+    Impl() :
+	list(),
+	key(),
+	color()
+    {
+    }
+    ~Impl()
+    {}
+};
+
+
+
+CustomColorPropertyAction::CustomColorPropertyAction( QObject * obj,
+						      QString const & propName,
+						      QObject * parent )
+    : QAction(parent),
+      impl(new Impl)
+{
+    impl->list.push_back(obj);
+    impl->key = propName;
+    this->setup();
+}
+    
+CustomColorPropertyAction::CustomColorPropertyAction( QList<QObject *> objs,
+						      QString const & propName,
+						      QObject * parent )
+    : QAction(parent),
+      impl(new Impl)
+{
+    impl->list = objs;
+    impl->key = propName;
+    this->setup();
+}
+CustomColorPropertyAction::~CustomColorPropertyAction()
+{
+    delete impl;
+}
+void CustomColorPropertyAction::setup()
+{
+    this->setText("Custom...");
+    this->setIcon(QIcon(":/QBoard/icon/colorize.png"));
+    connect(this,SIGNAL(triggered(bool)),this,SLOT(selectColor()));
+}
+void CustomColorPropertyAction::selectColor()
+{
+    if( impl->list.empty() ) return;
+    impl->color = (*impl->list.begin())->property(impl->key.toAscii().constData()).value<QColor>();
+    impl->color = QColorDialog::getColor(impl->color);
+    if (!impl->color.isValid()) return;
+    QVariant vcol(impl->color);
+    for( Impl::ListType::iterator it = impl->list.begin();
+	 impl->list.end() != it; ++it )
+    {
+	(*it)->setProperty( impl->key.toAscii(), vcol );
+    }
 }

@@ -152,10 +152,47 @@ public:
 private Q_SLOTS:
 	void setProperty();
 	void dtorDisconnect(QObject*);
+protected:
+    
 private:
     void setup();
     struct Impl;
     Impl * impl;
+};
+
+/**
+   CustomColorPropertyAction is a QAction which, when activated, shows
+   a color selection dialog. If a color is selected then all QObjects
+   passed to this object's ctor have a color property set, as defined
+   when calling the ctor.
+*/
+class CustomColorPropertyAction : public QAction
+{
+Q_OBJECT
+public:
+    /**
+       When this action is triggered, if a valid color is selected,
+       obj->property(propertyName,theSelectedColor) is called.
+    */
+    CustomColorPropertyAction( QObject * obj,
+			       QString const & propName,
+			       QObject * parent = 0);
+    
+    /**
+       Identical to the other ctor, but takes a list of
+       QObjects to act upon.
+    */
+    CustomColorPropertyAction( QList<QObject *> objs,
+			       QString const & propName,
+			       QObject * parent = 0);
+    virtual ~CustomColorPropertyAction();
+private Q_SLOTS:
+    void selectColor();
+private:
+    void setup();
+    struct Impl;
+    Impl * impl;
+
 };
 
 /**
