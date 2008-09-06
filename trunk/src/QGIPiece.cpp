@@ -410,6 +410,7 @@ void QGIPiece::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 void QGIPiece::mouseDoubleClickEvent( QGraphicsSceneMouseEvent * ev )
 {
     this->QGraphicsPixmapItem::mouseDoubleClickEvent(ev);
+    emit doubleClicked( this );
 }
 void QGIPiece::mouseMoveEvent( QGraphicsSceneMouseEvent * ev )
 {

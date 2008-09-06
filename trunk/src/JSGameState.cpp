@@ -175,7 +175,12 @@ JSGameState::createObject( QString const & className,
     if( git )
     {
 	self->addItem(git);
-	qDebug() << "JSGameState::createObject("<<className<<"): setting prototype to JSQGI.";
+	if(0) qDebug() << "JSGameState::createObject("<<className<<"): setting prototype to JSQGI.";
+	if( -1 != o->metaObject()->indexOfSignal(SIGNAL(doubleClicked(QGraphicsItem*))) )
+	{
+	    connect(o,SIGNAL(doubleClicked(QGraphicsItem*)),
+		    impl->qgiproto,SIGNAL(doubleClicked(QGraphicsItem*)));
+	}
 	jo.setPrototype( impl->qgiprotoj );
     }
     return jo;
