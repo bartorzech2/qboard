@@ -83,6 +83,9 @@ public:
     */
     virtual bool deserialize( S11nNode const & src );
 
+Q_SIGNALS:
+    void doubleClicked( QGraphicsItem * );
+
 public Q_SLOTS:
    /**
       See QGIHider::hideItems(). Returns object is this item's new

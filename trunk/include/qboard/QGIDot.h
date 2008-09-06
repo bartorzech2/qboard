@@ -36,8 +36,10 @@ QGIDot();
     QPainterPath shape() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     virtual bool event( QEvent * e );
+    virtual Serializable * clone() const;
 Q_SIGNALS:
     void dotDestructing( QGIDot * );
+    void doubleClicked( QGraphicsItem * );
 public Q_SLOTS:
    /**
       See QGIHider::hideItems(). Returns object is this item's new
@@ -53,7 +55,7 @@ public Q_SLOTS:
     */
     void split();
 protected:
-	//virtual void mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event );
+	virtual void mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event );
 	//virtual void focusOutEvent( QFocusEvent * event );
 	virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent * event );
 	QVariant itemChange(GraphicsItemChange change, const QVariant &value);

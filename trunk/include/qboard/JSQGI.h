@@ -31,6 +31,8 @@ public:
 
     Q_INVOKABLE QList<QGraphicsItem*> childItems();
 
+Q_SIGNALS:
+    void doubleClicked(QGraphicsItem*);
 
 public Q_SLOTS:
     QPointF pos(); // why is this not seen script-side?
@@ -44,6 +46,8 @@ public Q_SLOTS:
     //QPointF pos();
     QScriptValue prop(QString const & key);
     bool prop(QString const & key, QScriptValue const & val );
+
+    bool setParentItem( QGraphicsItem * );
 private:
     QGraphicsItem * self();
     struct Impl;
