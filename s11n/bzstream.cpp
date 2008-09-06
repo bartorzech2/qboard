@@ -32,6 +32,7 @@
 #include <s11n.net/zfstream/bzstream.hpp>
 #include <iostream>
 #include <string.h>		// for memcpy
+#include <s11n.net/zfstream/debuggering_macros.hpp> // COUT macro
 
 namespace zfstream
 {
