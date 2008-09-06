@@ -7,7 +7,7 @@ HEADERS = \
  $$S11NQT_HEADERS
 
 SOURCES = \
- $$S11NQT_SOURCES \
  S11nQtTests.cpp
 
-OBJECTS += $$S11N_OBJECTS
+QMAKE_LIBS += $$S11N_OBJECTS \
+   $$S11NQT_OBJECTS # We add these to QMAKE_LIBS instead of OBJECTS to keep qmake from cleaning them!

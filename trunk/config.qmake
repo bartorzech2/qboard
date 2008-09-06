@@ -128,7 +128,7 @@ for(CPP, S11N_SOURCES){
 # For Qt 4.4 we add some bits which aren't available in 4.3...
 contains(QT_VERSION, ^4\.4\..+ ){
 	 message("Adding Qt 4.4-specific bits")
-	 QBOARD_HEADERS_QT44 = $$SRC_DIR/QBoardDocsBrowser.h 
+	 QBOARD_HEADERS_QT44 = $$QBOARD_INCLUDES_DIR/QBoardDocsBrowser.h 
 	 QBOARD_SOURCES_QT44 = $$SRC_DIR/QBoardDocsBrowser.cpp
 	 QBOARD_FORMS_QT44 = $$UI_SRCDIR/QBoardDocsBrowser.ui
 	 QBOARD_QT44 = webkit
@@ -159,6 +159,11 @@ S11NQT_SOURCES = \
  $$SRC_DIR/S11nQt.cpp \
  $$SRC_DIR/S11nQtStream.cpp \
  $$SRC_DIR/Serializable.cpp
+S11NQT_OBJECTS =
+for(CPP, S11NQT_SOURCES){
+  BASENAME = $$basename(CPP)
+  S11NQT_OBJECTS += $$OBJECTS_DIR/$$replace(BASENAME,.cpp,$$DOT_OBJ)
+}
 
 
 
@@ -167,6 +172,7 @@ S11NQT_SOURCES = \
 # in the lib:
 H=$$QBOARD_INCLUDES_DIR
 QBOARD_HEADERS_LIB = \
+ $$QBOARD_HEADERS_QT44 \
  $$S11NQT_HEADERS \
  $$H/Dice.h \
  $$H/GameState.h \
@@ -195,6 +201,7 @@ QBOARD_HEADERS_LIB = \
 H=
 
 QBOARD_SOURCES_LIB = \
+ $$QBOARD_SOURCES_QT44 \
  $$S11NQT_SOURCES \
  $$SRC_DIR/Dice.cpp \
  $$SRC_DIR/GameState.cpp \
