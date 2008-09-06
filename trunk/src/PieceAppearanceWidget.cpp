@@ -100,14 +100,15 @@ void PieceAppearanceWidget::setupUI()
 	new QBoardView( impl->gs )
 	;
 
+    v->setTransformationAnchor(QGraphicsView::NoAnchor);
+#if 0
     v->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     v->setInteractive(true); // required to get mouse events to the children
-    v->setTransformationAnchor(QGraphicsView::NoAnchor);
-    //v->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
     v->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
     v->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
-    v->setDragMode(QGraphicsView::NoDrag);
+    v->setDragMode(QGraphicsView::RubberBandDrag);
     v->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+#endif
     v->setBackgroundBrush(QColor("#abb8fb"));
     v->viewport()->setObjectName( "PieceAppearanceWidget");
 
