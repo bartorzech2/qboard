@@ -105,7 +105,9 @@ public Q_SLOTS:
        If props.isObject() is true then this->props(object,props)
        is called to set the properties of the new object.
     */
-    QObject * createObject( QString const & className, QScriptValue const & props = QScriptValue() );
+    //QObject *
+    QScriptValue
+    createObject( QString const & className, QScriptValue const & props = QScriptValue() );
 
 private:
     struct Impl;

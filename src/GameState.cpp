@@ -34,6 +34,7 @@
 
 #include <qboard/QGIPiecePlacemarker.h>
 #include <qboard/JSGameState.h>
+#include <qboard/JSQGI.h>
 
 
 struct GameState::Impl
@@ -179,6 +180,10 @@ void GameState::setup()
     JSGameState * proto = new JSGameState(this);
     impl->js->setDefaultPrototype(qMetaTypeId<GameState*>(),
 				  impl->js->newQObject(proto));
+    qboard::JSQGI * protoQGI = new qboard::JSQGI(this);
+    impl->js->setDefaultPrototype(qMetaTypeId<QGraphicsItem*>(),
+				  impl->js->newQObject(protoQGI));
+
     impl->jsThis = impl->js->newQObject( this,
 					 QScriptEngine::QtOwnership
 					 //QScriptEngine::AutoCreateDynamicProperties
