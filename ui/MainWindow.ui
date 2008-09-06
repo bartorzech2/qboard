@@ -70,6 +70,7 @@
     <addaction name="actionToggleBoardDragMode" />
     <addaction name="actionNewBoardView" />
     <addaction name="separator" />
+    <addaction name="actionSelectAll" />
     <addaction name="actionCopy" />
     <addaction name="actionCut" />
     <addaction name="actionPaste" />
@@ -131,11 +132,12 @@
     <string>Board Toolar</string>
    </property>
    <attribute name="toolBarArea" >
-    <enum>RightToolBarArea</enum>
+    <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak" >
     <bool>false</bool>
    </attribute>
+   <addaction name="actionSelectAll" />
    <addaction name="actionCopy" />
    <addaction name="actionCut" />
    <addaction name="actionPaste" />
@@ -507,6 +509,9 @@
   <action name="actionSelectAll" >
    <property name="enabled" >
     <bool>true</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../resources/icons.qrc" >:/QBoard/icon/frame_edit.png</iconset>
    </property>
    <property name="text" >
     <string>Select &amp;all</string>
