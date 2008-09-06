@@ -107,8 +107,10 @@ public:
 	
     /**
        Creates a polymorphic clone of this object via serialization.
+
+       Subclasses may want to do some customization here.
     */
-    Serializable * clone() const;
+    virtual Serializable * clone() const;
 
 
 protected:
