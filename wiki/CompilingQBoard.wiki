@@ -17,10 +17,23 @@ To build QBoard, simply:
 
 The application will compile to `bin/QT_VERSION/QBoard`. To install it, simply copy it to your favourite binaries directory (e.g. `~/bin` is good).
 
+As of 20080906, the build creates a couple shared libraries which will need to be in your library path before running QBoard. You can try it out without installing it by doing:
+
+{{{
+me@host:qboard-VERSION> cd bin/QT_VERSION
+me@host:qboard-VERSION> LD_LIBRARY_PATH=".:$LD_LIBRARY_PATH" ./QBoard
+}}}
 
 = Non-Unix systems =
 
 Instructions for building it on non-Unix environments would be appreciated, if anyone gets it working.
+
+== Mac ==
+It "should" work as-is on OS/X, but to be honest i wouldn't touch a Mac with a 3 meter pole, so i don't know for sure if it works.
+
+== Windows ==
+
+There are known problems when trying to link libs11n as a DLL on Windows. The libs will build, but loading s11n files won't. (It's a long, sad story involving exportation of DLL symbols.) The only known workaround on Windows platforms is to link the s11n object files (from `s11n/*.cpp`) into the application directly, without using a DLL. If i can get access to a Windows machine with Cygwin (or similar) on it, i'll work on fixing the build to accommodate this.
 
 = And now what? =
 
