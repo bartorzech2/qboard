@@ -69,11 +69,11 @@ Aside from creating objects and setting properties, there's not much it can curr
 Here is an overview of the list of common properties (in alphabetical order), their expected data types, and the piece types which support this property. The piece types are listed by their class name, and is the name which can be passed to `qboard.createObject("ClassName")` to create a new object. Note that it is not recommended to use standard JavaScript notation when getting/setting these properties, as there are synchronization and type conversion issues which can't currently be addressed via that syntax. Use `qboard.prop()` and `qboard.props()` to get/set the properties instead.
 
 || *Property* || *JS data type* || *Piece types* || *Description* ||
+|| `alpha` || integer or floating point || QGIPiece, QGIDot || Alpha level (transparency) of the piece's color. If the number is less than 1.0 is it considered to be a relative alpha level between 0.0 and 1.0, otherwise it is assumed to be an integer value between 1 (very nearly transparent) and 255 (fully opaque). ||
 || `angle` || integer or floating point || QGIHtml, QGIPiece || rotation angle ||
 || `borderAlpha` || as for `colorAlpha` || QGIPiece || alpha level of a piece's border ||
 || `borderColor` || as for `color` || QGIPiece ||color of the piece's border || 
 || `color` || string or QColor(r,g,b[,a]) || QGIPiece, QGIDot ||The color of the object. The string may be a common color name ("red" or "lightblue") or HTML notation ("#RRGGBB"). ||
-|| `colorAlpha` || integer or floating point || QGIPiece, QGIDot || alpha level of the piece's color. If the number is less than 1.0 is it considered to be a relative alpha level between 0.0 and 1.0, otherwise it is assumed to be an integer value between 1 (very nearly transparent) and 255 (fully opaque). ||
 || `html` || text || QGIHtml || HTML (a subset, actually) text to display. ||
 || `pixmap` || image filename, relative to QBoard Home || QGIPiece, the game board ||The image file used for an item. This determines the piece's size. Any image format supported by Qt is okay. || 
 || `pos` || QPoint(X,Y) || QGIPiece, QGIHtml, QGIDot || the position of the piece, in x/y coordinates. This is normally the top/left corner, but some pieces (e.g. QGIDot) are centered. ||
