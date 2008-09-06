@@ -16,12 +16,13 @@ test -d ${DEST} || {
 }
 find . -name '*~' | xargs rm -f
 
-sdirs="apps counters resources src s11n ui plugins"
+sdirs="apps counters resources src s11n ui plugins include"
 
 echo "Copying files..."
 for d in $sdirs; do
     echo -e "\t... $d"
     find $d \
+	-type f \
 	-name '*.h' \
 	-o -name '*.?pp' \
 	-o -name '*.pro' \
@@ -30,10 +31,10 @@ for d in $sdirs; do
 	-o -name '*.png' \
 	-o -name '*.html' \
 	-o -name '*.js' \
+	-o -name '*.css' \
+	-o -name '*.wiki' \
 	| sed -e '/\/bak/d' \
 	-e '/\/nono/d' \
-	-e '/\/debug/d' \
-	-e '/\/release/d' \
 	-e '/\.#/d' \
 	-e '/\.svn/d' \
 	-e '/qrc_*.cpp/d' \
@@ -65,6 +66,7 @@ perl -pe "s|^\s*QBOARD_VERSION.+|QBOARD_VERSION=${VERSION}|" < config.qmake > $D
 echo "Removing a few unwanted files..."
 find $DEST -name 'qrc_*.cpp' | xargs rm -f
 find $DEST -name nono -o -name release -o -name debug | xargs rm -fr
+find $DEST -name  debug -o -name release | xargs rm -fr
 
 echo "Tarring...";
 TF=$DEST.tar.bz2
