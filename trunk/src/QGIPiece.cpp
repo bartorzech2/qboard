@@ -40,7 +40,6 @@ bool QGITypes::handleClickRaise( QGraphicsItem * it,
 	)
     {
 	bool high = (ev->buttons() & Qt::LeftButton);
-	//ev->accept();
 	qreal zV = qboard::nextZLevel(it,high);
 	if( zV != it->zValue() )
 	{
@@ -105,12 +104,6 @@ struct QGIPiece::Impl
     QPixmap pixcache;
 #endif
     int borderLineStyle;
-    /**
-       When block is true, QGIPiece will reject piece property updates.
-       This is a kludge to allow QGIPiece to properly update the piece
-       position.
-    */
-    bool block;
     size_t countPaintCache;
     size_t countRepaint;
     qreal alpha;
@@ -127,6 +120,7 @@ struct QGIPiece::Impl
     PropPixmap,
     PropPos,
     PropScale,
+    PropSize,
     PropZLevel,
     PropEND
     };
@@ -134,7 +128,6 @@ struct QGIPiece::Impl
     {
 	borderSize = 1;
 	borderLineStyle = Qt::SolidLine;
-	block = false;
 	countPaintCache = countRepaint = 0;
 	alpha = 1;
     }
@@ -206,7 +199,6 @@ bool QGIPiece::event( QEvent * e )
 
 void QGIPiece::propertySet( char const *pname, QVariant const & var )
 {
-    if( impl->block ) return;
     // FIXME: treat QVariant::Invalid appropriately for each property
 
     typedef QMap<QString,int> PMAP;
@@ -216,13 +208,14 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 #define MAP(S,V) pmap[S] = Impl::V;
 	MAP("color",PropColor);
 	MAP("alpha",PropAlpha);
-	MAP("colorAlpha",PropAlpha);
+	MAP("colorAlpha",PropAlpha); // older name
 	MAP("borderColor",PropBorderColor);
 	MAP("borderSize",PropBorderSize);
 	MAP("borderStyle",PropBorderStyle);
 	MAP("zLevel",PropZLevel);
 	MAP("pos",PropPos);
 	MAP("scale",PropScale);
+	MAP("size",PropSize);
 	MAP("angle",PropAngle);
 	MAP("dragDisabled",PropDragDisabled);
 	MAP("pixmap",PropPixmap);
@@ -232,21 +225,20 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     const QString key(pname?pname:"");
     int kid = pmap.value( key, Impl::PropUnknown );
     if( Impl::PropUnknown == kid ) return;
-    if(0) qDebug() << "QGIPiece::propertySet("<<pname<<")[block="<<impl->block<<"] val="<<var;
-
+    if(0) qDebug() << "QGIPiece::propertySet("<<key<<")] val ="<<var;
     if( Impl::PropZLevel == kid )
     {
 	this->setZValue(var.toDouble());
 	this->update();
 	return;
     }
-    if( Impl::PropPos == kid )
+    else if( Impl::PropPos == kid )
     {
 	this->setPos( var.value<QPointF>() );
 	this->update();
 	return;
     }
-    if( Impl::PropColor == kid )
+    else if( Impl::PropColor == kid )
     {
  	QColor col = var.value<QColor>();
  	if( 255 == col.alpha() )
@@ -267,7 +259,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	this->update();
 	return;
     }
-    if( Impl::PropAlpha == kid )
+    else if( Impl::PropAlpha == kid )
     {
 	qreal a = impl->alpha = var.toDouble();
 	if( a > 1.0 )
@@ -282,24 +274,19 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     	this->update();
 	return;
     }
-    if( Impl::PropBorderColor == kid )
+    else if( Impl::PropBorderColor == kid )
     {
-// 	QColor old = impl->borderColor;
 	QColor col = var.value<QColor>();
  	if( 255 == col.alpha() )
  	{
 	    col.setAlphaF( impl->borderColor.alphaF() );
  	}
 	impl->borderColor = col;
-// 	if( 255 ==  )
-// 	{
-// 	    impl->borderColor.setAlphaF( old.alphaF() );
-// 	}
 	impl->clearCache();
 	this->update();
 	return;
     }
-    if( Impl::PropBorderAlpha == kid )
+    else if( Impl::PropBorderAlpha == kid )
     {
 	qreal a = var.toDouble();
 	if( a > 1.0 )
@@ -314,7 +301,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	this->update();
 	return;
     }
-    if( Impl::PropBorderSize == kid )
+    else if( Impl::PropBorderSize == kid )
     {
 	double bs = var.toDouble();;
 	impl->borderSize = (bs >= 0) ? bs : 0;
@@ -322,34 +309,19 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	this->update();
 	return;
     }
-    if( Impl::PropBorderStyle == kid )
+    else if( Impl::PropBorderStyle == kid )
     {
 	impl->clearCache();
 	impl->borderLineStyle = s11n::qt::stringToPenStyle(var.toString());
 	this->update();
 	return;
     }
-    if( (Impl::PropScale == kid) || (Impl::PropAngle == kid) )
+    else if( (Impl::PropScale == kid) || (Impl::PropAngle == kid) )
     {
 	this->refreshTransformation();
 	return;
     }
-#if 0
-    if( Impl::PropSize == kid )
-    {
-	impl->clearCache();
-	if( impl->pixmap.isNull() )
-	{
-	    QPixmap bogus( var.toSize() );
-	    bogus.fill( QColor(Qt::transparent) );
-	    impl->pixmap = bogus;
-	    // Kludge to ensure bounding rect is kept intact
-	    this->setPixmap(bogus);
-	}
-	return;
-    }
-#endif
-    if( Impl::PropDragDisabled == kid )
+    else if( Impl::PropDragDisabled == kid )
     {
 	if( var.isValid() )
 	{
@@ -361,7 +333,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	}
 	return;
     }
-    if( Impl::PropPixmap == kid )
+    else if( Impl::PropPixmap == kid )
     {
 	this->prepareGeometryChange();
 	impl->clearCache();
@@ -402,6 +374,20 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	this->update();
 	return;
     } // pixmap property
+    if( Impl::PropSize == kid )
+    {
+	impl->clearCache();
+	if( impl->pixmap.isNull() )
+	{
+	    QPixmap bogus( var.toSize() );
+	    bogus.fill( QColor(Qt::transparent) );
+	    impl->pixmap = bogus;
+	    // Kludge to ensure bounding rect is kept intact
+	    this->setPixmap(bogus);
+	}
+	return;
+    }
+
 }
 
 void QGIPiece::mousePressEvent(QGraphicsSceneMouseEvent *ev)
@@ -634,7 +620,7 @@ void QGIPiece::dragMoveEvent( QGraphicsSceneDragDropEvent * event )
 bool QGIPiece::serialize( S11nNode & dest ) const
 {
     if( ! this->Serializable::serialize( dest ) ) return false;
-    S11nNodeTraits::set( dest, "QGIFlags", int(this->flags()) );
+    //S11nNodeTraits::set( dest, "QGIFlags", int(this->flags()) );
     QList<QGraphicsItem *> chgi( qboard::childItems(this) );
     if( ! chgi.isEmpty() )
     {
