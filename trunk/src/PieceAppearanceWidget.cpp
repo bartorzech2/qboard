@@ -38,55 +38,52 @@ void PieceAppearanceWidget::setupDefaultTemplates()
 {
     typedef QList<QColor> QCL;
     QCL cl;
-    cl << QColor(255,0,0)
-       << QColor(0,255,0)
-       << QColor(0,0,255)
-       << QColor(255,255,0)
-       << QColor(255,255,255)
-
-       << QColor(255,127,127)
-       << QColor(127,255,127)
-       << QColor(127,127,255)
-       << QColor(127,127,0)
-       << QColor(127,127,127)
-
-       << QColor(127,0,0)
-       << QColor(0,127,0)
-       << QColor(0,0,127)
-       << QColor(64,64,0)
-       << QColor(0,0,0,0)
-
+    QColor red( Qt::red );
+    QColor green(Qt::green);
+    QColor blue(Qt::blue);
+    QColor yellow(Qt::yellow);
+    QColor white(Qt::white);
+    cl
+	<< white
+	<< red
+	<< green
+	<< blue
+	<< yellow
 	;
     int step = 24;
     int space = 4;
     int x = space;
     int y = space;
-    int count = cl.size();
-    int pos = 0;
-    int rows = 3;
+    int at = 0;
     for( QCL::iterator it = cl.begin();
 	 cl.end() != it; ++it )
     {
-	QGIPiece * pc = new QGIPiece;
-	if( ! this->impl->pc ) this->impl->pc = pc;
-	this->impl->gs.addItem( pc );
-	pc->setProperty("size",QSize(step,step));
-	pc->setProperty("pos",QPoint(x,y));
-	pc->setProperty("dragDisabled",int(1));
-	const QRectF bounds( pc->boundingRect() );
-	if( ++pos >= (count/rows) )
-	{
-	    y += int(bounds.height())  + space;
-	    pos = 0;
-	    x = space;
+	QColor color = *it;
+	QColor darker = color.darker();
+	QColor lighter = color.lighter();
+	if( 0 == at++ )
+	{ // the obligatory special case for White:
+	    lighter = color.darker();
+	    darker = lighter.darker();
 	}
-	else
+	for( int i = 0; i < 3; ++i )
 	{
+	    if( i == 1 ) color = lighter;
+	    else if( i == 2 ) color = darker;
+	    QGIPiece * pc = new QGIPiece;
+	    if( ! this->impl->pc ) this->impl->pc = pc;
+	    this->impl->gs.addItem( pc );
+	    pc->setProperty("size",QSize(step,step));
+	    pc->setProperty("pos",QPoint(x,y));
+	    pc->setProperty("dragDisabled",int(1));
+	    const QRectF bounds( pc->boundingRect() );
 	    x += int(bounds.width()) + space;
+	    pc->setProperty("color",color);
+	    pc->setProperty("borderSize",1);
+	    pc->setProperty("borderColor",QColor(0,0,0));
 	}
-	pc->setProperty("color",*it);
-	pc->setProperty("borderSize",1);
-	pc->setProperty("borderColor",QColor(0,0,0));
+	y += step  + space;
+	x = space;
     }
     //impl->gs.scene()->setSceneRect( QRectF() );
 }
