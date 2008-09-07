@@ -29,9 +29,6 @@ unix:contains(QMAKE_CXX,g++){
 
 QT += script svg
 QMAKE_CXXFLAGS = $$QBOARD_CXXFLAGS
-#RESOURCES = $$RESOURCES_DIR/icons.qrc \
-#	$$RESOURCES_DIR/help.qrc \
-#	$$RESOURCES_DIR/javascript.qrc
 
 
 ########################################################################
@@ -50,7 +47,8 @@ QBOARD_HEADERS_MAINAPP = \
 
 RESOURCES = $$RESOURCES_DIR/icons.qrc \
 	$$RESOURCES_DIR/help.qrc \
-	$$RESOURCES_DIR/javascript.qrc
+	$$RESOURCES_DIR/javascript.qrc \
+	$$RESOURCES_DIR/images.qrc
 
 
 FORMS = \

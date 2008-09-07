@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/QBoard" >
+    <file>images/SplashScreen.jpg</file>
+  </qresource>
+</RCC>
