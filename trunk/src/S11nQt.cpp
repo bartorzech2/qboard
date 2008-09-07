@@ -951,6 +951,7 @@ bool QVariant_s11n::canHandle( int t )
 {
 	return 
 	    (t == QVariant::ByteArray)
+	    || (t == QVariant::Brush)
 	    || (t == QVariant::Color)
 	    || (t == QVariant::Date)
 	    || (t == QVariant::DateTime)
@@ -966,6 +967,7 @@ bool QVariant_s11n::canHandle( int t )
 	    || (t == QVariant::Rect)
 	    || (t == QVariant::RectF)
 	    || (t == QVariant::RegExp)
+	    || (t == QVariant::Pen)
 	    || (t == QVariant::Pixmap)
 	    || (t == QVariant::Point)
 	    || (t == QVariant::PointF)
@@ -1148,6 +1150,7 @@ bool QVariant_s11n::operator()( S11nNode & dest, QVariant const & src ) const
 
 	switch( vt )
 	{
+	    CASE_OBJ(Brush, src.value<QBrush>() );
 	    CASE_OBJ(ByteArray, src.toByteArray() );
 	    CASE_PROP(Int,toInt());
 	    CASE_PROP(UInt,toUInt());
@@ -1163,6 +1166,7 @@ bool QVariant_s11n::operator()( S11nNode & dest, QVariant const & src ) const
 	    CASE_OBJ(Matrix, src.value<QMatrix>() );
 	    CASE_OBJ(Map, src.toMap() );
 	    CASE_OBJ(Pixmap, src.value<QPixmap>() );
+	    CASE_OBJ(Pen, src.value<QPen>() );
 	    CASE_OBJ(Point, src.toPoint() );
 	    CASE_OBJ(PointF, src.toPointF() );
 	    CASE_OBJ(Rect, src.toRect() );
@@ -1216,6 +1220,7 @@ bool QVariant_s11n::operator()( S11nNode const & src, QVariant & dest ) const
 
 	switch( vt )
 	{
+	    CASE_OBJ(Brush,QBrush);
 	    CASE_OBJ(ByteArray,QByteArray);
 	    CASE_OBJ(Color,QColor);
 	    CASE_OBJ(Date,QDate);
@@ -1229,6 +1234,7 @@ bool QVariant_s11n::operator()( S11nNode const & src, QVariant & dest ) const
 	    CASE_PROP(LongLong,qlonglong,qlonglong(0));
 	    CASE_OBJ(Map,QVariantMap);
 	    CASE_OBJ(Matrix,QMatrix);
+	    CASE_OBJ(Pen,QPen);
 	    CASE_OBJ(Pixmap,QPixmap);
 	    CASE_OBJ(Point,QPoint);
 	    CASE_OBJ(PointF,QPointF);
