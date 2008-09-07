@@ -14,6 +14,8 @@ are at the top. Dates written extra large are release dates.
 
 == 2008 Sept 6 ==
 
+- Fixed a couple compile warnings/erros on certain compiler versions.
+
 - Improvements in JavaScript scriptability. It's now possible to add new children to pieces, to set properties on them via a member function, and to query and set their position. It's also possible to attach JS double-click handlers to QGIPiece and QGIDot objects.
 
 - Renamed some properties. Older data is still usable, but new saves will use the newer property names.
