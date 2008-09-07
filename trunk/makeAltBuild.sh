@@ -14,7 +14,7 @@ test -d ${DEST} || {
     exit 1
 }
 
-sdirs="apps counters resources src s11n ui plugins"
+sdirs="apps counters resources src s11n ui plugins include"
 echo "Copying files..."
 for d in $sdirs; do
     echo -e "\t... $d"
@@ -29,8 +29,6 @@ for d in $sdirs; do
 	-o -name '*.html' \
 	| sed -e '/\/bak/d' \
 	-e '/\/nono/d' \
-	-e '/\/release/d' \
-	-e '/\/debug/d' \
 	-e '/\.#/d' \
 	-e '/\.svn/d' \
 	-e '/qrc_*.cpp/d' \
@@ -43,6 +41,9 @@ for d in $sdirs; do
     }
     rm filelist
 done
+
+find $DEST -name 'release' -o -name 'debug' | xargs rm -fr 2>/dev/null
+
 
 cd $DEST && {
     orig=$PWD/..
