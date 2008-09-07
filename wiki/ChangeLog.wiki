@@ -11,6 +11,10 @@ are at the top. Dates written extra large are release dates.
 
 - Fixed: line width property wasn't properly handled for QGIDots (bug introduced yesterday).
 
+- Refactored how QGIPiece objects store their properties. Older data is still readable, but newer saves are not backwards compatible.
+
+- Fixed: pieces loaded via double-clicking had their absolute image paths saved in save files. They are now relative to the QBoard Home.
+
 
 == 2008 Sept 6 ==
 
