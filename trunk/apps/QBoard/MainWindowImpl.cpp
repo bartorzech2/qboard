@@ -80,6 +80,7 @@ struct MainWindowImpl::Impl
 	{
 	    paw->setupDefaultTemplates();
 	}
+	gstate.board().loadPixmap(":/QBoard/images/SplashScreen.jpg");
     }
     ~Impl()
     {
@@ -106,6 +107,7 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
       Ui::MainWindow(),
       impl(new Impl)
 {
+
 	setupUi(this);
 	this->setWindowTitle( QString("QBoard v. %1").arg(qboard::versionString()) );
 	connect( this->actionSave, SIGNAL(triggered(bool)), this, SLOT(saveGame()) );
@@ -179,7 +181,7 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 
 	splitter->addWidget( impl->gv );
 
-	splitter->setStretchFactor(0,1);
+	splitter->setStretchFactor(0,2);
 	splitter->setStretchFactor(1,3);
 
 	vsplit->addWidget( impl->paw );
@@ -196,6 +198,7 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	    qb.setProperty("view",jo);
 	}
 
+	this->resize(760,600);
 }
 
 MainWindowImpl::~MainWindowImpl()
