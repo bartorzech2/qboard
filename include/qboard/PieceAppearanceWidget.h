@@ -5,6 +5,7 @@
 #include <qboard/Serializable.h>
 #include "GameState.h"
 class QGraphicsView;
+class QGIPiece;
 class PieceAppearanceWidget : public QWidget, public Serializable
 {
 Q_OBJECT
@@ -19,7 +20,9 @@ public:
     GameState & state();
     GameState const & state() const;
     QGraphicsView * view();
-    void applyCurrentTemplate( QObject * target );
+    //void applyCurrentTemplate( QObject * target );
+    void applyCurrentTemplate( QGIPiece * target );
+
     void setupDefaultTemplates();
 public Q_SLOTS:
     /**

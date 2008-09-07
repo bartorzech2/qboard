@@ -174,7 +174,8 @@ void PieceAppearanceWidget::clear()
     this->impl->gs.clear();
 }
 
-void PieceAppearanceWidget::applyCurrentTemplate( QObject * tgt )
+//void PieceAppearanceWidget::applyCurrentTemplate( QObject * tgt )
+void PieceAppearanceWidget::applyCurrentTemplate( QGIPiece * tgt )
 {
     if( !tgt ) return;
     typedef QList<QGraphicsItem*> QIL;
@@ -210,6 +211,7 @@ void PieceAppearanceWidget::applyCurrentTemplate( QObject * tgt )
     QVariant pos( tgt->property("pos") );
     QVariant dragDisabled( tgt->property("dragDisabled") );
     {
+#if 0
 	QObject * src = impl->pc;
 	typedef QList<QByteArray> QL;
 	QL ql( src->dynamicPropertyNames() );
@@ -221,6 +223,19 @@ void PieceAppearanceWidget::applyCurrentTemplate( QObject * tgt )
 	    if( !key || (*key == '_') ) continue; // Qt reserves the "_q_" prefix, so we'll elaborate on that.
 	    tgt->setProperty( key, src->property(key) );
 	}
+#else
+	S11nNode n;
+	impl->pc->serialize(n);
+	// Lame kludge to ensure that we don't throw
+	// here if tgt is a subclass of QGIType:
+	const QString cn1( S11nNodeTraits::class_name(n).c_str() );
+	const QString cn2( tgt->s11nClass() );
+	if( cn1 != cn2 )
+	{
+	    S11nNodeTraits::class_name(n,cn2.toAscii().constData());
+	}
+	tgt->deserialize(n);
+#endif
     }
     tgt->setProperty("pos", pos );
     tgt->setProperty("pixmap", pix );
