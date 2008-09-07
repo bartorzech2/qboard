@@ -26,6 +26,7 @@
 #include <qboard/PropObj.h>
 #include <qboard/S11nQt/QPointF.h>
 #include <qboard/S11nQt/QPoint.h>
+#include <qboard/S11nQt/QPen.h>
 #include <qboard/S11nQt/QGraphicsItem.h>
 
 #include <algorithm>
@@ -96,17 +97,15 @@ void QGITypes::shuffleQGIList( QList<QGraphicsItem*> list, bool skipParentedItem
 
 struct QGIPiece::Impl
 {
-    QColor bgColor;
-    QColor borderColor;
-    qreal borderSize;
     QPixmap pixmap;
 #if QGIPiece_USE_PIXCACHE
     QPixmap pixcache;
 #endif
-    int borderLineStyle;
     size_t countPaintCache;
     size_t countRepaint;
     qreal alpha;
+    QPen pen;
+    QPen penB;
     enum PropIDs {
     PropUnknown = 0,
     PropAlpha,
@@ -126,10 +125,16 @@ struct QGIPiece::Impl
     };
     Impl()
     {
-	borderSize = 1;
-	borderLineStyle = Qt::SolidLine;
 	countPaintCache = countRepaint = 0;
 	alpha = 1;
+
+	penB = QPen(QColor(Qt::black),
+		    1,
+		    Qt::SolidLine,
+		    Qt::FlatCap,
+		    Qt::MiterJoin );
+	pen = penB;
+	pen.setColor(QColor(Qt::white));
     }
     ~Impl()
     {
@@ -211,6 +216,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	MAP("colorAlpha",PropAlpha); // older name
 	MAP("borderColor",PropBorderColor);
 	MAP("borderSize",PropBorderSize);
+	MAP("borderAlpha",PropBorderAlpha);
 	MAP("borderStyle",PropBorderStyle);
 	MAP("zLevel",PropZLevel);
 	MAP("pos",PropPos);
@@ -241,35 +247,37 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     else if( Impl::PropColor == kid )
     {
  	QColor col = var.value<QColor>();
- 	if( 255 == col.alpha() )
+	qreal alpha = impl->pen.color().alphaF();
+ 	if( 255 == col.alpha() ) // keep original alpha level
  	{
-	    if( impl->alpha > 1 )
+	    if( alpha > 1 )
 	    {
-		col.setAlpha( int(impl->alpha) );
+		col.setAlpha( int(alpha) );
 	    }
 	    else
 	    {
-		col.setAlphaF( impl->alpha );
+		col.setAlphaF( alpha );
 	    }
  	}
-	impl->alpha = col.alpha();
-	impl->bgColor = col;
-	if(0) qDebug() << "QGIPiece::propertySet(color):"<<impl->bgColor<<" alpha ="<<impl->alpha;
+	impl->pen.setColor( col );
+	if(0) qDebug() << "QGIPiece::propertySet(color):"<<impl->pen.color()<<" alpha ="<<impl->alpha;
 	impl->clearCache();
 	this->update();
 	return;
     }
     else if( Impl::PropAlpha == kid )
     {
-	qreal a = impl->alpha = var.toDouble();
+	qreal a = var.toDouble();
+	QColor col = impl->pen.color();
 	if( a > 1.0 )
 	{ // assume it's int-encoded
-	    impl->bgColor.setAlpha( int(a) );
+	    col.setAlpha( int(a) );
 	}
 	else
 	{
-	    impl->bgColor.setAlphaF( a );
+	    col.setAlphaF( a );
 	}
+	impl->pen.setColor( col );
 	impl->clearCache();
     	this->update();
 	return;
@@ -279,9 +287,9 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	QColor col = var.value<QColor>();
  	if( 255 == col.alpha() )
  	{
-	    col.setAlphaF( impl->borderColor.alphaF() );
+	    col.setAlphaF( impl->penB.color().alphaF() );
  	}
-	impl->borderColor = col;
+	impl->penB.setColor( col );
 	impl->clearCache();
 	this->update();
 	return;
@@ -289,22 +297,24 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     else if( Impl::PropBorderAlpha == kid )
     {
 	qreal a = var.toDouble();
+	QColor col( impl->penB.color() );
 	if( a > 1.0 )
 	{ // assume it's int-encoded
-	    impl->borderColor.setAlpha( int(a) );
+	    col.setAlpha( int(a) );
 	}
 	else
 	{
-	    impl->borderColor.setAlphaF( a );
+	    col.setAlphaF( a );
 	}
+	impl->penB.setColor( col );
 	impl->clearCache();
 	this->update();
 	return;
     }
     else if( Impl::PropBorderSize == kid )
     {
-	double bs = var.toDouble();;
-	impl->borderSize = (bs >= 0) ? bs : 0;
+	double bs = var.toDouble();
+	impl->penB.setWidth( (bs >= 0) ? bs : 0 );
 	impl->clearCache();
 	this->update();
 	return;
@@ -312,7 +322,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     else if( Impl::PropBorderStyle == kid )
     {
 	impl->clearCache();
-	impl->borderLineStyle = s11n::qt::stringToPenStyle(var.toString());
+	impl->penB.setStyle( s11n::qt::stringToPenStyle(var.toString()) );
 	this->update();
 	return;
     }
@@ -387,7 +397,6 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	}
 	return;
     }
-
 }
 
 void QGIPiece::mousePressEvent(QGraphicsSceneMouseEvent *ev)
@@ -462,29 +471,6 @@ QRectF QGIPiece::boundingRect() const
 	    r.setSize(sz.value<QSize>());
 	}
     }
-#if 0
-    // seems to mostly do what i want...
-    if( 1 && (impl->borderSize > 0) )
-    { // QGraphicsItem::boundingRect() docs say we need this:
-	qreal pw( impl->borderSize / 2.0 ); // size/2.0 doesn't quite work for me - still get graphics artefacts
-	r.setLeft( r.left() - pw );
-	r.setRight( r.right() + pw );
-	r.setTop( r.top() - pw );
-	r.setBottom( r.bottom() + pw );
-    }
-#else
-    if( 0 && (impl->borderSize > 0) )
-    { // QGraphicsItem::boundingRect() docs say we need this:
-	qreal bs = impl->borderSize;
-	r.adjust( 0, 0, bs * 2, bs * 2 );
-	//r.adjust( -bs, -bs, bs * 2, bs * 2 );
-    }
-#if 0
-    r = r.normalized();
-    r = QRectF( 0, 0,
-		std::ceil(r.width()), std::ceil(r.height()) );
-#endif
-#endif
     return r; // r.normalized();
 }
 
@@ -543,8 +529,6 @@ void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * optio
 	++impl->countRepaint;
 	QPainter * cp = 0;
 #if QGIPiece_USE_PIXCACHE
-// 	QSizeF csize( std::ceil(bounds.width()),
-// 		      std::ceil(bounds.height()) );
 	QPixmap captcha( bounds.size().toSize() );
 	AMSG << "bounds="<<bounds<<", pixcache.size ="<<captcha.size();
 	captcha.fill( Qt::transparent );
@@ -555,15 +539,16 @@ void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * optio
 #endif
 	if( 1 ) // Background color
 	{
-	    if( impl->bgColor.isValid() )
+	    QColor col = impl->pen.color();
+	    if( col.isValid() )
 	    {
-		cp->fillRect( bounds, impl->bgColor );
+		cp->fillRect( bounds, col );
 	    }
 	}
-	const qreal bs = impl->borderSize;
+	const qreal bs = impl->penB.widthF();
 	qreal xl = bs / 2.0;
 
-	if( ! impl->pixmap.isNull() )
+	if( ! impl->pixmap.isNull() ) // Draw pixmap
 	{
 	    // Weird: if i use impl->pixmap.rect() i get (0.5,0.5,W,H)
 	    QRectF pmr( QPointF(0,0), impl->pixmap.size() );
@@ -571,7 +556,8 @@ void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * optio
 	    AMSG << "drawPixmap("<<pmr<<"...)";
 	    cp->drawPixmap(pmr, impl->pixmap, impl->pixmap.rect() );
 	}
-	if( bs && impl->borderColor.isValid() )
+
+	if( bs && impl->penB.color().isValid() ) // Draw border
 	{
 	    QRectF br( bounds );
 	    br.adjust( xl, xl, -xl, -xl );
@@ -583,11 +569,7 @@ void QGIPiece::paint( QPainter * painter, const QStyleOptionGraphicsItem * optio
  	    }
 #endif
 	    cp->save();
-	    cp->setPen( QPen(impl->borderColor,
-			     bs,
-			     Qt::PenStyle( impl->borderLineStyle ),
-			     Qt::FlatCap,
-			     Qt::MiterJoin ) );
+	    cp->setPen( impl->penB );
 	    AMSG << "drawRect("<<br<<"...) bs ="<<bs<<", xl ="<<xl;;
 	    cp->drawRect( br );
 	    cp->restore();
@@ -636,9 +618,13 @@ bool QGIPiece::serialize( S11nNode & dest ) const
     // object :/
     PropObj props;
     qboard::copyProperties( this, &props );
-#if 0
+#if 1
     QStringList no;
     no << "alpha"
+       << "color"
+       << "borderColor"
+       << "borderSize"
+       << "borderStyle"
        << "borderAlpha"
 	;
     foreach( QString k, no )
@@ -648,19 +634,45 @@ bool QGIPiece::serialize( S11nNode & dest ) const
 #endif
     // i can't get the QColor alpha property to serialize (it's as if... well, no...)
     // so we save the alpha properties separately.
-    props.setProperty("alpha", impl->bgColor.alpha());
-    props.setProperty("borderAlpha", impl->borderColor.alpha());
+//     props.setProperty("alpha", impl->pen.color().alpha());
+//     props.setProperty("borderAlpha", impl->penB.color().alpha());
     props.setProperty("pos", this->pos() );
     props.setProperty("zLevel", this->zValue() );
-    return s11n::serialize_subnode( dest,"props", props );
+    return s11n::serialize_subnode( dest,"props", props )
+	&& s11n::serialize_subnode( dest, "pen", impl->pen )
+	&& s11n::serialize_subnode( dest, "borderPen", impl->penB );
 }
 
 bool QGIPiece::deserialize( S11nNode const & src )
 {
     if( ! this->Serializable::deserialize( src ) ) return false;
+    qboard::clearProperties(this);
     qboard::destroyQGIList( qboard::childItems(this) );
+    S11nNode const * ch = 0;
+    ch = s11n::find_child_by_name(src, "children");
+    if( ch )
     {
-	qboard::clearProperties(this);
+	typedef QList<QGraphicsItem *> QGIL;
+	QGIL childs;
+	    if( -1 == s11n::qt::deserializeQGIList<Serializable>( *ch,
+								  childs,
+								  this,
+								  QGraphicsItem::ItemIsMovable ) )
+	    {
+		return false;
+	    }
+    }
+    ch = s11n::find_child_by_name(src, "pen");
+    if( ch )
+    {
+	if( ! s11n::deserialize( *ch, impl->pen ) ) return false;
+    }
+    ch = s11n::find_child_by_name(src, "borderPen");
+    if( ch )
+    {
+	if( ! s11n::deserialize( *ch, impl->penB ) ) return false;
+    }
+    { // properties must come last, to override some pen settings.
 	PropObj props;
 	if( ! s11n::deserialize_subnode( src, "props", props ) )
 	{
@@ -668,23 +680,6 @@ bool QGIPiece::deserialize( S11nNode const & src )
 	    return false;
 	}
 	qboard::copyProperties( &props, this );
-    }
-
-    {
-	// FIXME: delete any existing children
-	S11nNode const * ch = s11n::find_child_by_name(src, "children");
-	if( ch )
-	{
-	    typedef QList<QGraphicsItem *> QGIL;
-	    QGIL childs;
-	    if( -1 == s11n::qt::deserializeQGIList<Serializable>( *ch,
-				  childs,
-				  this,
-				  QGraphicsItem::ItemIsMovable ) )
-	    {
-		return false;
-	    }
-	}
     }
     return true;
 }
