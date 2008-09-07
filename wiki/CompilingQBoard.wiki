@@ -15,6 +15,8 @@ To build QBoard, simply:
 ~> make
 }}}
 
+If you have a multi-processor or multi-core machine, try passing `-j2` to make, as this will speed up compilation by using two processors.
+
 The application will compile to `bin/QT_VERSION/QBoard`. To install it, simply copy it to your favourite binaries directory (e.g. `~/bin` is good).
 
 As of 20080906, the build creates a couple shared libraries which will need to be in your library path before running QBoard. You can try it out without installing it by doing:
