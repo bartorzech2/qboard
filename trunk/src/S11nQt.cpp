@@ -1006,7 +1006,8 @@ void VariantS11n::clear()
 bool QVariant_s11n::canHandle( int t )
 {
 	return 
-	    (t == QVariant::ByteArray)
+	    (t == QVariant::BitArray)
+	    || (t == QVariant::ByteArray)
 	    || (t == QVariant::Brush)
 	    || (t == QVariant::Color)
 	    || (t == QVariant::Date)
@@ -1206,6 +1207,7 @@ bool QVariant_s11n::operator()( S11nNode & dest, QVariant const & src ) const
 
 	switch( vt )
 	{
+	    CASE_OBJ(BitArray, src.value<QBitArray>() );
 	    CASE_OBJ(Brush, src.value<QBrush>() );
 	    CASE_OBJ(ByteArray, src.toByteArray() );
 	    CASE_PROP(Int,toInt());
@@ -1276,6 +1278,7 @@ bool QVariant_s11n::operator()( S11nNode const & src, QVariant & dest ) const
 
 	switch( vt )
 	{
+	    CASE_OBJ(BitArray,QBitArray);
 	    CASE_OBJ(Brush,QBrush);
 	    CASE_OBJ(ByteArray,QByteArray);
 	    CASE_OBJ(Color,QColor);
