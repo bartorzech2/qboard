@@ -544,6 +544,12 @@ bool QPen_s11n::operator()( S11nNode & dest, QPen const & src ) const
     NT::set(dest,"miterLimit", int(src.miterLimit()) );
     NT::set(dest,"width", src.width() );
     // TODO: dashOffset() + dashPattern()
+    QVector<qreal> dp( src.dashPattern() );
+    if( ! dp.empty() )
+    {
+	NT::set(dest,"dashOffset", src.dashOffset() );
+	s11n::list::serialize_streamable_list( dest, "dashPattern", dp );
+    }
     return s11n::serialize_subnode( dest, "brush", src.brush() )
 	&& s11n::serialize_subnode( dest, "color", src.color() )
 	;
@@ -567,6 +573,14 @@ bool QPen_s11n::operator()( S11nNode const & src, QPen & dest ) const
     tmp.setJoinStyle( Qt::PenJoinStyle(NT::get(src,"joinStyle", int(tmp.joinStyle()))));
     tmp.setMiterLimit( NT::get(src,"miterLimit", int(tmp.miterLimit())) );
     tmp.setWidth( NT::get(src,"width", tmp.width() ) );
+    const S11nNode * ch = s11n::find_child_by_name(src,"dashPattern");
+    if( ch )
+    { // Reminder: this must come after calling tmp.setStyle()
+	QVector<qreal> dp;
+	if( ! s11n::list::deserialize_streamable_list( *ch, dp ) ) return false;
+	tmp.setDashOffset( NT::get(src,"dashOffset", dest.dashOffset() ) );
+	tmp.setDashPattern(dp);
+    }
     dest = tmp;
     return true;
 }
