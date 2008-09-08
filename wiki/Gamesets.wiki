@@ -6,7 +6,7 @@
 A "gameset", in the context of QBoard, is simply a collection of graphics and/or
 text files for use with a specific game. They are normally put into a directory
 of their own, and this directory lives under the QBoard home directory.
-QBoard places no inherent limitations on the directory structure of a gameset or the names of its files.
+QBoard places no inherent limitations on the directory structure of a gameset or the names of its files, with the exception that all files must live somewhere under the QBoard Home directory (see [HOWTOGettingStarted] for details).
 
 
 = Creating your own sets =
