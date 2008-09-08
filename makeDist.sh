@@ -29,6 +29,7 @@ for d in $sdirs; do
 	-o -name '*.ui' \
 	-o -name '*.qrc' \
 	-o -name '*.png' \
+	-o -name '*.jpg' \
 	-o -name '*.html' \
 	-o -name '*.js' \
 	-o -name '*.css' \
