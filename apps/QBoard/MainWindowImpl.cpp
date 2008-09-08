@@ -40,7 +40,7 @@
 #include <qboard/QBoardHomeView.h>
 #include <qboard/QGILine.h>
 #include <qboard/utility.h>
-#include <qboard/S11nClipboard.h>
+#include <qboard/S11nQt/S11nClipboard.h>
 #include <qboard/QBoard.h>
 #include <qboard/PieceAppearanceWidget.h>
 #include "AboutQBoardImpl.h"
