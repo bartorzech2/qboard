@@ -36,6 +36,7 @@ That is, after including the proper header file(s) (which register(s) a specific
 #include "S11nQt.h"
 #include "S11Qt/QPoint.h"
 #include "S11Qt/QVariant.h"
+#include "S11Qt/QRectF.h"
 ...
 
 QPoint p(20,30);
