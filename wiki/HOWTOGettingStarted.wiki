@@ -38,7 +38,7 @@ QBoard-specific application data. If you need some ideas, see the available [Gam
 
 == Manipulating items ==
 
-Most items have a popup menu (accessible via right-clicking). If an item is selected and its menu is activated, many of the menu operations may apply to all selected pieces (e.g. Destroy, Cut/Copy, rotation, etc.). If a piece is not selected, actions taking through its popup menu will affect only that item (and potentially child items).
+Most items have a popup menu (accessible via right-clicking). If an item is selected and its menu is activated, many of the menu operations may apply to all selected pieces (e.g. Destroy, Cut/Copy, rotation, etc.). If a piece is not selected, actions taken through its popup menu will affect only that item (and potentially child items).
 
 Explore the menus for the available options. Note that different types of game pieces will have different menus.
 
@@ -54,11 +54,13 @@ However - having any scaled board view active _drastically_ cuts performance of 
 
 In any case, try to avoid zooming the main view unless you need it temporarily. There's a hotkey to zoom back to 100% - look in the Board menu of QBoard for the key combination.
 
+If you don't use minimaps, it is normally a good idea to turn on GL mode on the main board, as doing so drastically speeds up any operations when the board is scaled. However, GL mode is known to cause graphics glitches at times (e.g. pieces become temporarily invisible).
+
 == Piece style templates ==
 
 The colorful squares in the bottom/left of the main window are piece style templates. If you click one of those, newly-added pieces will take on that style. Use the right-click menu to edit them. You can also paste items copied from the board into this area, so you can customize your templates in any ways you like, including adding new ones or removing them.
 
-The templates area is saved automatically when QBoard exits. If you have hosed your templates beyond repair and want to start with a new set, close QBoard, delete the file `~/.QBoard/QBoard/persistance/MainWindow/default-templates`, then start QBoard. Deleting or replacing the file while QBoard is open will have no effect and the file will be replaced or overwritten when QBoard exits.
+The templates area is saved automatically when QBoard exits. If you have hosed your templates beyond repair and want to start with a new set, close QBoard, delete the file `~/.QBoard/QBoard/persistance/MainWindow/default-templates`, then start QBoard. Deleting or replacing the file while QBoard is open will have no effect, as the file will be replaced or overwritten when QBoard exits.
 
 
 == The clipboard ==
