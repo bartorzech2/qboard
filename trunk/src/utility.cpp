@@ -25,7 +25,7 @@
 
 #include <qboard/utility.h>
 #include <qboard/Serializable.h>
-#include <qboard/S11nClipboard.h> // another horrible dep!
+#include <qboard/S11nQt/S11nClipboard.h>
 #include <qboard/S11nQt.h>
 #include <qboard/S11nQt/QList.h>
 #include <qboard/GameState.h>

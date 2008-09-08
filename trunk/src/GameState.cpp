@@ -27,7 +27,7 @@
 #include <qboard/utility.h>
 #include <qboard/QBoard.h>
 #include <qboard/QBoardScene.h>
-#include <qboard/S11nClipboard.h>
+#include <qboard/S11nQt/S11nClipboard.h>
 #include <qboard/ScriptQt.h>
 #include <qboard/S11nQt/QPoint.h>
 #include <s11n.net/s11n/s11n_debuggering_macros.hpp>
