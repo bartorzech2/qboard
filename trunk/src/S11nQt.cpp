@@ -167,8 +167,8 @@ bool QBitArray_s11n::operator()(S11nNode & dest, QBitArray const & src ) const
     std::ostringstream buf;
     while( pos < count )
     {
-	unsigned short byt = 0;
-	for( int i = 7; (i >= 0) && (pos<count); --i, ++pos )
+	unsigned long byt = 0;
+	for( int i = 31; (i >= 0) && (pos<count); --i, ++pos )
 	{
 	    int b = src.testBit(pos) ? 1 : 0;
 	    byt |= (b << i);
@@ -196,14 +196,14 @@ bool QBitArray_s11n::operator()( S11nNode const & src, QBitArray & dest ) const
 	std::istringstream is( sbits );
 	while( pos < count )
 	{
-	    unsigned short byt = 0;
-	    is >> std::hex >> byt;
+	    unsigned long byt = 0;
 	    if( ! is.good() )
 	    {
 		qDebug() << "QBitArray_s11n::deserialize: error reading next byte group.";
 		return false;
 	    }
-	    for( int i = 7; (i >= 0) && (pos<count); --i, ++pos )
+	    is >> std::hex >> byt;
+	    for( int i = 31; (i >= 0) && (pos<count); --i, ++pos )
 	    {
 		int b = (byt >> i) & 0x1;
 		tmp.setBit( pos, b ? true : false );

@@ -5,16 +5,18 @@ namespace s11n { namespace qt {
     /*
       s11n proxy for QBitArray.
 
-      It stores QBitArrays as a series of encoded bytes,
-      squeezing them into groups of 8. Thus a QBitArray
-      with 800 bits is stored as a series of 100 small
-      numbers.
+      Stores QBitArrays using a relatively space-efficient algorithm
+      (efficient when compared to most other s11n proxies, anyway).
     */
     struct QBitArray_s11n
     {
 	/** Serializes src to dest. */
 	bool operator()( S11nNode & dest, QBitArray const & src ) const;
-	/** Deserializes dest from src. */
+	/**
+	   Deserializes dest from src.
+
+	   Dest is only modified if this routine succeeds.
+	*/
 	bool operator()( S11nNode const & src, QBitArray & dest ) const;
     };
 
