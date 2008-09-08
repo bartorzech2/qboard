@@ -151,7 +151,7 @@ H=$$QBOARD_INCLUDES_DIR
 S11NQT_HEADERS = \
  $$H/Serializable.h \
  $$H/S11n.h \
- $$H/S11nClipboard.h \
+ $$H/S11nQt/S11nClipboard.h \
  $$H/S11nQt.h
 H=
 S11NQT_SOURCES = \
