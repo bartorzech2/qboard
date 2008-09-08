@@ -288,12 +288,14 @@ void try_s11n()
     if(1)
     {
 
-	int count = 30;
+	int count = 64;
 	QBitArray ba(count);
-	for( int i = 0; i < count; i += 3 )
+	for( int i = 33; i < count; i += 3 )
 	{
 	    ba.setBit( i, true );
 	}
+	ba.setBit(31,true);
+	ba.setBit(0,true);
 	COUT << "original QBitArray:\n";
 
 #define OUTBIT(BA) for( int i = 0; i < BA.count(); ++i ) {\
@@ -320,6 +322,23 @@ void try_s11n()
 #undef OUTBIT
 	std::cout <<'\n';
 
+    }
+
+    if(1)
+    {
+	QPen p1(QColor(255,0,0,120));
+	{
+	    QVector<qreal> dp;
+	    dp << 4.0 << 2 << 2 << 4;
+	    p1.setDashPattern(dp);
+	}
+	p1.setWidth(4);
+	S11nNode n;
+	s11n::serialize( n, p1 );
+	QPen p2;
+	s11n::deserialize( n, p2 );
+	s11nlite::save(p1,std::cout);
+	s11nlite::save(p2,std::cout);
     }
 
 }
