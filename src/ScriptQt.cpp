@@ -920,7 +920,7 @@ namespace qboard {
 	return qboard::toSource<QVariant>( self );
     }
 
-    QString JSVariantPrototype::toString()
+    QString JSVariantPrototype::toVariantString()
     {
 	SELF(QString("[invalid object]"));
 	QString ret;

@@ -507,7 +507,7 @@ namespace qboard {
 	   QVariant is passed to qDebug(), so it cannot be eval'd
 	   or anything like that.
 	*/
-	QString toString();
+	QString toVariantString();
 
 	/**
 	   Returns this object's QVariant's userType() value.
