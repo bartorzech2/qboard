@@ -7,6 +7,7 @@
 #include <QEvent>
 #include <QWidget>
 #include <QMenu>
+#include <QGraphicsPixmapItem>
 
 #include <qboard/S11nQt.h>
 #include <qboard/utility.h>
@@ -143,14 +144,16 @@ void QGIHider::hideItem( QGraphicsItem * toHide )
 	}
 	//toHide->setPos(QPointF(0,0));
 	QObject * obj = dynamic_cast<QObject*>(toHide);
+	QColor color;
 	if( obj )
 	{
 	    QVariant cv( obj->property("color") );
 	    if( cv.canConvert<QColor>() )
 	    {
-		this->setBrush( QBrush(cv.value<QColor>(), impl->bstyle) );
+		color = cv.value<QColor>();
 	    }
 	}
+	this->setBrush( QBrush(color, impl->bstyle) );
 	if( sc )
 	{
 	    sc->addItem(this);
