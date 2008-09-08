@@ -21,7 +21,7 @@
 #include <qboard/utility.h>
 #include <qboard/S11nQt.h>
 #include <qboard/S11nQt/QList.h>
-#include <qboard/S11nClipboard.h>
+#include <qboard/S11nQt/S11nClipboard.h>
 #include <qboard/MenuHandlerGeneric.h>
 #include <qboard/PropObj.h>
 #include <qboard/S11nQt/QPointF.h>

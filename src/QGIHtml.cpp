@@ -21,7 +21,7 @@
 #include <qboard/S11nQt/QString.h>
 #include <qboard/utility.h>
 #include <qboard/MenuHandlerGeneric.h>
-#include <qboard/S11nClipboard.h>
+#include <qboard/S11nQt/S11nClipboard.h>
 
 #include <QGraphicsSceneMouseEvent>
 #include <QFocusEvent>
