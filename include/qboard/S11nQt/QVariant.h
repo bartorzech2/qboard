@@ -156,6 +156,7 @@ namespace s11n { namespace qt {
     - Time, Date, DateTime
     - ByteArray
     - Pixmap
+    - Brush, Pen
     - Any Serializable Type (as defined by libs11n), via the 
     VariantS11n proxy type.
 
