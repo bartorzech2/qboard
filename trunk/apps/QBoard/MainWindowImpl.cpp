@@ -444,7 +444,7 @@ bool MainWindowImpl::loadPiece( QFileInfo const & fi )
 	else
 	{
 	    impl->paw->applyCurrentTemplate( pc );
-	    pc->setProperty( "pixmap", fn );
+	    pc->setProperty( "pixmap", qboard::homeRelative(fn) );
 	}
 	impl->gstate.addItem(pc, true);
 	return true;
