@@ -9,7 +9,7 @@ The code is available via the QBoard source tree (look for `src/*11n*.*`) or as 
 
 The distribution contains code for de/serializing the following Qt types:
 
-  * QBitArray,
+  * QBitArray
   * QByteArray, with optional zlib compression
   * QBrush
   * QColor
