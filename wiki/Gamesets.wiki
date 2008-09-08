@@ -63,8 +63,14 @@ This set contains tons of good-looking counters created by Fransisco "Cisco" Ces
 Hex is a very simple strategy game for two players with a whopping 1 paragraph
 of rules. Each player places tokens on a hexagon-based board and attempts to
 connect to the far side, blocking his opponent as he goes.
+
 ----
-== CGME Joe ==
+== Insectica ==
+
+Insectica, written by Trevor Blake, is a game about insect combat. The premise is unique (see the included PDF file) and some of the mechanics are quite original. The gameset includes all necessary counters, a board, and the rules in PDF format.
+
+----
+== Joe ==
 
 *Joe* is a simple strategy combat game where little plastic army men
 do combat on a chessboard. Joe is an original title, by yours truly.
