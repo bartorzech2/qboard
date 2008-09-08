@@ -19,6 +19,7 @@
 #include <qboard/S11nQt.h>
 #include <s11n.net/s11n/functional.hpp>
 
+#include <qboard/S11nQt/QBitArray.h>
 #include <qboard/S11nQt/QBrush.h>
 #include <qboard/S11nQt/QByteArray.h>
 #include <qboard/S11nQt/QColor.h>
@@ -155,6 +156,61 @@ QString brushStyleToString( int i )
 #undef MAP
     }
     return bob.value( i, QString("NoBrush") );
+}
+
+bool QBitArray_s11n::operator()(S11nNode & dest, QBitArray const & src ) const
+{
+    typedef s11nlite::node_traits NT;
+    int count = src.count();
+    NT::set( dest, "count", count );
+    int pos = 0;
+    std::ostringstream buf;
+    while( pos < count )
+    {
+	unsigned short byt = 0;
+	for( int i = 7; (i >= 0) && (pos<count); --i, ++pos )
+	{
+	    int b = src.testBit(pos) ? 1 : 0;
+	    byt |= (b << i);
+	}
+	buf << std::hex << byt;
+	if( pos < count ) buf << ' ';
+    }
+    NT::set( dest, "bits", buf.str() );
+    return true;
+}
+
+bool QBitArray_s11n::operator()( S11nNode const & src, QBitArray & dest ) const
+{
+	typedef s11nlite::node_traits NT;
+	int count = NT::get( src, "count", int(0) );
+	QBitArray tmp(count);
+	if( ! count )
+	{
+	    dest = tmp;
+	    return true;
+	}
+	std::string sbits( NT::get(src,"bits",std::string()) );
+	if( sbits.empty() ) return false;
+	int pos = 0;
+	std::istringstream is( sbits );
+	while( pos < count )
+	{
+	    unsigned short byt = 0;
+	    is >> std::hex >> byt;
+	    if( ! is.good() )
+	    {
+		qDebug() << "QBitArray_s11n::deserialize: error reading next byte group.";
+		return false;
+	    }
+	    for( int i = 7; (i >= 0) && (pos<count); --i, ++pos )
+	    {
+		int b = (byt >> i) & 0x1;
+		tmp.setBit( pos, b ? true : false );
+	    }
+	}
+	dest = tmp;
+	return true;
 }
 
 bool QBrush_s11n::operator()(S11nNode & dest, QBrush const & src ) const

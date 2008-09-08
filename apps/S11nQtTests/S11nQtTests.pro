@@ -9,5 +9,6 @@ HEADERS = \
 SOURCES = \
  S11nQtTests.cpp
 
-QMAKE_LIBS += $$S11N_OBJECTS \
-   $$S11NQT_OBJECTS # We add these to QMAKE_LIBS instead of OBJECTS to keep qmake from cleaning them!
+LIBS += -L$$DESTDIR -lQBoard -lQBoardS11n
+#QMAKE_LIBS += $$S11N_OBJECTS \
+#   $$S11NQT_OBJECTS # We add these to QMAKE_LIBS instead of OBJECTS to keep qmake from cleaning them!

@@ -22,6 +22,7 @@
 #include "S11nQt.h"
 
 #include "S11nQt/QBrush.h"
+#include "S11nQt/QBitArray.h"
 #include "S11nQt/QByteArray.h"
 #include "S11nQt/QColor.h"
 #include "S11nQt/QDate.h"
@@ -282,6 +283,43 @@ void try_s11n()
 	QDateTime tr2;
 	s11nlite::deserialize( n, tr2 );
 	s11nlite::save( tr2, std::cout );
+    }
+
+    if(1)
+    {
+
+	int count = 30;
+	QBitArray ba(count);
+	for( int i = 0; i < count; i += 3 )
+	{
+	    ba.setBit( i, true );
+	}
+	COUT << "original QBitArray:\n";
+
+#define OUTBIT(BA) for( int i = 0; i < BA.count(); ++i ) {\
+	    std::cout << (ba.testBit(i) ? 1 : 0); }	  \
+	std::cout << '\n';
+
+	OUTBIT(ba);
+	S11nNode n;
+	if( ! s11nlite::serialize(n, ba) )
+	{
+	    throw s11n::s11n_exception("QBitArray serialization failed!");
+	}
+	s11nlite::save(n, std::cout);
+	QBitArray dba;
+	if( ! s11nlite::deserialize(n, dba) )
+	{
+	    throw s11n::s11n_exception("QBitArray deserialization failed!");
+	}
+	s11nlite::save( dba, std::cout);
+	COUT << "original QBitArray:\n";
+	OUTBIT(ba);
+	COUT << "deser'd QBitArray:\n";
+	OUTBIT(dba);
+#undef OUTBIT
+	std::cout <<'\n';
+
     }
 
 }
