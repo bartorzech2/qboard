@@ -93,7 +93,7 @@ void QGITypes::shuffleQGIList( QList<QGraphicsItem*> list, bool skipParentedItem
     return;
 }
 
-#define QGIPiece_USE_PIXCACHE 1
+#define QGIPiece_USE_PIXCACHE 0
 
 struct QGIPiece::Impl
 {
@@ -106,6 +106,7 @@ struct QGIPiece::Impl
     qreal alpha;
     QPen pen;
     QPen penB;
+    bool blocked;
     enum PropIDs {
     PropUnknown = 0,
     PropAlpha,
@@ -125,6 +126,7 @@ struct QGIPiece::Impl
     };
     Impl()
     {
+	blocked = false;
 	countPaintCache = countRepaint = 0;
 	alpha = 1;
 
@@ -188,8 +190,8 @@ void QGIPiece::refreshTransformation()
 
 bool QGIPiece::event( QEvent * e )
 {
-#if 1
-    while( e->type() == QEvent::DynamicPropertyChange )
+    while( (!impl->blocked)
+	   && (e->type() == QEvent::DynamicPropertyChange) )
     {
 	QDynamicPropertyChangeEvent *chev = dynamic_cast<QDynamicPropertyChangeEvent *>(e);
 	if( ! chev ) break;
@@ -198,14 +200,12 @@ bool QGIPiece::event( QEvent * e )
 	e->accept();
 	break;
     }
-#endif
     return QObject::event(e);
 }
 
 void QGIPiece::propertySet( char const *pname, QVariant const & var )
 {
     // FIXME: treat QVariant::Invalid appropriately for each property
-
     typedef QMap<QString,int> PMAP;
     static PMAP pmap;
     if( pmap.isEmpty() )
@@ -680,6 +680,16 @@ bool QGIPiece::deserialize( S11nNode const & src )
 	    return false;
 	}
 	qboard::copyProperties( &props, this );
+    }
+    {
+	/**
+	   kludge: when i refactored some properties to a QPen,
+	   it broke some other objects which relied on certain
+	   properties. So now we stuff those back into the props list
+	*/
+	impl->blocked = true;
+	this->setProperty("color",impl->pen.color());
+	impl->blocked = false;
     }
     return true;
 }
