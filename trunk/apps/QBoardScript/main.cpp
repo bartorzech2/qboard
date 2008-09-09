@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
         QScriptValue r = eng->evaluate(contents, fn, lineNumber);
         if (eng->hasUncaughtException()) {
             QStringList backtrace = eng->uncaughtExceptionBacktrace();
-            fprintf (stderr, "    %s\n%s\n\n", qPrintable(r.toString()),
+            fprintf (stderr, "JS exception:\n    %s\n%s\n\n", qPrintable(r.toString()),
                      qPrintable(backtrace.join("\n")));
             return EXIT_FAILURE;
         }
