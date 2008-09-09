@@ -34,7 +34,6 @@
 
 Q_DECLARE_METATYPE(QList<QGraphicsItem*>)
 Q_DECLARE_METATYPE(QVariant)
-//Q_DECLARE_METATYPE(QPoint)
 
 namespace qboard {
 
@@ -75,6 +74,16 @@ namespace qboard {
 	    arg(x.height());
     }
 
+    QString to_source_f<QColor>::operator()( QColor const & x ) const
+    {
+	return QString("QColor(%1,%2,%3,%4)").
+	    arg(x.red()).
+	    arg(x.green()).
+	    arg(x.blue()).
+	    arg(x.alphaF());
+    }
+
+
     QString to_source_f<QString>::operator()( QString const & x ) const
     {
 	bool hasSQ = x.contains('\'');
@@ -103,8 +112,7 @@ namespace qboard {
 	    DO(RectF,QRectF);
 	    DO(Size,QSize);
 	    DO(SizeF,QSizeF);
-	    case QVariant::Color:
-		return qboard::toSource( x.value<QString>() ); break;
+	    DO(Color,QColor);
 	  default:
 	      break;
 #undef DO
@@ -222,6 +230,23 @@ namespace qboard {
 	return obj;
     }
 
+    /**
+       Accepts arguments as follows:
+
+       If args is not an array then it must be an object with numeric
+       x/y properties.
+
+       If args is an array, IF the first element is an object then
+       that object is treated as described above. Otherwise there must
+       be at least 2 numeric arguments, which are used as x/y values.
+
+       So, in JS that's:
+
+       PT(x,y)
+
+       PT({x:N,y:N})
+
+    */
     template <typename PT>
     PT convert_script_value_f_point<PT>::operator()( QScriptEngine *,
 						  const QScriptValue & args ) const
@@ -229,53 +254,35 @@ namespace qboard {
 	typedef typename point_valtype<PT>::value_type value_type;
 	value_type x = 0;
 	value_type y = 0;
-	if( args.isArray() ||
-	    ! args.property("length").isUndefined() )
+	QScriptValue obj;
+	bool smellArray = (args.isArray() || ! args.property("length").isUndefined());
+	if( smellArray )
 	{
+	    if(0) qDebug() << "Looks like arguments array.";
+	    obj = args.property(0);
+	}
+	else if( args.isObject() )
+	{
+	    if(0) qDebug() << "Looks like an object.";
+	    obj = args;
+	}
+
+	if( smellArray && !obj.isObject() )
+	{
+	    if(0) qDebug() << "Trying arguments array.";
 	    x = value_type(args.property(0).toNumber());
 	    y = value_type(args.property(1).toNumber());
 	}
 	else
 	{
-	    x = value_type(args.property("x").toNumber());
-	    y = value_type(args.property("y").toNumber());
+	    if(0) qDebug() << "Trying object x/y:" << obj.toString() << ":" << toSource( obj );
+	    if(0) qDebug() << "obj.property(x).toNumber():"<<obj.property("x").toNumber();
+	    x = value_type(obj.property("x").toNumber());
+	    y = value_type(obj.property("y").toNumber());
 	}
+	if(0) qDebug() << "PT:"<<PT(x,y);
 	return PT(x,y);
     }
-
-//     template <typename PT>
-//     QScriptValue qpointToScriptValue(QScriptEngine *engine, const PT &s)
-//     {
-// 	if(0) qDebug() << "qpointfToScriptValue(engine,"<<s<<")";
-// 	QScriptValue obj = engine->newObject();
-// 	obj.setProperty("x", QScriptValue(engine, s.x()));
-// 	obj.setProperty("y", QScriptValue(engine, s.y()));
-// 	return obj;
-//     }
-
-//     template <typename PT>
-//     void qpointFromScriptValue(const QScriptValue &args, PT &s)
-//     {
-// 	if(0) qDebug() << "qpointFromScriptValue(): args count: " << args.property("length").toInt32()
-// 		 << ", tosource="<<toSource(args);
-// 	qreal x = 0;
-// 	qreal y = 0;
-// 	if( args.isArray() ||
-// 	    ! args.property("length").isUndefined() )
-// 	{
-// 	    if(0) qDebug() << "qpointFromScriptValue(): args smells like an array";
-// 	    x = args.property(0).toNumber();
-// 	    y = args.property(1).toNumber();
-// 	}
-// 	else
-// 	{
-// 	    if(0) qDebug() << "qpointFromScriptValue(): args doesn't smell like an array";
-// 	    x = args.property("x").toNumber();
-// 	    y = args.property("y").toNumber();
-// 	}
-// 	s = PT(x,y);
-// 	if(0) qDebug() << "qpointFromScriptValue("<<toSource( args )<<") ="<<s;
-//     }
 
     template <typename PT>
     QScriptValue QPoint_ctor(QScriptContext *ctx, QScriptEngine *eng)
@@ -306,24 +313,37 @@ namespace qboard {
 	value_type t = 0;
 	value_type w = 0;
 	value_type h = 0;
-#define ARG(X) args.property(X).toNumber()
-	if( args.isArray() ||
-	    ! args.property("length").isUndefined() )
+	QScriptValue obj;
+	bool smellArray = (args.isArray() ||
+			   ! args.property("length").isUndefined());
+	if( smellArray )
 	{
-	    l = value_type(ARG(0));
-	    t = value_type(ARG(1));
-	    w = value_type(ARG(2));
-	    h = value_type(ARG(3));
+	    obj = args.property(0);
+	}
+	else if( args.isObject() )
+	{
+	    obj = args;
+	}
+
+	if( smellArray && !obj.isObject() )
+	{
+#define ARG(X) value_type(args.property(X).toNumber())
+	    l = ARG(0);
+	    t = ARG(1);
+	    w = ARG(2);
+	    h = ARG(3);
+#undef ARG
 	}
 	else
 	{
-	    l = value_type(ARG("left"));
-	    t = value_type(ARG("top"));
-	    w = value_type(ARG("width"));
-	    h = value_type(ARG("height"));
-	}
+#define ARG(X) value_type(obj.property(X).toNumber())
+	    l = ARG("left");
+	    t = ARG("top");
+	    w = ARG("width");
+	    h = ARG("height");
 #undef ARG
-	return RT( l,t,w,h);
+	}
+	return RT( l, t, w, h );
     }
 
     template <typename RT>
@@ -350,15 +370,27 @@ namespace qboard {
 	typedef typename point_valtype<ST>::value_type value_type;
 	value_type w = 0;
 	value_type h = 0;
-#define ARG(X) args.property(X).toNumber()
-	if( args.isArray() ||
-	    ! args.property("length").isUndefined() )
+	QScriptValue obj;
+	bool smellArray = ( args.isArray() ||
+			    ! args.property("length").isUndefined() );
+	if( smellArray )
 	{
+	    obj = args.property(0);
+	}
+	else if( args.isObject() )
+	{
+	    obj = args;
+	}
+	if( smellArray && !obj.isObject() )
+	{
+#define ARG(X) value_type(args.property(X).toNumber())
 	    w = ARG(0);
 	    h = ARG(1);
+#undef ARG
 	}
 	else
 	{
+#define ARG(X) value_type(obj.property(X).toNumber())
 	    w = ARG("width");
 	    h = ARG("height");
 	}
@@ -395,10 +427,21 @@ namespace qboard {
 	int g = 0;
 	int b = 0;
 	qreal a = 255;
-#define ARG(X) args.property(X).toInt32()
-	if( args.isArray() ||
-	    ! args.property("length").isUndefined() )
+	QScriptValue obj;
+	bool smellArray = ( args.isArray() ||
+			    ! args.property("length").isUndefined() );
+	if( smellArray )
 	{
+	    obj = args.property(0);
+	}
+	else if( args.isObject() )
+	{
+	    obj = args;
+	}
+
+	if( smellArray && !obj.isObject() )
+	{
+#define ARG(X) args.property(X).toInt32()
 	    int argc = args.property("length").toInt32();
 	    QScriptValue arg = args.property(0);
 	    if( (1 == argc) && arg.isString() )
@@ -411,21 +454,23 @@ namespace qboard {
 	    a = (argc > 3)
 		? args.property(3).toNumber()
 		: 255.0;
+#undef ARG
 	}
 	else
 	{
+#define ARG(X) obj.property(X).toInt32()
 	    r = ARG("red");
 	    g = ARG("green");
 	    b = ARG("blue");
-	    QScriptValue av( args.property("alpha") );
+#undef ARG
+	    QScriptValue av( obj.property("alpha") );
 	    if( ! av.isUndefined() )
 	    {
 		a = av.toNumber();
 	    }
 	}
-#undef ARG
 	QColor c( r, g, b );
-	if( a < 1.0 ) c.setAlphaF(a);
+	if( a <= 1.0 ) c.setAlphaF(a);
 	else c.setAlpha( int(a) );
 	return c;
     }
