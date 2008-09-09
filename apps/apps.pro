@@ -1,4 +1,5 @@
+include(../config.qmake)
 TEMPLATE = subdirs
-# CONFIG += ordered
-SUBDIRS = S11nQtTests QBoard WikiLiteParser
-# qboardbatch
+SUBDIRS = QBoard WikiLiteParser
+!$$QBOARD_VERSION: SUBDIRS += S11nQtTests 
+unix: SUBDIRS += QBoardScript
