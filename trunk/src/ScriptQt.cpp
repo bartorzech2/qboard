@@ -115,7 +115,7 @@ namespace qboard {
     QString to_source_f_object::operator()( QScriptValue const & x ) const
     {
 	if( ! x.isObject() ) return QString("undefined"); // should we return an empty string?
-	if( ! x.isNull() ) return QString("null");
+	if( x.isNull() ) return QString("null");
 	QScriptValueIterator it( x );
 	QByteArray ba;
 	QBuffer buf(&ba);
@@ -160,10 +160,15 @@ namespace qboard {
     {
 	if( x.isUndefined() ) return "undefined";
 	if( x.isNull() ) return "null";
+	if(0) qDebug() << "to_source_f<QScriptValue>("<<x.toString()<<")";
 
 #define TODO(A,B,C)
 #define DO(IS,T,TO) \
-	if( x.IS() ) return toSource<T>( x.TO() );
+	if( x.IS() ) {\
+	    if(0) qDebug() << "to_source_f<QScriptValue>(is-a: "<<# IS<<")"; \
+	    return toSource<T>( x.TO() );\
+	}
+
 
 	DO(isVariant,QVariant,toVariant); // must come before the others!
 	DO(isBoolean,bool,toBoolean);
@@ -172,6 +177,7 @@ namespace qboard {
 	TODO(isRegExp,QRegExp,toRegExp);
 	if( x.isArray() || x.isObject() )
 	{
+	    if(0) qDebug() << "to_source_f<QScriptValue>(is-a: array or object)";
 	    return to_source_f_object()( x );
 	}
 
@@ -633,6 +639,32 @@ namespace qboard {
 	return QScriptValue(eng, rc);
     }
 
+    static QScriptValue js_include(QScriptContext *ctx, QScriptEngine *eng)
+    {
+	ScriptArgv av(ctx);
+	if( ! av.argc() ) return eng->evaluate(QString("throw new Error('include() cannot be called without parameters');"));
+	QScriptValue ret = eng->nullValue();
+	while( av.isValid() )
+	{
+	    //qDebug() << "js_include() trying arg #"<<av.at()<<"of"<<av.argc();
+	    QScriptValue fnv( av++ );
+	    QString fn( fnv.toString() );
+	    QString contents;
+	    QFile scriptFile(fn);
+	    if (!scriptFile.open(QIODevice::ReadOnly))
+	    {
+		QString msg = QString("include() could not open file \"%1\"").arg(fn);
+		ret = eng->evaluate(QString("throw new Error('%1')").arg(msg));
+		break;
+	    }
+	    QTextStream stream(&scriptFile);
+	    contents = stream.readAll();
+	    scriptFile.close();
+	    ret = eng->evaluate( contents, fn );
+	    if( ret.isError() || eng->hasUncaughtException() ) break;
+	}
+	return ret;
+    }
 
     QScriptEngine * createScriptEngine( QObject * parent )
     {
@@ -677,6 +709,9 @@ namespace qboard {
 			 QScriptValue::ReadOnly | QScriptValue::Undeletable );
 	glob.setProperty("confirm",
 			 js->newFunction(js_confirm),
+			 QScriptValue::ReadOnly | QScriptValue::Undeletable );
+	glob.setProperty("include",
+			 js->newFunction(js_include),
 			 QScriptValue::ReadOnly | QScriptValue::Undeletable );
 	glob.setProperty("randomInt",
 			 js->newFunction(js_randomInt),
@@ -842,6 +877,11 @@ namespace qboard {
 	return this->value();
     }
 
+    int ScriptArgv::at() const
+    {
+	return m_at;
+    }
+
     QScriptValue ScriptArgv::operator()() const
     {
 	return this->value();
@@ -885,7 +925,7 @@ namespace qboard {
 
     bool ScriptArgv::isValid() const
     {
-	return m_cx && (m_max>=0) && (m_at<=m_max);
+	return m_cx && (m_max>=0) && (m_at<m_max);
     }
 
 
