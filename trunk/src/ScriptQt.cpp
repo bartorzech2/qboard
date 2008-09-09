@@ -35,6 +35,19 @@
 Q_DECLARE_METATYPE(QList<QGraphicsItem*>)
 Q_DECLARE_METATYPE(QVariant)
 
+/**
+   An unfortunate kludge, this is used by QList<QScriptValue>::find().
+
+   We could use std::set<QScriptValue,CustomLessFtor>, but we have no
+   sensible way to perform < on QScriptValue objects.
+*/
+bool operator==(QScriptValue const & lhs, QScriptValue const & rhs)
+{
+    return lhs.strictlyEquals(rhs);
+}
+
+#include <set> // QList doesn't support a custom compare functor
+
 namespace qboard {
 
     QString to_source_f<QPoint>::operator()( QPoint const & x ) const
@@ -120,10 +133,41 @@ namespace qboard {
 	return QString("undefined");
     }
 
+//     struct ScriptValLess
+//     {
+// 	mutable QScriptValue func;
+// 	explicit ScriptValLess( QScriptEngine * e )
+// 	{
+// 	    func = e
+// 		? e->evaluate("function(l,r){return l<r;}")
+// 		: QScriptValue();
+// 	}
+// 	bool operator()(QScriptValue const & lhs, QScriptValue const & rhs) const
+// 	{
+// 	    return func.call( QScriptValue(),
+// 			      QScriptValueList()
+// 			      << lhs << rhs ).toBoolean();
+// 	}
+//     };
+
+    //typedef std::set<QScriptValue,ScriptValLess> ScriptValList;
+    typedef QList<QScriptValue> ScriptValList;
+    static ScriptValList & scriptValList()
+    {
+	static ScriptValList bob;
+	return bob;
+    }
+
     QString to_source_f_object::operator()( QScriptValue const & x ) const
     {
 	if( ! x.isObject() ) return QString("undefined"); // should we return an empty string?
 	if( x.isNull() ) return QString("null");
+	if( x.isFunction() ) return QString("('[toSource() cannot handle functions]',null)");
+	if( scriptValList().contains(x) )
+	{
+	    return QString("('[toSource() skipping circular object reference!]',null)");
+	}
+	scriptValList().append(x);
 	QScriptValueIterator it( x );
 	QByteArray ba;
 	QBuffer buf(&ba);
@@ -157,6 +201,7 @@ namespace qboard {
 	}
 	buf.write(closer);
 	buf.close();
+	scriptValList().removeAll(x);
 	QString ret(ba);
 	if(0) qDebug() << "to_source_f_object() returning:"<<ret
 		       << "\nbytecount="<<ba.count();
@@ -284,6 +329,9 @@ namespace qboard {
 	return PT(x,y);
     }
 
+    /**
+       See convert_script_value_f_point<PT>.
+    */
     template <typename PT>
     QScriptValue QPoint_ctor(QScriptContext *ctx, QScriptEngine *eng)
     {
@@ -304,6 +352,15 @@ namespace qboard {
 	return obj;
     }
 
+    /**
+       Converts JS arguments to a rectangle type RT. Arguments
+       must be compatible with one of:
+
+       RT(number,number,number,number)
+
+       RT({left:N,top:N,width:N,height:N})
+
+    */
     template <typename RT>
     RT convert_script_value_f_rect<RT>::operator()( QScriptEngine *,
 						  const QScriptValue & args ) const
@@ -363,6 +420,14 @@ namespace qboard {
 	return obj;
     }
 
+    /**
+       Converts JS arguments to a Size type RT. Arguments
+       must be compatible with one of:
+
+       ST(number,number)
+
+       ST({width:N,height:N})
+    */
     template <typename ST>
     ST convert_script_value_f_size<ST>::operator()( QScriptEngine *,
 						  const QScriptValue & args ) const
@@ -393,8 +458,8 @@ namespace qboard {
 #define ARG(X) value_type(obj.property(X).toNumber())
 	    w = ARG("width");
 	    h = ARG("height");
-	}
 #undef ARG
+	}
 	return ST(w,h);
     }
 
@@ -533,7 +598,8 @@ namespace qboard {
 	return ar;
     }
 
-    QList<QGraphicsItem*> convert_script_value_f<QList<QGraphicsItem*> >::
+    QList<QGraphicsItem*>
+    convert_script_value_f<QList<QGraphicsItem*> >::
     operator()( QScriptEngine *,
 		const QScriptValue & args ) const
     {
