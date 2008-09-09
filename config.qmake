@@ -55,8 +55,6 @@ REL_SRCDIR=$$replace(REL_SRCDIR,$$TOP_SRCDIR/,)
 REL_SRCDIR=$$replace(REL_SRCDIR,[^/]+,..)
 
 CONFIG += warn_on debug
-QT += script
-# debug_and_release
 
 VERSION = $$QBOARD_VERSION
 message(QBoard version $$QBOARD_VERSION)
@@ -133,7 +131,7 @@ contains(QT_VERSION, ^4\.4\..+ ){
 	 QBOARD_FORMS_QT44 = $$UI_SRCDIR/QBoardDocsBrowser.ui
 	 QBOARD_QT44 = webkit
 }
-QT = core gui $$QBOARD_QT44
+QT = core gui script $$QBOARD_QT44
 # FIXME: how to determine dynamically whether to enable OpenGL here?
 QT += opengl
 
