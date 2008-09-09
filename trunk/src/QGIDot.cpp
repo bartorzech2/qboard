@@ -418,6 +418,9 @@ void QGIDot::contextMenuEvent( QGraphicsSceneContextMenuEvent * ev )
 #endif
     m->exec( ev->screenPos() );
     delete m;
+    // We REALLY want to set (impl->active=false) here, BUT we might have just
+    // been deleted by the menu handler! Setting it before exec() doesn't
+    // work because of the event ordering.
 }
 
 void QGIDot::split()
