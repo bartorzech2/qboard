@@ -752,6 +752,16 @@ namespace qboard {
 	QString operator()( QString const &  ) const;
     };
 
+    template <>
+    struct to_source_f<QColor>
+    {
+	/**
+	   The result is a QColor ctor call containing
+	   c's RGBA information.
+	*/
+	QString operator()( QColor const & c) const;
+    };
+
     /**
        to_source_f specialization for QVariant.
     */
