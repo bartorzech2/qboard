@@ -61,6 +61,8 @@ namespace qboard {
        Front-end for converting types to QScriptValues.
 
        Can be used as the 2nd parameter to qScriptRegisterMetaType().
+
+       Equivalent to convert_script_value_f<T>()( e, t );
     */
     template <typename T>
     QScriptValue toScriptValue( QScriptEngine * e, T const & t )
@@ -68,7 +70,8 @@ namespace qboard {
 	return convert_script_value_f<T>()( e, t );
     }
     /**
-       Front-end for converting QScriptValues to other types.
+       Front-end for converting QScriptValues to other types. Equivalent
+       to convert_script_value_f<T>()( e, v ).
     */
     template <typename T>
     T fromScriptValue( QScriptEngine * e, QScriptValue const & v )
@@ -80,6 +83,10 @@ namespace qboard {
        Assigns t to the converted value of obj.
 
        Can be used as the 3rd parameter to qScriptRegisterMetaType().
+
+       Equivalent to:
+
+       t = fromScriptValue( obj.engine(), obj );
     */
     template <typename T>
     void fromScriptValue( const QScriptValue & obj, T & t)
@@ -132,9 +139,15 @@ namespace qboard {
 	RT operator()( QScriptEngine *, const QScriptValue & args) const;
     };
 
+    /**
+       Specialization for QRect.
+    */
     template <>
     struct convert_script_value_f<QRect> : convert_script_value_f_rect<QRect> {};
 
+    /**
+       Specialization for QRectF.
+    */
     template <>
     struct convert_script_value_f<QRectF> : convert_script_value_f_rect<QRectF> {};
 
@@ -144,6 +157,10 @@ namespace qboard {
 	QScriptValue operator()( QScriptEngine *, QGraphicsItem * const & r) const;
 	QGraphicsItem * operator()( QScriptEngine *, const QScriptValue & args) const;
     };
+
+    /**
+       Specialization to convert a QGraphicsItem pointers to/from JS.
+    */
     template <>
     struct convert_script_value_f<QGraphicsScene*>
     {
@@ -151,6 +168,9 @@ namespace qboard {
 	QGraphicsScene * operator()( QScriptEngine *, const QScriptValue & args) const;
     };
 
+    /**
+       Specialization to convert a list of QGraphicsItems to/from a JS array.
+    */
     template <>
     struct convert_script_value_f<QList<QGraphicsItem*> >
     {
@@ -180,9 +200,15 @@ namespace qboard {
 	ST operator()( QScriptEngine *, const QScriptValue & args) const;
     };
 
+    /**
+       Specialization for QSize.
+    */
     template <>
     struct convert_script_value_f<QSize> : convert_script_value_f_size<QSize> {};
 
+    /**
+       Specialization for QSizeF.
+    */
     template <>
     struct convert_script_value_f<QSizeF> : convert_script_value_f_size<QSizeF> {};
 
@@ -226,7 +252,23 @@ namespace qboard {
 
     /**
        Creates a new QScriptEngine (which the caller owns).  It is
-       preconfigured with some custom functions and type conversions.
+       preconfigured with some custom functions and type conversions, namely:
+
+       - ctors for QPoint/QPointF, QSize/QSizeF, QRect/QRectF, and QColor.
+
+       - A global-scope object called JSVariantPrototype, which can be set
+       as the JS prototype for QVariant objects. See the class JSVariantPrototype
+       for details.
+
+       Custom global functions:
+
+       - alert() and confirm()
+
+       - randomInt(N) returns a random integer in the range 0 to (N-1). randomInt(N,M)
+       returns a random integer in the inclusive range N to M.
+
+       - toSource(obj) tries to convert obj to a JS source representation.
+       
     */
     QScriptEngine * createScriptEngine( QObject * parent = 0 );
 
@@ -501,6 +543,7 @@ namespace qboard {
     public Q_SLOTS:
         /** A text/experiment function. */
 	void foo();
+
 	/**
 	   Returns a stringified form of this object's
 	   QVariant. String string will be the same as it is when a
