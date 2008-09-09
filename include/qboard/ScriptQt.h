@@ -269,6 +269,8 @@ namespace qboard {
 
        - toSource(obj) tries to convert obj to a JS source representation.
        
+       - include(file1[,fileN]) evalutes the given file(s) as JS code. The return value
+       is that from the last include. En Error object is thrown on error.
     */
     QScriptEngine * createScriptEngine( QObject * parent = 0 );
 
@@ -642,9 +644,17 @@ namespace qboard {
 
        Note that object-to-source conversions are quite imperfect.
        Basic values, objects, and arrays are handled, but
-       some cases are currently problematic (notably the lack
-       of correct handling for circular object references
-       and functions of any type).
+       some cases are currently problematic.
+
+       Known problem cases are:
+
+       - Functions of any type are not handled (replaced by null).
+
+       - Circular object references are not handled (replaced by null).
+
+       - It is not fully re-entrant for the case of JS Objects, and the
+       catching of circular object refs can fail if it is run from two threads
+       at once, both of which reference the same object(s).
 
        Given the limitations, this support is best reserved for
        debugging purposes, and not data serialization or object
