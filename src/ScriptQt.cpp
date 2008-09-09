@@ -34,6 +34,7 @@
 
 Q_DECLARE_METATYPE(QList<QGraphicsItem*>)
 Q_DECLARE_METATYPE(QVariant)
+//Q_DECLARE_METATYPE(QPoint)
 
 namespace qboard {
 
@@ -180,7 +181,9 @@ namespace qboard {
     }
 
 
-
+    /**
+       Internal helper to get proper numeric types for some algos.
+    */
     template <typename PT>
     struct point_valtype
     {
@@ -223,13 +226,11 @@ namespace qboard {
 	if( args.isArray() ||
 	    ! args.property("length").isUndefined() )
 	{
-	    if(0) qDebug() << "qpointFromScriptValue(): args smells like an array";
 	    x = value_type(args.property(0).toNumber());
 	    y = value_type(args.property(1).toNumber());
 	}
 	else
 	{
-	    if(0) qDebug() << "qpointFromScriptValue(): args doesn't smell like an array";
 	    x = value_type(args.property("x").toNumber());
 	    y = value_type(args.property("y").toNumber());
 	}
@@ -663,6 +664,13 @@ namespace qboard {
 	glob.setProperty("QSizeF", js->newFunction(QSize_ctor<QSizeF>));
 	glob.setProperty("QPoint", js->newFunction(QPoint_ctor<QPoint>));
 	glob.setProperty("QPointF", js->newFunction(QPoint_ctor<QPointF>));
+
+#if 0
+	// If i do this then JS-side QPoint(x,y) no longer works. :(
+	qScriptRegisterMetaType(js,
+				qboard::toScriptValue<QPoint>,
+				qboard::fromScriptValue<QPoint> );
+#endif
 
 	glob.setProperty("alert",
 			 js->newFunction(js_alert),
