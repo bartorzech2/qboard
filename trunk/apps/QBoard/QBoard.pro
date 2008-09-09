@@ -27,7 +27,7 @@ unix:contains(QMAKE_CXX,g++){
   warning("We're not under g++, which means i don't know the linker args to export your app symbols!")
 }
 
-QT += script svg
+QT += svg
 QMAKE_CXXFLAGS = $$QBOARD_CXXFLAGS
 
 
