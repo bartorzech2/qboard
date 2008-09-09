@@ -483,6 +483,12 @@ namespace qboard {
 	*/
 	bool isValid() const;
 
+	/**
+	   Returns the current argument position, starting at 0 and
+	   incremented by the ++ operators.
+	*/
+	int at() const;
+
     private:
 	QScriptContext * m_cx;
 	int m_at;
