@@ -190,8 +190,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    delete eng;
     delete app;
-
     return EXIT_SUCCESS;
 }
