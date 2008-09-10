@@ -397,6 +397,7 @@ void QGIDot::contextMenuEvent( QGraphicsSceneContextMenuEvent * ev )
 
     if( impl->inLine )
     {
+	m->addSeparator();
 	QMenu * mL = impl->inLine->createLineMenu();
 	m->addMenu(mL);
 	mL->setTitle("Incoming line");
@@ -406,6 +407,9 @@ void QGIDot::contextMenuEvent( QGraphicsSceneContextMenuEvent * ev )
 	pn.setPen( impl->inLine->pen() );
 	pn.drawLine( QLineF(0,0,16,16) );
 	mL->setIcon( QIcon(px) );
+	m->addAction(QIcon(":/QBoard/icon/editcopy.png"),
+		     "Clone with line",
+		     this, SLOT(cloneWithLine()));
     }
 
 
@@ -421,6 +425,24 @@ void QGIDot::contextMenuEvent( QGraphicsSceneContextMenuEvent * ev )
     // We REALLY want to set (impl->active=false) here, BUT we might have just
     // been deleted by the menu handler! Setting it before exec() doesn't
     // work because of the event ordering.
+}
+
+void QGIDot::cloneWithLine()
+{
+    if( ! impl->inLine ) return;
+    QGIDotLine * line = static_cast<QGIDotLine*>( impl->inLine->clone() );
+    QGraphicsItem * lp = impl->inLine->parentItem();
+    if( lp && (QGITypes::QGIDot == lp->type()) )
+    {
+	line->setSourceNode( impl->inLine->impl->src );
+    }
+    else
+    {
+	delete line; // otherwise we end up leaking it
+    }
+    QGIDot * dot = static_cast<QGIDot*>( line->impl->dest );
+    QPointF mypos( this->pos() );
+    dot->setPos( mypos + QPointF( impl->radius /2, impl->radius /2) );
 }
 
 void QGIDot::split()
