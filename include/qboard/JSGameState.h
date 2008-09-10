@@ -16,8 +16,22 @@
 #include <QObject>
 #include <QScriptable>
 #include <QScriptValue>
+#include <qboard/ScriptQt.h>
+
 class QGraphicsItem;
 class GameState;
+class QBoardView;
+
+namespace qboard {
+
+    template <>
+    struct convert_script_value_f<QBoardView*>
+    {
+	QScriptValue operator()( QScriptEngine *, QBoardView * const & r) const;
+	QBoardView * operator()( QScriptEngine *, const QScriptValue & args) const;
+    };
+}
+
 /**
    JSGameState is a JS-side prototype for use as
    a script-side base type of GameState objects.
@@ -31,7 +45,7 @@ public:
     virtual ~JSGameState();
 
     Q_INVOKABLE QList<QGraphicsItem*> items();
-
+    Q_INVOKABLE QString home() const;
 public Q_SLOTS:
     void bogo();
 
@@ -105,9 +119,11 @@ public Q_SLOTS:
        If props.isObject() is true then this->props(object,props)
        is called to set the properties of the new object.
     */
-    //QObject *
     QScriptValue
     createObject( QString const & className, QScriptValue const & props = QScriptValue() );
+
+    //QBoardView * createView();
+    QScriptValue createView();
 
 private:
     struct Impl;

@@ -13,6 +13,8 @@
 
 #include <qboard/JSGameState.h>
 #include <qboard/GameState.h>
+#include <qboard/QBoardView.h>
+
 #include <QDebug>
 #include <QScriptValue>
 #include <QScriptEngine>
@@ -21,6 +23,23 @@
 
 #include <qboard/ScriptQt.h>
 #include <qboard/JSQGI.h>
+#include <qboard/utility.h>
+
+Q_DECLARE_METATYPE(QBoardView*);
+namespace qboard {
+    QScriptValue convert_script_value_f<QBoardView*>::operator()(QScriptEngine *eng,
+								 QBoardView * const & in) const
+    {
+	return eng->newQObject(in);
+    }
+
+    QBoardView * convert_script_value_f<QBoardView*>::operator()( QScriptEngine *,
+								 const QScriptValue & args ) const
+    {
+	return qobject_cast<QBoardView*>(args.toQObject());
+    }
+}
+
 
 #define SELF(RV) GameState *self = this->self(); \
     QScriptEngine * js = this->engine(); \
@@ -28,13 +47,9 @@
 
 struct JSGameState::Impl
 {
-    qboard::JSVariantPrototype * qvproto;
-    QScriptValue qvprotoj;
     qboard::JSQGI * qgiproto;
     QScriptValue qgiprotoj;
     Impl() :
-	qvproto(0),
-	qvprotoj(),
 	qgiproto(0),
 	qgiprotoj()
     {
@@ -56,6 +71,20 @@ JSGameState::~JSGameState()
     delete impl;
 }
 
+QString JSGameState::home() const
+{
+    return qboard::home().absolutePath();
+}
+
+
+//QBoardView *
+QScriptValue
+JSGameState::createView()
+{
+    SELF(QScriptValue());
+    return js->newQObject(new QBoardView(*self),
+			  QScriptEngine::ScriptOwnership);
+}
 void JSGameState::bogo()
 {
     qDebug() << "JSGameState::bogo(): self =="<<this->self();
@@ -73,12 +102,9 @@ bool JSGameState::load( QString const & fn )
 
 GameState * JSGameState::self()
 {
-    if( (!impl->qvproto) || (!this->engine()) )
+    if( ! this->engine() ) return 0;
+    if( (!impl->qgiproto) )
     {
-	impl->qvproto = new qboard::JSVariantPrototype(this);
-	impl->qvprotoj = this->engine()->newQObject(impl->qvproto);
-	// not working for me for QVariant: this->engine()->setDefaultPrototype(qMetaTypeId<QVariant>(), impl->qvprotoj);
-
 	impl->qgiproto = new qboard::JSQGI(this);
 	impl->qgiprotoj = this->engine()->newQObject(impl->qgiproto);
     }

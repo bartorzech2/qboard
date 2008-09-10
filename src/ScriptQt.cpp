@@ -12,6 +12,7 @@
  */
 
 #include <qboard/ScriptQt.h>
+#include <qboard/QBoardView.h>
 #include <qboard/utility.h>
 
 #include <QPoint>
@@ -844,7 +845,9 @@ namespace qboard {
 	    JSVariantPrototype * proto = new JSVariantPrototype(js);
 	    // can't seem to tap in to the core QVariant prototypes... :(
 	    // js->setDefaultPrototype(qMetaTypeId<QVariant>(), js->newQObject(proto));
-	    glob.setProperty("JSVariantPrototype",js->newQObject(proto));
+	    glob.setProperty("JSVariantPrototype",
+			     js->newQObject(proto),
+			     QScriptValue::ReadOnly | QScriptValue::Undeletable );
 	}
 
 	glob.setProperty("QColor", js->newFunction(QColor_ctor));
