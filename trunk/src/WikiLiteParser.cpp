@@ -439,14 +439,15 @@ namespace qboard {
 	    {
 		state.flags += state_t::Bullet;
 	    }
-	    if( type != flag )
+	    //if( type != flag )
+	    if( !type )
 	    {
 		state.listTypes[++state.listDepth] = flag;
 		QString tag( QString("<%1 class='WLP'>").
 			     arg( Numbered ? "ol" : "ul" ) );
 		state.output( tag );
 	    }
-	    state.output( "<li class='WLP'>" );
+	    state.output( "<li>" );
 	}
     };
 #if 0
@@ -595,12 +596,6 @@ namespace qboard {
 	r_upper,
 	r_plus< r_alpha >
     > >
-// 	r_and< RL<
-// 	    r_and<RL< r_notat<r_blank>, r_notat< r_ch<']'> > > >,
-// 	    r_advance<1>
-// 	> >
-// 	>
-// 	> >
     {};
 
     struct r_wikiurl : r_and<RL<
@@ -731,10 +726,6 @@ namespace qboard {
 	    > >
     {};
 
-//     struct r_td :
-// 	r_action< r_tbar, a_tag<state_t::TD> >
-//     {};
-
     struct r_table_part : r_or< RL<
 	r_action<r_table_close, a_table_close >,
 	r_action<r_table_eol, a_table_eol >,
@@ -743,8 +734,67 @@ namespace qboard {
     > >
     {};
 
-
-
+//     struct a_list_close
+//     {
+// 	static void matched( parser_state &,
+// 			     const std::string &,
+// 			     state_t & state )
+// 	{
+// 	    char const * tag = (state.flags & state_t::UList)
+// 		? "</ul>\n"
+// 		: "</ol>\n";
+// 	    state.output( tag );
+// 	    state.flags &= ~state_t::UList;
+// 	    state.flags &= ~state_t::OList;
+// 	}
+//     };
+//     struct r_list_close
+//     {
+// 	typedef r_list_close type;
+// 	template <typename ClientState>
+// 	inline static bool matches( parser_state & ps, ClientState & state )
+// 	{
+// 	    if( ! (state.flags & (state_t::UList | state_t::OList)) ) return false;
+// 	    // This typedef completely hoses automatic indentation in xemacs:
+// 	    typedef r_and< RL< r_crnl, r_notat<r_and< RL<
+// 	        r_plus< r_repeat<r_blank,2> >, r_opt<r_blank>,r_or< RL< r_ch<'*'>, r_ch<'#'> > >
+// 		> > >
+// 		> > TheRule;
+//             return TheRule::matches( ps, state );
+//         }
+//     };
+// #if 0
+//     struct a_list_open
+//     {
+// 	static void matched( parser_state &,
+// 			     const std::string &,
+// 			     state_t & state )
+// 	{
+// 	    char const tag = (state.flags & state_t::UList)
+// 		? "</ul>\n"
+// 		: "</ol>\n";
+// 	    state.output( tag );
+// 	    state.flags &= ~state_t::UList;
+// 	    state.flags &= ~state_t::OList;
+// 	}
+//     };
+//     template <bool Numbered>
+//     struct r_list_open :
+// 	r_and< RL<
+// 	r_crnl,
+// 	r_plus< r_repeat<r_blank,2> >,
+// 	r_opt<r_blank>,
+// 	r_ch<Numbered ? '*' : '#'>
+// 	r_star<r_blank>
+// 	> >
+//     {};
+//     struct r_list_part : r_or< RL<
+// 	r_action<r_list_close, a_list_close>,
+// 	r_action<r_list_open, a_list_open>,
+// 	r_action<r_list_eol, a_list_eol >
+// 	> >
+//     {};
+// #endif
     struct r_markup
 	: r_or< RL< r_table_part,
 		    r_inlinable,
