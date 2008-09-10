@@ -12,6 +12,8 @@
  */
 
 #include <qboard/ScriptQt.h>
+#include <qboard/utility.h>
+
 #include <QPoint>
 #include <QSize>
 #include <QColor>
@@ -747,28 +749,76 @@ namespace qboard {
 	return QScriptValue(eng, rc);
     }
 
-    static QScriptValue js_include(QScriptContext *ctx, QScriptEngine *eng)
+    PathFinder & includePath()
     {
-	ScriptArgv av(ctx);
-	if( ! av.argc() ) return eng->evaluate(QString("throw new Error('include() cannot be called without parameters');"));
-	QScriptValue ret = eng->nullValue();
-	while( av.isValid() )
+	static PathFinder bob;
+	if( bob.empty() )
 	{
-	    //qDebug() << "js_include() trying arg #"<<av.at()<<"of"<<av.argc();
-	    QScriptValue fnv( av++ );
-	    QString fn( fnv.toString() );
-	    QString contents;
-	    QFile scriptFile(fn);
-	    if (!scriptFile.open(QIODevice::ReadOnly))
-	    {
-		QString msg = QString("include() could not open file \"%1\"").arg(fn);
-		ret = eng->evaluate(QString("throw new Error('%1')").arg(msg));
-		break;
-	    }
+	    bob.addPrefix( QString("%1/QBoard/js/").
+			   arg(qboard::home().absolutePath()),
+			   false );
+	    //bob.addSuffix( ".js" );
+	}
+	return bob;
+    }
+
+    QScriptValue jsInclude( QScriptEngine * eng,
+			     QString const & _fn )
+    {
+	QString fn( includePath().find( _fn ) );
+	QScriptContext * ctx = eng->currentContext();
+	if( fn.isEmpty() )
+	{
+	    QString msg = QString("include() could not find file \"%1\"").arg(_fn);
+	    return ctx->throwError(QScriptContext::URIError, msg );
+	}
+	QFile scriptFile(fn);
+	if (!scriptFile.open(QIODevice::ReadOnly))
+	{
+	    QString msg = QString("include() could not open file \"%1\"").arg(fn);
+	    return ctx->throwError(QScriptContext::URIError, msg );
+	}
+	QString contents;
+	{
 	    QTextStream stream(&scriptFile);
 	    contents = stream.readAll();
 	    scriptFile.close();
+	}
+	QScriptValue actObj( eng->globalObject() );
+	QScriptValue oldFile = actObj.property("__FILE__");
+	actObj.setProperty("__FILE__",QScriptValue(eng,fn));
+	QScriptValue ret;
+	try
+	{
 	    ret = eng->evaluate( contents, fn );
+	}
+	catch(std::exception const &ex)
+	{
+	    ret = ctx->throwError( QScriptContext::UnknownError,
+				   QString("include() threw a native exception: %1").
+				   arg(ex.what()) );
+	}
+	catch(...)
+	{
+	    ret = ctx->throwError( QScriptContext::UnknownError,
+				   QString("include() threw an unknown native exception.") );
+	}
+	actObj.setProperty("__FILE__",oldFile);
+	return ret;
+    }
+
+
+    static QScriptValue js_include2(QScriptContext *ctx, QScriptEngine *eng)
+    {
+
+	ScriptArgv av(ctx);
+	if( ! av.argc() ) return ctx->throwError(QScriptContext::RangeError,
+						 QString("include() cannot be called without parameters"));
+	QScriptValue ret = eng->nullValue();
+	while( av.isValid() )
+	{
+	    //qDebug() << "js_include2() trying arg #"<<av.at()<<"of"<<av.argc();
+	    ret = jsInclude( eng, (av++).toString() );
 	    if( ret.isError() || eng->hasUncaughtException() ) break;
 	}
 	return ret;
@@ -819,7 +869,7 @@ namespace qboard {
 			 js->newFunction(js_confirm),
 			 QScriptValue::ReadOnly | QScriptValue::Undeletable );
 	glob.setProperty("include",
-			 js->newFunction(js_include),
+			 js->newFunction(js_include2),
 			 QScriptValue::ReadOnly | QScriptValue::Undeletable );
 	glob.setProperty("randomInt",
 			 js->newFunction(js_randomInt),

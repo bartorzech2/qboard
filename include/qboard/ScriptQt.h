@@ -29,7 +29,7 @@ class QScriptContext;
 #include <QList>
 class QGraphicsItem;
 class QGraphicsScene;
-
+#include <qboard/PathFinder.h>
 
 namespace qboard {
 
@@ -269,10 +269,24 @@ namespace qboard {
 
        - toSource(obj) tries to convert obj to a JS source representation.
        
-       - include(file1[,fileN]) evalutes the given file(s) as JS code. The return value
-       is that from the last include. En Error object is thrown on error.
+       - include(file1[,fileN]) evalutes the given file(s) as JS code.
+       See jsInclude() for details.
     */
     QScriptEngine * createScriptEngine( QObject * parent = 0 );
+
+    /**
+       Searches includesPath() to find the given file. If found, it is
+       evaluated as JS code and the result of the eval is returned.
+       If it is not found or cannot be read, or throws an error, an
+       error object is returned.
+
+       The code is evaluated in the global scope.
+
+       Included files have access to the variable __FILE__ to get
+       their absolute file name.
+    */
+    QScriptValue jsInclude( QScriptEngine *,
+			    QString const & file );
 
     /**
        ScriptPacket is intended to be a scriptable package of code for
@@ -882,6 +896,10 @@ namespace qboard {
     template <>
     struct to_source_f<bool> : to_source_f_pod {};
 
+    /**
+       Returns the path search object used by JS-side include().
+    */
+    PathFinder & includePath();
 
 } // namespace
 
