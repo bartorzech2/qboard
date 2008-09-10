@@ -36,6 +36,10 @@
 #include <qboard/JSGameState.h>
 #include <qboard/JSQGI.h>
 
+#define GAMESTATE_DOMETA_BOARDVIEW 1
+#if GAMESTATE_DOMETA_BOARDVIEW
+Q_DECLARE_METATYPE(QBoardView*)
+#endif // GAMESTATE_DOMETA_BOARDVIEW
 
 struct GameState::Impl
 {
@@ -175,6 +179,11 @@ GameState::~GameState()
 void GameState::setup()
 {
     impl->js = qboard::createScriptEngine(this);
+
+    qScriptRegisterMetaType(impl->js,
+			    qboard::toScriptValue<QBoardView*>,
+			    qboard::fromScriptValue<QBoardView*> );
+
     QScriptValue glob( impl->js->globalObject() );
 
     JSGameState * proto = new JSGameState(this);
