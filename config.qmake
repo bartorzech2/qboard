@@ -180,6 +180,7 @@ QBOARD_HEADERS_LIB = \
  $$H/MenuHandlerBoard.h \
  $$H/MenuHandlerGeneric.h \
  $$H/PieceAppearanceWidget.h \
+ $$H/PathFinder.h \
  $$H/PropObj.h \
  $$H/ScriptQt.h \
  $$H/QBoard.h \
@@ -209,6 +210,7 @@ QBOARD_SOURCES_LIB = \
  $$SRC_DIR/MenuHandlerBoard.cpp \
  $$SRC_DIR/MenuHandlerGeneric.cpp \
  $$SRC_DIR/PieceAppearanceWidget.cpp \
+ $$SRC_DIR/PathFinder.cpp \
  $$SRC_DIR/PropObj.cpp \
  $$SRC_DIR/ScriptQt.cpp \
  $$SRC_DIR/QBoard.cpp \
