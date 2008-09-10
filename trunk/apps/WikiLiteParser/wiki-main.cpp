@@ -3,13 +3,13 @@
 #define COUT std::cout << __FILE__ << ":" << std::dec << __LINE__ << " : "
 
 #include <qboard/WikiLiteParser.h>
-
 #include <QFile>
 #include <QByteArray>
 
 int main( int argc, char ** argv )
 {
     CERR << "main()\n";
+
     QString fn("/dev/stdin");
     if( argc > 1 )
     {
@@ -20,7 +20,7 @@ int main( int argc, char ** argv )
     QByteArray src( inf.readAll() );
     if( ! src.size() )
     {
-	CERR << "Source empty!";
+	CERR << "Source empty!\n";
 	return 1;
     }
     if( argc > 2 )
