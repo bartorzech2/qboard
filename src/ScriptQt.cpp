@@ -179,7 +179,6 @@ namespace qboard {
 	char const * opener = (isAr ? "[" : "{");
 	char const * closer = (isAr ? "]" : "}");
 	char const * sep = ",";
-	//str << opener;
 	buf.write(opener);
 	while( it.hasNext() )
 	{
@@ -203,8 +202,6 @@ namespace qboard {
 	buf.close();
 	scriptValList().removeAll(x);
 	QString ret(ba);
-	if(0) qDebug() << "to_source_f_object() returning:"<<ret
-		       << "\nbytecount="<<ba.count();
 	return ret;
     }
 
