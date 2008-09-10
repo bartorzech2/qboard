@@ -51,11 +51,14 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QStringList>
 #include <QtGui/QApplication>
+#include <QtCore/QDir>
 
 #include <stdlib.h>
 
 #include <qboard/GameState.h>
 #include <qboard/QBoardView.h>
+#include <qboard/ScriptQt.h>
+#include <qboard/utility.h>
 #include "Readline.hpp"
 
 static bool wantsToQuit;
@@ -104,8 +107,17 @@ static void interactive(QScriptEngine *eng)
             QScriptValue result = eng->evaluate(code, QLatin1String("typein"));
             code.clear();
             prompt = qscript_prompt;
-            if (! result.isUndefined())
+	    if( result.isError() )
+	    {
+		fprintf(stderr,"EXCEPTION: %s\n",qPrintable(result.toString()));
+		QStringList backtrace = eng->uncaughtExceptionBacktrace();
+		fprintf(stderr, "Backtrace:\n%s\n",
+			qPrintable(backtrace.join("\n")));
+	    }
+            else if (! result.isUndefined())
+	    {
                 fprintf(stderr, "%s\n", qPrintable(result.toString()));
+	    }
             if (wantsToQuit)
                 break;
         }
@@ -119,6 +131,7 @@ static QScriptValue importExtension(QScriptContext *context, QScriptEngine *engi
 
 int main(int argc, char *argv[])
 {
+    //QDir::setCurrent( qboard::home().absolutePath() );
     QApplication *app;
     if (argc >= 2 && !qstrcmp(argv[1], "-tty")) {
         ++argv;
@@ -131,8 +144,9 @@ int main(int argc, char *argv[])
     GameState gstate;
     QScriptEngine *eng = &gstate.jsEngine();
 
-    QScriptValue globalObject = eng->globalObject();
 
+    QScriptValue globalObject = eng->globalObject();
+    globalObject.setProperty("__FILE__", QScriptValue(eng,"stdin") );
     {
         if (!globalObject.property("qt").isObject())
             globalObject.setProperty("qt", eng->newObject());            
@@ -157,32 +171,16 @@ int main(int argc, char *argv[])
         QString contents;
         int lineNumber = 1;
 
+	QScriptValue r;
         if (fn == QLatin1String("-")) {
             QTextStream stream(stdin, QFile::ReadOnly);
             contents = stream.readAll();
+	    r = eng->evaluate(contents, fn, lineNumber);
         }
-
         else {
-            QFile file(fn);
-
-            if (file.open(QFile::ReadOnly)) {
-                QTextStream stream(&file);
-                contents = stream.readAll();
-                file.close();
-
-                // strip off #!/usr/bin/env qscript line
-                if (contents.startsWith("#!")) {
-                    contents.remove(0, contents.indexOf("\n"));
-                    ++lineNumber;
-                }
-            }
+	    r = qboard::jsInclude( eng, fn );
         }
-
-        if (contents.isEmpty())
-            continue;
-
-        QScriptValue r = eng->evaluate(contents, fn, lineNumber);
-        if (eng->hasUncaughtException()) {
+        if(r.isError()) {
             QStringList backtrace = eng->uncaughtExceptionBacktrace();
             fprintf (stderr, "JS exception:\n    %s\n%s\n\n", qPrintable(r.toString()),
                      qPrintable(backtrace.join("\n")));
