@@ -16,7 +16,7 @@ are at the top. Dates written extra large are release dates.
 
 *2008 Sept 9*
 
-- Minor improvements in the JS stuff, particularly in the handling of QPoint/QRect/QSize/QColor types.
+- Minor improvements in the JS stuff, particularly in the handling of QPoint/QRect/QSize/QColor types. Added JS-side include() to include other JS files.
 
 
 *2008 Sept 7*
