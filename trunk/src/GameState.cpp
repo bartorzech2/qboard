@@ -294,22 +294,7 @@ QScriptEngine & GameState::jsEngine() const
 
 QScriptValue GameState::evalScriptFile( QString const & fn )
 {
-    QFile scriptFile(fn);
-    QString sname;
-    QString contents;
-    if (!scriptFile.open(QIODevice::ReadOnly))
-    {
-	sname = QString("GameState::evalScriptFile(%1)").arg(fn);
-	contents = QString("new Error(\"GameState::evalScriptFile() could not open file [%1]\")").arg(fn);
-    }
-    else
-    {
-	sname = fn;
-	QTextStream stream(&scriptFile);
-	contents = stream.readAll();
-	scriptFile.close();
-    }
-    return impl->js->evaluate( contents, sname );
+    return qboard::jsInclude( impl->js, fn );
 }
 
 QGraphicsScene * GameState::scene()
