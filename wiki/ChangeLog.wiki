@@ -7,6 +7,13 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top. Dates written extra large are release dates.
 
 ----
+*2008 Sept 10*
+
+- QGIHider (covered pieces) can now be colored as one likes. They can't be rotated/scaled independently because doing so causes graphics artefacts when the items are uncovered.
+
+- When a QGIDot has been split into a line, a new menu option appears which allows one to clone the dot along with its incoming line (attached to the original parent dot).
+
+
 *2008 Sept 9*
 
 - Minor improvements in the JS stuff, particularly in the handling of QPoint/QRect/QSize/QColor types.
