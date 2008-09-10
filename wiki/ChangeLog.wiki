@@ -7,6 +7,11 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top. Dates written extra large are release dates.
 
 ----
+*2008 Sept 9*
+
+- Minor improvements in the JS stuff, particularly in the handling of QPoint/QRect/QSize/QColor types.
+
+
 *2008 Sept 7*
 
 - Fixed: line width property wasn't properly handled for QGIDots (bug introduced yesterday).
