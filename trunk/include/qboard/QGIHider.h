@@ -74,7 +74,6 @@ public:
 
     */
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    virtual bool event( QEvent * e );
 
     /**
        Creates a new hider for the given item. Ownership of qgi is
@@ -135,6 +134,8 @@ public Q_SLOTS:
     void unhideItems();
 
 protected:
+    virtual bool event( QEvent * e );
+
     virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent * event );
     /**
        Reimplemented to handle raise-on-click.
@@ -142,6 +143,9 @@ protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *ev);
 
 private:
+    void propertySet( char const *pname, QVariant const & var );
+    void refreshTransformation();
+
     /**
        Calls h->unhideItem() and calls h->deleteLater().
     */
