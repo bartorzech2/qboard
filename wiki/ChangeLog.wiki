@@ -11,6 +11,9 @@ are at the top. Dates written extra large are release dates.
 
 - Added full JS wrapper for the QBoardView type using about 90% generated code. This generator will make writing JS wrappers for the other QObject types significantly easier.
 
+- Holy cow - the downloads page says some 18 people have downloaded QBoard since yesterday, which probably means a link was posted somewhere.
+
+
 *2008 Sept 10*
 
 - QGIHider (covered pieces) can now be colored as one likes. They can't be rotated/scaled independently because doing so causes graphics artefacts when the items are uncovered.
