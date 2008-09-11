@@ -47,18 +47,29 @@ JSQGI::~JSQGI()
     delete impl;
 }
 
-QPointF JSQGI::pos()
+QScriptValue JSQGI::posXYZ()
 {
-    SELF(QPointF());
-    return self->pos();
+    SELF(QScriptValue());
+    QPointF p( self->pos() );
+    //QString("function(){ var x=new Object();x.x=%1;x.y=%2;x.z=%3;return x;}()").
+    return js->evaluate( QString("{x:%1,y:%2,z:%3}").
+			 arg(p.x()).
+			 arg(p.y()).
+			 arg(self->zValue()),
+			 "");
 }
 
 bool JSQGI::setParentItem( QGraphicsItem * p )
 {
-    if( ! p ) return false;
     SELF(false);
     self->setParentItem(p);
     return true;
+}
+
+void JSQGI::moveBy( qreal x, qreal y )
+{
+    SELF();
+    self->setPos( self->pos() + QPointF( x, y ) );
 }
 
 void JSQGI::move( QPointF const & p )

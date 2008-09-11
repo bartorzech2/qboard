@@ -117,6 +117,12 @@ namespace qboard {
 	SELF();
 	return self->setGLMode(b);
     }
+
+    QWidget * JSQBoardView::viewport()
+    {
+	SELF(0);
+	return self->viewport();
+    }
 #undef SELF
 #undef SELFQOBJ
 } // namespace

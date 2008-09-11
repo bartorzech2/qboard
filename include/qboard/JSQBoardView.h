@@ -81,6 +81,8 @@ namespace qboard {
         See QBoardView::setGLMode().
     */
     Q_INVOKABLE void setGLMode(bool);
+
+    Q_INVOKABLE QWidget * viewport();
     private:
 	struct Impl;
 	Impl * impl;
