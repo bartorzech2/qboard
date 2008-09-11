@@ -673,19 +673,7 @@ bool GameState::pasteClipboard( QPoint const & target )
 		}
 	    }
 	    newpos -= pD;
-
-#if 1	    
 	    qgi->setPos( newpos );
-#else
-	    if( QObject * qobj = dynamic_cast<QObject*>(*it) )
-	    {
-		qobj->setProperty( "pos", newpos );
-	    }
-	    else
-	    {
-		qgi->setPos( newpos );
-	    }
-#endif
 	    if(0) qDebug() << "qboard::pasteClipboard() adding Serializable QGI to scene:"
 			   << "newpos ="<<newpos
 			   << qgi;
