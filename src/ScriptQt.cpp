@@ -720,6 +720,18 @@ namespace qboard {
     */
     static QScriptValue js_randomInt(QScriptContext *ctx, QScriptEngine *eng)
     {
+	/**
+	   To consider:
+
+	   http://www.shawnolson.net/a/789/make-javascript-mathrandom-useful.html
+
+	   http://thepenry.net/jsrandom.php
+
+	   Math.floor(Math.random() * (max - min + 1) + min)
+
+	   to get numbers between min and max, inclusive.
+	*/
+
 	ScriptArgv av(ctx);
 	int low = 0;
 	int high = 0;
@@ -746,8 +758,17 @@ namespace qboard {
 	    qsrand( uint(static_cast<void*>(ctx)) );
 	}
 
+#if 1
 	int rc = ( qrand() % (high - low + 1) ) + low;
 	return QScriptValue(eng, rc);
+#else
+	// Always gives me the same results????
+	QString code = QString("Math.floor(Math.random() * (%1 - %2 + 1) + %3)").
+	    arg(high).
+	    arg(low).
+	    arg(low);
+	return eng->evaluate( code, "randomInt()" );
+#endif
     }
 
     PathFinder & includePath()
