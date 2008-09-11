@@ -25,22 +25,6 @@
 #include <qboard/JSQGI.h>
 #include <qboard/utility.h>
 
-Q_DECLARE_METATYPE(QBoardView*);
-namespace qboard {
-    QScriptValue convert_script_value_f<QBoardView*>::operator()(QScriptEngine *eng,
-								 QBoardView * const & in) const
-    {
-	return eng->newQObject(in);
-    }
-
-    QBoardView * convert_script_value_f<QBoardView*>::operator()( QScriptEngine *,
-								 const QScriptValue & args ) const
-    {
-	return qobject_cast<QBoardView*>(args.toQObject());
-    }
-}
-
-
 #define SELF(RV) GameState *self = this->self(); \
     QScriptEngine * js = this->engine(); \
     if(!self || !js) return RV;

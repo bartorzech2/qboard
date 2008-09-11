@@ -176,6 +176,7 @@ QBOARD_HEADERS_LIB = \
  $$H/GameState.h \
  $$H/GL.h \
  $$H/JSGameState.h \
+ $$H/JSQBoardView.h \
  $$H/JSQGI.h \
  $$H/MenuHandlerBoard.h \
  $$H/MenuHandlerGeneric.h \
@@ -200,33 +201,36 @@ QBOARD_HEADERS_LIB = \
  $$H/WikiLiteView.h
 H=
 
+S=$$SRC_DIR
 QBOARD_SOURCES_LIB = \
  $$QBOARD_SOURCES_QT44 \
  $$S11NQT_SOURCES \
- $$SRC_DIR/Dice.cpp \
- $$SRC_DIR/GameState.cpp \
- $$SRC_DIR/JSGameState.cpp \
- $$SRC_DIR/JSQGI.cpp \
- $$SRC_DIR/MenuHandlerBoard.cpp \
- $$SRC_DIR/MenuHandlerGeneric.cpp \
- $$SRC_DIR/PieceAppearanceWidget.cpp \
- $$SRC_DIR/PathFinder.cpp \
- $$SRC_DIR/PropObj.cpp \
- $$SRC_DIR/ScriptQt.cpp \
- $$SRC_DIR/QBoard.cpp \
- $$SRC_DIR/QBoardHomeView.cpp \
- $$SRC_DIR/QBoardPlugin.cpp \
- $$SRC_DIR/QBoardScene.cpp \
- $$SRC_DIR/QBoardView.cpp \
- $$SRC_DIR/QGIDot.cpp \
- $$SRC_DIR/QGIHider.cpp \
- $$SRC_DIR/QGIHtml.cpp \
- $$SRC_DIR/QGILine.cpp \
- $$SRC_DIR/QGIPiece.cpp \
- $$SRC_DIR/QGIPiecePlacemarker.cpp \
- $$SRC_DIR/utility.cpp \
- $$SRC_DIR/WikiLiteParser.cpp \
- $$SRC_DIR/WikiLiteView.cpp
+ $$S/Dice.cpp \
+ $$S/GameState.cpp \
+ $$S/JSGameState.cpp \
+ $$S/JSQBoardView.cpp \
+ $$S/JSQGI.cpp \
+ $$S/MenuHandlerBoard.cpp \
+ $$S/MenuHandlerGeneric.cpp \
+ $$S/PieceAppearanceWidget.cpp \
+ $$S/PathFinder.cpp \
+ $$S/PropObj.cpp \
+ $$S/ScriptQt.cpp \
+ $$S/QBoard.cpp \
+ $$S/QBoardHomeView.cpp \
+ $$S/QBoardPlugin.cpp \
+ $$S/QBoardScene.cpp \
+ $$S/QBoardView.cpp \
+ $$S/QGIDot.cpp \
+ $$S/QGIHider.cpp \
+ $$S/QGIHtml.cpp \
+ $$S/QGILine.cpp \
+ $$S/QGIPiece.cpp \
+ $$S/QGIPiecePlacemarker.cpp \
+ $$S/utility.cpp \
+ $$S/WikiLiteParser.cpp \
+ $$S/WikiLiteView.cpp
+S=
 QBOARD_OBJECTS_LIB =
 for(CPP, QBOARD_SOURCES_LIB){
   BASENAME = $$basename(CPP)
