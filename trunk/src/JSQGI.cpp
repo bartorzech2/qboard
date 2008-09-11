@@ -47,16 +47,15 @@ JSQGI::~JSQGI()
     delete impl;
 }
 
-QScriptValue JSQGI::posXYZ()
+QScriptValue JSQGI::posXY()
 {
     SELF(QScriptValue());
     QPointF p( self->pos() );
     //QString("function(){ var x=new Object();x.x=%1;x.y=%2;x.z=%3;return x;}()").
-    return js->evaluate( QString("{x:%1,y:%2,z:%3}").
+    return js->evaluate( QString("{x:%1,y:%2}").
 			 arg(p.x()).
-			 arg(p.y()).
-			 arg(self->zValue()),
-			 "");
+			 arg(p.y()),
+			 "JSQGI::posXY()");
 }
 
 bool JSQGI::setParentItem( QGraphicsItem * p )
@@ -66,10 +65,20 @@ bool JSQGI::setParentItem( QGraphicsItem * p )
     return true;
 }
 
-void JSQGI::moveBy( qreal x, qreal y )
+QGraphicsItem* JSQGI::parentItem()
+{
+    SELF(0);
+    return self->parentItem();
+}
+
+void JSQGI::moveBy( QPointF const & p )
 {
     SELF();
-    self->setPos( self->pos() + QPointF( x, y ) );
+    self->setPos( self->pos() + p );
+}
+void JSQGI::moveBy( qreal x, qreal y )
+{
+    this->moveBy(QPointF(x,y));
 }
 
 void JSQGI::move( QPointF const & p )
@@ -93,6 +102,18 @@ qreal JSQGI::posY()
     SELF(0.0);
     return self->pos().y();
 }
+
+void JSQGI::setZValue( qreal z)
+{
+    SELF();
+    self->setZValue(z);
+}
+qreal JSQGI::zValue()
+{
+    SELF(0.0);
+    return self->zValue();
+}
+
 QScriptValue JSQGI::prop(QString const & key)
 {
     char const * ckey = key.toAscii().constData();
