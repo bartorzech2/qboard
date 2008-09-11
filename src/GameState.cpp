@@ -35,6 +35,8 @@
 #include <qboard/QGIPiecePlacemarker.h>
 #include <qboard/JSGameState.h>
 #include <qboard/JSQGI.h>
+#include <qboard/QBoardView.h>
+#include <qboard/JSQBoardView.h>
 
 #define GAMESTATE_DOMETA_BOARDVIEW 1
 #if GAMESTATE_DOMETA_BOARDVIEW
@@ -186,12 +188,24 @@ void GameState::setup()
 
     QScriptValue glob( impl->js->globalObject() );
 
-    JSGameState * proto = new JSGameState(this);
-    impl->js->setDefaultPrototype(qMetaTypeId<GameState*>(),
-				  impl->js->newQObject(proto));
-    qboard::JSQGI * protoQGI = new qboard::JSQGI(this);
-    impl->js->setDefaultPrototype(qMetaTypeId<QGraphicsItem*>(),
-				  impl->js->newQObject(protoQGI));
+    {
+	JSGameState * proto = new JSGameState(this);
+	impl->js->setDefaultPrototype(qMetaTypeId<GameState*>(),
+				      impl->js->newQObject(proto));
+    
+    }
+    {
+	qboard::JSQGI * protoQGI = new qboard::JSQGI(this);
+	impl->js->setDefaultPrototype(qMetaTypeId<QGraphicsItem*>(),
+				      impl->js->newQObject(protoQGI));
+    }
+    {
+	qboard::JSQBoardView * proto = new qboard::JSQBoardView(impl->js);
+	QScriptValue protoj = impl->js->newQObject(proto);
+	impl->js->setDefaultPrototype(qMetaTypeId<QBoardView*>(),
+				      protoj );
+    }
+
 
     impl->jsThis = impl->js->newQObject( this,
 					 QScriptEngine::QtOwnership

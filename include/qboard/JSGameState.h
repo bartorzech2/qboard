@@ -22,15 +22,14 @@ class QGraphicsItem;
 class GameState;
 class QBoardView;
 
-namespace qboard {
-
-    template <>
-    struct convert_script_value_f<QBoardView*>
-    {
-	QScriptValue operator()( QScriptEngine *, QBoardView * const & r) const;
-	QBoardView * operator()( QScriptEngine *, const QScriptValue & args) const;
-    };
-}
+// namespace qboard {
+//     template <>
+//     struct convert_script_value_f<QBoardView*>
+//     {
+// 	QScriptValue operator()( QScriptEngine *, QBoardView * const & r) const;
+// 	QBoardView * operator()( QScriptEngine *, const QScriptValue & args) const;
+//     };
+// }
 
 /**
    JSGameState is a JS-side prototype for use as
