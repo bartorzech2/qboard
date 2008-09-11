@@ -59,7 +59,6 @@ while read RV FN PARAMS; do
     if [[ x1 = x${opt_header} ]]; then
 cat <<EOF
     /**
-        See ${class}::${FN}() here.
     */
     Q_INVOKABLE ${RV} ${FN}(${PARAMS});
 EOF
