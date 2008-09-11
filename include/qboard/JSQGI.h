@@ -29,24 +29,37 @@ public:
     JSQGI( QObject * parent = 0 );
     virtual ~JSQGI();
 
+    /**
+       Returns all children of this object which inherit both
+       QGraphicsItem and QObject.
+    */
     Q_INVOKABLE QList<QGraphicsItem*> childItems();
-
-
     /**
        Moves this object to the given coords.
     */
     Q_INVOKABLE void move( qreal x, qreal y );
-    Q_INVOKABLE void moveBy( qreal x, qreal y );
     /**
        Moves this object to the given coords.
     */
     Q_INVOKABLE void move( QPointF const & p );
+    /**
+       Moves the item by the given relative coordinates.
+    */
+    Q_INVOKABLE void moveBy( qreal x, qreal y );
+    /**
+       Moves the item by the given relative coordinates.
+    */
+    Q_INVOKABLE void moveBy( QPointF const & p );
 
     /**
        Returns the object's current X position, relative to its parent
        (if it has one) or its scene.
     */
     Q_INVOKABLE qreal posX();
+    /**
+       Returns the object's current Y position, relative to its parent
+       (if it has one) or its scene.
+    */
     Q_INVOKABLE qreal posY();
 
     /**
@@ -55,18 +68,28 @@ public:
 
        So it was renamed.
 
-       Returns the current position as a JS object {x:N,y:N,z:N}
+       Returns the current position as a JS object {x:N,y:N}
 
        This value can, in turn, be passed to the QPoint or QPointF
        constructor in JS code, e.g.:
 
        \code
-       var pos = someItem.posXYZ();
+       var pos = someItem.posXY();
        pos.x = pos.x + 20;
        someItem.prop('pos',QPoint(pos));
        \endcode
     */
-    Q_INVOKABLE QScriptValue posXYZ();
+    Q_INVOKABLE QScriptValue posXY();
+
+    /**
+       Returns the object's current z-level value.
+    */
+    Q_INVOKABLE qreal zValue();
+
+    /**
+       Sets the object's current z-level value.
+    */
+    void setZValue( qreal );
 
     /**
        Returns the value of the given property.
@@ -86,6 +109,12 @@ public:
        an underlying QGraphicsItem.
     */
     Q_INVOKABLE bool setParentItem( QGraphicsItem * p );
+
+    /**
+       Returns this object's parent item, or 0 if it is top-level or
+       has not yet been added to a scene or parent.
+    */
+    Q_INVOKABLE QGraphicsItem * parentItem();
 
 Q_SIGNALS:
     void doubleClicked(QGraphicsItem*);
