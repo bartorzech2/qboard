@@ -19,7 +19,7 @@ test x = "${class}x" && usage
 
 echo "Creating QScript prototype and support code. It will not compile as-is. See the comments for details."
 
-jsproto="JS${class}Prototype"
+jsproto="JS${class}"
 NS=qboard
 
 cpp=${jsproto}.cpp
