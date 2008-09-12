@@ -121,7 +121,10 @@ public Q_SLOTS:
     QScriptValue
     createObject( QString const & className, QScriptValue const & props = QScriptValue() );
 
-    //QBoardView * createView();
+    /**
+       Creates a new QBoardView object, which is owned by the
+       underlying scripting engine.
+    */
     QScriptValue createView();
 
 private:
