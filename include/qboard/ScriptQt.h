@@ -662,13 +662,14 @@ namespace qboard {
 
        Known problem cases are:
 
-       - Functions of any type are not handled (replaced by null).
+       - Native functions can of course not be converted to source code.
 
        - Circular object references are not handled (replaced by null).
 
-       - It is not fully re-entrant for the case of JS Objects, and the
-       catching of circular object refs can fail if it is run from two threads
-       at once, both of which reference the same object(s).
+       - It is not fully re-entrant for the case of crawling JS Object
+	references, and the catching of circular object refs can fail
+	if it is run from two threads at once, both of which reference
+	the same object(s).
 
        Given the limitations, this support is best reserved for
        debugging purposes, and not data serialization or object

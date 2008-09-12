@@ -165,7 +165,7 @@ namespace qboard {
     {
 	if( ! x.isObject() ) return QString("undefined"); // should we return an empty string?
 	if( x.isNull() ) return QString("null");
-	if( x.isFunction() ) return QString("('[toSource() cannot handle functions]',null)");
+	if( x.isFunction() ) return x.toString(); // QString("('[toSource() cannot handle functions]',null)");
 	if( scriptValList().contains(x) )
 	{
 	    return QString("('[toSource() skipping circular object reference!]',null)");
