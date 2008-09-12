@@ -109,8 +109,8 @@ static void interactive(QScriptEngine *eng)
             prompt = qscript_prompt;
 	    if( result.isError() )
 	    {
-		fprintf(stderr,"EXCEPTION: %s\n",qPrintable(result.toString()));
 		QStringList backtrace = eng->uncaughtExceptionBacktrace();
+		fprintf(stderr,"EXCEPTION: %s\n",qPrintable(result.toString()));
 		fprintf(stderr, "Backtrace:\n%s\n",
 			qPrintable(backtrace.join("\n")));
 	    }
