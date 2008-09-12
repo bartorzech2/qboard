@@ -24,10 +24,12 @@
 #include <qboard/S11nQt/S11nClipboard.h>
 #include <qboard/MenuHandlerGeneric.h>
 #include <qboard/PropObj.h>
+
+#include <qboard/S11nQt/QGraphicsItem.h>
 #include <qboard/S11nQt/QPointF.h>
 #include <qboard/S11nQt/QPoint.h>
 #include <qboard/S11nQt/QPen.h>
-#include <qboard/S11nQt/QGraphicsItem.h>
+#include <qboard/S11nQt/QTransform.h>
 
 #include <algorithm>
 #include <cstdlib>
@@ -354,7 +356,7 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	}
 	else if( var.canConvert<QString>() )
 	{
-	    QString fname( var.toString() );
+	    QString fname( qboard::homeRelative(var.toString()) );
 	    if( pix.load( fname ) )
 	    {
 		this->setProperty("size",pix.size());
@@ -613,29 +615,38 @@ bool QGIPiece::serialize( S11nNode & dest ) const
 	    return false;
 	}
     }
+    const QTransform tra( this->transform() );
+    if( ! tra.isIdentity() )
+    {
+        s11n::serialize_subnode( dest, "transform", tra );
+    }
+
     // EVIL KLUDGE: we must ensure that our 'pos' property is set
     // properly. We must violate constness to do so or use a proxy
     // object :/
     PropObj props;
+#if 0
     qboard::copyProperties( this, &props );
 #if 1
     QStringList no;
     no << "alpha"
+       << "angle"
        << "color"
        << "borderColor"
        << "borderSize"
        << "borderStyle"
        << "borderAlpha"
+       << "scale"
 	;
     foreach( QString k, no )
     {
 	props.setProperty(k.toAscii().constData(), QVariant());
     }
 #endif
-    // i can't get the QColor alpha property to serialize (it's as if... well, no...)
-    // so we save the alpha properties separately.
-//     props.setProperty("alpha", impl->pen.color().alpha());
-//     props.setProperty("borderAlpha", impl->penB.color().alpha());
+#endif
+#define DO(K){ QVariant v( this->property(# K) ); if(v.isValid()) props.setProperty(# K,v); }
+    DO(size);
+    DO(pixmap)
     props.setProperty("pos", this->pos() );
     props.setProperty("zLevel", this->zValue() );
     return s11n::serialize_subnode( dest,"props", props )
@@ -654,13 +665,25 @@ bool QGIPiece::deserialize( S11nNode const & src )
     {
 	typedef QList<QGraphicsItem *> QGIL;
 	QGIL childs;
-	    if( -1 == s11n::qt::deserializeQGIList<Serializable>( *ch,
-								  childs,
-								  this,
-								  QGraphicsItem::ItemIsMovable ) )
-	    {
-		return false;
-	    }
+	if( -1 == s11n::qt::deserializeQGIList<Serializable>( *ch,
+							      childs,
+							      this
+							      //QGraphicsItem::ItemIsMovable
+							      ) )
+	{
+	    return false;
+	}
+    }
+    {
+	/**
+	   If "transform" entry is missing (i.e. was the Identity
+	   Transformation, which we don't bother serializing), then
+	   deser will fail, in which case we get an Identity
+	   transform, which is what we want by default.
+	*/
+	QTransform tr;
+	s11n::deserialize_subnode( src, "transform", tr );
+	this->setTransform(tr);
     }
     ch = s11n::find_child_by_name(src, "pen");
     if( ch )
