@@ -41,6 +41,9 @@ While the source is essentially platform-independent...
 
 There are known problems when trying to link libs11n as a DLL on Windows. The libs will build, but loading s11n files won't work. (It's a long, sad story involving exportation of DLL symbols.) The only known workaround on Windows platforms is to link the s11n object files (from `s11n/*.cpp`) into the application directly, without using a DLL. If i can get access to a Windows machine with Cygwin (or similar) on it, i'll work on testing/fixing the build to accommodate this.
 
+*Big tips:* if you try to build it on Windows, make sure you enable the "keep unreferenced data" option (it is off by default, AFAIK). It is critical for the deserialization classloader to function properly (so, e.g. pasting won't work without it). In MSVC this is `/OPT:NOREF`. Also make sure to turn OFF precompiled headers - they won't work with this template-heavy code.
+
+
 = And now what? =
 
 Now see [HOWTOGettingStarted].
