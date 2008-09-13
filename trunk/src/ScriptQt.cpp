@@ -15,6 +15,7 @@
 #include <qboard/QBoardView.h>
 #include <qboard/utility.h>
 
+#include <QApplication>
 #include <QPoint>
 #include <QSize>
 #include <QColor>
@@ -37,6 +38,13 @@
 
 Q_DECLARE_METATYPE(QList<QGraphicsItem*>)
 Q_DECLARE_METATYPE(QVariant)
+
+#if 0
+extern void com_trolltech_qt_core_ScriptPlugin(const QString &key, QScriptEngine *engine);
+extern void com_trolltech_qt_gui_ScriptPlugin(const QString &key, QScriptEngine *engine);
+// extern void com_trolltech_qt_network_ScriptPlugin(const QString &key, QScriptEngine *engine);
+extern void com_trolltech_qt_uitools_ScriptPlugin(const QString &key, QScriptEngine *engine);
+#endif
 
 /**
    An unfortunate kludge, this is used by QList<QScriptValue>::find().
@@ -846,20 +854,64 @@ namespace qboard {
 	return ret;
     }
 
+    QScriptValue js_importExtension(QScriptContext *context, QScriptEngine *engine)
+    {
+	return engine->importExtension(context->argument(0).toString());
+    }
+
+
     QScriptEngine * createScriptEngine( QObject * parent )
     {
+	static bool inited = false;
+	if( ! inited )
+	{
+	    inited = true;
+	    QStringList paths = qApp->libraryPaths();
+	    QDir qhome( qboard::home() );
+	    paths <<  QString("%1/QBoard/plugins").arg(qhome.absolutePath());
+	    qApp->setLibraryPaths(paths);
+	}
 	QScriptEngine * js = new QScriptEngine( parent );
 	QScriptValue glob( js->globalObject() );
 
+	{
+		glob.setProperty("qt", js->newObject());
+		glob.property("qt").setProperty("app", js->newQObject(QApplication::instance()) );
+		QScriptValue qscript = js->newObject();
+		qscript.setProperty("importExtension", js->newFunction(js_importExtension));
+		glob.property("qt").setProperty("script", qscript);
+	}
+
+#if 1
+	/**
+	   HUGE KLUDGE while i try to import more official Qt bindings.
+	   This mess instantiates certain templates which otherwise don't
+	   get instantiated and therefor don't get put into our library. :(
+	*/
+	{
+	    QScriptValue kludge;
+#define INST(T) kludge = toScriptValue( js, T() ); T tmp##T( fromScriptValue<T>(js,QScriptValue(kludge)) );
+	    INST(QPoint);
+	    INST(QPointF);
+	    INST(QRect);
+	    INST(QRectF);
+	    INST(QSize);
+	    INST(QSizeF);
+	    INST(QColor);
+#undef INST
+	}
+#endif // instantiation kludge
+
+	qScriptRegisterMetaType(js, 
+				qboard::toScriptValue<QList<QGraphicsItem*> >,
+				qboard::fromScriptValue<QList<QGraphicsItem*> > );
+#if 1
 	qScriptRegisterMetaType<QGraphicsItem*>(js,
 						qboard::toScriptValue<QGraphicsItem*>,
 						qboard::fromScriptValue<QGraphicsItem*> );
 	qScriptRegisterMetaType(js,
 				qboard::toScriptValue<QGraphicsScene*>,
 				qboard::fromScriptValue<QGraphicsScene*> );
-	qScriptRegisterMetaType(js, 
-				qboard::toScriptValue<QList<QGraphicsItem*> >,
-				qboard::fromScriptValue<QList<QGraphicsItem*> > );
 
 	if(1)
 	{
@@ -878,12 +930,6 @@ namespace qboard {
 	glob.setProperty("QSizeF", js->newFunction(QSize_ctor<QSizeF>));
 	glob.setProperty("QPoint", js->newFunction(QPoint_ctor<QPoint>));
 	glob.setProperty("QPointF", js->newFunction(QPoint_ctor<QPointF>));
-
-#if 0
-	// If i do this then JS-side QPoint(x,y) no longer works. :(
-	qScriptRegisterMetaType(js,
-				qboard::toScriptValue<QPoint>,
-				qboard::fromScriptValue<QPoint> );
 #endif
 
 	glob.setProperty("alert",
