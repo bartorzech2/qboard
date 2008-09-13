@@ -17,5 +17,5 @@ for( MODULE, BINDINGS_TO_BUILD ){
 
 unix{
   # Only build this if you have libreadline dev files installed:
-  SUBDIRS += qs_eval
+  # SUBDIRS += qs_eval
 }
