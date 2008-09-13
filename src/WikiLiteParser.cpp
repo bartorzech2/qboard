@@ -172,13 +172,20 @@ namespace qboard {
     struct a_tag
     {
 	static void matched( parser_state &,
-			     const std::string &,
+			     const std::string &m,
 			     state_t & state )
 	{
 	    char const * tag = 0;
 	    bool doclose = (state.flags & tagFlag);
 	    bool doopen = !doclose;
 	    QString style(" class='WLP'" );
+	    if( (state.flags & state_t::FixedFont)
+		&& (tagFlag != state_t::FixedFont) )
+	    {
+		state.output(m.c_str());
+		return; // disable tags in FixedFont mode
+	    }
+
 	    switch( tagFlag )
 	    {
 	      case state_t::Bold: tag = "strong"; break;
@@ -489,7 +496,7 @@ namespace qboard {
     {};
 
     struct r_fixed
-	: r_action< r_ch<96>, a_tag<state_t::FixedFont> >
+	: r_action< r_ch<'`'>, a_tag<state_t::FixedFont> >
     {};
 
     struct r_superscript :
@@ -511,13 +518,14 @@ namespace qboard {
     {};
 
     struct r_fontmod :
-	r_or< RL< r_header,
-		  r_bold,
-		  r_italics,
-		  r_fixed,
-		  r_superscript,
-		  r_subscript,
-		  r_strike > >
+	r_or< RL<
+	    r_fixed, // must come first b/c it has special handling of some tags
+	    r_header,
+	    r_bold,
+	    r_italics,
+	    r_superscript,
+	    r_subscript,
+	    r_strike > >
     {};
 
     struct r_hr : r_action< r_repeat< r_ch<'-'>, 4>,
