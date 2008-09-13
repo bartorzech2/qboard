@@ -1,6 +1,8 @@
 #summary Scripting QBoard with JavaScript
 #labels Docs-User,Featured
 
+*Achtung: this is no longer current since experimentation with the [QtScriptBindings] started (20080913).*
+
 See also: [JSSnippets]
 
 = Introduction =
