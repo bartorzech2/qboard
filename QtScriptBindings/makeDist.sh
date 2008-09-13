@@ -26,6 +26,8 @@ for d in $sdirs; do
 	-name '*.h' \
 	-o -name '*.?pp' \
 	-o -name '*.pr?' \
+	-o -name '*.js' \
+	-o -name '*.qs' \
 	-o -name '*.qmake' \
 	| sed -e '/\/bak/d' \
 	-e '/\/nono/d' \
@@ -49,6 +51,7 @@ if [[ -e doc ]]; then
 else
     echo "NOT INCLUDING DOCS in dist! To get them, copy the qtscriptgenerator doc dir here."
 fi
+cp -rp examples $DEST
 
 cp README.txt \
     LICENSE.GPL? \
@@ -57,7 +60,7 @@ cp README.txt \
     $DEST
 
 echo "Removing a few unwanted files..."
-find $DEST -name 'qrc_*.cpp' | xargs rm -f
+find $DEST -name 'qrc_*.cpp' -o -name '*~' | xargs rm -f
 find $DEST -name nono -o -name release -o -name debug | xargs rm -fr
 find $DEST -name  debug -o -name release | xargs rm -fr
 
