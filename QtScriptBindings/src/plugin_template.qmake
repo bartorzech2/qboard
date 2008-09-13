@@ -1,0 +1,35 @@
+message(PLUGIN_NAME=$${PLUGIN_NAME})
+!exists($${PLUGIN_NAME}/main.cpp){
+	error("main.cpp not found");
+}
+#!include(config.qmake){
+#	error("Could not include config.qmake!");
+#}
+CONFIG += plugin
+contains(QT_VERSION, /^4\.[123]\..+/ ){
+  error("Sorry, This code requires Qt version 4.4+, but you *seem* to have version $${QT_VERSION}");
+}
+
+QMAKE_CXXFLAGS += -I..
+TEMPLATE = lib
+OBJECTS_DIR = obj
+TARGET = $$qtLibraryTarget(QtScript_$${PLUGIN_NAME})
+DESTDIR = $${PWD}/../build/plugins/script
+message(TARGET=$${TARGET})
+PRI=$${PLUGIN_NAME}/$${PLUGIN_NAME}.pri
+!include($${PRI}){
+	error(Could not include .pri file $${PRI})
+}
+SOURCES += main.cpp
+#contains(PLUGIN_NAME,com_trolltech_qt_uitools){
+#  QMAKE_LIBS += -lQtUiTools
+#}
+########################################################################
+# Work around the fact the the generated code inconsistently uses
+# (or doesn't use) the <QtXXX/...> prefixes on #includes:
+QMAKE_CXXFLAGS += -I$${QMAKE_INCDIR_QT}
+
+#contains(PLUGIN_NAME,com_trolltech_qt_network){
+#  QMAKE_CXXFLAGS += -I$${QMAKE_INCDIR_QT}/QtNetwork # on my box this isn't added automatically
+#  message("Adding QtNetwork inc dir kludge: $${QMAKE_CXXFLAGS}")
+#}
