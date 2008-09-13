@@ -14,3 +14,8 @@ BINDINGS_TO_BUILD += xmlpatterns
 for( MODULE, BINDINGS_TO_BUILD ){
   SUBDIRS += com_trolltech_qt_$${MODULE}
 }
+
+unix{
+  # Only build this if you have libreadline dev files installed:
+  SUBDIRS += qs_eval
+}
