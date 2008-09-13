@@ -32,6 +32,22 @@ That will build several .so files to:
 
      build/plugins/script
 
+IF you have GNU Readline development files installed, edit src/src.pro
+and uncomment the line which adds the subdir 'qs_eval'. That will build
+a small console application which you can use to run the examples
+in examples/*.qs, e.g.:
+
+  ~> cd examples
+  ~> ../src/qs_eval/qs_eval AnalogClock.qs
+
+qs_eval automatically imports all extensions (or at least the ones
+which will load on my box). Unfortunately, qs_eval hard-codes the
+plugin paths and needs to stay in the directory it was built in.
+
+
+========================================================================
+Installing
+
 To install the libraries and use them from your Qt apps you
 have a couple options:
 
@@ -98,7 +114,7 @@ i distribute this code but did not write it. i cannot offer support
 for any of it.
 
 As of this writing (Sept 13, 2008) i have only tried a few of the JS
-bindings. The ones i tried seemed to work as expected, with the
-exception that there seems to be no way to write output to a JS-side
-QFile object. i'm sure any such shortcomings will be remedied as the
-Qt Script Generator matures.
+bindings. The ones i tried seemed to mostly work as expected, but some
+of the example code (under examples/*.qs) contains some comments about
+workaround for broken bindings. i'm sure any such shortcomings will be
+remedied as the Qt Script Generator matures.
