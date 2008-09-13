@@ -3,7 +3,7 @@
 
 = Qt Script Generator =
 
-Achtung: this support requires Qt 4.4+. It won't work with Qt 4.3.x and earlier.
+Achtung: this support requires Qt 4.4.1+. It won't work with Qt 4.4.0 and earlier.
 
 As of 20080913, worked started on support for the Qt/JS bindings being created by the Qt Script Generator project:
 
