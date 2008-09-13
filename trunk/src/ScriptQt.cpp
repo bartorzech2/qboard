@@ -787,7 +787,8 @@ namespace qboard {
 	    bob.addPrefix( QString("%1/QBoard/js/").
 			   arg(qboard::home().absolutePath()),
 			   false );
-	    //bob.addSuffix( ".js" );
+	    bob.addSuffix( ".qs" );
+	    bob.addSuffix( ".js" );
 	}
 	return bob;
     }
@@ -875,11 +876,14 @@ namespace qboard {
 	QScriptValue glob( js->globalObject() );
 
 	{
-		glob.setProperty("qt", js->newObject());
-		glob.property("qt").setProperty("app", js->newQObject(QApplication::instance()) );
-		QScriptValue qscript = js->newObject();
-		qscript.setProperty("importExtension", js->newFunction(js_importExtension));
-		glob.property("qt").setProperty("script", qscript);
+	    QScriptValue qtj = js->newObject();
+	    glob.setProperty("qt", qtj);
+	    QScriptValue qappj = js->newQObject(QApplication::instance());
+	    qtj.setProperty("app", qappj );
+	    glob.setProperty("qApp", qappj );
+	    QScriptValue qscript = js->newObject();
+	    qscript.setProperty("importExtension", js->newFunction(js_importExtension));
+	    qtj.setProperty("script", qscript);
 	}
 
 #if 1
