@@ -9,11 +9,11 @@ are at the top. Dates written extra large are release dates.
 ----
 *2008 Sept 13*
 
-- Managed to get the Qt Script Generator working and generated JS bindings for nearly the whole Qt API. It doesn't all work, but the basic stuff seems to. HOWEVER... those bits require Qt 4.4 and will be available as a separate download at some point. Because i have no desire to somehow back-port megs of generated code to Qt4.3, only the most basic scripting features will available to QBoard built with Qt4.3, as opposed to Qt4.4.
-The Qt Script Generator is available from:
+- Managed to get the Qt Script Generator working and generated JS bindings for a significant portion of the Qt API. It doesn't all work, but the basic stuff seems to. HOWEVER... those bits require Qt 4.4 and will be available as a separate download at some point. Because i have no desire to somehow back-port some 14MB of generated code to Qt4.3, only the most basic scripting features will available to QBoard built with Qt4.3, as opposed to Qt4.4. The Qt Script Generator itself is available from:
 
   http://labs.trolltech.com/page/Projects/QtScript/Generator
 
+or check the downloads page for pre-generated copies of the bindings, reading for building as a Qt plugin.
 
 *2008 Sept 11*
 
