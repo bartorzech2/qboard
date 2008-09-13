@@ -9,20 +9,24 @@ As of 20080913, worked started on support for the Qt/JS bindings being created b
 
 http://labs.trolltech.com/page/Projects/QtScript/Generator
 
-to simplify QBoard development using those generated bindings, we have pre-generated copies of the bindings in the QBoard source tree, and available as a download on the Downloads page. This copy will be kept reasonably up to date with whatever is in the Qt Script Generator source repository. This copy contains no changes, just a simplified build process over the original (because the .cpp files are already generated).
+to simplify QBoard development using those generated bindings, we have pre-generated copies of the bindings in the QBoard source repository, and available as a download on the Downloads page. Because it takes so long to build, it is not part of the core QBoard deliverable, but is available separately on the downloads page. This copy will be kept reasonably up to date with whatever is in the Qt Script Generator source repository. This copy contains no changes, just a simplified build process over the original (because the .cpp files are already generated).
 
 The current (Sept 13 2008) status of the bindings seems to be:
 
-  * Nearly all of the Qt API is covered, available for calling via JS scripts!
+  * A huge portion of the Qt API is covered, available for calling via JS scripts!
   * Not all of it works _quite_ right. A great deal does work, however, and will allow us to write all kinds of functionality in JS code instead of C++.
 
 These bindings are much, much more powerful and complete than anything i could dream of coding up, so they will eventually replace some of the Qt/JS bindings QBoard has already (at the cost of having to sacrifice some features when QBoard is built under Qt 4.3).
+
+= Downloading =
+
+Follow the download link at the top of this page and look for `QtScriptBindings-*.tar.bz2`.
 
 = JS bindings API documentation =
 
 To get the complete JS-side API docs, see `doc/index.html` in the downloadable package.
 
-= Using this from QBoard =
+= Using this stuff from QBoard =
 
 If you build the bindings code (as explained in the included README file), you can use the bindings in QBoard (version 20080913+) by puting the binding DLL files (`libqtscript_*.so`) in your QBoard home dir, under `QBoard/plugins/script`. Then you can access them from JS code:
 
