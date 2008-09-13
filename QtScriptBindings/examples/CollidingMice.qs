@@ -189,6 +189,8 @@ function CollidingMice(parent) {
 
     for (var i = 0; i < CollidingMice.MOUSE_COUNT; ++i) {
         var mouse = new Mouse(this);
+	mouse.setFlag( QGraphicsItem.ItemIsMovable, true );
+	mouse.setFlag( QGraphicsItem.ItemIsSelectable, true );
         mouse.setPos(Math.sin((i * 6.28) / CollidingMice.MOUSE_COUNT) * 200,
                      Math.cos((i * 6.28) / CollidingMice.MOUSE_COUNT) * 200);
         scene.addItem(mouse);
