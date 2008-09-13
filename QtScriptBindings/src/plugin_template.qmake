@@ -13,7 +13,7 @@ contains(QT_VERSION, /^4\.[123]\..+/ ){
 QMAKE_CXXFLAGS += -I..
 TEMPLATE = lib
 OBJECTS_DIR = obj
-TARGET = $$qtLibraryTarget(QtScript_$${PLUGIN_NAME})
+TARGET = $$qtLibraryTarget(qtscript_$$replace(PLUGIN_NAME,com_trolltech_qt_,))
 DESTDIR = $${PWD}/../build/plugins/script
 message(TARGET=$${TARGET})
 PRI=$${PLUGIN_NAME}/$${PLUGIN_NAME}.pri
