@@ -1,0 +1,104 @@
+This distribution contains pre-generated Qt/JavaScript bindings
+for a large set of the Qt API. It was generated using the
+Qt Script Generator:
+
+   http://labs.trolltech.com/page/Projects/QtScript/Generator
+
+This code is distributed primarily for use with the QBoard project
+(http://code.google.com/p/qboard), but is distributed independently
+in the hopes that it might be useful to others.
+
+License: Same as Qt Open Source Edition (GPLv2 or GPLv3)
+
+Requirements: Qt 4.4+ development environment (qmake, headers, libs)
+
+========================================================================
+Configuring it:
+
+By default the build process will try to build all available bindings.
+If you want to limit what modules are built (e.g. if your Qt doesn't
+have OpenGL or WebKit support), edit src/src.pro and comment out or
+remove the appropriate lines.
+
+========================================================================
+Building it:
+
+   ~> qmake
+   ~> make
+
+Go get some coffee. That'll take a bit.
+
+That will build several .so files to:
+
+     build/plugins/script
+
+To install the libraries and use them from your Qt apps you
+have a couple options:
+
+1) Copy them under QT_DIR/plugins/script
+
+2) Copy them to DIR_OF_YOUR_CHOICE/plugins/scripts then add
+DIR_OF_YOUR_CHOICE/plugins (without the '/scripts' suffix) to the Qt
+library path from C++ code like so:
+
+    QStringList paths = qApp->libraryPaths();
+    paths <<  QString("DIR_OF_YOUR_CHOICE/plugins");
+    qApp->setLibraryPaths(paths);
+
+
+Then call:
+
+     QScriptEngine * js = ...;
+     js->importExtension(XXX);
+
+where XXX is one of the following strings:
+
+      qt.core: the core Qt types
+      qt.gui: the widgets and QGraphics stuff
+      qt.network
+      qt.opengl
+      qt.sql
+      qt.svg
+      qt.uitools
+      qt.webkit
+      qt.xml
+      qt.xmlpatterns
+
+Alternately, you can add an importExtension() function to JS with
+a little bit of work:
+
+
+  static QScriptValue
+  js_importExtension(QScriptContext *context, QScriptEngine *engine)
+  {
+      return engine->importExtension(context->argument(0).toString());
+  }
+
+  // Now define that function for JS:
+
+  glob.setProperty("qt", js->newObject());
+  glob.property("qt").
+	setProperty("app", js->newQObject(QApplication::instance()) );
+  QScriptValue qscript = js->newObject();
+  qscript.setProperty("importExtension", js->newFunction(js_importExtension));
+  glob.property("qt").setProperty("script", qscript);
+
+
+Now call the following JS code to import the extension:
+
+
+  qt.script.importExtension("qt.core");
+  qt.script.importExtension("qt.gui");
+  ...
+
+========================================================================
+NOTES:
+
+i distribute this code but did not write it. i cannot offer support
+for any of it.
+
+As of this writing (Sept 13, 2008) i have only tried a few of the JS
+bindings. The ones i tried seemed to work as expected, with the
+exception that there seems to be no way to write output to a JS-side
+QFile object. i'm sure any such shortcomings will be remedied as the
+Qt Script Generator matures.
