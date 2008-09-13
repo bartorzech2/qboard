@@ -357,6 +357,7 @@ namespace qboard {
 	    {
 		if(1) qDebug() << (copy?"copy":"cut")<<"handler cannot handle non-Serializables."
 			       << "Skipping object "<<*it;
+		continue;
 	    }
 	    //if(0) qDebug() <<"qboard::clipboardScene() marking for "<<(copy?"COPY":"CUT") << *it;
 	    seritems.push_back(ser);
