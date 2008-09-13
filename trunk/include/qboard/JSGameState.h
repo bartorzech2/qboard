@@ -127,6 +127,12 @@ public Q_SLOTS:
     */
     QScriptValue createView();
 
+    /**
+       Adds the given item to the scene, transfering ownership
+       to the scene.
+    */
+    void addItem( QGraphicsItem * item );
+
 private:
     struct Impl;
     Impl * impl;
