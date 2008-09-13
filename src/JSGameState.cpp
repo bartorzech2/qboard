@@ -153,6 +153,11 @@ bool JSGameState::props( QObject * tgt, QScriptValue const & props )
     }
     return true;
 }
+void JSGameState::addItem( QGraphicsItem * it )
+{
+    SELF();
+    self->addItem(it);
+}
 
 //QObject *
 QScriptValue
