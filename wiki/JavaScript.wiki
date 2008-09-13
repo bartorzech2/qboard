@@ -1,7 +1,7 @@
 #summary Scripting QBoard with JavaScript
 #labels Docs-User,Featured
 
-*Achtung: this is no longer current since experimentation with the [QtScriptBindings] started (20080913).*
+*Achtung: this is no longer current since experimentation with the [QtScriptBindings] started (20080913). Don't use the JS bindings at all in versions newer than 20080913 until this notice is gone.*
 
 See also: [JSSnippets]
 
