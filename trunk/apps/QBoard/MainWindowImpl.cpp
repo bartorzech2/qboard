@@ -196,6 +196,7 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	    QScriptValue jo = js.newQObject( impl->gv, QScriptEngine::QtOwnership );
 	    QScriptValue qb = js.globalObject().property("qboard");
 	    qb.setProperty("view",jo);
+	    qb.setProperty("window",js.newQObject(this, QScriptEngine::QtOwnership ) );
 	}
 
 	this->resize(760,600);
