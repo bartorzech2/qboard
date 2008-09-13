@@ -124,11 +124,6 @@ static void interactive(QScriptEngine *eng)
     }
 }
 
-static QScriptValue importExtension(QScriptContext *context, QScriptEngine *engine)
-{
-    return engine->importExtension(context->argument(0).toString());
-}
-
 int main(int argc, char *argv[])
 {
     //QDir::setCurrent( qboard::home().absolutePath() );
@@ -144,16 +139,32 @@ int main(int argc, char *argv[])
     GameState gstate;
     QScriptEngine *eng = &gstate.jsEngine();
 
+    QStringList paths = app->libraryPaths();
+    QDir qhome( qboard::home() );
+    paths <<  QString("%1/QBoard/plugins").arg(qhome.absolutePath());
+    app->setLibraryPaths(paths);
+#if 1
+    QScriptValue impv;
+#define IMP(M) impv=eng->importExtension(# M); \
+    if(impv.isError()) {\
+	qDebug() << "Error importing module"<<# M<<":"<<impv.toString(); \
+	if(0) return 1;							\
+    }
+//     IMP(qt.core);
+//     IMP(qt.gui);
+//     IMP(qt.xml);
+//     IMP(qt.svg);
+//     IMP(qt.network);
+//     IMP(qt.sql);
+//     IMP(qt.opengl);
+//     IMP(qt.webkit);
+//     IMP(qt.xmlpatterns);
+//     IMP(qt.uitools);
+#undef IMP
+#endif
 
     QScriptValue globalObject = eng->globalObject();
     globalObject.setProperty("__FILE__", QScriptValue(eng,"stdin") );
-    {
-        if (!globalObject.property("qt").isObject())
-            globalObject.setProperty("qt", eng->newObject());            
-        QScriptValue qscript = eng->newObject();
-        qscript.setProperty("importExtension", eng->newFunction(importExtension));
-        globalObject.property("qt").setProperty("script", qscript);
-    }
 
     if (! *++argv) {
         interactive(eng);
