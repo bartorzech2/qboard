@@ -36,15 +36,10 @@
 #include <QBuffer>
 #include <QDateTime>
 
+#include <ctime>
+
 Q_DECLARE_METATYPE(QList<QGraphicsItem*>)
 Q_DECLARE_METATYPE(QVariant)
-
-#if 0
-extern void com_trolltech_qt_core_ScriptPlugin(const QString &key, QScriptEngine *engine);
-extern void com_trolltech_qt_gui_ScriptPlugin(const QString &key, QScriptEngine *engine);
-// extern void com_trolltech_qt_network_ScriptPlugin(const QString &key, QScriptEngine *engine);
-extern void com_trolltech_qt_uitools_ScriptPlugin(const QString &key, QScriptEngine *engine);
-#endif
 
 /**
    An unfortunate kludge, this is used by QList<QScriptValue>::find().
@@ -612,7 +607,7 @@ namespace qboard {
     {
 	QScriptValue ar = eng->newArray();
 	unsigned int ndx = 0;
-	foreach( QGraphicsItem * gi, in )
+	Q_FOREACH( QGraphicsItem * gi, in )
 	{
 	    QScriptValue o = eng->toScriptValue(gi);
 	    if( o.isObject() )
@@ -884,6 +879,7 @@ namespace qboard {
 	static bool inited = false;
 	if( ! inited )
 	{
+	    qsrand( ::time(0) ); // QtScript Math.random() appears to need this
 	    inited = true;
 	    QStringList paths = qApp->libraryPaths();
 	    QDir qhome( qboard::home() );
@@ -910,7 +906,7 @@ namespace qboard {
 	    ext << "qt.core"
 		<< "qt.gui"
 		;
-	    foreach( QString e, ext )
+	    Q_FOREACH( QString e, ext )
 	    {
 		QScriptValue rc( js->importExtension( e ) );
 		if( rc.isError() )

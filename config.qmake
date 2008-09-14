@@ -54,7 +54,7 @@ REL_SRCDIR = $$(PWD)
 REL_SRCDIR=$$replace(REL_SRCDIR,$$TOP_SRCDIR/,)
 REL_SRCDIR=$$replace(REL_SRCDIR,[^/]+,..)
 
-CONFIG += warn_on debug
+CONFIG += warn_on debug no_keywords
 
 VERSION = $$QBOARD_VERSION
 message(QBoard version $$QBOARD_VERSION)

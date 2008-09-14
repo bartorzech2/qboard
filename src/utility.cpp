@@ -217,7 +217,7 @@ namespace qboard {
 
     void destroyQGIList( QList<QGraphicsItem *> const & li )
     {
-	foreach( QGraphicsItem * it, li )
+	Q_FOREACH( QGraphicsItem * it, li )
 	{
 	    delete it;
 	}

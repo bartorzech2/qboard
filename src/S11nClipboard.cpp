@@ -15,6 +15,11 @@
 #include <sstream>
 #include <QClipboard>
 #include <QApplication>
+
+#ifndef Q_EMIT
+#  define Q_EMIT
+#endif
+
 S11nClipboard::S11nClipboard() : m_node(0)
 {
     this->syncFromQt();

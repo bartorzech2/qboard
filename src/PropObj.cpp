@@ -30,6 +30,11 @@
 #include <qboard/utility.h>
 #include <qboard/S11nQt.h>
 
+// Qt bug? Q_EMIT is never getting defined for me
+#ifndef Q_EMIT
+#define Q_EMIT
+#endif
+
 PropObj::PropObj() : QObject(),
 		     Serializable("PropObj")
 {

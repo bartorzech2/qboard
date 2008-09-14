@@ -116,8 +116,8 @@ PathFinder::find( QString const & baseName,
     QStringList suffix( impl->suffix );
     prefix.push_front("");
     suffix.push_front("");
-    foreach( QString pre, prefix ){
-	foreach( QString suf, suffix )
+    Q_FOREACH( QString pre, prefix ){
+	Q_FOREACH( QString suf, suffix )
 	{
 	    QString fn = pre + baseName + suf;
 	    //qDebug() << "PathFinder::find() trying:"<<fn;
