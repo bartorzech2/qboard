@@ -26,7 +26,7 @@ Going ahead and doing a release because:
 
   http://labs.trolltech.com/page/Projects/QtScript/Generator
 
-or check the downloads page for pre-generated copies of the bindings, reading for building as a Qt plugin.
+or check the downloads page for pre-generated copies of the bindings, read for building as a Qt plugin.
 
 *2008 Sept 11*
 
