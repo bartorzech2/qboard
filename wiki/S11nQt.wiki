@@ -79,7 +79,13 @@ if( var.canConvert<VariantS11n>() )
 }
 }}}
 
-= Serializing QObjects, QWidgets, etc. =
+= Notable limitations =
+
+The Qt API has a number of useful types which we would like to be able to serialize, but cannot because they lack accessors and/or mutators for certain information. The notable example which comes to mind is QRegion, from which we can extract all data, but have no way of restoring it (the API is missing a setter or two). QIcon has similar problems. Other types, like QImage, could be serialized but it would be horribly, horribly inefficient to do so with s11n, so we don't bother.
+
+See below for limitations regarding...
+
+== Serializing QObjects, QWidgets, etc. ==
 
 S11nQt doesn't have routines for directly serializing QObject trees, but:
 
