@@ -30,7 +30,7 @@
 #include <QtGui/QApplication>
 
 #include <stdlib.h>
-#include "Readline.hpp"
+#include "../readline/Readline.hpp"
 
 static bool wantsToQuit;
 
@@ -168,8 +168,9 @@ int main(int argc, char *argv[])
     IMP(qt.sql);
     IMP(qt.opengl);
     IMP(qt.webkit);
-//     IMP(qt.xmlpatterns);
+//     IMP(qt.xmlpatterns); // won't load for me.
     IMP(qt.uitools);
+    IMP(readline);
 #undef IMP
 
     globalObject.setProperty("qApp", eng->newQObject(app));

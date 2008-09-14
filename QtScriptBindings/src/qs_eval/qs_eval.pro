@@ -6,7 +6,7 @@ mac:CONFIG -= app_bundle
 
 SOURCES = \
 	main.cpp \
-	Readline.cpp
+	../readline/Readline.cpp
 
 ########################################################################
 # See ../QBoard/QBoard.pro for why this wickedness exists...
