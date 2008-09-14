@@ -108,6 +108,15 @@ Now call the following JS code to import the extension:
   ...
 
 ========================================================================
+EXTRA STUFF
+
+Aside from the Qt API bindings, there might be some other plugins
+i've written, adapted, or downright stolen:
+
+     src/readline contains a GNU Readline-ish plugin. See the README
+     in that directory for details.
+
+========================================================================
 NOTES:
 
 i distribute this code but did not write it. i cannot offer support
