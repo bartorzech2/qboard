@@ -9,7 +9,7 @@ As of 20080913, worked started on support for the Qt/JS bindings being created b
 
 http://labs.trolltech.com/page/Projects/QtScript/Generator
 
-to simplify QBoard development using those generated bindings, we have pre-generated copies of the bindings in the QBoard source repository, and available as a download on the Downloads page (look for `QtScriptBindings-*.tar.bz2`). This copy will be kept reasonably up to date with whatever is in the Qt Script Generator source repository. This copy contains no changes, just a simplified build process over the original (because the .cpp files are already generated).
+to simplify QBoard development using those generated bindings, we have pre-generated copies of the bindings in the QBoard source repository, and available as a download on the Downloads page (look for `QtScriptBindings-*.tar.bz2`). This copy will be kept reasonably up to date with whatever is in the Qt Script Generator source repository. This copy contains no changes, just a simplified build process over the original (because the .cpp files are already generated). It also contains a few bits i've hacked together, which aren't part of the Qt API bindings but are QtScript plugins.
 
 The current (Sept 13 2008) status of the bindings seems to be:
 
