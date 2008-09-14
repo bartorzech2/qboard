@@ -7,6 +7,17 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top. Dates written extra large are release dates.
 
 ----
+== *2008 Sept 14* ==
+
+Going ahead and doing a release because:
+
+- My RSI is acting up from all the typing the past weeks (during the days at work, and 8-10 hours/night at home). i don't know if i'll be able to code much the next few weeks.
+
+- The app essentially does everything i want it to do. Most of what i want to do now is refinement.
+
+- The JS bindings need some re-thought, and i think i'm going to strip out the current work and start from scratch on those, basing the bindings off of the work from the Qt Script Generator project. That will take more time than i can currently commit to, though.
+
+
 *2008 Sept 13*
 
 - Fixed: wiki parser now disables other inlined markup inside of a `TT block`, like Google Code does.
