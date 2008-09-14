@@ -88,7 +88,7 @@ static void interactive(QScriptEngine *eng)
 
     QString code;
 
-    forever {
+    Q_FOREVER {
 	std::string rline;
 	bool breakout = false;
 	rline = rl.readline( prompt, breakout );
