@@ -95,3 +95,7 @@ S11nQt doesn't have routines for directly serializing QObject trees, but:
 It might be possible to de/serialize signal/slot connections by introducing another pass to the serialization process, where we tag all related objects, add that tag info to their serialized output, and re-build the connections from those tags during deserialization. Signals and slots are internally referred to by their stringified names, so that's not the problem. It's finding the correct object to reconnect to at deserialization time, that's the problem.
 
 That said, it is possible (and trivial) to serialize QObject trees, and QBoard does so in several places.
+
+= Why not use Qt's built-in QDataStream serialization? =
+
+Much of the Qt API supports i/o operators for QDataStream, which can be used to de/serialize Qt-native objects. Why should one not use that for long-term storage? Because it's a proprietary binary format, not something one can re-use. The QDataStream approach is useful for IPC and such, but proprietary binary formats are not generically suitable for long-term storage of application data, IMO.
