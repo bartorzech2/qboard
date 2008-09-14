@@ -29,13 +29,14 @@
 #include <QPointF>
 #include <QMenu>
 #include <QEvent>
-
 #include <cmath> // acos()
 
 #include <qboard/S11nQt/QBrush.h>
 #include <qboard/S11nQt/QPen.h>
 #include <qboard/S11nQt/QPointF.h>
 #include <qboard/S11nQt/QGraphicsItem.h>
+
+Q_DECLARE_METATYPE(QGIDot*)
 
 struct QGIDot::Impl
 {

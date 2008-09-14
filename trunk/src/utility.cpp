@@ -174,6 +174,12 @@ namespace qboard {
 		//qDebug() << "qboard::destroyToplevelItems(QList) skipping parented item.";
 		continue;
 	    }
+	    sc = (*it)->scene();
+	    if( sc )
+	    {
+		if(0) qDebug() << "qboard::destroyToplevelItems(QList) asking Scene to remove *it:"<<*it;
+		sc->removeItem(*it);
+	    }
 #if 1 // i don't like this, but it avoids some crashes!
 	    if( QObject * obj = dynamic_cast<QObject*>(*it) )
 	    { // kludge to help avoid stepping on self during Destroy/Delete actions
@@ -182,12 +188,6 @@ namespace qboard {
 	    }
 	    else
 	    {
-		sc = (*it)->scene();
-		if( sc )
-		{
-		    if(0) qDebug() << "qboard::destroyToplevelItems(QList) asking Scene to remove *it:"<<*it;
-		    sc->removeItem(*it);
-		}
 		if(0) qDebug() << "qboard::destroyToplevelItems(QList) delete *it:" <<*it;
 		delete *it;
 	    }
@@ -351,7 +351,6 @@ namespace qboard {
 	{
 	    if( (*it)->parentItem() ) continue;
 	    //if(0) qDebug() <<"qboard::clipboardScene() marking " << *it;
-	    if( !copy ) toCut.push_back(*it); // FIXME? only cut serializables?
 	    Serializable * ser = dynamic_cast<Serializable*>(*it);
 	    if( ! ser )
 	    {
@@ -359,6 +358,7 @@ namespace qboard {
 			       << "Skipping object "<<*it;
 		continue;
 	    }
+	    if( !copy ) toCut.push_back(*it); // FIXME? only cut serializables?
 	    //if(0) qDebug() <<"qboard::clipboardScene() marking for "<<(copy?"COPY":"CUT") << *it;
 	    seritems.push_back(ser);
 	}

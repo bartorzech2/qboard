@@ -50,6 +50,8 @@
 #include <qboard/QBoardDocsBrowser.h>
 #endif
 
+#include <qboard/ScriptQt.h>
+
 #define QBOARD_MAINWINDOW_PERSISTENCE_CLASS "MainWindow"
 
 struct MainWindowImpl::Impl
@@ -336,31 +338,12 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 	    v->parseFile(fn);
 	    win->setWindowTitle( v->windowTitle() );
 	}
-	else if( QRegExp("\\.js$",Qt::CaseInsensitive).indexIn(fn) > 0 )
+	else if( QRegExp("\\.[jq]s$",Qt::CaseInsensitive).indexIn(fn) > 0 )
 	{
 	    QScriptEngine & js( impl->gstate.jsEngine() );
 	    qDebug() << "[ running script"<<fn<<"]";
-	    QScriptValue rv;
-	    {
-		QFile scriptFile(fn);
-		if (!scriptFile.open(QIODevice::ReadOnly))
-		{
-		    QString msg = QString("MainWindowImpl::loadFile(%1)").arg(fn);
-		    QMessageBox::warning( this, "Open failed",
-					  msg,
-					  QMessageBox::Ok, QMessageBox::Ok );
-		    return false;
-		}
-		QTextStream stream(&scriptFile);
-		QString contents = stream.readAll();
-		scriptFile.close();
-		rv = js.evaluate(contents,qboard::homeRelative(fn) );
-	    }
-#if QT_VERSION >= 0x040400
+	    QScriptValue rv = qboard::jsInclude( &js, fn );
 	    if( rv.isError() )
-#else
-	    if( js.hasUncaughtException() ) // in Qt 4.4.1 this fails!
-#endif
 	    {
 		QStringList bt( js.uncaughtExceptionBacktrace() );
 		QScriptValue exv = rv.isError() ? rv : js.uncaughtException();
@@ -371,7 +354,7 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 		QMessageBox::warning( this, "JavaScript Exception",
 				      msg,
 				      QMessageBox::Ok, QMessageBox::Ok );
-		return false;
+		worked = false;
 	    }
 	    else
 	    {

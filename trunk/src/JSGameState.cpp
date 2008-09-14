@@ -87,11 +87,26 @@ bool JSGameState::load( QString const & fn )
 GameState * JSGameState::self()
 {
     if( ! this->engine() ) return 0;
+#if 0
     if( (!impl->qgiproto) )
     {
+	// FIXME: we only need one proto per engine
 	impl->qgiproto = new qboard::JSQGI(this);
 	impl->qgiprotoj = this->engine()->newQObject(impl->qgiproto);
+#if 0
+	QScriptValue qgip = this->engine()->defaultPrototype( qMetaTypeId<QGraphicsItem*>() );
+	if( qgip.isValid() )
+	{
+	    qDebug() << "JSGameState::self() found default QGraphicsItem prototype.";
+	    impl->qgiprotoj.setPrototype( qgip );
+	}
+	else
+	{
+	    impl->qgiprotoj = this->engine()->newQObject(impl->qgiproto);
+	}
+#endif
     }
+#endif
     GameState * s = qscriptvalue_cast<GameState*>(thisObject());
     if( ! s )
     {
@@ -164,7 +179,6 @@ QScriptValue
 JSGameState::createObject( QString const & className,
 				     QScriptValue const & props )
 {
-    //QObject * dflt;
     QScriptValue dflt;
     SELF(dflt);
     // FIXME: try loading via Qt's metatype system if s11n::cl fails.
@@ -185,18 +199,55 @@ JSGameState::createObject( QString const & className,
     {
 	this->props( o, props );
     }
-    QScriptValue jo = js->newQObject(o); //,QScriptEngine::AutoOwnership);
+    QScriptValue jo = js->newQObject(o);//,QScriptEngine::ScriptOwnership);
     QGraphicsItem * git = dynamic_cast<QGraphicsItem*>(s);
     if( git )
     {
-	self->addItem(git);
-	if(0) qDebug() << "JSGameState::createObject("<<className<<"): setting prototype to JSQGI.";
+// 	QObject oldprops;
+// 	qboard::copyProperties(this,&oldprops);
+// 	qboard::clearProperties(this);
+ 	QVariant posval( o->property("pos") );
+ 	if( posval.isValid() )
+ 	{
+ 	    // Kludge to appease qt.gui bindings. If we don't
+	    // do this then the 'pos' property overwrites
+	    // the pos() function. :(
+ 	    o->setProperty("pos", QVariant() );
+	    git->setPos( posval.value<QPointF>() );
+ 	}
+#if 0
 	if( -1 != o->metaObject()->indexOfSignal(SIGNAL(doubleClicked(QGraphicsItem*))) )
 	{
 	    connect(o,SIGNAL(doubleClicked(QGraphicsItem*)),
 		    impl->qgiproto,SIGNAL(doubleClicked(QGraphicsItem*)));
 	}
+#endif
+
+#if 0
+#if 1
+	// this partially conflicts with the one used by the qt.gui JS extension
+	if(1) qDebug() << "JSGameState::createObject("<<className<<"): setting prototype to JSQGI.";
 	jo.setPrototype( impl->qgiprotoj );
+#else
+	QScriptValue qgip =
+	    //impl->qgiprotoj;
+	    this->engine()->defaultPrototype( qMetaTypeId<QGraphicsItem*>() );
+	if( qgip.isValid() )
+	{
+	    qDebug() << "JSGameState::createObject(): setting default QGI JS prototype.";
+	    jo.setPrototype( qgip );
+	}
+	else
+	{
+	    qDebug() << "JSGameState::createObject(): no default QGI JS prototype found.";
+	}
+#endif
+#endif
+// 	qboard::copyProperties(&oldprops,this);
+ 	if( posval.isValid() )
+ 	{
+ 	}
+	self->addItem(git);
     }
     return jo;
 }

@@ -31,6 +31,8 @@
 #include <QKeySequence>
 #include <QFont>
 
+Q_DECLARE_METATYPE(QGIHtml*)
+
 struct QGIHtml::Impl
 {
     GraphicsItemFlags giflags;

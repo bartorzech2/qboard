@@ -182,18 +182,21 @@ void GameState::setup()
 {
     impl->js = qboard::createScriptEngine(this);
 
+    QGITypes::setupJsEngine(impl->js);
+
     qScriptRegisterMetaType(impl->js,
 			    qboard::toScriptValue<QBoardView*>,
 			    qboard::fromScriptValue<QBoardView*> );
-
     QScriptValue glob( impl->js->globalObject() );
 
+    if(1)
     {
 	JSGameState * proto = new JSGameState(this);
 	impl->js->setDefaultPrototype(qMetaTypeId<GameState*>(),
 				      impl->js->newQObject(proto));
     
     }
+    if(0)
     {
 	qboard::JSQGI * protoQGI = new qboard::JSQGI(this);
 	impl->js->setDefaultPrototype(qMetaTypeId<QGraphicsItem*>(),
@@ -219,15 +222,6 @@ void GameState::setup()
     impl->jsThis.setProperty( "client", impl->js->newObject() );
 
     QScriptValue sval;
-#if 0
-    sval = impl->js->newFunction(jsEtGameProperty);
-    if( ! sval.isFunction() )
-    {
-	throw std::runtime_error("GameState::setup(): could not create JS function.");
-    }
-    impl->jsThis.setProperty( "P", sval );
-    impl->jsThis.setProperty( "x", QScriptValue(impl->js,"hi") );
-#endif
     impl->js->globalObject().setProperty("QT_VERSION",QScriptValue(impl->js,QT_VERSION));
     impl->js->globalObject().setProperty("QBOARD_VERSION",QScriptValue(impl->js,QBOARD_VERSION));
     impl->js->globalObject().setProperty("QBOARD_VERSION_STRING",QScriptValue(impl->js,qboard::versionString()));
@@ -240,8 +234,15 @@ void GameState::setup()
     impl->jsThis.setProperty("pos",
 			     impl->js->newFunction(getsetPlacementPos),
 			     QScriptValue::PropertyGetter|QScriptValue::PropertySetter);
-    sval = impl->js->newQObject(impl->scene, QScriptEngine::QtOwnership );
-    impl->jsThis.setProperty( "scene", sval );
+    {
+	sval = impl->js->newQObject(impl->scene, QScriptEngine::QtOwnership );
+	impl->jsThis.setProperty( "scene", sval );
+	QScriptValue qgip = impl->js->defaultPrototype( qMetaTypeId<QGraphicsScene*>() );
+	if( qgip.isValid() )
+	{
+	    sval.setPrototype( qgip );
+	}
+    }
 
 }
 QPointF GameState::placementPos() const

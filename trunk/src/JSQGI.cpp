@@ -51,11 +51,11 @@ QScriptValue JSQGI::posXY()
 {
     SELF(QScriptValue());
     QPointF p( self->pos() );
-    //QString("function(){ var x=new Object();x.x=%1;x.y=%2;x.z=%3;return x;}()").
-    return js->evaluate( QString("{x:%1,y:%2}").
-			 arg(p.x()).
-			 arg(p.y()),
-			 "JSQGI::posXY()");
+    QString code = QString("({x:%1,y:%2})").
+	arg(p.x()).
+	arg(p.y())
+	;
+    return js->evaluate( code, "JSQGI::posXY()");
 }
 
 bool JSQGI::setParentItem( QGraphicsItem * p )
@@ -71,6 +71,7 @@ QGraphicsItem* JSQGI::parentItem()
     return self->parentItem();
 }
 
+
 void JSQGI::moveBy( QPointF const & p )
 {
     SELF();
@@ -81,15 +82,15 @@ void JSQGI::moveBy( qreal x, qreal y )
     this->moveBy(QPointF(x,y));
 }
 
-void JSQGI::move( QPointF const & p )
+void JSQGI::setPos( QPointF const & p )
 {
     SELF();
     self->setPos(p);
 }
 
-void JSQGI::move( qreal x, qreal y )
+void JSQGI::setPos( qreal x, qreal y )
 {
-    this->move( QPointF(x,y) );
+    this->setPos( QPointF(x,y) );
 }
 
 qreal JSQGI::posX()

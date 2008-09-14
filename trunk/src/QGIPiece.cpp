@@ -35,67 +35,10 @@
 #include <cstdlib>
 #include <ctime>
 
-bool QGITypes::handleClickRaise( QGraphicsItem * it,
-				 QGraphicsSceneMouseEvent * ev )
-{
-    if( (ev->buttons() & Qt::LeftButton)
-	|| (ev->buttons() & Qt::MidButton)
-	)
-    {
-	bool high = (ev->buttons() & Qt::LeftButton);
-	qreal zV = qboard::nextZLevel(it,high);
-	if( zV != it->zValue() )
-	{
-	    it->setZValue( zV );
-	}
-	return true;
-    }
-    return false;
-}
-static int shuffleRand(int n)
-{
-    return std::rand() % n ;
-}
-void QGITypes::shuffleQGIList( QList<QGraphicsItem*> list, bool skipParentedItems )
-{
-    if( list.isEmpty() ) return;
-    typedef QList<QGraphicsItem*> LI;
-    static unsigned int seed = 0;
-    if( 0 == seed )
-    {
-	std::srand(seed = std::time(0));
-    }
-    typedef std::vector<QGraphicsItem*> VT;
-    typedef std::vector<QPointF> VPT;
-    typedef std::vector<qreal> ZPT;
-    const int lsz = list.size();
-    VT vec(lsz, (QGraphicsItem*)0 );
-    VPT pts(lsz, QPointF());
-    ZPT zvals(lsz,0.0);
-    unsigned int i = 0;
-    for( LI::iterator it = list.begin();
-	 list.end() != it; ++it )
-    {
-	if( skipParentedItems && (*it)->parentItem() ) continue;
-	vec[i] = *it;
-	pts[i] = (*it)->pos();
-	zvals[i] = (*it)->zValue();
-	++i;
-    }
-    if( ! i ) return;
-    std::random_shuffle( &vec[0], &vec[i], shuffleRand );
-    //std::random_shuffle( &pts[0], &pts[i], shuffleRand );
-    std::random_shuffle( &zvals[0], &zvals[i], shuffleRand );
-    for( unsigned int x = 0; x < i; ++x )
-    {
-	QGraphicsItem * gi = vec[x];
-	gi->setPos( pts[x] );
-	gi->setZValue( zvals[x] );
-    }
-    return;
-}
+Q_DECLARE_METATYPE(QGIPiece*)
 
-#define QGIPiece_USE_PIXCACHE 0
+
+#define QGIPiece_USE_PIXCACHE 1
 
 struct QGIPiece::Impl
 {
@@ -238,13 +181,11 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
     {
 	this->setZValue(var.toDouble());
 	this->update();
-	return;
     }
     else if( Impl::PropPos == kid )
     {
 	this->setPos( var.value<QPointF>() );
 	this->update();
-	return;
     }
     else if( Impl::PropColor == kid )
     {
@@ -265,7 +206,6 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	if(0) qDebug() << "QGIPiece::propertySet(color):"<<impl->pen.color()<<" alpha ="<<impl->alpha;
 	impl->clearCache();
 	this->update();
-	return;
     }
     else if( Impl::PropAlpha == kid )
     {
@@ -282,7 +222,6 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	impl->pen.setColor( col );
 	impl->clearCache();
     	this->update();
-	return;
     }
     else if( Impl::PropBorderColor == kid )
     {
@@ -294,7 +233,6 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	impl->penB.setColor( col );
 	impl->clearCache();
 	this->update();
-	return;
     }
     else if( Impl::PropBorderAlpha == kid )
     {
@@ -311,7 +249,6 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	impl->penB.setColor( col );
 	impl->clearCache();
 	this->update();
-	return;
     }
     else if( Impl::PropBorderSize == kid )
     {
@@ -319,19 +256,16 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	impl->penB.setWidth( (bs >= 0) ? bs : 0 );
 	impl->clearCache();
 	this->update();
-	return;
     }
     else if( Impl::PropBorderStyle == kid )
     {
 	impl->clearCache();
 	impl->penB.setStyle( s11n::qt::stringToPenStyle(var.toString()) );
 	this->update();
-	return;
     }
     else if( (Impl::PropScale == kid) || (Impl::PropAngle == kid) )
     {
 	this->refreshTransformation();
-	return;
     }
     else if( Impl::PropDragDisabled == kid )
     {
@@ -343,7 +277,6 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	{
 	    this->setFlag( QGraphicsItem::ItemIsMovable, true );
 	}
-	return;
     }
     else if( Impl::PropPixmap == kid )
     {
@@ -384,7 +317,6 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	    this->setPixmap(bogus);
 	}
 	this->update();
-	return;
     } // pixmap property
     if( Impl::PropSize == kid )
     {
@@ -397,7 +329,6 @@ void QGIPiece::propertySet( char const *pname, QVariant const & var )
 	    // Kludge to ensure bounding rect is kept intact
 	    this->setPixmap(bogus);
 	}
-	return;
     }
 }
 
