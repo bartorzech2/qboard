@@ -10,7 +10,7 @@ The code is available via the QBoard source tree (look for `src/*11n*.*`) or as 
 The distribution contains code for de/serializing the following Qt types:
 
 || *Type* || *Notes* ||
-|| QBitArray || Backs the bits into blocks of 32-bit integers. ||
+|| QBitArray || Packs the bits into blocks of 32-bit integers. ||
 || QByteArray || Bin64-encoded. Objects over a certain (configurable) size will be compressed with zlib. ||
 || QBrush || All significant properties are stored, including custom transformations and textures. ||
 || QColor || RGBA data ||
