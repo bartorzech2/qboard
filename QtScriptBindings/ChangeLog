@@ -1,0 +1,14 @@
+This is the informat ChangeLog for Stephan Beal's distribution
+of the Qt Script Bindings code, plus a couple other bits.
+
+See README.txt for full project details.
+
+Newest items are at the top...
+========================================================================
+
+2008 Sept 14:
+
+- Added GNU Readline script plugin, such that
+QScriptEngine::importExtention("readline") will load a minimalist
+GNU Readline plugin.
+
