@@ -16,6 +16,7 @@
 #include <QList>
 #include <QGraphicsItem>
 class QGraphicsSceneMouseEvent;
+class QScriptEngine;
 /**
    QGITypes holds the custom QGraphicsItem::type() values used
    by QBoard-related QGraphicsItem types.
@@ -73,5 +74,8 @@ struct QGITypes
        safely pass false.
     */
     static void shuffleQGIList( QList<QGraphicsItem*> list, bool skipParentedItems = true );
+
+
+    static void setupJsEngine( QScriptEngine * );
 };
 #endif // QBOARD_QGI_H_INCLUDED

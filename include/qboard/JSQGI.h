@@ -37,11 +37,11 @@ public:
     /**
        Moves this object to the given coords.
     */
-    Q_INVOKABLE void move( qreal x, qreal y );
+    Q_INVOKABLE void setPos( qreal x, qreal y );
     /**
        Moves this object to the given coords.
     */
-    Q_INVOKABLE void move( QPointF const & p );
+    Q_INVOKABLE void setPos( QPointF const & p );
     /**
        Moves the item by the given relative coordinates.
     */
@@ -61,6 +61,7 @@ public:
        (if it has one) or its scene.
     */
     Q_INVOKABLE qreal posY();
+
 
     /**
        Damn! If this function is called pos() it gets hidden by the pos

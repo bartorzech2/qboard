@@ -571,6 +571,23 @@ namespace qboard {
 								     const QScriptValue & args ) const
     {
 	return dynamic_cast<QGraphicsItem*>(args.toQObject());
+#if 0
+	QVariant var( args.toVariant() );
+	QGraphicsItem * qgi = dynamic_cast<QGraphicsItem*>( var.value<QGraphicsItem*>() );
+	char const * prefix = "convert_script_value_f<QGraphicsItem*>():";
+	qDebug() << "Trying to convert variant"
+	    //<< "(type=="<<var.userType()<<QVariant::typeToName(QVariant::Type(var.userType()))<<")"
+		 << var
+		 << "canconvert =="<<var.canConvert<QGraphicsItem*>()
+		 << "to QGI:"<<qgi;
+	if( ! qgi )
+	{
+	    qDebug() << prefix << "couldn't convert :(";
+	    eng->currentContext()->throwError(QScriptContext::TypeError,
+					      "object is not-a QGraphicsItem");
+	}
+	return qgi;
+#endif
     }
 
     QScriptValue convert_script_value_f<QGraphicsScene*>::operator()(QScriptEngine *eng,
@@ -597,7 +614,7 @@ namespace qboard {
 	unsigned int ndx = 0;
 	foreach( QGraphicsItem * gi, in )
 	{
-	    QScriptValue o = toScriptValue(eng,gi);
+	    QScriptValue o = eng->toScriptValue(gi);
 	    if( o.isObject() )
 	    {
 		ar.setProperty( ndx++, o );
@@ -618,7 +635,8 @@ namespace qboard {
 	{
 	    it.next();
 	    QGraphicsItem * qgi =
-		fromScriptValue<QGraphicsItem*>(args.engine(),it.value());
+		args.engine()->fromScriptValue<QGraphicsItem*>(it.value());
+		//fromScriptValue<QGraphicsItem*>(args.engine(),it.value());
 	    if( ! qgi ) continue;
 	    out.push_back( qgi );
 	}
@@ -886,6 +904,21 @@ namespace qboard {
 	    qtj.setProperty("script", qscript);
 	}
 
+	{ // import known extensions...
+	    QStringList ext;
+	    ext << "qt.core"
+		<< "qt.gui"
+		;
+	    foreach( QString e, ext )
+	    {
+		QScriptValue rc( js->importExtension( e ) );
+		if( rc.isError() )
+		{
+		    qDebug() << "qoard::createScriptEngine() could not import extension"<<e;
+		}
+	    }
+	}
+
 #if 1
 	/**
 	   HUGE KLUDGE while i try to import more official Qt bindings.
@@ -906,17 +939,21 @@ namespace qboard {
 	}
 #endif // instantiation kludge
 
+#if 0
 	qScriptRegisterMetaType(js, 
 				qboard::toScriptValue<QList<QGraphicsItem*> >,
 				qboard::fromScriptValue<QList<QGraphicsItem*> > );
-#if 1
+	/**
+	   IF i do this then my conversions from native QGI* to JS Object work. If i don't,
+	   they do work, but the qt.gui bindings don't see the native objects, so THEY
+	   don't work.
+	*/
 	qScriptRegisterMetaType<QGraphicsItem*>(js,
 						qboard::toScriptValue<QGraphicsItem*>,
 						qboard::fromScriptValue<QGraphicsItem*> );
 	qScriptRegisterMetaType(js,
 				qboard::toScriptValue<QGraphicsScene*>,
 				qboard::fromScriptValue<QGraphicsScene*> );
-
 	if(1)
 	{
 	    JSVariantPrototype * proto = new JSVariantPrototype(js);

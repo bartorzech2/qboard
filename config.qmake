@@ -221,6 +221,7 @@ QBOARD_SOURCES_LIB = \
  $$S/QBoardPlugin.cpp \
  $$S/QBoardScene.cpp \
  $$S/QBoardView.cpp \
+ $$S/QGI.cpp \
  $$S/QGIDot.cpp \
  $$S/QGIHider.cpp \
  $$S/QGIHtml.cpp \
