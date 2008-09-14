@@ -35,6 +35,7 @@ for d in $sdirs; do
 	-o -name '*.css' \
 	-o -name '*.wiki' \
 	| sed -e '/\/bak/d' \
+	-e '/osdab/d' \
 	-e '/\/nono/d' \
 	-e '/\.#/d' \
 	-e '/\.svn/d' \
