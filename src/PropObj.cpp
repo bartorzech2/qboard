@@ -55,7 +55,7 @@ bool PropObj::event( QEvent * e )
 	if( ! chev ) return false;
 	e->accept();
 	char const * key = chev->propertyName().constData();
-	emit propertySet( key, this->property(key) );
+	Q_EMIT propertySet( key, this->property(key) );
 	return true;
     }
     return QObject::event(e);

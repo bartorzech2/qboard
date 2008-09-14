@@ -128,7 +128,7 @@ QGIDot::~QGIDot()
 	this->removeEdge( it );
     }
 #endif
-    emit dotDestructing(this);
+    Q_EMIT dotDestructing(this);
     delete impl;
 }
 
@@ -342,7 +342,7 @@ QGraphicsItem * QGIDot::hideItems()
 void QGIDot::mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event )
 {
     this->QGraphicsEllipseItem::mouseDoubleClickEvent(event);
-    emit doubleClicked(this);
+    Q_EMIT doubleClicked(this);
 }
 
 void QGIDot::contextMenuEvent( QGraphicsSceneContextMenuEvent * ev )
@@ -696,7 +696,7 @@ QGIDotLine::QGIDotLine() : QObject(),
 
 QGIDotLine::~QGIDotLine()
 {
-    emit lineDestructing(this);
+    Q_EMIT lineDestructing(this);
     //qDebug() << "QGIDotLine::~QGIDotLine()";
     delete impl;
 }

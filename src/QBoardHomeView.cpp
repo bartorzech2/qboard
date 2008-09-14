@@ -197,7 +197,7 @@ void QBoardHomeView::mouseDoubleClickEvent( QMouseEvent * event )
 	QFileInfo fi( impl->model->fileInfo(impl->current) );
 	if( fi.isFile() )
 	{
-	    emit itemActivated( fi );
+	    Q_EMIT itemActivated( fi );
 	}
     }
 }
