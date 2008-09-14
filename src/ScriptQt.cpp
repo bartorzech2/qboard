@@ -904,6 +904,7 @@ namespace qboard {
 	    qtj.setProperty("script", qscript);
 	}
 
+	if(0)
 	{ // import known extensions...
 	    QStringList ext;
 	    ext << "qt.core"
