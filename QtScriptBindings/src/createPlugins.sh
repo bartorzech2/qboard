@@ -20,8 +20,7 @@ for m in $modules; do
 	    echo 'QMAKE_CXXFLAGS += -I$${QMAKE_INCDIR_QT}/QtXmlPatterns'
 	    ;;
 	uitools)
-	    echo "QT += gui"
-	    echo 'QMAKE_LIBS += -lQtUiTools'
+	    echo "CONFIG += uitools"
 	    ;;
 	webkit)
 	    echo "QT += webkit network"
