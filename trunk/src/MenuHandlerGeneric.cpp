@@ -160,7 +160,7 @@ void MenuHandlerCopyCut::cloneItem()
 	gl.push_back(m_gi);
     }
     //sl = qboard::graphicsItemsCast<Serializable>( gl );
-    foreach( QGraphicsItem * gi, gl )
+    Q_FOREACH( QGraphicsItem * gi, gl )
     {
 	Serializable * ser = dynamic_cast<Serializable*>( gi );
 	if( ! ser ) continue;
@@ -171,7 +171,7 @@ void MenuHandlerCopyCut::cloneItem()
     {
 	sc->clearSelection();
     }
-    foreach( Pair p, sl )
+    Q_FOREACH( Pair p, sl )
     {
 	Serializable * s = p.first->clone();
 	if( ! s )

@@ -140,9 +140,10 @@ void MenuHandlerBoard::doMenu( GameState & gs, QBoardView * pv, QContextMenuEven
 	QStringList cl;
 	cl << "QGIDot"
 	   << "QGIHtml";
-	foreach( QString cn, cl )
+	for( QStringList::iterator it = cl.begin();
+	     cl.end() != it; ++it )
 	{
-
+	    QString cn(*it);
 	    QString code =
 		QString( "qboard.createObject('%1',{pos:qboard.placementPos()});").
 		arg(cn);

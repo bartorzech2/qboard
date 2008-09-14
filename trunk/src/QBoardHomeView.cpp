@@ -14,6 +14,7 @@
 #include <QKeyEvent>
 
 #include <qboard/utility.h>
+#include <qboard/emitkludge.h>
 
 // If QBHomeView_USE_DIRICON is a string then: if a dir entry has a file named that
 // string (e.g. ".diricon.png") then that icon is used in place of the default one.
@@ -39,7 +40,10 @@
 #include <QResource>
 #endif
 
-
+// Qt bug? Q_EMIT is never getting defined for me
+#ifndef Q_EMIT
+#define Q_EMIT
+#endif
 
 QBoardFileIconProvider::QBoardFileIconProvider() :
     QFileIconProvider()

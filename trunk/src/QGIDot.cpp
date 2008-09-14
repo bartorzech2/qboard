@@ -35,7 +35,7 @@
 #include <qboard/S11nQt/QPen.h>
 #include <qboard/S11nQt/QPointF.h>
 #include <qboard/S11nQt/QGraphicsItem.h>
-
+#include <qboard/emitkludge.h>
 Q_DECLARE_METATYPE(QGIDot*)
 
 struct QGIDot::Impl
@@ -123,7 +123,7 @@ QGIDot::~QGIDot()
     QBOARD_VERBOSE_DTOR << "~QGIDot()";
 #if 1
     EdgeList cp( impl->edges );
-    foreach( QGIDotLine * it, cp )
+    Q_FOREACH( QGIDotLine * it, cp )
     {
 	this->removeEdge( it );
     }
@@ -319,8 +319,10 @@ QVariant QGIDot::itemChange(GraphicsItemChange change, const QVariant &value)
 {
 	switch (change) {
 		case ItemPositionHasChanged:
-		    foreach (QGIDotLine *edge, impl->edges)
+		    Q_FOREACH(QGIDotLine *edge, impl->edges)
+		    {
 			edge->adjust();
+		    }
 		break;
 	default:
 		break;
@@ -549,7 +551,7 @@ bool QGIDot::deserialize(  S11nNode const & src )
 	{
 	    return false;
 	}
-	foreach( QGraphicsItem * it, childs )
+	Q_FOREACH( QGraphicsItem * it, childs )
 	{
 	    if( it->type() != QGITypes::QGIDotLine )
 	    {

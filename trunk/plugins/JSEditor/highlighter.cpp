@@ -45,6 +45,10 @@
 
 #include "highlighter.h"
 
+#ifndef Q_EMIT
+#define Q_EMIT
+#endif
+
 JSHighlighter::JSHighlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
 {
@@ -63,7 +67,7 @@ JSHighlighter::JSHighlighter(QTextDocument *parent)
                     << "\\btemplate\\b" << "\\btypedef\\b" << "\\btypename\\b"
                     << "\\bunion\\b" << "\\bunsigned\\b" << "\\bvirtual\\b"
                     << "\\bvoid\\b" << "\\bvolatile\\b";
-    foreach (QString pattern, keywordPatterns) {
+    Q_FOREACH(QString pattern, keywordPatterns) {
         rule.pattern = QRegExp(pattern);
         rule.format = keywordFormat;
         highlightingRules.append(rule);
@@ -99,7 +103,7 @@ JSHighlighter::JSHighlighter(QTextDocument *parent)
 
 void JSHighlighter::highlightBlock(const QString &text)
 {
-    foreach (HighlightingRule rule, highlightingRules) {
+    Q_FOREACH(HighlightingRule rule, highlightingRules) {
         QRegExp expression(rule.pattern);
         int index = text.indexOf(expression);
         while (index >= 0) {
