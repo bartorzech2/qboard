@@ -51,7 +51,7 @@ void S11nClipboard::syncToQt()
     {
 	cb->clear();
     }
-    emit signalUpdated();
+    Q_EMIT signalUpdated();
     connect(QApplication::clipboard(),SIGNAL(dataChanged()),this,SLOT(syncFromQt()));
 }
 
@@ -62,7 +62,7 @@ void S11nClipboard::syncFromQt()
     m_node = 0;
     if( data.isEmpty() )
     {
-	emit signalUpdated();
+	Q_EMIT signalUpdated();
 	return;
     }
     S11nNode * node = 0;
@@ -72,7 +72,7 @@ void S11nClipboard::syncFromQt()
 	node = s11nlite::load_node( buf );
     }
     m_node = node;
-    emit signalUpdated();
+    Q_EMIT signalUpdated();
 }
 
 S11nClipboard::S11nNode * S11nClipboard::take()

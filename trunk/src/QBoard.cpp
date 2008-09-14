@@ -49,7 +49,7 @@ bool QBoard::event( QEvent * e )
 		    this->m_file = var.value<QString>();
 		    this->m_px = QPixmap(m_file);
 		}
-		emit loadedBoard();
+		Q_EMIT loadedBoard();
 	    }
 	    return true;
 	}
@@ -152,7 +152,7 @@ bool QBoard::s11nLoad( QString const & fn )
     if( this->fileNameMatches(fn) )
     {
 	bool ret = this->Serializable::s11nLoad( fn );
-	if( ret ) emit loadedBoard();
+	if( ret ) Q_EMIT loadedBoard();
 	return ret;
     }
     else
