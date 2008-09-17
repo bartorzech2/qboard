@@ -379,7 +379,7 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 	}
 	else if( QRegExp("\\.(png|jpg|gif|xpm|svg|bmp)$",Qt::CaseInsensitive).indexIn(fn) > 0 )
 	{ // ^^^ FIXME: get the list of image formats from somewhere dynamic
-		const size_t threshold = 10 * 1024;
+		const size_t threshold = 12 * 1024;
 		// ^^^ fixme: ^^^^ do this based on image resolution, not file size, cuz many
 		// large-sized PNGs are quite small.
 		if( fi.size() < threshold )
