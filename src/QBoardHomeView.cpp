@@ -14,7 +14,6 @@
 #include <QKeyEvent>
 
 #include <qboard/utility.h>
-#include <qboard/emitkludge.h>
 
 // If QBHomeView_USE_DIRICON is a string then: if a dir entry has a file named that
 // string (e.g. ".diricon.png") then that icon is used in place of the default one.

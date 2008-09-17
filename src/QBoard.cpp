@@ -18,7 +18,6 @@
 #include <QDebug>
 #include <QVariant>
 
-#include <qboard/emitkludge.h>
 
 QBoard::QBoard() 
     : QObject(),

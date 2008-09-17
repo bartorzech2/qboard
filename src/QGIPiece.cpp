@@ -31,8 +31,6 @@
 #include <qboard/S11nQt/QPen.h>
 #include <qboard/S11nQt/QTransform.h>
 
-#include <qboard/emitkludge.h>
-
 #include <algorithm>
 #include <cstdlib>
 #include <ctime>
