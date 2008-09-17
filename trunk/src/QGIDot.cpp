@@ -35,7 +35,6 @@
 #include <qboard/S11nQt/QPen.h>
 #include <qboard/S11nQt/QPointF.h>
 #include <qboard/S11nQt/QGraphicsItem.h>
-#include <qboard/emitkludge.h>
 Q_DECLARE_METATYPE(QGIDot*)
 
 struct QGIDot::Impl
