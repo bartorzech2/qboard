@@ -57,6 +57,8 @@ f104SNIP0aNoClassYetf10bborderColor08QVariante<SNIP>
 
 The point is, the format doesn't interest us. QBoard only cares about the structure of the data, and uses that structure to determine whether it can or cannot handle a given set of data. The structure represents various objects, and whether or not QBoard can do anything with those objects is context dependent.
 
+If you really want to, you can convert QBoard saved data to arbitrary s11n-supported formats using [http://s11n.net/s11nconvert/ s11nconvert].
+
 = What exactly can QBoard save and load? =
 
 The GUI currently provides only features for saving/loading the game as a whole, via the File->Save/Load menus and the Quicksave/Quickload features.
