@@ -893,10 +893,10 @@ namespace Ps {
 	}
 	catch( parse_error const & ex )
 	{
-	    // recreate exception without the state,
+	    // Recreate exception without the state,
 	    // which won't be valid once this function returns.
 	    std::string msg( ex.what() );
-	    msg += "\n near "+ex.where();
+	    msg += "\nNear "+ex.where();
 	    throw std::runtime_error( msg );
 	}
 	return false;
@@ -910,8 +910,7 @@ namespace Ps {
     template <typename Rule, typename ClientState>
     bool parse( std::string const & in, ClientState & st)
     {
-	parse_iterator it(in);
-	return parse<Rule>( it, st );
+	 return parse<Rule>( parse_iterator(in), st );
     }
 
     /**
@@ -1070,6 +1069,36 @@ namespace Ps {
 	    return true;
 	}
     };
+    /**
+       Alias for r_action<Rule,Action>
+    */
+    template <typename Rule, typename Action>
+    struct r_if : r_action< Rule, Action >
+    {};
+
+    /**
+       Similar to r_action, if Rule matches then ActionIf::matched()
+       is called and true is returned, otherwise ActionElse::matched()
+       is called and true is returned.
+
+       There is no guaranty as to whether this function consumes input
+       - that depends entirely on Rule. If Rule does not match then no
+       input is consumed (assuming Rule conforms to the rules).
+    */
+    template <typename Rule, typename ActionIf, typename ActionElse>
+    struct r_ifelse
+    {
+	typedef r_ifelse type;
+	template <typename ClientState>
+	inline static bool matches( parser_state & in, ClientState & st )
+	{
+	    if( ! r_action<Rule,ActionIf>::matches(in,st) )
+	    {
+		r_action<r_success,ActionElse>::matches(in,st);
+	    }
+	    return true;
+	}
+    };
 
 
     namespace Detail {
@@ -1176,11 +1205,6 @@ namespace Ps {
        eof. Note that actions triggered as part of Rule cannot be
        un-done if the rule later fails to match and the input is
        rewound.
-
-       Note that a break_exception thrown from Rule
-       will propagate out of this class, which means
-       that a Break changes the meaning of "optional"
-       (because "break" trumps "optional").
     */
     template <typename Rule>
     struct r_opt
@@ -1251,7 +1275,7 @@ namespace Ps {
     /**
        Matches Rule at least Min times and at most Max times. If it
        does not match it does not consume, but if forward parsing
-       caused Actions to be triggered then they are not un-done by
+       causes Actions to be triggered then they are not un-done by
        rewinding.
 
        Note that once Max is reached, checking stops. That means
@@ -1323,39 +1347,6 @@ namespace Ps {
     };
 
     /**
-       Consumes no input and throws an ExceptionType.
-    */
-    template <typename ExceptionType>
-    struct r_throw_base
-    {
-	typedef r_throw_base base;
-	template <typename State>
-	static bool matches( parser_state &, State & )
-	{
-            throw ExceptionType();
-	}
-    };
-
-    /**
-       Specialized to ensure the error point is marked.
-    */
-    template <>
-    struct r_throw_base<parse_error>
-    {
-	typedef r_throw_base type;
-	template <typename State>
-	static bool matches( parser_state & in, State & )
-	{
-            throw parse_error(in, "parse error triggered by r_throw" );
-	    return false;
-	}
-    };
-
-    typedef r_throw_base<parse_error> r_throw;
-
-
-
-    /**
        Matches any characters in the range [Min..Max]
     */
     template< int Min, int Max >
@@ -1377,6 +1368,72 @@ namespace Ps {
 	    return false;
 	}
     };
+
+    /**
+       EXPERIMENTAL!
+
+       Matches all input up to the point where Rule::matches()
+       returns true. Each time Rule does not match, the input
+       iterator is bumped up by one and we try again.
+
+       This rule returns true only if Rule is ever matched, but it may
+       or may not consume input. If Rule matches immediately, no input
+       is consumed, otherwise input is consumed up to the point where
+       Rule will match. Thus when this rule finishes, either Rule
+       *will* match the next input or we are at eof.
+
+       Caveats:
+
+       [In theory] the given Rule should not normally call actions
+       because it would then be easy to accidentally trigger the
+       action twice in down-stream parse rules. So...
+
+       Instead of this:
+
+       r_until< r_action<MyRule, MyAction > >
+
+       Use:
+
+       r_action< r_until<MyRule>, MyAction >
+
+       Additionally:
+
+       - Rule should not be a rule which doesn't consume (e.g. r_at).
+
+       - DO NOT use r_eof (or equivalent) as Rule - it won't behave as
+       expected because this routine also has to do its own eof checks
+       and we run into an ambiguity.
+    */
+    template <typename Rule>
+    struct r_until
+    {
+	typedef r_until type;
+	template <typename ClientState>
+	inline static bool matches( parser_state & in, ClientState & st )
+	{
+	    parse_iterator thepos(in.pos());
+	    parse_iterator begin(thepos);
+	    bool gotMatch = Rule::matches( in, st );
+	    if( gotMatch )
+	    {
+		in.pos(thepos);
+		return true;
+	    }
+	    while( ! gotMatch )
+	    {
+		thepos = ++in;
+ 		if( in.eof() )
+ 		{
+ 		    break;
+ 		}
+		gotMatch = Rule::matches( in, st );
+	    }
+	    in.pos( gotMatch ? thepos : begin );
+	    return gotMatch;
+	}
+    };
+
+    
 
     /**
        Matches only the character CH. If CaseSensitive is true then CH
@@ -1666,44 +1723,6 @@ namespace Ps {
     {};
 
 
-    /** Parser for C++-style comments. */
-    struct r_comment_cpp :
-	r_and< rule_list<
-	    r_chseq< char_list<'/','/'> >,
-	    r_star< r_notch<'\n'> >,
-	    r_eol
-	    > >
-    {};
-
-    template <typename R>
-    struct r_throw_if : r_and< rule_list<
-	r_and< rule_list<R,r_throw> >,
-	r_success > >
-    {};
-
-    namespace Detail
-    {
-	/** Inner part of a C++ comment. Consumes until '*' followed by '/'. */
-	struct r_comment_c_inner : r_and< rule_list<
-	    r_star< r_and< rule_list<
-		r_notat< r_chseq< char_list<'*','/'> > >,
-		r_advance<1>
-		> > >,
-	    r_throw_if< r_eof >
-	> >
-	{};
-    }
-    /** Parser for C-style comments. */
-    struct r_comment_c :
-	r_and< rule_list<
-	    r_chseq< char_list<'/','*'> >,
-	    Detail::r_comment_c_inner,
-	    r_chseq< char_list<'*','/'> >
-	    > >
-    {};
-
-
-
     namespace Detail {
 	using namespace Ps;
 	struct line_col_state
@@ -1759,6 +1778,8 @@ namespace Ps {
 	line = st.line;
 	col = st.col;
     }
+
+    
 } // namespace
 
 #endif // s11n_net_PARSEPP_HPP_INCLUDED
