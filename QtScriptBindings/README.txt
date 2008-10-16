@@ -54,8 +54,8 @@ have a couple options:
 
 1) Copy them under QT_DIR/plugins/script
 
-2) Copy them to DIR_OF_YOUR_CHOICE/plugins/scripts then add
-DIR_OF_YOUR_CHOICE/plugins (without the '/scripts' suffix) to the Qt
+2) Copy them to DIR_OF_YOUR_CHOICE/plugins/script then add
+DIR_OF_YOUR_CHOICE/plugins (without the '/script' suffix) to the Qt
 library path from C++ code like so:
 
     QStringList paths = qApp->libraryPaths();
