@@ -41,10 +41,13 @@
 #include <qboard/QGILine.h>
 #include <qboard/utility.h>
 #include <qboard/S11nQt/S11nClipboard.h>
+#include <qboard/S11nQt/QByteArray.h>
 #include <qboard/QBoard.h>
 #include <qboard/PieceAppearanceWidget.h>
 #include "AboutQBoardImpl.h"
 #include <qboard/WikiLiteView.h>
+
+
 
 #if QT_VERSION >= 0x040400
 #include <qboard/QBoardDocsBrowser.h>
@@ -56,23 +59,27 @@
 
 struct MainWindowImpl::Impl
 {
+    QMainWindow * window;
     GameState gstate;
     QBoardView * gv;
     QBoardHomeView * tree;
     PieceAppearanceWidget *paw;
     QWidget * sidebar;
-    static char const * fileName;
+    static char const * pieceTemplatesFile;
+    static char const * geometryFile;
     static char const * persistanceClass;
-    Impl() : gstate(),
-	     gv(0),
-	     tree(0),
-	     paw(new PieceAppearanceWidget),
-	     sidebar(0)
+    Impl(QMainWindow * window) :
+	window(window),
+	gstate(),
+	gv(0),
+	tree(0),
+	paw(new PieceAppearanceWidget),
+	sidebar(0)
     {
 	QDir pdir = qboard::persistenceDir( persistanceClass );
-	QString fn = pdir.canonicalPath() + "/" + fileName;
 	try
 	{
+	    QString fn = pdir.canonicalPath() + "/" + pieceTemplatesFile;
 	    if( ! paw->s11nLoad(fn) )
 	    {
 		paw->setupDefaultTemplates();
@@ -87,9 +94,9 @@ struct MainWindowImpl::Impl
     ~Impl()
     {
 	QDir pdir = qboard::persistenceDir( persistanceClass );
-	QString fn = pdir.canonicalPath() + "/" + fileName;
 	try
 	{
+	    QString fn = pdir.canonicalPath() + "/" + pieceTemplatesFile;
 	    paw->s11nSave(fn,false);
 	}
 	catch(...){}
@@ -101,13 +108,14 @@ struct MainWindowImpl::Impl
 	delete sidebar;
     }
 };
-char const * MainWindowImpl::Impl::fileName = "default-templates";
+char const * MainWindowImpl::Impl::pieceTemplatesFile = "default-templates";
+char const * MainWindowImpl::Impl::geometryFile = "geometry.s11n";
 char const * MainWindowImpl::Impl::persistanceClass = "MainWindow";
 
 MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f) 
     : QMainWindow(parent, f),
       Ui::MainWindow(),
-      impl(new Impl)
+      impl(new Impl(this))
 {
 
 	setupUi(this);
@@ -201,7 +209,24 @@ MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f)
 	    qb.setProperty("window",js.newQObject(this, QScriptEngine::QtOwnership ) );
 	}
 
-	this->resize(760,600);
+	S11nNode * snode = 0;
+	try
+	{
+	    // FIXME: use the S11nQt QIODevice proxy so we can use unicode file names:
+	    QDir pdir = qboard::persistenceDir( Impl::persistanceClass );
+	    QString fn = pdir.canonicalPath() + "/" + Impl::geometryFile;
+	    QByteArray ba;
+	    snode = s11nlite::load_node( fn.toAscii().constData() );
+	    if( snode && s11nlite::deserialize( *snode, ba ) )
+	    {
+		this->restoreGeometry(ba);
+	    }
+	}
+	catch(...)
+	{
+	    this->resize(760,600);
+	}
+	delete snode; snode = 0;
 }
 
 MainWindowImpl::~MainWindowImpl()
@@ -221,7 +246,7 @@ void MainWindowImpl::clearClipboard()
 
 void MainWindowImpl::clipboardUpdated()
 {
-    QString msg;
+    QString msg("s11n clipboard ");
     S11nClipboard & cb( S11nClipboard::instance() );
     if( ! cb.contents() )
     {
@@ -231,7 +256,7 @@ void MainWindowImpl::clipboardUpdated()
     }
     else
     {
-	msg += cb.contentLabel();
+	msg += "updated: "+cb.contentLabel();
 	this->actionClearClipboard->setEnabled( true );
 	this->actionPaste->setEnabled( true );
 #if 0
@@ -308,6 +333,21 @@ bool MainWindowImpl::saveGame()
 		lbl.toAscii() );
 	return fn.isEmpty() ? false : this->saveGame(fn);
 }
+
+void MainWindowImpl::closeEvent(QCloseEvent *event)
+{
+    QDir pdir = qboard::persistenceDir( Impl::persistanceClass );
+    try
+    {
+	// FIXME: use the S11nQt QIODevice proxy so we can use unicode file names:
+	QString fn = pdir.canonicalPath() + "/" + Impl::geometryFile;
+	s11nlite::save( this->saveGeometry(), fn.toAscii().constData() );
+    }
+    catch(...)
+    {}
+    QMainWindow::closeEvent(event);
+}
+
 
 bool MainWindowImpl::loadFile( QFileInfo const & fi )
 {

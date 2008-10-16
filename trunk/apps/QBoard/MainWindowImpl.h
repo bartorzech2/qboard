@@ -15,6 +15,7 @@
 
 #include <QMainWindow>
 #include <QFileInfo>
+class QCloseEvent;
 #include "ui_MainWindow.h"
 
 class MainWindowImpl : public QMainWindow, public Ui::MainWindow
@@ -47,6 +48,7 @@ public Q_SLOTS:
     //virtual bool eventFilter( QObject * watched, QEvent * event );
 protected:
 	//bool eventFilter(QObject *obj, QEvent *ev);	
+    virtual void closeEvent(QCloseEvent *event);
 private Q_SLOTS:
 	void chdir(const QDir & dir);
     void clipboardUpdated();
