@@ -3,7 +3,7 @@
 #include <QtScript/QScriptEngine>
 #include <QtCore/QDebug>
 
-#include <QtUiTools/quiloader.h>
+#include <quiloader.h>
 
 QScriptValue qtscript_create_QUiLoader_class(QScriptEngine *engine);
 

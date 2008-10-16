@@ -10,7 +10,8 @@ in the hopes that it might be useful to others.
 
 License: Same as Qt Open Source Edition (GPLv2 or GPLv3)
 
-Requirements: Qt 4.4+ development environment (qmake, headers, libs)
+Requirements: Qt 4.4.2+ (qmake, headers, libs)
+It won't work with Qt <= 4.4.1
 
 ========================================================================
 Configuring it:
@@ -119,8 +120,9 @@ i've written, adapted, or downright stolen:
 ========================================================================
 NOTES:
 
-i distribute this code but did not write it. i cannot offer support
-for any of it.
+i distribute this code but did not write most of it (only the "extra
+stuff" listed above). i cannot offer support for any parts i didn't
+write.
 
 As of this writing (Sept 13, 2008) i have only tried a few of the JS
 bindings. The ones i tried seemed to mostly work as expected, but some

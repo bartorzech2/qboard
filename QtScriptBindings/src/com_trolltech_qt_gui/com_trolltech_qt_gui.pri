@@ -431,6 +431,7 @@ SOURCES += \
            $$PWD/qtscript_QRubberBand.cpp \
            $$PWD/qtscript_QScrollArea.cpp \
            $$PWD/qtscript_QScrollBar.cpp \
+           $$PWD/qtscript_QSessionManager.cpp \
            $$PWD/qtscript_QShortcut.cpp \
            $$PWD/qtscript_QShortcutEvent.cpp \
            $$PWD/qtscript_QShowEvent.cpp \

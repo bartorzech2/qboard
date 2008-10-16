@@ -23,6 +23,7 @@
 #include <qobject.h>
 #include <qpalette.h>
 #include <qpoint.h>
+#include <qsessionmanager.h>
 #include <qsize.h>
 #include <qstringlist.h>
 #include <qstyle.h>

@@ -3,68 +3,68 @@
 #include <QtScript/QScriptEngine>
 #include <QtCore/QDebug>
 
-#include <qxmlquery.h>
-#include <qxmlnamepool.h>
-#include <qxmlresultitems.h>
-#include <qabstractxmlnodemodel.h>
 #include <qabstractxmlnodemodel.h>
 #include <qxmlname.h>
-#include <qsourcelocation.h>
+#include <qabstractxmlnodemodel.h>
 #include <qabstractxmlnodemodel.h>
 #include <qabstractxmlreceiver.h>
-#include <qabstractmessagehandler.h>
-#include <qabstracturiresolver.h>
-#include <qxmlserializer.h>
+#include <qxmlquery.h>
+#include <qsourcelocation.h>
+#include <qxmlresultitems.h>
+#include <qxmlnamepool.h>
 #include <qsimplexmlnodemodel.h>
+#include <qxmlserializer.h>
+#include <qabstracturiresolver.h>
+#include <qabstractmessagehandler.h>
 #include <qxmlformatter.h>
 
-QScriptValue qtscript_create_QXmlQuery_class(QScriptEngine *engine);
-QScriptValue qtscript_create_QXmlNamePool_class(QScriptEngine *engine);
-QScriptValue qtscript_create_QXmlResultItems_class(QScriptEngine *engine);
-QScriptValue qtscript_create_QXmlNodeModelIndex_class(QScriptEngine *engine);
 QScriptValue qtscript_create_QAbstractXmlNodeModel_class(QScriptEngine *engine);
 QScriptValue qtscript_create_QXmlName_class(QScriptEngine *engine);
-QScriptValue qtscript_create_QSourceLocation_class(QScriptEngine *engine);
 QScriptValue qtscript_create_QXmlItem_class(QScriptEngine *engine);
+QScriptValue qtscript_create_QXmlNodeModelIndex_class(QScriptEngine *engine);
 QScriptValue qtscript_create_QAbstractXmlReceiver_class(QScriptEngine *engine);
-QScriptValue qtscript_create_QAbstractMessageHandler_class(QScriptEngine *engine);
-QScriptValue qtscript_create_QAbstractUriResolver_class(QScriptEngine *engine);
-QScriptValue qtscript_create_QXmlSerializer_class(QScriptEngine *engine);
+QScriptValue qtscript_create_QXmlQuery_class(QScriptEngine *engine);
+QScriptValue qtscript_create_QSourceLocation_class(QScriptEngine *engine);
+QScriptValue qtscript_create_QXmlResultItems_class(QScriptEngine *engine);
+QScriptValue qtscript_create_QXmlNamePool_class(QScriptEngine *engine);
 QScriptValue qtscript_create_QSimpleXmlNodeModel_class(QScriptEngine *engine);
+QScriptValue qtscript_create_QXmlSerializer_class(QScriptEngine *engine);
+QScriptValue qtscript_create_QAbstractUriResolver_class(QScriptEngine *engine);
+QScriptValue qtscript_create_QAbstractMessageHandler_class(QScriptEngine *engine);
 QScriptValue qtscript_create_QXmlFormatter_class(QScriptEngine *engine);
 
 static const char * const qtscript_com_trolltech_qt_xmlpatterns_class_names[] = {
-    "QXmlQuery"
-    , "QXmlNamePool"
-    , "QXmlResultItems"
-    , "QXmlNodeModelIndex"
-    , "QAbstractXmlNodeModel"
+    "QAbstractXmlNodeModel"
     , "QXmlName"
-    , "QSourceLocation"
     , "QXmlItem"
+    , "QXmlNodeModelIndex"
     , "QAbstractXmlReceiver"
-    , "QAbstractMessageHandler"
-    , "QAbstractUriResolver"
-    , "QXmlSerializer"
+    , "QXmlQuery"
+    , "QSourceLocation"
+    , "QXmlResultItems"
+    , "QXmlNamePool"
     , "QSimpleXmlNodeModel"
+    , "QXmlSerializer"
+    , "QAbstractUriResolver"
+    , "QAbstractMessageHandler"
     , "QXmlFormatter"
 };
 
 typedef QScriptValue (*QtBindingCreator)(QScriptEngine *engine);
 static const QtBindingCreator qtscript_com_trolltech_qt_xmlpatterns_class_functions[] = {
-    qtscript_create_QXmlQuery_class
-    , qtscript_create_QXmlNamePool_class
-    , qtscript_create_QXmlResultItems_class
-    , qtscript_create_QXmlNodeModelIndex_class
-    , qtscript_create_QAbstractXmlNodeModel_class
+    qtscript_create_QAbstractXmlNodeModel_class
     , qtscript_create_QXmlName_class
-    , qtscript_create_QSourceLocation_class
     , qtscript_create_QXmlItem_class
+    , qtscript_create_QXmlNodeModelIndex_class
     , qtscript_create_QAbstractXmlReceiver_class
-    , qtscript_create_QAbstractMessageHandler_class
-    , qtscript_create_QAbstractUriResolver_class
-    , qtscript_create_QXmlSerializer_class
+    , qtscript_create_QXmlQuery_class
+    , qtscript_create_QSourceLocation_class
+    , qtscript_create_QXmlResultItems_class
+    , qtscript_create_QXmlNamePool_class
     , qtscript_create_QSimpleXmlNodeModel_class
+    , qtscript_create_QXmlSerializer_class
+    , qtscript_create_QAbstractUriResolver_class
+    , qtscript_create_QAbstractMessageHandler_class
     , qtscript_create_QXmlFormatter_class
 };
 

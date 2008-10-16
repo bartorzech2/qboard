@@ -1,7 +1,7 @@
 #ifndef QTSCRIPTSHELL_QUILOADER_H
 #define QTSCRIPTSHELL_QUILOADER_H
 
-#include <QtUiTools/quiloader.h>
+#include <quiloader.h>
 
 #include <QtScript/qscriptvalue.h>
 

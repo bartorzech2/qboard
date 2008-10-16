@@ -70,7 +70,7 @@ static QScriptValue qtscript_QSqlRecord_throw_ambiguity_error_helper(
     QStringList fullSignatures;
     for (int i = 0; i < lines.size(); ++i)
         fullSignatures.append(QString::fromLatin1("%0(%1)").arg(functionName).arg(lines.at(i)));
-    return context->throwError(QString::fromLatin1("QFile::%0(): could not find a function match; candidates are:\n%1")
+    return context->throwError(QString::fromLatin1("QSqlRecord::%0(): could not find a function match; candidates are:\n%1")
         .arg(functionName).arg(fullSignatures.join(QLatin1String("\n"))));
 }
 
@@ -276,13 +276,13 @@ static QScriptValue qtscript_QSqlRecord_prototype_call(QScriptContext *context, 
     case 17:
     if (context->argumentCount() == 2) {
         if (context->argument(0).isString()
-            && context->argument(1).isVariant()) {
+            && true) {
             QString _q_arg0 = context->argument(0).toString();
             QVariant _q_arg1 = context->argument(1).toVariant();
             _q_self->setValue(_q_arg0, _q_arg1);
             return context->engine()->undefinedValue();
         } else if (context->argument(0).isNumber()
-            && context->argument(1).isVariant()) {
+            && true) {
             int _q_arg0 = context->argument(0).toInt32();
             QVariant _q_arg1 = context->argument(1).toVariant();
             _q_self->setValue(_q_arg0, _q_arg1);

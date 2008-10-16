@@ -11,6 +11,7 @@ HEADERS += \
            $$PWD/qtscriptshell_QNetworkAccessManager.h \
            $$PWD/qtscriptshell_QNetworkCookieJar.h \
            $$PWD/qtscriptshell_QNetworkReply.h \
+           $$PWD/qtscriptshell_QSslSocket.h \
            $$PWD/qtscriptshell_QTcpServer.h \
            $$PWD/qtscriptshell_QTcpSocket.h \
            $$PWD/qtscriptshell_QUdpSocket.h \
@@ -38,6 +39,12 @@ SOURCES += \
            $$PWD/qtscript_QNetworkReply.cpp \
            $$PWD/qtscript_QNetworkRequest.cpp \
            $$PWD/qtscript_QSsl.cpp \
+           $$PWD/qtscript_QSslCertificate.cpp \
+           $$PWD/qtscript_QSslCipher.cpp \
+           $$PWD/qtscript_QSslConfiguration.cpp \
+           $$PWD/qtscript_QSslError.cpp \
+           $$PWD/qtscript_QSslKey.cpp \
+           $$PWD/qtscript_QSslSocket.cpp \
            $$PWD/qtscript_QTcpServer.cpp \
            $$PWD/qtscript_QTcpSocket.cpp \
            $$PWD/qtscript_QUdpSocket.cpp \
@@ -54,6 +61,7 @@ SOURCES += \
            $$PWD/qtscriptshell_QNetworkAccessManager.cpp \
            $$PWD/qtscriptshell_QNetworkCookieJar.cpp \
            $$PWD/qtscriptshell_QNetworkReply.cpp \
+           $$PWD/qtscriptshell_QSslSocket.cpp \
            $$PWD/qtscriptshell_QTcpServer.cpp \
            $$PWD/qtscriptshell_QTcpSocket.cpp \
            $$PWD/qtscriptshell_QUdpSocket.cpp \

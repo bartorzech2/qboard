@@ -12,7 +12,7 @@
 #include <qlist.h>
 #include <qobject.h>
 #include <qstringlist.h>
-#include <QtUiTools/quiloader.h>
+#include <quiloader.h>
 #include <qwidget.h>
 
 #define QTSCRIPT_IS_GENERATED_FUNCTION(fun) ((fun.data().toUInt32() & 0xFFFF0000) == 0xBABE0000)

@@ -6,6 +6,11 @@ See README.txt for full project details.
 Newest items are at the top...
 ========================================================================
 
+2008 Oct 16:
+
+- Pulled in latest changes from the main git tree. Now requires Qt 4.4.2+.
+
+
 2008 Sept 14:
 
 - Added GNU Readline script plugin, such that

@@ -40,7 +40,7 @@ static QScriptValue qtscript_QXmlItem_throw_ambiguity_error_helper(
     QStringList fullSignatures;
     for (int i = 0; i < lines.size(); ++i)
         fullSignatures.append(QString::fromLatin1("%0(%1)").arg(functionName).arg(lines.at(i)));
-    return context->throwError(QString::fromLatin1("QFile::%0(): could not find a function match; candidates are:\n%1")
+    return context->throwError(QString::fromLatin1("QXmlItem::%0(): could not find a function match; candidates are:\n%1")
         .arg(functionName).arg(fullSignatures.join(QLatin1String("\n"))));
 }
 
@@ -137,7 +137,7 @@ static QScriptValue qtscript_QXmlItem_static_call(QScriptContext *context, QScri
         QScriptValue _q_result = context->engine()->newVariant(context->thisObject(), qVariantFromValue(_q_cpp_result));
         return _q_result;
     } else if (context->argumentCount() == 1) {
-        if (context->argument(0).isVariant()) {
+        if (true) {
             QVariant _q_arg0 = context->argument(0).toVariant();
             QXmlItem _q_cpp_result(_q_arg0);
             QScriptValue _q_result = context->engine()->newVariant(context->thisObject(), qVariantFromValue(_q_cpp_result));

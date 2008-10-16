@@ -1,5 +1,8 @@
 TEMPLATE = subdirs
 SUBDIRS =
+
+########################################################################
+# Comment out or remove any particular bindings you don't want:
 BINDINGS_TO_BUILD = core
 BINDINGS_TO_BUILD += gui
 BINDINGS_TO_BUILD += uitools
@@ -11,11 +14,14 @@ BINDINGS_TO_BUILD += webkit
 BINDINGS_TO_BUILD += xml
 BINDINGS_TO_BUILD += xmlpatterns
 
-for( MODULE, BINDINGS_TO_BUILD ){
-  SUBDIRS += com_trolltech_qt_$${MODULE}
+########################################################################
+# If you don't have GNU Readline dev files installed, comment this out:
+unix {
+  SUBDIRS += readline
+  SUBDIRS += qs_eval
 }
 
-unix{
-  # Only build this if you have libreadline dev files installed:
-  # SUBDIRS += qs_eval
+
+for( MODULE, BINDINGS_TO_BUILD ){
+  SUBDIRS += com_trolltech_qt_$${MODULE}
 }

@@ -5,27 +5,27 @@
 
 #include <qwebframe.h>
 #include <qwebsettings.h>
-#include <qwebframe.h>
 #include <qwebpluginfactory.h>
 #include <qwebhistoryinterface.h>
 #include <qwebpage.h>
+#include <qwebframe.h>
 #include <qwebview.h>
 
 QScriptValue qtscript_create_QWebHitTestResult_class(QScriptEngine *engine);
 QScriptValue qtscript_create_QWebSettings_class(QScriptEngine *engine);
-QScriptValue qtscript_create_QWebFrame_class(QScriptEngine *engine);
 QScriptValue qtscript_create_QWebPluginFactory_class(QScriptEngine *engine);
 QScriptValue qtscript_create_QWebHistoryInterface_class(QScriptEngine *engine);
 QScriptValue qtscript_create_QWebPage_class(QScriptEngine *engine);
+QScriptValue qtscript_create_QWebFrame_class(QScriptEngine *engine);
 QScriptValue qtscript_create_QWebView_class(QScriptEngine *engine);
 
 static const char * const qtscript_com_trolltech_qt_webkit_class_names[] = {
     "QWebHitTestResult"
     , "QWebSettings"
-    , "QWebFrame"
     , "QWebPluginFactory"
     , "QWebHistoryInterface"
     , "QWebPage"
+    , "QWebFrame"
     , "QWebView"
 };
 
@@ -33,10 +33,10 @@ typedef QScriptValue (*QtBindingCreator)(QScriptEngine *engine);
 static const QtBindingCreator qtscript_com_trolltech_qt_webkit_class_functions[] = {
     qtscript_create_QWebHitTestResult_class
     , qtscript_create_QWebSettings_class
-    , qtscript_create_QWebFrame_class
     , qtscript_create_QWebPluginFactory_class
     , qtscript_create_QWebHistoryInterface_class
     , qtscript_create_QWebPage_class
+    , qtscript_create_QWebFrame_class
     , qtscript_create_QWebView_class
 };
 

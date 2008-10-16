@@ -53,7 +53,8 @@ else
 fi
 cp -rp examples $DEST
 
-cp README.txt \
+cp ChangeLog \
+    README.txt \
     LICENSE.GPL? \
     LICENSE.txt \
     QtScriptBindings.pro \

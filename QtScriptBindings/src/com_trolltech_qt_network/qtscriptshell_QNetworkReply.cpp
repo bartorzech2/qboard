@@ -9,6 +9,8 @@
 #include <qnetworkaccessmanager.h>
 #include <qnetworkrequest.h>
 #include <qobject.h>
+#include <qsslconfiguration.h>
+#include <qsslerror.h>
 #include <qurl.h>
 
 #define QTSCRIPT_IS_GENERATED_FUNCTION(fun) ((fun.data().toUInt32() & 0xFFFF0000) == 0xBABE0000)

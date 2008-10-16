@@ -15,6 +15,7 @@
 #include <qlist.h>
 #include <qnetworkproxy.h>
 #include <qobject.h>
+#include <qsslerror.h>
 #include <qtcpsocket.h>
 
 #include "qtscriptshell_QHttp.h"
@@ -84,7 +85,7 @@ static QScriptValue qtscript_QHttp_throw_ambiguity_error_helper(
     QStringList fullSignatures;
     for (int i = 0; i < lines.size(); ++i)
         fullSignatures.append(QString::fromLatin1("%0(%1)").arg(functionName).arg(lines.at(i)));
-    return context->throwError(QString::fromLatin1("QFile::%0(): could not find a function match; candidates are:\n%1")
+    return context->throwError(QString::fromLatin1("QHttp::%0(): could not find a function match; candidates are:\n%1")
         .arg(functionName).arg(fullSignatures.join(QLatin1String("\n"))));
 }
 

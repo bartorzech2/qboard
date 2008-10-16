@@ -17,6 +17,7 @@
 #include <qnetworkreply.h>
 #include <qnetworkrequest.h>
 #include <qobject.h>
+#include <qsslerror.h>
 
 #include "qtscriptshell_QNetworkAccessManager.h"
 
@@ -57,7 +58,7 @@ static QScriptValue qtscript_QNetworkAccessManager_throw_ambiguity_error_helper(
     QStringList fullSignatures;
     for (int i = 0; i < lines.size(); ++i)
         fullSignatures.append(QString::fromLatin1("%0(%1)").arg(functionName).arg(lines.at(i)));
-    return context->throwError(QString::fromLatin1("QFile::%0(): could not find a function match; candidates are:\n%1")
+    return context->throwError(QString::fromLatin1("QNetworkAccessManager::%0(): could not find a function match; candidates are:\n%1")
         .arg(functionName).arg(fullSignatures.join(QLatin1String("\n"))));
 }
 

@@ -28,6 +28,7 @@
 #include <qobject.h>
 #include <qpalette.h>
 #include <qpoint.h>
+#include <qsessionmanager.h>
 #include <qsize.h>
 #include <qstringlist.h>
 #include <qstyle.h>
@@ -78,6 +79,9 @@ static const char * const qtscript_QApplication_function_names[] = {
     , "widgetAt"
     // prototype
     , "inputContext"
+    , "isSessionRestored"
+    , "sessionId"
+    , "sessionKey"
     , "setInputContext"
     , "toString"
 };
@@ -124,6 +128,9 @@ static const char * const qtscript_QApplication_function_signatures[] = {
     , "QPoint p\nint x, int y"
     // prototype
     , ""
+    , ""
+    , ""
+    , ""
     , "QInputContext arg__1"
 ""
 };
@@ -135,7 +142,7 @@ static QScriptValue qtscript_QApplication_throw_ambiguity_error_helper(
     QStringList fullSignatures;
     for (int i = 0; i < lines.size(); ++i)
         fullSignatures.append(QString::fromLatin1("%0(%1)").arg(functionName).arg(lines.at(i)));
-    return context->throwError(QString::fromLatin1("QFile::%0(): could not find a function match; candidates are:\n%1")
+    return context->throwError(QString::fromLatin1("QApplication::%0(): could not find a function match; candidates are:\n%1")
         .arg(functionName).arg(fullSignatures.join(QLatin1String("\n"))));
 }
 
@@ -321,7 +328,7 @@ static QScriptValue qtscript_QApplication_prototype_call(QScriptContext *context
     if (context->callee().isFunction())
         _id = context->callee().data().toUInt32();
     else
-        _id = 0xBABE0000 + 2;
+        _id = 0xBABE0000 + 5;
 #endif
     Q_ASSERT((_id & 0xFFFF0000) == 0xBABE0000);
     _id &= 0x0000FFFF;
@@ -341,6 +348,27 @@ static QScriptValue qtscript_QApplication_prototype_call(QScriptContext *context
     break;
 
     case 1:
+    if (context->argumentCount() == 0) {
+        bool _q_result = _q_self->isSessionRestored();
+        return QScriptValue(context->engine(), _q_result);
+    }
+    break;
+
+    case 2:
+    if (context->argumentCount() == 0) {
+        QString _q_result = _q_self->sessionId();
+        return QScriptValue(context->engine(), _q_result);
+    }
+    break;
+
+    case 3:
+    if (context->argumentCount() == 0) {
+        QString _q_result = _q_self->sessionKey();
+        return QScriptValue(context->engine(), _q_result);
+    }
+    break;
+
+    case 4:
     if (context->argumentCount() == 1) {
         QInputContext* _q_arg0 = qscriptvalue_cast<QInputContext*>(context->argument(0));
         _q_self->setInputContext(_q_arg0);
@@ -348,7 +376,7 @@ static QScriptValue qtscript_QApplication_prototype_call(QScriptContext *context
     }
     break;
 
-    case 2: {
+    case 5: {
     QString result = QString::fromLatin1("QApplication");
     return QScriptValue(context->engine(), result);
     }
@@ -756,13 +784,16 @@ QScriptValue qtscript_create_QApplication_class(QScriptEngine *engine)
         , 2
         // prototype
         , 0
+        , 0
+        , 0
+        , 0
         , 1
         , 0
     };
     engine->setDefaultPrototype(qMetaTypeId<QApplication*>(), QScriptValue());
     QScriptValue proto = engine->newVariant(qVariantFromValue((QApplication*)0));
     proto.setPrototype(engine->defaultPrototype(qMetaTypeId<QCoreApplication*>()));
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 6; ++i) {
         QScriptValue fun = engine->newFunction(qtscript_QApplication_prototype_call, function_lengths[i+38]);
         fun.setData(QScriptValue(engine, uint(0xBABE0000 + i)));
         proto.setProperty(QString::fromLatin1(qtscript_QApplication_function_names[i+38]),
