@@ -281,13 +281,13 @@ static hashval_t hash_cstring_djb2( void const * vstr)
     return hash;
 }
 
-unsigned short QByteArray_s11n::compressionThreshold = 100;
+unsigned long QByteArray_s11n::compressionThreshold = 100;
 bool QByteArray_s11n::operator()( S11nNode & dest, QByteArray const & src ) const
 {
     if( src.isEmpty() ) return true;
     typedef s11nlite::node_traits NT;
     bool zIt = QByteArray_s11n::compressionThreshold
-	? ((src.size() > QByteArray_s11n::compressionThreshold) ? true : false)
+	? ((((unsigned long)src.size()) > QByteArray_s11n::compressionThreshold) ? true : false)
 	: false;
     QByteArray b64( QByteArray( zIt
 				? qCompress(src)
@@ -318,6 +318,10 @@ bool QByteArray_s11n::operator()( S11nNode const & src, QByteArray & dest ) cons
 	}
 	tmp = QByteArray::fromBase64( tmp );
 	dest = qUncompress( tmp );
+	if( dest.isEmpty() )
+	{ // try harder to see if these warnings are valid: "qUncompress: Z_DATA_ERROR: Input data is corrupted"
+	    dest = tmp;
+	}
 	return true;
 }
 
