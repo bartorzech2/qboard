@@ -37,7 +37,7 @@ namespace s11n { namespace qt {
 	   If set to 0 then compression is disabled. The default value is
 	   quite small - technically undefined, but "probably" around 100.
 	*/
-	static unsigned short compressionThreshold;
+	static unsigned long compressionThreshold;
     };
 }} // namespaces
 /** s11n proxy for QByteArray. */
