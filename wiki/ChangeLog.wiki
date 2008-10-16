@@ -7,6 +7,11 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top. Dates written extra large are release dates.
 
 ----
+*2008 Oct 16*
+
+- Main window geometry is now persistant across sessions.
+
+
 == *2008 Sept 14* ==
 
 Going ahead and doing a release because:
