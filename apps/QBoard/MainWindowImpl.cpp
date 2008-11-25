@@ -110,7 +110,7 @@ struct MainWindowImpl::Impl
 };
 char const * MainWindowImpl::Impl::pieceTemplatesFile = "default-templates";
 char const * MainWindowImpl::Impl::geometryFile = "geometry.s11n";
-char const * MainWindowImpl::Impl::persistanceClass = "MainWindow";
+char const * MainWindowImpl::Impl::persistanceClass = QBOARD_MAINWINDOW_PERSISTENCE_CLASS;
 
 MainWindowImpl::MainWindowImpl( QWidget * parent, Qt::WFlags f) 
     : QMainWindow(parent, f),
