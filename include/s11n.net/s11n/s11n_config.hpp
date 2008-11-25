@@ -19,9 +19,9 @@
 
 
 #define s11n_S11N_PACKAGE_NAME "s11n"
-#define s11n_S11N_LIBRARY_VERSION "1.2.7"
-#define s11n_S11N_LIBRARY_VERSION_HEX (0x010207)
-#define s11n_PACKAGE_RELEASE_CODENAME "Arlo Guthrie"
+#define s11n_S11N_LIBRARY_VERSION "1.2.9"
+#define s11n_S11N_LIBRARY_VERSION_HEX (0x010209)
+#define s11n_PACKAGE_RELEASE_CODENAME "The Software Still Known As S11n"
 #define s11n_PACKAGE_LICENSE "Public Domain"
 #define s11n_PACKAGE_URL "http://s11n.net/"
 #define s11n_PACKAGE_EMAIL_ADDRESS "s11n-devel@lists.sourceforge.net"
@@ -36,7 +36,7 @@
 #  define s11n_CONFIG_ENABLE_PLUGINS (1)
 #else
 #  define s11n_CONFIG_HAVE_LIBEXPAT 0
-#  define s11n_CONFIG_HAVE_ZFSTREAM (1)
+#  define s11n_CONFIG_HAVE_ZFSTREAM 0
 #  define s11n_CONFIG_ENABLE_PLUGINS (1)
 #endif
 
@@ -45,8 +45,8 @@
 #  define s11n_CONFIG_SHARED_DIR std::string("C:\\s11n.net\\shared")
 #  define s11n_CONFIG_LIB_DIR std::string("C:\\s11n.net\\lib")
 #else
-#  define s11n_CONFIG_SHARED_DIR std::string("/usr/share/s11n")
-#  define s11n_CONFIG_LIB_DIR std::string("/usr/lib/s11n")
+#  define s11n_CONFIG_SHARED_DIR std::string("/home/stephan/share/s11n")
+#  define s11n_CONFIG_LIB_DIR std::string("/home/stephan/lib/s11n")
 #endif
 
 #define s11n_S11NLITE_DEFAULT_SERIALIZER_TYPE_NAME std::string("s11n::io::funtxt_serializer")

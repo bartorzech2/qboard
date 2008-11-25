@@ -280,31 +280,22 @@ namespace s11nlite {
         node_type * load_node( std::istream & src );
 
 
+        /**
+	   Tries to load a node_type from the given source.  On
+	   success, dest is set to the contents of that source and
+	   true is returned, otherwise false is returned and dest is
+	   untouched.
 
+	   Added in versions 1.3.1 and 1.2.8.
+	*/
+        bool load_node( const std::string & src, node_type & dest );
 
-// unnecessary with 1.1.3's functors:
-//         /**
-//            deserializer is a functor for deserializing
-//            SerializableType objects from node_type objects.
-//            Sometimes this may be more convenient to use than
-//            deserialize(), e.g., when deserializing multiple
-//            objects of the same type.
-//            Sample usage:
-// <pre>
-// typedef deserializer<MyBaseType> Deser;
-// Deser d;
-// MyBaseType * obj = d( my_data_node );
-// </pre>
-//         */
-//         template <typename SerializableType>
-//         struct node_deserializer
-//         {
-//                 typedef SerializableType serializable_type;
-//                 serializable_type * operator()( const node_type & src )
-//                 {
-//                         return s11n::deserialize<node_type,serializable_type>( src );
-//                 }
-//         };
+        /**
+	   Overloaded form taking an input stream instead of a string.
+
+	   Added in versions 1.3.1 and 1.2.8.
+	*/
+        bool load_node( std::istream & src, node_type & dest );
 
         /**
 	   See s11n::deserialize().
