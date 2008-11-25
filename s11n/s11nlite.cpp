@@ -12,6 +12,7 @@
 #include <s11n.net/s11n/io/strtool.hpp>
 // #include <s11n.net/stringutil/stdstring_tokenizer.hpp>
 #include <s11n.net/s11n/io/serializers.hpp> // create_serializer()
+#include <memory> // auto_ptr<>
 
 #define S11NLITE_CONFIG_FILE std::string("${HOME}/.s11nlite-1.1.conf")
 #define S11NLITE_SERIALIZER_KEY std::string("serializer_class")
@@ -154,6 +155,24 @@ namespace s11nlite {
         {
 		return instance().load_node( src );
         }
+
+        bool load_node( const std::string & src, node_type & dest )
+	{
+	    typedef std::auto_ptr<node_type> AP;
+	    AP n( load_node( src ) );
+	    if( ! n.get() ) return false;
+	    node_traits::swap( dest, *n );
+	    return true;
+	}
+
+        bool load_node( std::istream & src, node_type & dest )
+	{
+	    typedef std::auto_ptr<node_type> AP;
+	    AP n( load_node( src ) );
+	    if( ! n.get() ) return false;
+	    node_traits::swap( dest, *n );
+	    return true;
+	}
 
 
 } // namespace
