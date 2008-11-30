@@ -7,6 +7,11 @@ This is the informal ChangeLog for the QBoard project. Newest items
 are at the top. Dates written extra large are release dates.
 
 ----
+
+*2008 Nov 30*
+
+- Reversed zoom in/out mouse wheel, to match Firefox. Build changes to accommodate seemingly harmless change in qmake 4.4.3 which broke my builds. More JS experimentation, but all that stuff is in the air right now.
+
 *2008 Oct 16*
 
 - Main window geometry is now persistant across sessions.
