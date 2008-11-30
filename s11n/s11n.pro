@@ -6,7 +6,7 @@
 # file exists only to create the .o files, and we ignore
 # the generated .so/.dll altogether.
 include(../config.qmake)
-VERSION = 1.2.7
+VERSION = 1.2.9
 TEMPLATE = lib
 TARGET = QBoardS11n
 QT =

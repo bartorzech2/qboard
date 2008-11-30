@@ -109,7 +109,8 @@ public:
        Returns false only if this object is not properly bound to
        an underlying QGraphicsItem.
     */
-    Q_INVOKABLE bool setParentItem( QGraphicsItem * p );
+    //Q_INVOKABLE bool setParentItem( QGraphicsItem * p );
+    Q_INVOKABLE bool setParentItem( QScriptValue const & p );
 
     /**
        Returns this object's parent item, or 0 if it is top-level or
