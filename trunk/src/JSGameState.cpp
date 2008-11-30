@@ -87,7 +87,7 @@ bool JSGameState::load( QString const & fn )
 GameState * JSGameState::self()
 {
     if( ! this->engine() ) return 0;
-#if 0
+#if 1
     if( (!impl->qgiproto) )
     {
 	// FIXME: we only need one proto per engine
@@ -223,11 +223,17 @@ JSGameState::createObject( QString const & className,
 	}
 #endif
 
-#if 0
+#if 1
 #if 1
 	// this partially conflicts with the one used by the qt.gui JS extension
 	if(1) qDebug() << "JSGameState::createObject("<<className<<"): setting prototype to JSQGI.";
 	jo.setPrototype( impl->qgiprotoj );
+	QVariant varo(git); // evaluates to bool!
+	varo.setValue<QGraphicsItem*>(git);
+	qDebug() << "JSGameState::createObject() QGI:"<<varo;
+	jo.setData( js->newVariant( varo ) );
+	qDebug() << "JSGameState::createObject() re-read:"<<jo.property("__QGI").toVariant();
+	//jo.setData( js->newVariant( QVariant(git) ) );
 #else
 	QScriptValue qgip =
 	    //impl->qgiprotoj;

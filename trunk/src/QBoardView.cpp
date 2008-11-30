@@ -322,11 +322,11 @@ void QBoardView::wheelEvent(QWheelEvent *event)
     {
 	if( event->delta() < 0 )
 	{
-	    this->zoomIn();
+	    this->zoomOut();
 	}
 	else
 	{
-	    this->zoomOut();
+	    this->zoomIn();
 	}
 	event->accept();
 	return;

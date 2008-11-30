@@ -900,11 +900,12 @@ namespace qboard {
 	    qtj.setProperty("script", qscript);
 	}
 
-	if(0)
+	if(1)
 	{ // import known extensions...
 	    QStringList ext;
 	    ext << "qt.core"
 		<< "qt.gui"
+		//<< "qt.sql"
 		;
 	    Q_FOREACH( QString e, ext )
 	    {
@@ -936,10 +937,11 @@ namespace qboard {
 	}
 #endif // instantiation kludge
 
-#if 0
 	qScriptRegisterMetaType(js, 
 				qboard::toScriptValue<QList<QGraphicsItem*> >,
 				qboard::fromScriptValue<QList<QGraphicsItem*> > );
+
+#if 0
 	/**
 	   IF i do this then my conversions from native QGI* to JS Object work. If i don't,
 	   they do work, but the qt.gui bindings don't see the native objects, so THEY

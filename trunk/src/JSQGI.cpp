@@ -58,9 +58,19 @@ QScriptValue JSQGI::posXY()
     return js->evaluate( code, "JSQGI::posXY()");
 }
 
-bool JSQGI::setParentItem( QGraphicsItem * p )
+bool JSQGI::setParentItem( QScriptValue const & pv )
 {
     SELF(false);
+    QGraphicsItem * p = dynamic_cast<QGraphicsItem*>(pv.toQObject());
+    // ^^^ qscriptvalue_cast() doesn't work here, but dynamic_cast() does!
+    qDebug() << "JSQGI::setParentItem() tried direct cast:"<<p;
+    if( ! p )
+    {
+	QVariant var( pv.toVariant() );
+	p = var.value<QGraphicsItem*>();
+	qDebug() << "JSQGI::setParentItem() tried variant cast:"<<p;
+    }
+    if( ! p ) return false;
     self->setParentItem(p);
     return true;
 }
@@ -147,7 +157,11 @@ QList<QGraphicsItem*> JSQGI::childItems()
 
 QGraphicsItem * JSQGI::self()
 {
-    QGraphicsItem * s = qscriptvalue_cast<QGraphicsItem*>(thisObject());
+    // qscriptvalue_cast<QGraphicsItem*>(thisObject());
+    QVariant var( thisObject().data().toVariant() );
+    qDebug() << "JSQGI::self() variant:"<<var;
+    QGraphicsItem * s = var.value<QGraphicsItem*>();
+    qDebug() << "JSQGI::self() QGI:"<<s;
     if( ! s )
     {
 	this->context()->throwError("JSQGI::self() got a null pointer.");
