@@ -34,7 +34,6 @@
 #include <qboard/S11nQt/QPair.h>
 #include <qboard/S11nQt/QPen.h>
 #include <qboard/S11nQt/QPixmap.h>
-#include <qboard/S11nQt/QPixmap.h>
 #include <qboard/S11nQt/QPoint.h>
 #include <qboard/S11nQt/QPointF.h>
 #include <qboard/S11nQt/QRect.h>
@@ -707,7 +706,7 @@ bool QRegExp_s11n::operator()( S11nNode & dest, QRegExp const & src ) const
 	if( ! s11n::serialize_subnode( dest, "pattern", src.pattern() ) ) return false;
 	NT::set( dest, "syntax", int(src.patternSyntax()) );
 	NT::set( dest, "case", int(src.caseSensitivity()) );
-	NT::set( dest, "min", int(src.caseSensitivity()) );
+	NT::set( dest, "min", bool(src.isMinimal()) );
 	return true;
 }
 bool QRegExp_s11n::operator()( S11nNode const & src, QRegExp & dest ) const
