@@ -18,18 +18,23 @@ which can simplify the process:
 # Tip: the command uses screen coordinates, so do not resize or move
 # the target window once capturing as begun.
 echo "Click the window to capture..."
-geom=$(xwininfo 2>/dev/null | grep "geometry ")
-if [[ x = "x${geom}" ]]; then
-    echo "Invalid geometry or -geometry flag not found in xwininfo output"
-    exit 1
-fi
+
+tmpfile=/tmp/screengrab.tmp.$$
+trap 'touch $tmpfile; rm -f $tmpfile' 0
+
+xwininfo > $tmpfile 2>/dev/null
+left=$(grep 'Absolute upper-left X:' $tmpfile | awk '{print $4}');
+top=$(grep 'Absolute upper-left Y:' $tmpfile | awk '{print $4}');
+width=$(grep 'Width:' $tmpfile | awk '{print $2}');
+height=$(grep 'Height:' $tmpfile | awk '{print $2}');
+geom="-geometry ${width}x${height}+${left}+${top}"
 echo "Geometry: ${geom}"
-size=$(echo $geom | perl -pe 's|\D+ +(\d+x\d+).*|$1|')
-pos=$(echo $geom | perl -pe 's|.*\+(\d+)\+(\d+).*|$1,$2|')
+size="${width}x${height}"
+pos="${left},${top}"
 echo "pos=$pos size=$size"
 
 out=${1-screengrab.avi}
-test -f $out && rm $out
+#test -f $out && rm $out
 
 framerate=4
 echo "# ffmpeg command"
@@ -40,7 +45,6 @@ echo ffmpeg -f x11grab \
     -i ${DISPLAY-0:0}+${pos} \
     -sameq \
     $out
-
 }}}
 
 
