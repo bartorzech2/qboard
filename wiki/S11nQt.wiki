@@ -73,7 +73,7 @@ To deserialize it, we do:
 {{{
 if( var.canConvert<VariantS11n>() )
 {
-  VariantS11n sv( myVariant.value<VariantS11n>() );
+  VariantS11n sv( var.value<VariantS11n>() );
   MySerializable * my = sv.deserialize<MySerializable>();
   ...
 }
