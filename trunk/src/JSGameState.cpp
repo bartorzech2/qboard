@@ -228,7 +228,7 @@ JSGameState::createObject( QString const & className,
 	// this partially conflicts with the one used by the qt.gui JS extension
 	if(1) qDebug() << "JSGameState::createObject("<<className<<"): setting prototype to JSQGI.";
 	jo.setPrototype( impl->qgiprotoj );
-	QVariant varo(git); // evaluates to bool!
+	QVariant varo(git ? true : false); // evaluates to bool! // not in qt4.5!
 	varo.setValue<QGraphicsItem*>(git);
 	qDebug() << "JSGameState::createObject() QGI:"<<varo;
 	jo.setData( js->newVariant( varo ) );
