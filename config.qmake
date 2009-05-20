@@ -125,7 +125,7 @@ message( S11N_OBJECTS=$$S11N_OBJECTS )
 
 ########################################################################
 # For Qt 4.4 we add some bits which aren't available in 4.3...
-contains(QT_VERSION, ^4\.4\..+ ){
+contains(QT_VERSION, ^4\.(4|5)\..+ ){
 	 message("Adding Qt 4.4-specific bits")
 	 QBOARD_HEADERS_QT44 = $$QBOARD_INCLUDES_DIR/QBoardDocsBrowser.h 
 	 QBOARD_SOURCES_QT44 = $$SRC_DIR/QBoardDocsBrowser.cpp
