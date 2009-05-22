@@ -1,0 +1,38 @@
+                                xpbm v0.1
+
+xpbm is a pbm assistance program for X-Window.  Currently it reads
+only VMAP files.  Some day, it may read other file formats.  xpbm 
+does not know the rules to any games, it is strictly the online
+equivalent of cardboard.
+
+
+INSTALLATION
+============
+
+Type make.  If it busts let me know, or fix it, and send me the patch.
+Some day I may get around to making a configure script if it is
+necessary.
+
+
+RUNNING
+=======
+
+Unfortunately you have to start the program in the same directory you 
+have the VMAP file in.  Eventually I would like to have it search some
+path for VMAP files, and have some kind of friendlier selection system.
+
+* Select File - Import VMAP menu item to open a VMAP file.  
+
+* Left click on the map to bring up a unit selection window.  
+
+* Left down click on a unit to begin moving the unit, and release the 
+button to finish moving the unit.
+
+* Right click on a counter to bring up the unit properties window.  
+
+* Hit escape to banish either window.  
+
+* Shift down left click to start a line, and release the button to 
+complete the line.  
+
+* To erase all lines, use the File - Erase Lines menu item.

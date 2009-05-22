@@ -1,0 +1,16 @@
+# V_MAP save file
+# VERSION ver
+VERSION 1.7
+# MAP step_size max_top max_left path/name
+MAP 120 0 0 bfm-map.jpg
+
+# TILES rows columns path/name
+TILES 7 12 bfm_set.jpg
+
+# STACKING ON=auto_stack
+STACKING ON
+
+# UNIT top left in_play bitmap_index comment
+UNIT 263 152 1 17 
+
+# LINE x0 y0 x1 y1

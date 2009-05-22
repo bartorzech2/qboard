@@ -1,0 +1,26 @@
+# V_MAP save file
+# VERSION ver
+
+VERSION 1.3
+
+# MAP step_size max_top max_left path\name
+MAP 120 0 0 bfm-map.jpg
+#MAP 120 0 0 bfm_map_big.jpg
+
+#
+# TILES rows columns path\name
+TILES 7 12 bfm_set.jpg
+
+#
+# STACKING ON=auto_stack
+STACKING ON
+
+#
+# UNIT top left in_play bitmap_index comment
+
+# This is a guess, I need to bring home a vmap file
+
+# LINE x0 y0 x1 y1     style color
+
+
+

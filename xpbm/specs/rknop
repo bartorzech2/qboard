@@ -1,0 +1,266 @@
+This was the last complete message I sent to Todd on the topic.  There
+was a little back-and-forth after that.  JV_Map doesn't yet implement all
+of this, but it implements some of it.
+
+-Rob
+
+---------- Forwarded message ----------
+Date: Tue, 6 Feb 2001 22:28:28 -0800 (PST)
+From: Robert A. Knop Jr. <rknop@pobox.com>
+To: Todd Zircher <tzircher@yahoo.com>
+Subject: Final? VMP 2.0 file specification
+
+Incorporating what you sent me, this is what we have.
+
+Let me know if you have any other changes; otherwise, I'll probably start
+working on implementing this!
+
+-Rob
+
+========================================================================
+Proposal for the VMP 2.0 file specification, version 0.3
+
+Line terminators: all lines should end with CRLF (the DOS standard).
+
+Fields: absolutely column position is unimportant.  Except where noted,
+fields are separated by one more more spaces (ASCII 32).
+
+BEGIN VMP FILE
+
+    Every VMP file begins with this line.  This lets you "embed" VMP
+    files, which is a fancy word for being sloppy.  I tend to send VMP
+    files as attachments, but if you send them as just part of the text
+    of the message, you can then read the whole E-mail message into
+    V_Map or JV_Map.  This will tell it where to start processing.
+
+END VMP FILE
+
+    Every VMP file will end with this line.  Everything in between the
+    begin and end lines will be processed, everything outside them will
+    be ignored.
+
+    Typically, only the *first* set of data between BEGIN and END
+    directives will be read.  If you have multiple moves in one file,
+    the NEWEST move should be the first one in the file.  (Append at the
+    beginning.)
+
+# comments
+
+    Any line which begins with a # is a comment, and the rest of the
+    line is ignored.
+
+(blank line)
+
+    Blank lines are allowed, but need not be preserved from one read to
+    the next.  They are ignored on read-in.
+
+VERSION 2.0
+
+    Version of the file spec appears after a space after the VERSION tag.
+
+TITLE
+
+    A title for the game.  After the space after the word TITLE, the
+    rest of the line is a string which will be displayed with the game.
+
+VMPNUM
+
+    Ignored as of version 2.0.  However, eventually this will be
+    monotonically increasing as VMP files are saved from a given game.
+    Together with a "game" or "Meta-VMP" file that tracks all of the VMP
+    files with a given game, this tag will let you know where in the
+    game this VMP file goes (and will let you know if you missed any).
+
+MAP
+
+    There can be any number of MAP statements (though there must be at
+    least one).  Each one indicates a map which will be opened in a
+    window.  Thus, there can be many windows associated with a single
+    given game.  The MAP statement takes seven parameters:
+
+
+      <number> : number of this map.  This must be no more than one
+                  map with each number.
+
+      <x0> : The x position of the top-left corner of this map in pixels
+             (Used if maps are tiled, should just be 0 otherwise).
+             Pixel 0,0 is the absolute top-left.
+
+      <y0> : The y position of the top-left corner of this map in pxiels
+
+      <width> : The width of the map in pixels.  (The program can use
+                this to verify that an image of the right size is read
+                in.)
+
+      <height> : The height of the map in pixels.
+
+      <name> : The filename for the image of this map (NO SPACES IN NAME)
+
+      <title> : The title for this map.  This field encompasses the rest
+                of the line, including spaces.
+
+SNAP
+
+    Binary: snap tiles?  Valid values are ON and OFF.  Implementation of
+    snapping is optional, but the value should be preserved from one VMP
+    file to the next.  Snapping is rectangular, to the size of the
+    tiles.
+
+TILES
+
+    There can only be one TILES statement in any given VMP file.  It
+    indicates the counter set for the game.  It has three parameters:
+
+      <rows> : the number of rows of counters in the set
+      <columns> : the number of columns of counters in the set
+      <filename> : the filename of the image.
+
+PLAYER
+
+    There can be any number of PLAYER statements.  They give information
+    about the player.
+
+      <number> : The number of this player.  It must be unique,
+                 If zero, it's assumed to be the GM; if you
+                 a game has no GM, there should be no player 0.
+                 Even if there is no player 0, player 0 will
+                 still own generic markers (terrain, etc).
+
+      <email> : E-mail address of the player
+
+      <password> : An encrypted password for the player.  For now, this
+                   should alwyas be "*" (no password) until the standard
+                   for the encryption is set.
+
+      <name/comments> : Starts after the first space after the E-mail
+                        address : any further text (name, whatever)
+                        including spaces to be associated with this
+                        player.  This field spans the rest of the line,
+                        and can include spaces.
+
+UNIT
+
+    There can be any number of UNIT statements.  They indicate the
+    sundry counters which are displayed on the sundry maps.  They must
+    come after all of the other statements (except for the "END VMP
+    FILE" statement.  Order matters: Units are listed in z-order from
+    lowest to highest, so that a later listed until will be rendered on
+    top.  This order need *not* be preserved, and the units may be
+    written out in a different zorder with the next VMP file.  The
+    unit statement has eight parameters:
+
+      <ordinal> : The is a unique specifier for the unit.  It's eventual
+                  use is that it will be used to track units from one
+                  turn to the next.  The VMP 2.0 file specification
+                  doesn't address this, but I'm thinking ahead to a
+                  "game" file specification which will be a collection
+                  of VMP files.
+
+      <top> : The Y position of the upper-left corner of the
+                       counter.
+
+      <left> : The X position of the upper-left corner of the
+
+
+      <map> : The map number on which this counter appears.  This map
+              number must have appeared above in a MAP statement.
+
+      <index> : The "bitmap" index into the tiles set for this counter.
+                Count tiles starting at the upper left and going to the
+                right, then down (as you read normal English text).
+
+      <owner> : The owner of this counter.  The number must have
+                previously appeared in a PLAYER statement, or must be 0
+                for "unowned" tiles.  (E.g. things like terrain
+                counters, or things which should be oned by the GM.)
+
+      <facing> : The angle, in degrees, to which to rotate this counter.
+                 For version 2.0 of the file spec, this *must* be zero.
+                 However, hopefully looking ahead we may be able to do
+                 facing with counters in version 2.1 or what not of the
+                 file spec.
+
+      <comment> : A comment for the counter.  This field spans the rest
+                  of the line, and can include spaces.
+
+
+ENCRYPT
+
+      A variant UNIT that has the "real" data for the unit.  This field
+      is not supported in VMP version 2.0, but hopefully will be in the
+      future.
+
+LINE
+
+     A line to be drawn on the screen.  There are four fields
+
+      <x0> : First x coordinate of the line (pixels)
+      <y0> : First y coordinate of the line
+      <x1> : Last x coordinate of the line
+      <y1> : Last y coordinate of the line
+      <id> : The map ID on which this line goes
+      <t>  : Thickness of the line (pixels) (implementation is optiona.l)
+      <c>  : Color of the line (in a hex RGB triplet, e.g. ffff00 for yellow)
+      <title> : Everything else, including spaces, is text to be
+                rendered with the line.
+
+RULER
+
+     The ruler statement sets the scale for the lines and the units of
+     measure that a given line is equal to.
+
+      <x> : How many pixels per unit (ie. 10 pixels / kilometer)
+      <y> : The same ratio, but for vertical units
+      <id> : The map ID that this ruler is associated with.  Each map can
+             have its own size scale, if needed.
+      <units> : A text description of the units of measure; pixels, meters,
+                yeards, etc.
+
+
+
+DICE
+
+     Multiple DICE directives may appear.  Implementation is optional,
+     but they should be preserved.  They represent pre-set dice
+     configurations for convenience of the user and any internal
+     die-rollers.  The values are:
+
+      <numdice> : Number of dice in one roll
+      <sides> : Number of sides on one die
+      <modifier> : 0, +1, +2, ..., or -1, -2, ... : modifier to add to roll
+      <table> : Set to "none" by default.  This field will point to a table
+                of values that can be rolled instead of the dice returning
+                a numerical value.
+      <name> : This is the description of the dice.
+               "2d6", "2d10+2", "Crit Check"
+
+TABLE
+
+
+     Multiple TABLE directives may appear.  Implementation is optional,
+     but they should be preserved.  They represent result tables used
+     in wargames as well as RPG aids such as wandering monster tables
+     for convenience of the user and any internal die-rollers.  The
+     values are:
+
+      <name> : The name of the table.  This is a single word with no
+               spaces, but underscores are allowed.
+      <weight> : This represents the number of pips or digits on a
+                 dice throw and is used for non-linear tables or
+                 averaging dice.
+      <result> : This is the free form text message to display.
+
+example:  Roll a 1d6 and average it or roll a 1d20 and determine some loot.
+
+TABLE average 1 You rolled a 2.
+TABLE average 2 You rolled a 3.
+TABLE average 2 You rolled a 4.
+TABLE average 1 You rolled a 5.
+
+TABLE treasure1 1 You found 1d6 platinum coins.
+TABLE treasure1 3 You found 2d6 gold coins.
+TABLE treasure1 6 You found 2d8 silver coins.
+TABLE treasure1 10 You found 2d10 copper coins.
+
+
+
