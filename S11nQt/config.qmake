@@ -1,0 +1,24 @@
+########################################################################
+# Shared qmake configuration data for libS11nQt.
+
+QMAKE_SHARED_CONF = config.qmake # THIS file
+TOP_SRCDIR=$$PWD
+!exists($$TOP_SRCDIR/$$QMAKE_SHARED_CONF) {
+    error("to fix this, edit $$QMAKE_SHARED_CONF and set the variable TOP_SRCDIR to the \
+	absolute path of the top-most directory of this source tree (the dir \
+	containing $$QMAKE_SHARED_CONF)")
+}
+
+########################################################################
+# Construct a relative dir to the root. This won't work for TOP_SRCDIR,
+# or at least it's untested.
+REL_SRCDIR = $$(PWD)
+REL_SRCDIR=$$replace(REL_SRCDIR,$$TOP_SRCDIR/,)
+REL_SRCDIR=$$replace(REL_SRCDIR,[^/]+,..)
+
+OBJECTS_DIR = $$REL_SRCDIR/build/$$QT_VERSION
+
+QMAKE_INCDIR += $$REL_SRCDIR/include
+
+CONFIG += warn_on debug no_keywords
+

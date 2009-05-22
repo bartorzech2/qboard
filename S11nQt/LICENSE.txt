@@ -1,0 +1,10 @@
+This is the LICENSE file for the QBoard project.
+
+QBoard is Copyright (c) 2008 Stephan Beal
+(http://wanderinghorse.net/home/stephan/)
+
+This source code is a derivative of Qt 4.x and therefor follows the
+same license.  You may use this code under the terms of the GNU
+General Public License, version 2, version 3, or, at your discretion,
+any later version. See the files LICENSE.GPL2 and LICENSE.GPL3 for
+the full text of the licenses.
