@@ -5,17 +5,21 @@
 Since i'm the maintainer of the s11n project (http://s11n.net), a library for serializing
 objects in C++, QBoard uses libs11n for its serialization needs (that is, loading and saving). As QBoard develops, code is written to bind Qt-based types to the s11n serialization framework. That code is independent of QBoard and may be helpful to coders working on arbitrary Qt-based projects. (Historical note: libs11n was originally written with the express intent of (someday) supporting this very application.)
 
-As of May 2009, this code is maintained in its own library. It is accessible via:
+= Getting the source =
+
+The S11nQt distribution contains a complete copy of libs11n plus the Qt extensions described below. As of May 2009, it is maintained in its own library, separate from qboard. It is accessible via:
 
    * [http://code.google.com/p/qboard/source/browse/#svn/S11nQt its source repository]
    * via the downloads page. Look for `libS11nQt-S11N_VERSION-RELEASE_DATE.tar.bz2`.
    * The main qboard source tree also has a copy, but that is no longer the master copy, and may eventually be phased out.
 
-The S11nQt distribution contains a complete copy of libs11n plus the Qt extensions described below. It can be used as a replacement for vanilla libs11n builds, but is intended for redistribution along with Qt client applications. If you want to add the Qt extensions to your own copy of libs11n, simply:
+It can be used as a replacement for vanilla libs11n builds, but is intended for redistribution along with Qt client applications. If you want to add the Qt extensions to your own copy of libs11n, simply:
 
    * Copy [http://code.google.com/p/qboard/source/browse/#svn/S11nQt/include/s11n.net/s11n/qt%3Fstate%3Dclosed include/s11n.net/qt] to {{{<s11n.net/s11n>}}} on your system.
    * Copy [http://code.google.com/p/qboard/source/browse/#svn/S11nQt/include/s11n.net/s11n/proxy/qt include/s11n.net/proxy/qt] to {{{<s11n.net/s11n/proxy>}}} on your system.
-   * Copy [http://code.google.com/p/qboard/source/browse/#svn/S11nQt/s11n s11n/S*.cpp] into your project (note that that's a capital `S*`, not lower-case!). Alternately, link them in with your local libs11n.
+   * Copy [http://code.google.com/p/qboard/source/browse/#svn/S11nQt/s11n s11n/S*.cpp] into your project (note that that's a capital `S*`, not lower-case!). Alternately, link them in with your local libs11n. No changes to libs11n are required.
+
+= Supported Qt types =
 
 These s11n/Qt extensions contain code for de/serializing the following Qt types:
 
