@@ -546,7 +546,6 @@ bool QPen_s11n::operator()( S11nNode & dest, QPen const & src ) const
     NT::set(dest,"joinStyle", int(src.joinStyle()) );
     NT::set(dest,"miterLimit", int(src.miterLimit()) );
     NT::set(dest,"width", src.width() );
-    // TODO: dashOffset() + dashPattern()
     QVector<qreal> dp( src.dashPattern() );
     if( ! dp.empty() )
     {
@@ -981,7 +980,7 @@ char const * VariantS11n::variantTypeName()
 int VariantS11n::variantType()
 {
     static int bob = qRegisterMetaType<VariantS11n>(variantTypeName());
-	    return bob;
+    return bob;
 }
 
 VariantS11n::VariantS11n()
