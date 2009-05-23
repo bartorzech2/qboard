@@ -20,6 +20,8 @@
 #  define Q_EMIT
 #endif
 
+namespace s11n { namespace qt {
+
 S11nClipboard::S11nClipboard() : m_node(0)
 {
     this->syncFromQt();
@@ -126,3 +128,5 @@ QString S11nClipboard::contentLabel()
 	return QString("[empty]");
     }
 }
+
+}} // namespaces

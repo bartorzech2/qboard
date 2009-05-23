@@ -17,6 +17,7 @@
 #include <s11n.net/s11n/s11nlite.hpp>
 #include <QDebug>
 
+namespace s11n { namespace qt {
 /**
    S11nClipboard provides clipboard features for any Serializable
    type. It is intended to be used as a Singleton - fetch its instance
@@ -140,5 +141,7 @@ private Q_SLOTS:
 private:
     S11nNode * m_node;
 };
+
+}} // namespaces
 
 #endif // __S11NCLIPBOARD_H__

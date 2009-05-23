@@ -8,7 +8,7 @@ TARGET = S11nQt
 OBJECTS_DIR = $$OBJECTS_DIR/obj-s11n
 MOC_DIR = $$OBJECTS_DIR
 MAIN_INCLUDES_DIR = $$REL_SRCDIR/include
-DESTDIR = $$REL_SRCDIR/build/$$QT_VERSION
+DESTDIR = $$BUILD_DEST_DIR
 
 message(libS11nQt version $$VERSION)
 message(QT_VERSION $$QT_VERSION)
@@ -48,7 +48,7 @@ H=$$MAIN_INCLUDES_DIR/s11n.net/s11n/qt
 S11N_HEADERS_QT = \
  $$H/Serializable.h \
  $$H/S11n.h \
- $$H/S11nQt/S11nClipboard.h \
+ $$H/S11nClipboard.h \
  $$H/S11nQt.h
 H=
 S11N_SOURCES_QT = \

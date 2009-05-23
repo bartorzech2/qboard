@@ -1,6 +1,6 @@
 #ifndef S11NQT_QPolygon_H_INCLUDED
 #define S11NQT_QPolygon_H_INCLUDED 1
-#include "S11nQt/QList.h"
+#include <s11n.net/s11n/proxy/qt/QList.h>
 #include <QPoint>
 #include <QPolygon>
 

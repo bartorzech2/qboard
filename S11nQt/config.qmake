@@ -20,5 +20,6 @@ OBJECTS_DIR = $$REL_SRCDIR/build/$$QT_VERSION
 
 QMAKE_INCDIR += $$REL_SRCDIR/include
 
+BUILD_DEST_DIR = $$REL_SRCDIR/build/$$QT_VERSION
 CONFIG += warn_on debug no_keywords
 
