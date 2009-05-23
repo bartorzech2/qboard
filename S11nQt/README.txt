@@ -10,8 +10,14 @@ It is maintained as part of the QBoard project:
 
 http://code.google.com/p/qboard
 
+An overview of its features can be found here:
+
+http://code.google.com/p/qboard/wiki/S11nQt
+
+
 Author: Stephan Beal (http://wanderinghorse.net/home/stephan)
 
+License: same as Qt: GNU GPL 2 or 3
 
 ========================================================================
 BUILDING AND INSTALLING
@@ -22,9 +28,12 @@ might work with earlier 4.x releases):
  ~> qmake
  ~> make
 
-The library will be built to ./build/$QT_VERSION/... To install it, simply
+The shared library will be built to ./build/$QT_VERSION/... To install it, simply
 copy it to somewhere in your libs path. If you need the headers, simply copy
 ./include/s11n.net to some directory in your includes path. If you already have
 libs11n instead, then you only need to copy ./include/s11n.net/s11n/qt into your
 existing <s11n.net/s11n> directory and copy ./include/s11n.net/s11n/proxy/qt
 to <s11n.net/s11n/proxy>.
+
+Note that a static-library build will not work properly - this is a limitation
+of s11n.
