@@ -24,14 +24,15 @@ serialization support for many common Qt types.
 
 #include <s11n.net/s11n/s11nlite.hpp>
 //#include <s11n.net/s11n/s11n_debuggering_macros.hpp>
-/* Used by the s11n-related algorithms. */
-typedef s11nlite::node_type S11nNode;
-/* Used by the s11n-related algorithms. */
-typedef s11nlite::node_traits S11nNodeTraits;
 
 #include <sstream>
 #include <memory>
 namespace s11n { namespace qt {
+
+    /* Used by the s11n-related algorithms. */
+    typedef s11nlite::node_type S11nNode;
+    /* Used by the s11n-related algorithms. */
+    typedef s11nlite::node_traits S11nNodeTraits;
 
     /**
        Given one of the following strings, it returns the appropriate Qt::PenStyle

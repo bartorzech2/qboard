@@ -53,6 +53,8 @@
 
 #include <s11n.net/s11n/proxy/pod/int.hpp>
 
+using s11n::qt::S11nNode;
+
 void try_s11n()
 {
     // test out our s11n-qt routines...
