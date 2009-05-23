@@ -61,7 +61,7 @@ void try_s11n()
     using namespace s11n::qt;
     typedef s11nlite::node_traits NT;
 #define THROW(MSG) throw std::runtime_error(MSG);
-    if(0)
+    if(1)
     {
 	s11nlite::serialize( node, qs );
 	s11nlite::save( node, std::cout );
@@ -72,8 +72,7 @@ void try_s11n()
 	s11nlite::save( qs, std::cout );
     }
 
-    NT::clear(node);
-    if(0)
+    if(1)
     {
 	QRect qr(1,3,4,5);
 	NT::clear(node);
@@ -85,8 +84,7 @@ void try_s11n()
     }
 
 	
-    NT::clear(node);
-    if(0)
+    if(1)
     {
 	QStringList li;
 	li << "Item 1" << "Item 2" << "Item 3";
@@ -98,8 +96,7 @@ void try_s11n()
 	s11nlite::save( node, std::cout );
     }
 	
-    NT::clear(node);
-    if(0)
+    if(1)
     {
 	typedef QVector<QRect> QV;
 	QV vec;
@@ -115,26 +112,25 @@ void try_s11n()
 	vec.clear();
     }
 
-    NT::clear(node);
-    if(0)
+    if(1)
     {
 	//QVector<QPoint> poly;
 	QPolygon poly;
-	for( int i =0 ; i < 5; ++i ) poly.push_back( QPoint(i,1) );
+	for( int i =0 ; i < 5; ++i ) poly.push_back( QPoint(i,-i) );
 	s11nlite::save( poly, std::cout );
     }
 
-    NT::clear(node);
-    if(0)
+    if(1)
     {
-	QString ucstr("Hällo, world.");
-	qDebug() << "ucstr="<<ucstr<<'='<<"H\u00e4llo, world.";
+
+	QString ucstr("He\u00ae\u00aeo, world.");
+	qDebug() << "ucstr="<<ucstr<<'='<<"He\u00ae\u00aeo, world.";
 	s11nlite::save( ucstr, std::cout );
     }
 
-    NT::clear(node);
-    if(0)
+    if(1)
     {
+        NT::clear(node);
 	QByteArray qb;
 	if( 0 )
 	{
@@ -161,9 +157,9 @@ void try_s11n()
 	COUT << "QByteArray: ["<<qbd.constData()<<"]\n";
     }
 
-    NT::clear(node);
-    if(0)
+    if(1)
     {
+        NT::clear(node);
 	QPixmap pm(500,500);
 	pm.fill(QColor(255,0,0));
 	qDebug() << "QPixmap:"<<QVariant(pm);
@@ -249,7 +245,7 @@ void try_s11n()
 	s11nlite::save( deser, std::cout );
     }
 
-    if(0)
+    if(1)
     {
 	QTransform tr(11,12,13,21,22,23,31,32,33);
 	COUT << "QTransform:\n";
@@ -261,7 +257,7 @@ void try_s11n()
 	s11nlite::save( tr2, std::cout );
     }
 
-    if(0)
+    if(1)
     {
 	QMatrix tr(11,12,21,22,3,4);
 	COUT << "QMatrix:\n";
