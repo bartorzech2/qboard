@@ -10,9 +10,6 @@ MOC_DIR = $$OBJECTS_DIR
 MAIN_INCLUDES_DIR = $$REL_SRCDIR/include
 DESTDIR = $$BUILD_DEST_DIR
 
-message(libS11nQt version $$VERSION)
-message(QT_VERSION $$QT_VERSION)
-
 #QT = core
 CONFIG += dll debug warn_on no_keywords
 #OBJECTS_DIR = $$S11N_OBJ_DIR
