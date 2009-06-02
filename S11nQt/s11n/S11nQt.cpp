@@ -4,11 +4,9 @@
  *
  * Copyright (c) 2008, 2009 Stephan Beal (http://wanderinghorse.net/home/stephan/)
  *
- * This file may be used under the terms of the GNU General Public
- * License versions 2.0 or 3.0 as published by the Free Software
- * Foundation and appearing in the files LICENSE.GPL2 and LICENSE.GPL3
- * included in the packaging of this file.
- *
+ * This file may be used under the terms of any license(s) allowed by
+ * the version of Qt against which this code is compiled and
+ * linked. The exact choice of licenses depends on the version of Qt.
  */
 
 #include <QChar>

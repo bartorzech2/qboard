@@ -1,5 +1,5 @@
-#ifndef __QBOARD_S11N_H_INCLUDED__
-#define __QBOARD_S11N_H_INCLUDED__
+#ifndef __S11N_NET_S11N_QT_S11N_H_INCLUDED__
+#define __S11N_NET_S11N_QT_S11N_H_INCLUDED__
 /*
  * This file is (or was, at some point) part of the QBoard project
  * (http://code.google.com/p/qboard)
@@ -20,4 +20,4 @@ typedef s11nlite::node_type S11nNode;
 /* Used by the s11n-related algorithms. */
 typedef s11nlite::node_traits S11nNodeTraits;
 
-#endif // __QBOARD_S11N_H_INCLUDED__
+#endif // __S11N_NET_S11N_QT_S11N_H_INCLUDED__

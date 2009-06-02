@@ -1,16 +1,14 @@
-#ifndef QBOARD_S11nQtStream_H_INCLUDED
-#define QBOARD_S11nQtStream_H_INCLUDED
+#ifndef S11N_NET_S11N_QT_S11nQtStream_H_INCLUDED
+#define S11N_NET_S11N_QT_S11nQtStream_H_INCLUDED
 /*
  * This file is (or was, at some point) part of the QBoard project
  * (http://code.google.com/p/qboard)
  *
- * Copyright (c) 2008 Stephan Beal (http://wanderinghorse.net/home/stephan/)
+ * Copyright (c) 2008, 2009 Stephan Beal (http://wanderinghorse.net/home/stephan/)
  *
- * This file may be used under the terms of the GNU General Public
- * License versions 2.0 or 3.0 as published by the Free Software
- * Foundation and appearing in the files LICENSE.GPL2 and LICENSE.GPL3
- * included in the packaging of this file.
- *
+ * This file may be used under the terms of any license(s) allowed by
+ * the version of Qt against which this code is compiled and
+ * linked. The exact choice of licenses depends on the version of Qt.
  */
 
 #include <iostream>
@@ -278,4 +276,4 @@ namespace s11n { namespace qt {
     }
 
 }} // namespaces
-#endif // QBOARD_S11nQtStream_H_INCLUDED
+#endif // S11N_NET_S11N_QT_S11nQtStream_H_INCLUDED
