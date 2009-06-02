@@ -19,6 +19,11 @@ It can be used as a replacement for vanilla libs11n builds, but is intended for 
    * Copy [http://code.google.com/p/qboard/source/browse/#svn/S11nQt/include/s11n.net/s11n/proxy/qt include/s11n.net/proxy/qt] to {{{<s11n.net/s11n/proxy>}}} on your system.
    * Copy [http://code.google.com/p/qboard/source/browse/#svn/S11nQt/s11n s11n/S*.cpp] into your project (note that that's a capital `S*`, not lower-case!). Alternately, link them in with your local libs11n. No changes to libs11n are required.
 
+= License =
+
+libs11n is Public Domain, but libqt has several licensing choices and those choices depend partially on the Qt version. To be license-compatible with all versions of Qt, libS11nQt may be used under the terms of whatever license (or licenses) has (or have) been accepted for the particular version of Qt it is being compiled and linked against. For example, if it is used in conjunction with Qt 4.3 and the GPLv2 license, then libS11nQt is GPLv2 in that context. If it is used with Qt 4.5 and the LGPL, then libS11nQt is LGPL in that context. Likewise for the commercial Qt license.
+
+
 = Supported Qt types =
 
 These s11n/Qt extensions contain code for de/serializing the following Qt types:
