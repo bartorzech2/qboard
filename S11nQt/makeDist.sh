@@ -44,7 +44,6 @@ done
 
 cp \
     README.txt \
-    LICENSE.GPL? \
     LICENSE.txt \
     config.qmake \
     S11nQt.pro \
