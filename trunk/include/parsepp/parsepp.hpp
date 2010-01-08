@@ -190,7 +190,7 @@ namespace Ps {
        - parse_iterators are read-only iterators. They cannot be used
        to change their input.
     */
-    class parse_iterator : public std::iterator<std::input_iterator_tag,const std::string::value_type>
+    class parse_iterator : public std::iterator<std::input_iterator_tag,std::string::value_type>
     {
     private:
 	static const int start_column = 1;
@@ -367,7 +367,7 @@ namespace Ps {
 	*/
 	value_type operator*() const
 	{
-	    return (this->m_pos == this->m_end)
+	    return (this->m_pos >= this->m_end)
 		? 0
 		: *(this->m_pos);
 	}
