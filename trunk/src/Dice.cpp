@@ -27,6 +27,7 @@
 #include <qboard/S11nQt/QPointF.h>
 
 #include <qboard/Dice.h>
+#include <time.h>
 
 namespace qboard {
 
@@ -41,7 +42,7 @@ struct Die::Impl
 	if( ! seeded )
 	{
 	    seeded = true;
-	    qsrand( uint(static_cast<void*>(this)) );
+	    qsrand( time(NULL) );
 	}
     }
     ~Impl()
