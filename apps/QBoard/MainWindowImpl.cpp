@@ -48,8 +48,8 @@
 #include <qboard/WikiLiteView.h>
 
 
-
-#if QT_VERSION >= 0x040400
+#define USE_DOCS_BROWSER 0/*(QT_VERSION >= 0x040400)*/
+#if USE_DOCS_BROWSER
 #include <qboard/QBoardDocsBrowser.h>
 #endif
 
@@ -286,7 +286,7 @@ void MainWindowImpl::chdir(const QDir & dir)
 
 void MainWindowImpl::launchHelp()
 {
-#if QT_VERSION >= 0x040400
+#if USE_DOCS_BROWSER
 	(new QBoardDocsBrowser)->show();
 #else
 	QMessageBox::warning( this, tr("Not implemented!"),
@@ -404,7 +404,7 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 	}
 	else if( QRegExp("\\.(html|txt)$",Qt::CaseInsensitive).indexIn(fn) > 0 )
 	{
-#if QT_VERSION >= 0x040400
+#if USE_DOCS_BROWSER
 		QBoardDocsBrowser * b = new QBoardDocsBrowser;
 		b->setHome(fn);
 		b->setWindowTitle(fn);
@@ -422,7 +422,7 @@ bool MainWindowImpl::loadFile( QFileInfo const & fi )
 		const size_t threshold = 12 * 1024;
 		// ^^^ fixme: ^^^^ do this based on image resolution, not file size, cuz many
 		// large-sized PNGs are quite small.
-		if( fi.size() < threshold )
+		if( static_cast<size_t>(fi.size()) < threshold )
 		{
 			worked = this->loadPiece(fi);
 		}
@@ -697,7 +697,7 @@ void MainWindowImpl::doSomethingExperimental()
 	    QDir pluginsDir(qApp->applicationDirPath());
 	    QString fname = pluginsDir.absoluteFilePath("plugins/libJSEditor.so");
 	    qDebug() << "fname =="<<fname;
-#if QT_VERSION >= 0x040400
+#if USE_DOCS_BROWSER
 	    qDebug() << "pluginsDir =="<<pluginsDir;
 #endif
 	    QPluginLoader loader(fname);
