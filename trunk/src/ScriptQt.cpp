@@ -776,7 +776,7 @@ namespace qboard {
 	if( ! seeded )
 	{
 	    seeded = true;
-	    qsrand( uint(static_cast<void*>(ctx)) );
+	    qsrand( time(NULL) );
 	}
 
 #if 1
